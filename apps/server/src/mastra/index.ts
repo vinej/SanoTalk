@@ -1,16 +1,17 @@
 import { Mastra } from "@mastra/core";
-import { summaryAgent } from "./agents/summary.ts";
-import { soapNoteAgent } from "./agents/soap-note.ts";
+import { summaryAgent } from "./agents/summary.js";
+import { soapNoteAgent } from "./agents/soap-note.js";
 import { db, agentRun } from "@sanotalk/db";
 import { eq } from "drizzle-orm";
-import { logger } from "../logger.ts";
+import { logger } from "../logger.js";
+import { PinoLogger } from '@mastra/loggers'
 
 export const mastra = new Mastra({
   agents: { summaryAgent, soapNoteAgent },
-  logger: {
-    type: "CONSOLE",
-    level: "INFO",
-  },
+  logger: new PinoLogger({
+    name: 'Mastra',
+    level: 'info',
+  }),
 });
 
 export async function runPendingAgents() {

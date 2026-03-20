@@ -1,4 +1,4 @@
-import { createTRPCRouter } from "./trpc.js";
+import { createTRPCRouter } from "./trcp.js";
 import { sessionsRouter } from "./routers/sessions.js";
 import { transcriptsRouter } from "./routers/transcripts.js";
 import { livekitRouter } from "./routers/livekit.js";

@@ -1,4 +1,7 @@
-{
+{  
+  "workspaces": [
+    "packages/*"
+  ],
   "name": "@sanotalk/db",
   "version": "0.0.1",
   "private": true,
@@ -20,6 +23,7 @@
   },
   "devDependencies": {
     "@sanotalk/config": "workspace:*",
+    "@sanotalk/db": "workspace:*",
     "drizzle-kit": "^0.28.0",
     "typescript": "^5.6.3"
   }

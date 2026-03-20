@@ -1,5 +1,4 @@
 import pino from "pino";
-import PinoLoki from "pino-loki";
 
 const lokiUrl = process.env.LOKI_URL;
 

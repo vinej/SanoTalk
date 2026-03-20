@@ -6,7 +6,7 @@ export interface SendEmailOptions {
   to: string;
   subject: string;
   html: string;
-  text?: string;
+  text?: string | undefined;
 }
 
 export async function sendEmail(opts: SendEmailOptions) {
@@ -15,7 +15,7 @@ export async function sendEmail(opts: SendEmailOptions) {
     to: opts.to,
     subject: opts.subject,
     html: opts.html,
-    text: opts.text,
+    text: opts.text? opts.text : 'undefined',
   });
 
   if (error) {

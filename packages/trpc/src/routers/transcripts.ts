@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../trpc.js";
+import { createTRPCRouter, protectedProcedure } from "../trcp.js";
 import { transcript, transcriptSummary } from "@sanotalk/db";
 import { eq, asc } from "drizzle-orm";
 
@@ -26,6 +26,7 @@ export const transcriptsRouter = createTRPCRouter({
     .input(
       z.object({
         sessionId: z.string().uuid(),
+        speakerId: z.string().optional(),
         speakerLabel: z.string().optional(),
         content: z.string(),
         confidence: z.number().optional(),
@@ -39,13 +40,7 @@ export const transcriptsRouter = createTRPCRouter({
         .insert(transcript)
         .values({
           sessionId: input.sessionId,
-          speakerId: ctx.user.id,
-          speakerLabel: input.speakerLabel,
           content: input.content,
-          confidence: input.confidence,
-          startMs: input.startMs,
-          endMs: input.endMs,
-          rawDeepgramResult: input.rawDeepgramResult,
         })
         .returning();
       return saved;

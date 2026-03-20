@@ -1,6 +1,6 @@
 import { pgEnum, text, timestamp, uuid } from "drizzle-orm/pg-core";
-import { createTable } from "./auth.ts";
-import { user } from "./auth.ts";
+import { createTable } from "./auth.js";
+import { user } from "./auth.js";
 
 export const sessionStatusEnum = pgEnum("sanotalk_session_status", [
   "scheduled",

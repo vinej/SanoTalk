@@ -1,6 +1,6 @@
 import { text, timestamp, uuid, jsonb } from "drizzle-orm/pg-core";
-import { createTable } from "./auth.ts";
-import { talkSession } from "./sessions.ts";
+import { createTable } from "./auth.js";
+import { talkSession } from "./sessions.js";
 
 // Mastra agent execution logs
 export const agentRun = createTable("agent_run", {

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../trpc.js";
+import { createTRPCRouter, protectedProcedure } from "../trcp.js";
 import { agentRun } from "@sanotalk/db";
 import { eq } from "drizzle-orm";
 
@@ -11,10 +11,7 @@ export const agentsRouter = createTRPCRouter({
       const [run] = await ctx.db
         .insert(agentRun)
         .values({
-          sessionId: input.sessionId,
-          agentName: "transcript-summary",
-          input: { sessionId: input.sessionId },
-          status: "pending",
+          'agentName': "transcript-summary",
         })
         .returning();
       return run;
