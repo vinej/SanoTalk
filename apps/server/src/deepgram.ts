@@ -1,15 +1,12 @@
-import { createClient } from "@deepgram/sdk";
-
-import { WebSocketServer } from "ws";
-import WebSocket from "ws";
-
+import { createClient, LiveTranscriptionEvents } from "@deepgram/sdk";
+import { WebSocket, WebSocketServer } from "ws";
 import type { Server } from "http";
 import { logger } from "./logger.js";
 
 export function startDeepgramWebSocket(server: Server) {
-const wss = new WebSocketServer({ server, path: "/ws/transcribe" });
-const deepgram = createClient(process.env.DEEPGRAM_API_KEY);
-  
+  const wss = new WebSocketServer({ server, path: "/ws/transcribe" });
+  const deepgram = createClient(process.env.DEEPGRAM_API_KEY!);
+
   wss.on("connection", (ws: WebSocket, req) => {
     logger.info({ url: req.url }, "Transcription WS client connected");
 
@@ -23,16 +20,16 @@ const deepgram = createClient(process.env.DEEPGRAM_API_KEY);
       utterance_end_ms: 1000,
     });
 
-    dgConnection.on("open", () => {
+    dgConnection.on(LiveTranscriptionEvents.Open, () => {
       logger.info("Deepgram connection opened");
 
       ws.on("message", (data) => {
         if (dgConnection.getReadyState() === 1) {
-          dgConnection.send(data as Buffer);
+          dgConnection.send(data as ArrayBuffer);
         }
       });
 
-      dgConnection.on("transcript", (data: { channel: { alternatives: any[]; }; is_final: any; }) => {
+      dgConnection.on(LiveTranscriptionEvents.Transcript, (data) => {
         const transcript = data.channel.alternatives[0];
         if (transcript && ws.readyState === WebSocket.OPEN) {
           ws.send(
@@ -47,7 +44,7 @@ const deepgram = createClient(process.env.DEEPGRAM_API_KEY);
         }
       });
 
-      dgConnection.on("error", (err: any) => {
+      dgConnection.on(LiveTranscriptionEvents.Error, (err) => {
         logger.error({ err }, "Deepgram error");
       });
     });

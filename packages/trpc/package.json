@@ -16,7 +16,9 @@
     "livekit-server-sdk": "^2.15.0",
     "minio": "^8.0.7",
     "nanoid": "^5.1.7",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "@sanotalk/config": "workspace:*",
+    "@sanotalk/db": "workspace:*"
   },
   "devDependencies": {
     "@sanotalk/config": "workspace:*",

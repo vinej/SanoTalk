@@ -1,4 +1,5 @@
 {
+  "workspaces": ["packages/*"],
   "name": "@sanotalk/server",
   "version": "0.0.1",
   "private": true,
@@ -10,7 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@deepgram/sdk": "^5.0.0",
+    "@deepgram/sdk": "4",
     "@mastra/core": "^1.15.0",
     "@mastra/evals": "^1.1.2",
     "@mastra/libsql": "^1.7.1",
@@ -19,15 +20,20 @@
     "@mastra/observability": "^1.5.1",
     "@sanotalk/db": "workspace:*",
     "@sanotalk/trpc": "workspace:*",
+    "@sanotalk/config": "workspace:*",
     "@trpc/server": "^11.0.0",
     "better-auth": "^1.2.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
     "drizzle-orm": "^0.36.4",
+    "express": "^5.2.1",
     "install": "^0.13.0",
     "npm": "^11.12.0",
     "pino": "^10.3.1",
     "pino-loki": "^3.0.0",
     "resend": "^6.9.4",
     "trpc": "^0.11.3",
+    "ws": "^8.19.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

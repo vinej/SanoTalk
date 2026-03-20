@@ -1,11 +1,13 @@
 {
   "compilerOptions": {
-    "outDir": "./dist",
-    "lib": ["ES2022"],
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "Bundler"
-  },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+    "moduleResolution": "node",
+    "module": "esnext",
+    "target": "es2020",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "baseUrl": "c:/SonoTalk/Sonatalk",
+    "paths": {
+      "@deepgram/sdk": ["./node_modules/@deepgram/sdk/dist/esm/index.js"]
+    }
+  }
 }
