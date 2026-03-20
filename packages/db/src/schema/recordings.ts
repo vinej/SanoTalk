@@ -1,6 +1,6 @@
 import { text, timestamp, uuid, integer, boolean } from "drizzle-orm/pg-core";
-import { createTable } from "./auth.js";
-import { talkSession } from "./sessions.js";
+import { createTable } from "./auth.ts";
+import { talkSession } from "./sessions.ts";
 
 export const recording = createTable("recording", {
   id: uuid("id").primaryKey().defaultRandom(),

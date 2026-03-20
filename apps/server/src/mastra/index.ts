@@ -1,9 +1,9 @@
 import { Mastra } from "@mastra/core";
-import { summaryAgent } from "./agents/summary.js";
-import { soapNoteAgent } from "./agents/soap-note.js";
+import { summaryAgent } from "./agents/summary.ts";
+import { soapNoteAgent } from "./agents/soap-note.ts";
 import { db, agentRun } from "@sanotalk/db";
 import { eq } from "drizzle-orm";
-import { logger } from "../logger.js";
+import { logger } from "../logger.ts";
 
 export const mastra = new Mastra({
   agents: { summaryAgent, soapNoteAgent },

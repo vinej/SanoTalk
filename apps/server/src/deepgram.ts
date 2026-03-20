@@ -1,7 +1,7 @@
 import { createClient, LiveTranscriptionEvents } from "@deepgram/sdk";
 import { WebSocketServer, type WebSocket } from "ws";
 import type { Server } from "http";
-import { logger } from "./logger.js";
+import { logger } from "./logger.ts";
 
 export function startDeepgramWebSocket(server: Server) {
   const wss = new WebSocketServer({ server, path: "/ws/transcribe" });
