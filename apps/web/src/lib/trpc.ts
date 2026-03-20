@@ -12,12 +12,12 @@ export const trpcClient = trpc.createClient({
         (opts.direction === "down" && opts.result instanceof Error),
     }),
     httpBatchLink({
-      url: `${import.meta.env.VITE_API_URL ?? ""}/api/trpc`,
+      url: `${process.env.VITE_API_URL ?? ""}/api/trpc`,
       headers() {
         return {};
       },
       fetch(url, options) {
-        return fetch(url, { ...options, credentials: "include" });
+        return fetch(url, { ...options as any, credentials: "include" });
       },
     }),
   ],

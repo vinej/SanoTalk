@@ -25,7 +25,7 @@ function RootComponent() {
       )}
       <Outlet />
       <Toaster />
-      {import.meta.env.DEV && <TanStackRouterDevtools />}
+      {process.env.DEV && <TanStackRouterDevtools />}
     </>
   );
 }

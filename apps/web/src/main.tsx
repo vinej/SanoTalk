@@ -11,7 +11,7 @@ import { initOpenReplay } from "./lib/openreplay";
 // Initialize OpenReplay
 initOpenReplay();
 
-const router = createRouter({
+const router: any = createRouter({
   routeTree,
   context: { queryClient },
   defaultPreload: "intent",

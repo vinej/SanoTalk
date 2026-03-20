@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { AuthCard } from "@daveyplate/better-auth-ui";
 import { authClient } from "@/lib/auth-client";
+import { any } from "zod";
 
-export const Route = createFileRoute("/login")({
+export const Route: any = createFileRoute("/login")({
   component: LoginPage,
 });
 
@@ -17,7 +18,6 @@ function LoginPage() {
           </p>
         </div>
         <AuthCard
-          authClient={authClient}
           view="signIn"
           redirectTo="/dashboard"
         />

@@ -19,6 +19,7 @@
     "@mastra/observability": "^1.5.1",
     "@sanotalk/db": "workspace:*",
     "@sanotalk/trpc": "workspace:*",
+    "@trpc/server": "^11.0.0",
     "better-auth": "^1.2.0",
     "drizzle-orm": "^0.36.4",
     "install": "^0.13.0",
@@ -26,6 +27,7 @@
     "pino": "^10.3.1",
     "pino-loki": "^3.0.0",
     "resend": "^6.9.4",
+    "trpc": "^0.11.3",
     "zod": "^4.3.6"
   },
   "devDependencies": {
