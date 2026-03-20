@@ -1,0 +1,9 @@
+{
+  "name": "@sanotalk/config",
+  "version": "0.0.1",
+  "private": true,
+  "exports": {
+    "./eslint": "./eslint.js",
+    "./tsconfig": "./tsconfig.base.json"
+  }
+}

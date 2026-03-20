@@ -1,0 +1,23 @@
+SanoTalk/
+├── .github/
+│   └── workflows/
+│       ├── ci.yml
+│       └── deploy.yml
+├── apps/
+│   ├── web/                  # React 19 frontend
+│   └── server/               # tRPC + Mastra backend
+├── packages/
+│   ├── db/                   # Drizzle schema & migrations
+│   ├── trpc/                 # Shared tRPC router types
+│   └── config/               # Shared configs (eslint, tsconfig)
+├── infra/
+│   ├── docker-compose.yml
+│   ├── docker-compose.prod.yml
+│   └── grafana/
+│       └── provisioning/
+├── .env.example
+├── .gitignore
+├── package.json              # Root workspace
+├── pnpm-workspace.yaml
+├── turbo.json
+└── README.md
