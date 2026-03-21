@@ -1,7 +1,6 @@
-import type { inferAsyncReturnType } from "@trpc/server";
 import type { CreateHTTPContextOptions } from "@trpc/server/adapters/standalone";
 import { db } from "@sanotalk/db";
-import { auth } from "./auth.js";
+import { auth } from "./auth";
 
 export async function createTRPCContext(opts: CreateHTTPContextOptions) {
   const session = await auth.api.getSession({
@@ -17,4 +16,4 @@ export async function createTRPCContext(opts: CreateHTTPContextOptions) {
   };
 }
 
-export type TRPCContext = inferAsyncReturnType<typeof createTRPCContext>;
+export type TRPCContext = Awaited<ReturnType<typeof createTRPCContext>>

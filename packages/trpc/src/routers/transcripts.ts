@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../trcp.js";
+import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { transcript, transcriptSummary } from "@sanotalk/db";
 import { eq, asc } from "drizzle-orm";
 

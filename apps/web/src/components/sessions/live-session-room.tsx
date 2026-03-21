@@ -9,10 +9,10 @@ import "@livekit/components-styles";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { useTranscriptSocket } from "@/hooks/use-transcript-socket";
-import type { TalkSession } from "@sanotalk/db";
+import { TalkSession } from "@sanotalk/db";
 
-interface Props {
-  session: TalkSession;
+type Props = {
+  session: TalkSession
 }
 
 export function LiveSessionRoom({ session }: Props) {
@@ -29,7 +29,7 @@ export function LiveSessionRoom({ session }: Props) {
   const startMutation = trpc.sessions.start.useMutation();
 
   const handleJoin = useCallback(async () => {
-    await startMutation.mutateAsync({ id: session.id });
+    await startMutation.mutateAsync({ id: session.id});
     getTokenMutation.mutate({ roomName: session.roomName });
   }, [session, getTokenMutation, startMutation]);
 
@@ -37,7 +37,7 @@ export function LiveSessionRoom({ session }: Props) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-6 p-8">
         <div className="text-center space-y-2">
-          <h2 className="text-2xl font-semibold">{session.title}</h2>
+          <h2 className="text-2xl font-semibold">{session.hostId}</h2>
           <p className="text-muted-foreground">Room: {session.roomName}</p>
         </div>
         <Button

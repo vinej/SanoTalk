@@ -1,3 +1,3 @@
-export { type AppRouter } from "./router.js";
-export { appRouter } from "./router.js";
-export { createTRPCContext } from "./context.js";
+export { type AppRouter } from "./router";
+export { appRouter } from "./router";
+export { createTRPCContext } from "./context";

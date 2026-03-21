@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trcp.js";
+import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trcp";
 import { talkSession, sessionParticipant } from "@sanotalk/db";
 import { eq, desc } from "drizzle-orm";
 import { nanoid } from "nanoid";
@@ -24,7 +24,7 @@ export const sessionsRouter = createTRPCRouter({
         },
       });
       if (!result) throw new Error("Session not found");
-      return result;
+      return result
     }),
 
   create: protectedProcedure

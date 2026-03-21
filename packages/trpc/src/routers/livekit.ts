@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../trcp.js";
+import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { AccessToken } from "livekit-server-sdk";
 
 export const livekitRouter = createTRPCRouter({

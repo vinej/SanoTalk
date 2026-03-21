@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import type { TalkSession } from "@sanotalk/db";
 import {
   Card,
   CardContent,
@@ -11,6 +10,12 @@ import { Badge } from "@/components/ui/badge";
 import { Calendar, Video } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import { TalkSession } from "@sanotalk/db";
+
+type Props = {
+  session: TalkSession
+}
+
 const statusColors = {
   scheduled: "bg-blue-100 text-blue-700",
   active: "bg-green-100 text-green-700",
@@ -18,9 +23,6 @@ const statusColors = {
   cancelled: "bg-red-100 text-red-700",
 } as const;
 
-interface Props {
-  session: TalkSession;
-}
 
 export function SessionCard({ session }: Props) {
   return (
@@ -29,7 +31,7 @@ export function SessionCard({ session }: Props) {
         <CardHeader className="pb-2">
           <div className="flex items-start justify-between gap-2">
             <CardTitle className="text-base line-clamp-2 group-hover:text-primary transition-colors">
-              {session.title}
+              {session.hostId}
             </CardTitle>
             <Badge
               variant="secondary"

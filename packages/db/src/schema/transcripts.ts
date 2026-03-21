@@ -1,7 +1,7 @@
 import { text, timestamp, uuid, jsonb, real } from "drizzle-orm/pg-core";
-import { createTable } from "./auth.js";
-import { talkSession } from "./sessions.js";
-import { user } from "./auth.js";
+import { createTable } from "./auth";
+import { talkSession } from "./sessions";
+import { user } from "./auth";
 
 export const transcript = createTable("transcript", {
   id: uuid("id").primaryKey().defaultRandom(),

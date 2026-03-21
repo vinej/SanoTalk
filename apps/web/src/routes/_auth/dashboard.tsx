@@ -3,14 +3,36 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { SessionCard } from "@/components/sessions/session-card";
 import { Plus } from "lucide-react";
+import { TalkSession } from "@sanotalk/db";
+
+type Props = {
+  session: TalkSession
+}
 
 export const Route = createFileRoute("/_auth/dashboard")({
   component: DashboardPage,
 });
 
+function transformSessionDates(session: any): TalkSession {
+  return {
+      ...session,
+      id: session.id,
+      hostId: session.hostId,
+      roomName: session.roomName,
+      status: session.status,
+      scheduledAt: session.scheduledAt ? new Date(session.scheduledAt) : null,
+      startedAt: session.startedAt ? new Date(session.startedAt) : null,
+      endedAt: session.endedAt ? new Date(session.endedAt) : null,
+      createdAt: new Date(session.createdAt),
+      updatedAt: new Date(session.updatedAt),
+  };
+}
 function DashboardPage() {
   const { data: sessions, isLoading } = trpc.sessions.list.useQuery();
-  const { context } = Route.useRouteContext();
+
+  if (!sessions || sessions === undefined) return null
+
+  const sessionsWithDates = sessions.map(transformSessionDates);
 
   return (
     <div className="container mx-auto py-8 space-y-6">
@@ -37,7 +59,7 @@ function DashboardPage() {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {sessions?.map((session) => (
+          {sessionsWithDates?.map((session: TalkSession) => (
             <SessionCard key={session.id} session={session} />
           ))}
           {!sessions?.length && (

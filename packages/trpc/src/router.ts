@@ -1,9 +1,9 @@
 import { createTRPCRouter } from "./trcp.js";
-import { sessionsRouter } from "./routers/sessions.js";
-import { transcriptsRouter } from "./routers/transcripts.js";
-import { livekitRouter } from "./routers/livekit.js";
-import { agentsRouter } from "./routers/agents.js";
-import { storageRouter } from "./routers/storage.js";
+import { sessionsRouter } from "./routers/sessions";
+import { transcriptsRouter } from "./routers/transcripts";
+import { livekitRouter } from "./routers/livekit";
+import { agentsRouter } from "./routers/agents";
+import { storageRouter } from "./routers/storage";
 
 export const appRouter = createTRPCRouter({
   sessions: sessionsRouter,

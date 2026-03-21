@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../trcp.js";
+import { createTRPCRouter, protectedProcedure } from "../trcp";
 import * as Minio from "minio";
 
 let _minioClient: Minio.Client | null = null;

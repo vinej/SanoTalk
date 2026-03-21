@@ -14,7 +14,7 @@ export const auth = betterAuth({
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
       // Resend integration — handled in server/src/email.ts
-      const { sendEmail } = await import("../../server/src/email.js" as string);
+      const { sendEmail } = await import("../../server/src/email" as string);
       await sendEmail({
         to: user.email,
         subject: "Verify your SanoTalk account",
