@@ -1,4 +1,4 @@
-import { initTRPC, TRPCError } from "@trpc/server";
+process.env.VITE_API_URLimport { initTRPC, TRPCError } from "@trpc/server";
 import { ZodError } from "zod";
 import type { TRPCContext } from "./context";
 

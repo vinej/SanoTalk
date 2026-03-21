@@ -6,7 +6,7 @@ import { eq, asc } from "drizzle-orm";
 export const transcriptsRouter = createTRPCRouter({
   bySession: protectedProcedure
     .input(z.object({ sessionId: z.string().uuid() }))
-    .query(async ({ ctx, input }) => {
+    .query(async ({ ctx , input }) => {
       return ctx.db.query.transcript.findMany({
         where: eq(transcript.sessionId, input.sessionId),
         orderBy: [asc(transcript.startMs)],

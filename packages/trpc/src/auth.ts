@@ -23,5 +23,5 @@ export const auth = betterAuth({
     },
   },
   socialProviders: {},
-  trustedOrigins: [process.env.VITE_API_URL ?? "http://localhost:5173"],
+  trustedOrigins: ['http://localhost:3001'],
 });

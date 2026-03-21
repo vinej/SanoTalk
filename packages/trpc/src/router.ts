@@ -13,4 +13,4 @@ export const appRouter = createTRPCRouter({
   storage: storageRouter,
 });
 
-export type AppRouter = typeof appRouter;
+export type AppRouterSonoTalk = typeof appRouter;

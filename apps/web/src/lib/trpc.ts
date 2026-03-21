@@ -1,8 +1,8 @@
 import { createTRPCReact } from "@trpc/react-query";
 import { httpBatchLink, loggerLink } from "@trpc/client";
-import type { AppRouter } from "@sanotalk/trpc";
+import type { AppRouterSonoTalk } from "@sanotalk/trpc";
 
-export const trpc = createTRPCReact<AppRouter>();
+export const trpc = createTRPCReact<AppRouterSonoTalk>();
 
 export const trpcClient = trpc.createClient({
   links: [
@@ -12,7 +12,7 @@ export const trpcClient = trpc.createClient({
         (opts.direction === "down" && opts.result instanceof Error),
     }),
     httpBatchLink({
-      url: `${process.env.VITE_API_URL ?? ""}/api/trpc`,
+      url: 'http://localhost:3001/api/trpc',
       headers() {
         return {};
       },

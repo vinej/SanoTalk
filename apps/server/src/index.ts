@@ -18,7 +18,7 @@ const PORT = process.env.PORT ?? 3001;
 app.use(
   cors({
     origin: [
-      process.env.VITE_API_URL ?? "http://localhost:5173",
+      'http://localhost:3001' ,
       "http://localhost:5173",
     ],
     credentials: true,
