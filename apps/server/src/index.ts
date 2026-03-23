@@ -29,7 +29,7 @@ app.use(
 app.use(express.json({ limit: "10mb" }));
 
 // ─── Better Auth ───────────────────────────────────────────────────────────
-app.all("/api/auth/*", toNodeHandler(auth));
+app.use("/api/auth", toNodeHandler(auth));
 
 // ─── tRPC ─────────────────────────────────────────────────────────────────
 app.use(

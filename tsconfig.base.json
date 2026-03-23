@@ -18,7 +18,6 @@
     "sourceMap": true,
     "rootDir": "src",
     "outDir": "dist",
-    "composite": true,
-    "noEmit": false
+    "composite": true
   }
 }

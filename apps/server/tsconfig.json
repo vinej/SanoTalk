@@ -7,8 +7,12 @@
       "@/*": ["./src/*"],
       "@sanotalk/trpc/*": ["../../packages/trpc/src/*"],
       "@sanotalk/db/*": ["../../packages/db/src/*"],
-      "@sanotalk/config/*": ["../../packages/config/src/*"],
       "@deepgram/sdk": ["./node_modules/@deepgram/sdk/dist/esm/index.js"]
     }
-  }
+  },
+  "references": [
+    { "path": "../../packages/trpc"},
+    { "path": "../../packages/db"}
+  ]
 }
+

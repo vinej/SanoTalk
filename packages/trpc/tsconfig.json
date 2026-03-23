@@ -3,10 +3,11 @@
   "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
+    "noEmitOnError": false,
     "paths": {
       "@/*": ["./src/*"],
-      "@sanotalk/db/*": ["../../packages/db/src/*"],
-      "@sanotalk/config/*": ["../../packages/config/src/*"]
+      "@sanotalk/trpc/*": ["../../packages/trpc/src/*"],
+      "@sanotalk/db/*": ["../../packages/db/src/*"]
     },
   }
 }

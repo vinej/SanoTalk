@@ -6,15 +6,15 @@
   "exports": {
     ".": "./src/index.ts"
   },
-    "scripts": {
-    "build": "tsc -b"
+  "scripts": {
+    "build": "tsc"
   },
   "dependencies": {
-    "@sanotalk/config": "workspace:*",
     "@sanotalk/db": "workspace:*",
+    "@sanotalk/trpc": "workspace:*",
     "@trpc/server": "^11.0.0",
     "better-auth": "^1.2.0",
-    "drizzle-orm": "^0.36.4",
+    "drizzle-orm": "^0.41.0",
     "livekit-server-sdk": "^2.15.0",
     "minio": "^8.0.7",
     "nanoid": "^5.1.7",
@@ -22,7 +22,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@sanotalk/config": "workspace:*",
+    "@sanotalk/trpc": "workspace:*",
     "@sanotalk/db": "workspace:*",
     "@types/node": "^22.7.5",
     "typescript": "^5.6.3"
