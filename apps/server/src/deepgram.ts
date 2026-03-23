@@ -21,7 +21,7 @@ export function startDeepgramWebSocket(server: Server) {
 
     const dgConnection = deepgram.listen.live({
       model: "nova-2",
-      language: "fr",
+      language: "en",
       smart_format: true,
       diarize: true,
       punctuate: true,
