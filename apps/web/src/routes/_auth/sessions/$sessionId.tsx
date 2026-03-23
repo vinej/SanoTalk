@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { trpc } from "../../../lib/trpc";
 import { LiveSessionRoom } from "../../../components/sessions/live-session-room";
 import { TranscriptPanel } from "../../../components/transcript/transcript-panel";
@@ -7,10 +7,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui
 import { appRouter } from "node_modules/@sanotalk/trpc/src/router";
 import { id } from "zod/v4/locales";
 
+
 export const Route = createFileRoute("/_auth/sessions/$sessionId")({
   component: SessionPage,
 });
-
 
 function SessionPage() {
   const { sessionId } = Route.useParams();

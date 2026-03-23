@@ -24,12 +24,12 @@ const AuthRoute = AuthRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthDashboardRoute = AuthDashboardRouteImport.update({
-  id: '/dashboard',
+  id: '/_auth/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthSessionsSessionIdRoute = AuthSessionsSessionIdRouteImport.update({
-  id: '/sessions/$sessionId',
+  id: '/auth_/sessions/$sessionId',
   path: '/sessions/$sessionId',
   getParentRoute: () => AuthRoute,
 } as any)
@@ -50,8 +50,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
-  '/_auth/dashboard': typeof AuthDashboardRoute
-  '/_auth/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
+  '/dashboard': typeof AuthDashboardRoute
+  '/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath

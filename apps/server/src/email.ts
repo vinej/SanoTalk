@@ -11,7 +11,7 @@ export interface SendEmailOptions {
 
 export async function sendEmail(opts: SendEmailOptions) {
   const { data, error } = await resend.emails.send({
-    from: process.env.EMAIL_FROM ?? "noreply@sanotalk.app",
+    from: "noreply@sanotalk.app",
     to: opts.to,
     subject: opts.subject,
     html: opts.html,

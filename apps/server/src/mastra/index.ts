@@ -6,6 +6,10 @@ import { eq } from "drizzle-orm";
 import { logger } from "../logger.js";
 import { PinoLogger } from '@mastra/loggers'
 
+import dotenv from "dotenv";
+
+dotenv.config({ path: "../../.env" });
+
 export const mastra = new Mastra({
   agents: { summaryAgent, soapNoteAgent },
   logger: new PinoLogger({

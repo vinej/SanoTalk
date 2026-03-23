@@ -1,8 +1,8 @@
 export function initOpenReplay() {
-  const projectKey = process.env.VITE_OPENREPLAY_PROJECT_KEY
-  const ingestPoint = process.env.VITE_OPENREPLAY_INGEST_POINT? process.env.VITE_OPENREPLAY_INGEST_POINT: undefined;
+  //const projectKey = process.env.VITE_OPENREPLAY_PROJECT_KEY
+  //const ingestPoint = process.env.VITE_OPENREPLAY_INGEST_POINT? process.env.VITE_OPENREPLAY_INGEST_POINT: undefined;
 
-  if (!projectKey || process.env.DEV) return;
+  //if (!projectKey || process.env.DEV) return;
 
   return;
 

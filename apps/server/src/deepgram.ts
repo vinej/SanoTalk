@@ -1,11 +1,11 @@
 import { createClient, LiveTranscriptionEvents } from "@deepgram/sdk";
 import { WebSocket, WebSocketServer } from "ws";
 import type { Server } from "http";
-import { logger } from "./logger.js";
+import { logger } from "./logger";
 
 export function startDeepgramWebSocket(server: Server) {
   const wss = new WebSocketServer({ server, path: "/ws/transcribe" });
-  const deepgram = createClient(process.env.DEEPGRAM_API_KEY!);
+  const deepgram = createClient("your-deepgram-api-key");
 
   wss.on("connection", (ws: WebSocket, req) => {
     logger.info({ url: req.url }, "Transcription WS client connected");
