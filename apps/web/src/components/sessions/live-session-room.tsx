@@ -3,7 +3,6 @@ import {
   LiveKitRoom,
   VideoConference,
   RoomAudioRenderer,
-  useMaybeRoomContext,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { trpc } from "../../lib/trpc";
@@ -69,13 +68,21 @@ export function LiveSessionRoom({ session }: Props) {
 }
 
 function TranscriptionOverlay({ sessionId }: { sessionId: string }) {
-  const { liveText } = useTranscriptSocket(sessionId);
-
-  if (!liveText) return null;
+  const { liveText, isRecording, micError } = useTranscriptSocket(sessionId);
 
   return (
-    <div className="absolute bottom-20 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-lg max-w-xl text-center text-sm backdrop-blur-sm">
-      {liveText}
-    </div>
+    <>
+      <div className="absolute top-4 right-4 flex items-center gap-2 bg-black/60 text-white px-3 py-1.5 rounded-full text-xs backdrop-blur-sm">
+        {isRecording && <span className="inline-block w-2 h-2 rounded-full bg-red-500 animate-pulse" />}
+        {!isRecording && micError && <span className="inline-block w-2 h-2 rounded-full bg-yellow-500" />}
+        {!isRecording && !micError && <span className="inline-block w-2 h-2 rounded-full bg-gray-500" />}
+        {micError ? `Mic: ${micError}` : isRecording ? "Recording" : "Connecting mic…"}
+      </div>
+      {liveText && (
+        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-lg max-w-xl text-center text-sm backdrop-blur-sm">
+          {liveText}
+        </div>
+      )}
+    </>
   );
 }

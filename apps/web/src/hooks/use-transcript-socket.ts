@@ -10,7 +10,10 @@ interface TranscriptMessage {
 
 export function useTranscriptSocket(sessionId: string) {
   const [liveText, setLiveText] = useState("");
+  const [isRecording, setIsRecording] = useState(false);
+  const [micError, setMicError] = useState<string | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
+  const recorderRef = useRef<MediaRecorder | null>(null);
   const utils = trpc.useUtils();
 
   const saveMutation = trpc.transcripts.save.useMutation({
@@ -20,6 +23,10 @@ export function useTranscriptSocket(sessionId: string) {
   });
 
   useEffect(() => {
+    // Reset state for this mount
+    setMicError(null);
+    setIsRecording(false);
+
     const wsUrl = `${import.meta.env.VITE_WS_URL ?? "ws://localhost:3001"}/ws/transcribe?sessionId=${sessionId}`;
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
@@ -39,14 +46,42 @@ export function useTranscriptSocket(sessionId: string) {
       }
     };
 
-    return () => ws.close();
+    ws.onopen = () => {
+      navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+        .then((stream) => {
+          const recorder = new MediaRecorder(stream, { mimeType: "audio/webm;codecs=opus" });
+          recorderRef.current = recorder;
+
+          recorder.ondataavailable = (e) => {
+            if (e.data.size > 0 && ws.readyState === WebSocket.OPEN) {
+              ws.send(e.data);
+            }
+          };
+
+          recorder.onstart = () => setIsRecording(true);
+          recorder.onstop = () => setIsRecording(false);
+
+          recorder.start(250);
+        })
+        .catch((err: Error) => {
+          console.error("[transcript] mic access denied:", err);
+          setMicError(err.message);
+        });
+    };
+
+    let intentionallyClosed = false;
+    ws.onerror = () => {
+      if (!intentionallyClosed) setMicError("WebSocket connection failed");
+    };
+
+    return () => {
+      intentionallyClosed = true;
+      recorderRef.current?.stop();
+      recorderRef.current?.stream.getTracks().forEach((t) => t.stop());
+      recorderRef.current = null;
+      ws.close();
+    };
   }, [sessionId]);
 
-  const sendAudioChunk = (chunk: Blob | ArrayBuffer) => {
-    if (wsRef.current?.readyState === WebSocket.OPEN) {
-      wsRef.current.send(chunk);
-    }
-  };
-
-  return { liveText, sendAudioChunk };
+  return { liveText, isRecording, micError };
 }

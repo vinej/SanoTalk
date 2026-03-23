@@ -6,7 +6,6 @@
     "noEmitOnError": false,
     "paths": {
       "@/*": ["./src/*"],
-      "@sanotalk/trpc/*": ["../../packages/trpc/src/*"],
       "@sanotalk/db/*": ["../../packages/db/src/*"]
     },
   }

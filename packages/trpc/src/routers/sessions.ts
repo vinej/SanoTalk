@@ -17,14 +17,19 @@ export const sessionsRouter = createTRPCRouter({
   byId: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
-      const result = await ctx.db.query.talkSession.findFirst({
-        where: eq(talkSession.id, input.id),
-        with: {
-          participants: { with: { user: true } },
-        },
-      });
-      if (!result) throw new Error("Session not found");
-      return result
+      try {
+        const result = await ctx.db.query.talkSession.findFirst({
+          where: eq(talkSession.id, input.id),
+          with: {
+            participants: { with: { user: true } },
+          },
+        });
+        if (!result) throw new Error("Session not found");
+        return result;
+      } catch (e) {
+        console.error("[sessions.byId] error:", e);
+        throw e;
+      }
     }),
 
   create: protectedProcedure

@@ -17,9 +17,9 @@ export const transcriptsRouter = createTRPCRouter({
   summaryBySession: protectedProcedure
     .input(z.object({ sessionId: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
-      return ctx.db.query.transcriptSummary.findFirst({
+      return (await ctx.db.query.transcriptSummary.findFirst({
         where: eq(transcriptSummary.sessionId, input.sessionId),
-      }) ?? null;
+      })) ?? null;
     }),
 
   save: protectedProcedure

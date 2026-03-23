@@ -11,9 +11,11 @@ export const agentsRouter = createTRPCRouter({
       const [run] = await ctx.db
         .insert(agentRun)
         .values({
-          'agentName': "transcript-summary",
+          agentName: "summaryAgent",
+          input: { sessionId: input.sessionId },
         })
         .returning();
+      if (run) ctx.triggerAgentRun(run.id);
       return run;
     }),
 
