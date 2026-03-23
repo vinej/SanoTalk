@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { trpc } from "@/lib/trpc";
-import { LiveSessionRoom } from "@/components/sessions/live-session-room";
-import { TranscriptPanel } from "@/components/transcript/transcript-panel";
-import { SummaryPanel } from "@/components/summary/summary-panel";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { trpc } from "../../../lib/trpc";
+import { LiveSessionRoom } from "../../../components/sessions/live-session-room";
+import { TranscriptPanel } from "../../../components/transcript/transcript-panel";
+import { SummaryPanel } from "../../../components/summary/summary-panel";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { appRouter } from "node_modules/@sanotalk/trpc/src/router";
 import { id } from "zod/v4/locales";
 

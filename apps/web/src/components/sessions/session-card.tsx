@@ -5,10 +5,10 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+} from "../../components/ui/card";
+import { Badge } from "../../components/ui/badge";
 import { Calendar, Video } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
 
 import { TalkSession } from "@sanotalk/db";
 

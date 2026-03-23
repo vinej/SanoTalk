@@ -1,6 +1,7 @@
 import { createTRPCReact } from "@trpc/react-query";
 import { httpBatchLink, loggerLink } from "@trpc/client";
 import type { AppRouterSonoTalk } from "@sanotalk/trpc";
+import superjson from "superjson"
 
 export const trpc = createTRPCReact<AppRouterSonoTalk>();
 
@@ -13,6 +14,7 @@ export const trpcClient = trpc.createClient({
     }),
     httpBatchLink({
       url: 'http://localhost:3001/api/trpc',
+      transformer : superjson,
       headers() {
         return {};
       },

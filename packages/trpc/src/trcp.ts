@@ -1,8 +1,10 @@
-process.env.VITE_API_URLimport { initTRPC, TRPCError } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
 import { ZodError } from "zod";
 import type { TRPCContext } from "./context";
+import superjson from 'superjson';
 
 const t = initTRPC.context<TRPCContext>().create({
+  transformer: superjson,
   errorFormatter({ shape, error }) {
     return {
       ...shape,

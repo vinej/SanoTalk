@@ -1,6 +1,6 @@
 import type { CreateHTTPContextOptions } from "@trpc/server/adapters/standalone";
 import { db } from "@sanotalk/db";
-import { auth } from "./auth";
+import { auth } from "@/auth";
 
 export async function createTRPCContext(opts: CreateHTTPContextOptions) {
   const session = await auth.api.getSession({

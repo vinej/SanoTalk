@@ -5,9 +5,9 @@ import {
 } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import type { QueryClient } from "@tanstack/react-query";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster as Sooner } from "../components/ui/sonner";
 
-interface RouterContext {
+export interface RouterContext {
   queryClient: QueryClient;
 }
 
@@ -24,7 +24,7 @@ function RootComponent() {
         <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-primary animate-pulse" />
       )}
       <Outlet />
-      <Toaster />
+      <Sooner />
       {process.env.DEV && <TanStackRouterDevtools />}
     </>
   );

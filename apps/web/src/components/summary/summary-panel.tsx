@@ -1,8 +1,8 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { trpc } from "@/lib/trpc";
+import { ScrollArea } from "../../components/ui/scroll-area";
+import { Button } from "../../components/ui/button";
+import { trpc } from "../../lib/trpc";
 import { Sparkles, Loader2 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "../../components/ui/badge";
 
 interface Props {
   sessionId: string;

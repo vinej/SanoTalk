@@ -1,7 +1,7 @@
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { trpc } from "@/lib/trpc";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+import { ScrollArea } from "../../components/ui/scroll-area";
+import { trpc } from "../../lib/trpc";
+import { Badge } from "../../components/ui/badge";
+import { cn } from "../../lib/utils";
 
 interface Props {
   sessionId: string;

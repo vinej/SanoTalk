@@ -3,6 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db, user, session, account, verification } from "@sanotalk/db";
 
 export const auth = betterAuth({
+  baseURL: "http://localhost:3000",
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: { user, session, account, verification },

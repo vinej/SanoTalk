@@ -4,11 +4,11 @@ import cors from "cors";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "@sanotalk/trpc";
 import { createTRPCContext } from "@sanotalk/trpc";
-import { auth } from "../../../packages/trpc/src/auth.js";
+import { auth } from "@sanotalk/trpc/auth";
 import { toNodeHandler } from "better-auth/node";
-import { logger } from "./logger.js";
-import { startDeepgramWebSocket } from "./deepgram.js";
-import { runPendingAgents } from "./mastra/index.js";
+import { logger } from "./logger";
+import { startDeepgramWebSocket } from "./deepgram";
+import { runPendingAgents } from "./mastra/index";
 import http from "http";
 
 const app = express();

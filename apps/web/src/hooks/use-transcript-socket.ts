@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { trpc } from "@/lib/trpc";
+import { trpc } from "../lib/trpc";
 
 interface TranscriptMessage {
   type: "transcript";

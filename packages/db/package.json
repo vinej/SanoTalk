@@ -1,7 +1,4 @@
-{  
-  "workspaces": [
-    "packages/*"
-  ],
+{
   "name": "@sanotalk/db",
   "version": "0.0.1",
   "private": true,
@@ -12,6 +9,7 @@
     "./client": "./src/client.ts"
   },
   "scripts": {
+    "build": "tsc -b",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",

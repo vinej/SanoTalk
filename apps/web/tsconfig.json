@@ -1,6 +1,8 @@
 {
-  "extends": "@sanotalk/config/tsconfig",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
     "target": "ES2022",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "module": "ESNext",
@@ -8,10 +10,15 @@
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@sanotalk/trpc/*": ["../../packages/trpc/src/*"],
+      "@sanotalk/db/*": ["../../packages/db/src/*"],
+      "@sanotalk/config/*": ["../../packages/config/src/*"]
     },
-    "noEmit": true
-  },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["node_modules"]
+  }
+  ,
+  "references": [
+    { "path": "../../packages/trpc"},
+    { "path": "../../packages/db"}
+  ],
 }

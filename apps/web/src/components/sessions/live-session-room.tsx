@@ -6,9 +6,9 @@ import {
   useMaybeRoomContext,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { trpc } from "@/lib/trpc";
-import { Button } from "@/components/ui/button";
-import { useTranscriptSocket } from "@/hooks/use-transcript-socket";
+import { trpc } from "../../lib/trpc";
+import { Button } from "../../components/ui/button";
+import { useTranscriptSocket } from "../../hooks/use-transcript-socket";
 import { TalkSession } from "@sanotalk/db";
 
 type Props = {

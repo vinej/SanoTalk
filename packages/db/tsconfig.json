@@ -2,9 +2,6 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist",
-    "scripts": {
-      "build": "tsc -b"
-    }
+    "outDir": "dist"
   }
 }

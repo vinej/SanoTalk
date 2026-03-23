@@ -1,12 +1,13 @@
-{
-  "compilerOptions": {
-    "moduleResolution": "node",
-    "module": "esnext",
-    "target": "es2020",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
-    "baseUrl": "c:/SonoTalk/Sonatalk",
+{"extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "baseUrl": ".",
     "paths": {
+      "@/*": ["./src/*"],
+      "@sanotalk/trpc/*": ["../../packages/trpc/src/*"],
+      "@sanotalk/db/*": ["../../packages/db/src/*"],
+      "@sanotalk/config/*": ["../../packages/config/src/*"],
       "@deepgram/sdk": ["./node_modules/@deepgram/sdk/dist/esm/index.js"]
     }
   }

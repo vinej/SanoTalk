@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { trpc } from "@/lib/trpc";
-import { Button } from "@/components/ui/button";
-import { SessionCard } from "@/components/sessions/session-card";
+import { trpc } from "../../lib/trpc";
+import { Button } from "../../components/ui/button";
+import { SessionCard } from "../../components/sessions/session-card";
 import { Plus } from "lucide-react";
 import { TalkSession } from "@sanotalk/db";
 
