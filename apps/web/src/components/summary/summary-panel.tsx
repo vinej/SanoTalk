@@ -14,10 +14,12 @@ export function SummaryPanel({ sessionId }: Props) {
 
   const generateMutation = trpc.agents.generateSummary.useMutation({
     onSuccess: () => {
-      // Poll for completion
+      // Poll for completion — stop after 30s or when summary appears
+      let attempts = 0;
       const interval = setInterval(() => {
+        attempts++;
         void refetch().then((r) => {
-          if (r.data) clearInterval(interval);
+          if (r.data != null || attempts >= 15) clearInterval(interval);
         });
       }, 2000);
     },

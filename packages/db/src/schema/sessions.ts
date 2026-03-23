@@ -1,4 +1,5 @@
 import { pgEnum, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createTable } from "./auth";
 import { user } from "./auth";
 
@@ -35,6 +36,21 @@ export const sessionParticipant = createTable("session_participant", {
   leftAt: timestamp("left_at"),
   livekitParticipantId: text("livekit_participant_id"),
 });
+
+export const talkSessionRelations = relations(talkSession, ({ many }) => ({
+  participants: many(sessionParticipant),
+}));
+
+export const sessionParticipantRelations = relations(sessionParticipant, ({ one }) => ({
+  session: one(talkSession, {
+    fields: [sessionParticipant.sessionId],
+    references: [talkSession.id],
+  }),
+  user: one(user, {
+    fields: [sessionParticipant.userId],
+    references: [user.id],
+  }),
+}));
 
 export type TalkSession = typeof talkSession.$inferSelect;
 export type NewTalkSession = typeof talkSession.$inferInsert;

@@ -19,7 +19,7 @@ export const transcriptsRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       return ctx.db.query.transcriptSummary.findFirst({
         where: eq(transcriptSummary.sessionId, input.sessionId),
-      });
+      }) ?? null;
     }),
 
   save: protectedProcedure

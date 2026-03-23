@@ -30,9 +30,7 @@ function transformSessionDates(session: any): TalkSession {
 function DashboardPage() {
   const { data: sessions, isLoading } = trpc.sessions.list.useQuery();
 
-  if (!sessions || sessions === undefined) return null
-
-  const sessionsWithDates = sessions.map(transformSessionDates);
+  const sessionsWithDates = sessions?.map(transformSessionDates) ?? [];
 
   return (
     <div className="container mx-auto py-8 space-y-6">
@@ -59,7 +57,7 @@ function DashboardPage() {
         </div>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {sessionsWithDates?.map((session: TalkSession) => (
+          {sessionsWithDates.map((session: TalkSession) => (
             <SessionCard key={session.id} session={session} />
           ))}
           {!sessions?.length && (

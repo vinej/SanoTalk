@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trcp";
-import { talkSession, sessionParticipant } from "@sanotalk/db";
+import { createTRPCRouter, protectedProcedure } from "../trcp";
+import { talkSession } from "@sanotalk/db";
 import { eq, desc } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
@@ -37,11 +37,11 @@ export const sessionsRouter = createTRPCRouter({
       const roomName = `sanotalk-${nanoid(10)}`;
       const [created] = await ctx.db
         .insert(talkSession)
-        .values(
-          {
-          roomName: roomName? roomName : 'undefined',
-          hostId: ctx.user.id? ctx.user.id : 'undefined'
-          }
+        .values({
+          roomName,
+          hostId: ctx.user.id,
+          scheduledAt: input.scheduledAt ? new Date(input.scheduledAt) : null,
+        }
         )
 
         .returning();
@@ -54,7 +54,7 @@ export const sessionsRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const [updated] = await ctx.db
         .update(talkSession)
-        .set({ hostId: input.id })
+        .set({ status: "active", startedAt: new Date() })
         .where(eq(talkSession.id, input.id))
         .returning();
       return updated;
@@ -65,7 +65,7 @@ export const sessionsRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const [updated] = await ctx.db
         .update(talkSession)
-        .set({ hostId: input.id })
+        .set({ status: "completed", endedAt: new Date() })
         .where(eq(talkSession.id, input.id))
         .returning();
       return updated;

@@ -9,7 +9,7 @@ import "./styles/globals.css";
 import { initOpenReplay } from "./lib/openreplay";
 
 // Initialize OpenReplay
-initOpenReplay();
+//initOpenReplay();
 
 const router: any = createRouter({
   routeTree,

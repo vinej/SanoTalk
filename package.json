@@ -9,7 +9,13 @@
     "db:generate": "turbo db:generate",
     "db:migrate": "turbo db:migrate",
     "db:studio": "pnpm --filter @sanotalk/db studio",
-    "typecheck": "turbo typecheck"
+    "typecheck": "turbo typecheck",
+    "build:db": "pnpm --filter @sanotalk/db build",
+    "build:trpc": "pnpm --filter @sanotalk/trpc build",
+    "build:server": "pnpm --filter @sanotalk/server build",
+    "build:web": "pnpm --filter @sanotalk/web build",
+    "clean": "node -e \"['packages/db/dist','packages/trpc/dist','apps/server/dist','apps/web/dist','packages/db/tsconfig.tsbuildinfo','packages/trpc/tsconfig.tsbuildinfo','apps/server/tsconfig.tsbuildinfo','apps/web/tsconfig.tsbuildinfo'].forEach(d=>{try{require('fs').rmSync(d,{recursive:true,force:true});console.log('removed',d)}catch(e){}})\"",
+    "build:all": "pnpm build:db && pnpm build:trpc && pnpm build:server && pnpm build:web"
   },
   "devDependencies": {
     "turbo": "^2.3.0",

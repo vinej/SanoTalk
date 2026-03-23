@@ -1,4 +1,5 @@
 import { text, timestamp, uuid, jsonb, real } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 import { createTable } from "./auth";
 import { talkSession } from "./sessions";
 import { user } from "./auth";
@@ -39,6 +40,17 @@ export const transcriptSummary = createTable("transcript_summary", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
+export const transcriptRelations = relations(transcript, ({ one }) => ({
+  speaker: one(user, {
+    fields: [transcript.speakerId],
+    references: [user.id],
+  }),
+  session: one(talkSession, {
+    fields: [transcript.sessionId],
+    references: [talkSession.id],
+  }),
+}));
 
 export type Transcript = typeof transcript.$inferSelect;
 export type TranscriptSummary = typeof transcriptSummary.$inferSelect;

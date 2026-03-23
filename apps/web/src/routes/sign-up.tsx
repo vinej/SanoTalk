@@ -2,11 +2,11 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { AuthCard, AuthUIProvider } from "@daveyplate/better-auth-ui";
 import { authClient } from "../lib/auth-client";
 
-export const Route: any = createFileRoute("/login")({
-  component: LoginPage,
+export const Route: any = createFileRoute("/sign-up")({
+  component: SignUpPage,
 });
 
-function LoginPage() {
+function SignUpPage() {
   const navigate = useNavigate();
 
   return (
@@ -25,7 +25,7 @@ function LoginPage() {
             </p>
           </div>
           <AuthCard
-            pathname="/login"
+            pathname="/sign-up"
             redirectTo="/dashboard"
           />
         </div>

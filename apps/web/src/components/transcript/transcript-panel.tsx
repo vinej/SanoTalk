@@ -10,7 +10,7 @@ interface Props {
 export function TranscriptPanel({ sessionId }: Props) {
   const { data: transcripts, isLoading } = trpc.transcripts.bySession.useQuery(
     { sessionId },
-    { refetchInterval: 5000 }
+    { refetchInterval: (query) => (query.state.status === "error" ? false : 5000), retry: 1 }
   );
 
   return (
