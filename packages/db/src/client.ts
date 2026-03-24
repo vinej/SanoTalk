@@ -1,3 +1,8 @@
+import { config } from "dotenv";
+import { fileURLToPath } from "url";
+import { resolve, dirname } from "path";
+config({ path: resolve(dirname(fileURLToPath(import.meta.url)), "../../../.env") });
+
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema/index";
