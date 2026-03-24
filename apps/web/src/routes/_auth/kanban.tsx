@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { trpc } from "../../lib/trpc";
+import { useTranslation } from "react-i18next";
 import { Button } from "../../components/ui/button";
 import {
   Card,
@@ -72,6 +73,7 @@ function KanbanPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
+  const { t } = useTranslation(["kanban", "common"]);
 
   const utils = trpc.useUtils();
   const { data: tasks = [], isLoading } = trpc.tasks.list.useQuery();
@@ -113,21 +115,21 @@ function KanbanPage() {
       {/* Page header */}
       <div style={{ borderBottom: "1px solid #e2e8f0", backgroundColor: "white", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
-          <h1 style={{ fontSize: "20px", fontWeight: 600, margin: 0 }}>Kanban Board</h1>
+          <h1 style={{ fontSize: "20px", fontWeight: 600, margin: 0 }}>{t("kanban:title")}</h1>
           <p style={{ fontSize: "13px", color: "#64748b", margin: "2px 0 0 0" }}>
-            {tasks.length} task{tasks.length !== 1 ? "s" : ""} total
+            {t("kanban:tasksTotal", { count: tasks.length })}
           </p>
         </div>
         <div style={{ display: "flex", gap: "8px" }}>
           <Button size="sm" variant="outline" asChild>
             <Link to="/dashboard">
               <LayoutDashboard className="w-4 h-4 mr-1.5" />
-              Dashboard
+              {t("common:dashboard")}
             </Link>
           </Button>
           <Button size="sm" onClick={() => setCreateOpen(true)}>
             <Plus className="w-4 h-4 mr-1.5" />
-            New Task
+            {t("kanban:newTask")}
           </Button>
         </div>
       </div>
@@ -145,7 +147,7 @@ function KanbanPage() {
                 <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
                   <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "50%", backgroundColor: col.dot, flexShrink: 0 }} />
                   <span style={{ fontSize: "13px", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.05em", color: "#475569" }}>
-                    {col.label}
+                    {t(`kanban:columns.${col.status}`)}
                   </span>
                 </div>
                 <span style={{ fontSize: "12px", fontWeight: 600, backgroundColor: col.badgeBg, color: "#475569", borderRadius: "999px", padding: "2px 10px" }}>
@@ -164,7 +166,7 @@ function KanbanPage() {
 
                 {!isLoading && colTasks.length === 0 && (
                   <div style={{ padding: "24px 0", textAlign: "center", fontSize: "13px", color: "#94a3b8", fontStyle: "italic" }}>
-                    No tasks here
+                    {t("kanban:noTasks")}
                   </div>
                 )}
 
@@ -196,14 +198,14 @@ function KanbanPage() {
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>New Task</DialogTitle>
+            <DialogTitle>{t("kanban:dialog.title")}</DialogTitle>
           </DialogHeader>
           <div style={{ display: "flex", flexDirection: "column", gap: "16px", padding: "8px 0" }}>
             <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <Label htmlFor="task-title">Title</Label>
+              <Label htmlFor="task-title">{t("kanban:dialog.titleLabel")}</Label>
               <Input
                 id="task-title"
-                placeholder="Enter task title"
+                placeholder={t("kanban:dialog.titlePlaceholder")}
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleCreate()}
@@ -212,10 +214,10 @@ function KanbanPage() {
               />
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <Label htmlFor="task-desc">Description</Label>
+              <Label htmlFor="task-desc">{t("kanban:dialog.descriptionLabel")}</Label>
               <Input
                 id="task-desc"
-                placeholder="Enter task description (optional)"
+                placeholder={t("kanban:dialog.descriptionPlaceholder")}
                 value={newDescription}
                 onChange={(e) => setNewDescription(e.target.value)}
                 className="!border-slate-400"
@@ -224,13 +226,13 @@ function KanbanPage() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setCreateOpen(false)}>
-              Cancel
+              {t("common:cancel")}
             </Button>
             <Button
               onClick={handleCreate}
               disabled={!newTitle.trim() || createMutation.isPending}
             >
-              Create
+              {t("common:create")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -252,6 +254,7 @@ function TaskCard({
   onMoveBack?: (() => void) | undefined;
   onDelete: () => void;
 }) {
+  const { t } = useTranslation("kanban");
   const createdDate = new Date(task.createdAt).toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",
@@ -288,16 +291,16 @@ function TaskCard({
 
         <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
           {onMoveBack && (
-            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onMoveBack} title="Move back">
+            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onMoveBack} title={t("actions.moveBack")}>
               <ArrowLeft className="w-3.5 h-3.5" />
             </Button>
           )}
           {onMoveForward && (
-            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onMoveForward} title="Move forward">
+            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onMoveForward} title={t("actions.moveForward")}>
               <ArrowRight className="w-3.5 h-3.5" />
             </Button>
           )}
-          <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onDelete} title="Delete">
+          <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onDelete} title={t("actions.delete")}>
             <Trash2 className="w-3.5 h-3.5 text-destructive" />
           </Button>
         </div>

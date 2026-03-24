@@ -4,10 +4,8 @@ import { Button } from "../../components/ui/button";
 import { SessionCard } from "../../components/sessions/session-card";
 import { Plus, Kanban } from "lucide-react";
 import { TalkSession } from "@sanotalk/db";
-
-type Props = {
-  session: TalkSession
-}
+import { useTranslation } from "react-i18next";
+import { LanguageSwitcher } from "../../components/language-switcher";
 
 export const Route = createFileRoute("/_auth/dashboard")({
   component: DashboardPage,
@@ -27,8 +25,10 @@ function transformSessionDates(session: any): TalkSession {
       updatedAt: new Date(session.updatedAt),
   };
 }
+
 function DashboardPage() {
   const { data: sessions, isLoading } = trpc.sessions.list.useQuery();
+  const { t } = useTranslation(["dashboard", "common"]);
 
   const sessionsWithDates = sessions?.map(transformSessionDates) ?? [];
 
@@ -36,22 +36,21 @@ function DashboardPage() {
     <div className="container mx-auto py-8 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Sessions</h1>
-          <p className="text-muted-foreground mt-1">
-            Manage your medical consultations
-          </p>
+          <h1 className="text-3xl font-bold tracking-tight">{t("dashboard:title")}</h1>
+          <p className="text-muted-foreground mt-1">{t("dashboard:subtitle")}</p>
         </div>
         <div className="flex gap-2">
+          <LanguageSwitcher />
           <Button variant="outline" asChild>
             <Link to="/kanban">
               <Kanban className="mr-2 h-4 w-4" />
-              Kanban
+              {t("common:kanban")}
             </Link>
           </Button>
           <Button asChild>
             <Link to="/sessions/new">
               <Plus className="mr-2 h-4 w-4" />
-              New Session
+              {t("dashboard:newSession")}
             </Link>
           </Button>
         </div>
@@ -70,7 +69,7 @@ function DashboardPage() {
           ))}
           {!sessions?.length && (
             <div className="col-span-3 text-center py-16 text-muted-foreground">
-              No sessions yet. Create your first one!
+              {t("dashboard:noSessions")}
             </div>
           )}
         </div>

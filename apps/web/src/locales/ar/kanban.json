@@ -1,0 +1,24 @@
+{
+  "title": "لوحة كانبان",
+  "tasksTotal_one": "مهمة واحدة",
+  "tasksTotal_other": "{{count}} مهام",
+  "newTask": "مهمة جديدة",
+  "noTasks": "لا توجد مهام هنا",
+  "columns": {
+    "not_assigned": "غير معين",
+    "assigned": "معين",
+    "completed": "مكتمل"
+  },
+  "dialog": {
+    "title": "مهمة جديدة",
+    "titleLabel": "العنوان",
+    "titlePlaceholder": "أدخل عنوان المهمة",
+    "descriptionLabel": "الوصف",
+    "descriptionPlaceholder": "أدخل وصف المهمة (اختياري)"
+  },
+  "actions": {
+    "moveBack": "تحريك للخلف",
+    "moveForward": "تحريك للأمام",
+    "delete": "حذف"
+  }
+}

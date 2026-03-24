@@ -9,8 +9,8 @@ import {
 import { Badge } from "../../components/ui/badge";
 import { Calendar, Video } from "lucide-react";
 import { cn } from "../../lib/utils";
-
 import { TalkSession } from "@sanotalk/db";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   session: TalkSession
@@ -25,6 +25,7 @@ const statusColors = {
 
 
 export function SessionCard({ session }: Props) {
+  const { t } = useTranslation("sessions");
   return (
     <Link to="/sessions/$sessionId" params={{ sessionId: session.id }}>
       <Card className="h-full hover:shadow-md transition-shadow cursor-pointer group">
@@ -40,7 +41,7 @@ export function SessionCard({ session }: Props) {
                 statusColors[session.status]
               )}
             >
-              {session.status}
+              {t(`card.statuses.${session.status}`)}
             </Badge>
           </div>
           <CardDescription className="text-xs truncate">
@@ -57,7 +58,7 @@ export function SessionCard({ session }: Props) {
           {session.status === "active" && (
             <div className="flex items-center gap-1 text-green-600 font-medium">
               <Video className="h-3 w-3 animate-pulse" />
-              Live now
+              {t("card.liveNow")}
             </div>
           )}
         </CardContent>

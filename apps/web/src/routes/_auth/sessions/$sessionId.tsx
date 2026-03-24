@@ -6,6 +6,7 @@ import { SummaryPanel } from "../../../components/summary/summary-panel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "../../../components/ui/button";
+import { useTranslation } from "react-i18next";
 
 
 export const Route = createFileRoute("/_auth/sessions/$sessionId")({
@@ -14,13 +15,14 @@ export const Route = createFileRoute("/_auth/sessions/$sessionId")({
 
 function SessionPage() {
   const { sessionId } = Route.useParams();
+  const { t } = useTranslation(["sessions", "common"]);
   const { data: session, isLoading } = trpc.sessions.byId.useQuery({ id: sessionId });
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="animate-pulse text-muted-foreground">
-          Loading session…
+          {t("detail.loading")}
         </div>
       </div>
     );
@@ -47,7 +49,7 @@ function SessionPage() {
         <Button size="sm" variant="ghost" asChild>
           <Link to="/dashboard">
             <ArrowLeft className="w-4 h-4 mr-1" />
-            Dashboard
+            {t("common:back")}
           </Link>
         </Button>
       </div>
@@ -62,8 +64,8 @@ function SessionPage() {
           <div className="flex flex-col h-full overflow-hidden">
             <Tabs defaultValue="transcript" className="flex flex-col h-full">
               <TabsList className="m-2 shrink-0">
-                <TabsTrigger value="transcript">Transcript</TabsTrigger>
-                <TabsTrigger value="summary">AI Summary</TabsTrigger>
+                <TabsTrigger value="transcript">{t("sessions:detail.transcript")}</TabsTrigger>
+                <TabsTrigger value="summary">{t("sessions:detail.aiSummary")}</TabsTrigger>
               </TabsList>
               <TabsContent
                 value="transcript"

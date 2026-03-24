@@ -1,0 +1,45 @@
+{
+  "new": {
+    "title": "New Session",
+    "subtitle": "Start a new medical consultation session.",
+    "creating": "Creating…",
+    "start": "Start Session"
+  },
+  "detail": {
+    "loading": "Loading session…",
+    "transcript": "Transcript",
+    "aiSummary": "AI Summary"
+  },
+  "card": {
+    "liveNow": "Live now",
+    "statuses": {
+      "scheduled": "Scheduled",
+      "active": "Active",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    }
+  },
+  "room": {
+    "room": "Room",
+    "connecting": "Connecting…",
+    "join": "Join Session",
+    "recording": "Recording",
+    "connectingMic": "Connecting mic…",
+    "micError": "Mic: {{error}}"
+  },
+  "transcript": {
+    "title": "Live Transcript",
+    "speaker": "Speaker",
+    "empty": "Transcript will appear here during the session…"
+  },
+  "summary": {
+    "title": "AI Summary",
+    "generate": "Generate",
+    "sections": {
+      "summary": "Summary",
+      "keyPoints": "Key Points",
+      "soapNote": "SOAP Note"
+    },
+    "empty": "Click Generate to create an AI summary after the session."
+  }
+}

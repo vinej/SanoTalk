@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { trpc } from "../../../lib/trpc";
 import { Button } from "../../../components/ui/button";
+import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/_auth/sessions/new")({
   component: NewSessionPage,
@@ -8,6 +9,7 @@ export const Route = createFileRoute("/_auth/sessions/new")({
 
 function NewSessionPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation("sessions");
   const createSession = trpc.sessions.create.useMutation({
     onSuccess: (session) => {
       if (session) navigate({ to: `/sessions/${session.id}` as any });
@@ -17,13 +19,13 @@ function NewSessionPage() {
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="text-center space-y-4">
-        <h1 className="text-2xl font-bold">New Session</h1>
-        <p className="text-muted-foreground">Start a new medical consultation session.</p>
+        <h1 className="text-2xl font-bold">{t("new.title")}</h1>
+        <p className="text-muted-foreground">{t("new.subtitle")}</p>
         <Button
           onClick={() => createSession.mutate({})}
           disabled={createSession.isPending}
         >
-          {createSession.isPending ? "Creating…" : "Start Session"}
+          {createSession.isPending ? t("new.creating") : t("new.start")}
         </Button>
         {createSession.isError && (
           <p className="text-destructive text-sm">{createSession.error.message}</p>

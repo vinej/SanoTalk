@@ -1,0 +1,24 @@
+{
+  "title": "看板",
+  "tasksTotal_one": "共 {{count}} 个任务",
+  "tasksTotal_other": "共 {{count}} 个任务",
+  "newTask": "新建任务",
+  "noTasks": "暂无任务",
+  "columns": {
+    "not_assigned": "未分配",
+    "assigned": "已分配",
+    "completed": "已完成"
+  },
+  "dialog": {
+    "title": "新建任务",
+    "titleLabel": "标题",
+    "titlePlaceholder": "输入任务标题",
+    "descriptionLabel": "描述",
+    "descriptionPlaceholder": "输入任务描述（可选）"
+  },
+  "actions": {
+    "moveBack": "向前移动",
+    "moveForward": "向后移动",
+    "delete": "删除"
+  }
+}

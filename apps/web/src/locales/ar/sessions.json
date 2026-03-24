@@ -1,0 +1,45 @@
+{
+  "new": {
+    "title": "جلسة جديدة",
+    "subtitle": "ابدأ استشارة طبية جديدة.",
+    "creating": "جارٍ الإنشاء…",
+    "start": "بدء الجلسة"
+  },
+  "detail": {
+    "loading": "جارٍ تحميل الجلسة…",
+    "transcript": "النص",
+    "aiSummary": "ملخص الذكاء الاصطناعي"
+  },
+  "card": {
+    "liveNow": "مباشر الآن",
+    "statuses": {
+      "scheduled": "مجدولة",
+      "active": "نشطة",
+      "completed": "مكتملة",
+      "cancelled": "ملغاة"
+    }
+  },
+  "room": {
+    "room": "الغرفة",
+    "connecting": "جارٍ الاتصال…",
+    "join": "الانضمام إلى الجلسة",
+    "recording": "تسجيل",
+    "connectingMic": "جارٍ توصيل الميكروفون…",
+    "micError": "الميكروفون: {{error}}"
+  },
+  "transcript": {
+    "title": "النص المباشر",
+    "speaker": "المتحدث",
+    "empty": "سيظهر النص هنا خلال الجلسة…"
+  },
+  "summary": {
+    "title": "ملخص الذكاء الاصطناعي",
+    "generate": "توليد",
+    "sections": {
+      "summary": "الملخص",
+      "keyPoints": "النقاط الرئيسية",
+      "soapNote": "ملاحظة SOAP"
+    },
+    "empty": "انقر على توليد لإنشاء ملخص بعد الجلسة."
+  }
+}

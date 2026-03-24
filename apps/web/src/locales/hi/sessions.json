@@ -1,0 +1,45 @@
+{
+  "new": {
+    "title": "नया सत्र",
+    "subtitle": "एक नई चिकित्सा परामर्श शुरू करें।",
+    "creating": "बनाया जा रहा है…",
+    "start": "सत्र शुरू करें"
+  },
+  "detail": {
+    "loading": "सत्र लोड हो रहा है…",
+    "transcript": "प्रतिलिपि",
+    "aiSummary": "AI सारांश"
+  },
+  "card": {
+    "liveNow": "अभी लाइव",
+    "statuses": {
+      "scheduled": "निर्धारित",
+      "active": "सक्रिय",
+      "completed": "पूर्ण",
+      "cancelled": "रद्द"
+    }
+  },
+  "room": {
+    "room": "कमरा",
+    "connecting": "जोड़ा जा रहा है…",
+    "join": "सत्र में शामिल हों",
+    "recording": "रिकॉर्डिंग",
+    "connectingMic": "माइक्रोफ़ोन जोड़ा जा रहा है…",
+    "micError": "माइक: {{error}}"
+  },
+  "transcript": {
+    "title": "लाइव प्रतिलिपि",
+    "speaker": "वक्ता",
+    "empty": "सत्र के दौरान प्रतिलिपि यहाँ दिखाई देगी…"
+  },
+  "summary": {
+    "title": "AI सारांश",
+    "generate": "उत्पन्न करें",
+    "sections": {
+      "summary": "सारांश",
+      "keyPoints": "मुख्य बिंदु",
+      "soapNote": "SOAP नोट"
+    },
+    "empty": "सत्र के बाद AI सारांश बनाने के लिए उत्पन्न करें पर क्लिक करें।"
+  }
+}

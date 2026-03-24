@@ -1,0 +1,24 @@
+{
+  "title": "कानबान बोर्ड",
+  "tasksTotal_one": "कुल {{count}} कार्य",
+  "tasksTotal_other": "कुल {{count}} कार्य",
+  "newTask": "नया कार्य",
+  "noTasks": "यहाँ कोई कार्य नहीं",
+  "columns": {
+    "not_assigned": "असाइन नहीं",
+    "assigned": "असाइन किया गया",
+    "completed": "पूर्ण"
+  },
+  "dialog": {
+    "title": "नया कार्य",
+    "titleLabel": "शीर्षक",
+    "titlePlaceholder": "कार्य का शीर्षक दर्ज करें",
+    "descriptionLabel": "विवरण",
+    "descriptionPlaceholder": "कार्य का विवरण दर्ज करें (वैकल्पिक)"
+  },
+  "actions": {
+    "moveBack": "पीछे ले जाएं",
+    "moveForward": "आगे ले जाएं",
+    "delete": "हटाएं"
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "title": "Tableau Kanban",
+  "tasksTotal_one": "{{count}} tâche au total",
+  "tasksTotal_other": "{{count}} tâches au total",
+  "newTask": "Nouvelle tâche",
+  "noTasks": "Aucune tâche ici",
+  "columns": {
+    "not_assigned": "Non assigné",
+    "assigned": "Assigné",
+    "completed": "Terminé"
+  },
+  "dialog": {
+    "title": "Nouvelle tâche",
+    "titleLabel": "Titre",
+    "titlePlaceholder": "Entrez le titre de la tâche",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Entrez une description (optionnel)"
+  },
+  "actions": {
+    "moveBack": "Reculer",
+    "moveForward": "Avancer",
+    "delete": "Supprimer"
+  }
+}

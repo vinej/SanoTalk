@@ -1,0 +1,45 @@
+{
+  "new": {
+    "title": "Nouvelle session",
+    "subtitle": "Démarrez une nouvelle consultation médicale.",
+    "creating": "Création en cours…",
+    "start": "Démarrer la session"
+  },
+  "detail": {
+    "loading": "Chargement de la session…",
+    "transcript": "Transcription",
+    "aiSummary": "Résumé IA"
+  },
+  "card": {
+    "liveNow": "En direct",
+    "statuses": {
+      "scheduled": "Planifiée",
+      "active": "Active",
+      "completed": "Terminée",
+      "cancelled": "Annulée"
+    }
+  },
+  "room": {
+    "room": "Salle",
+    "connecting": "Connexion…",
+    "join": "Rejoindre la session",
+    "recording": "Enregistrement",
+    "connectingMic": "Connexion du micro…",
+    "micError": "Micro : {{error}}"
+  },
+  "transcript": {
+    "title": "Transcription en direct",
+    "speaker": "Intervenant",
+    "empty": "La transcription apparaîtra ici durant la session…"
+  },
+  "summary": {
+    "title": "Résumé IA",
+    "generate": "Générer",
+    "sections": {
+      "summary": "Résumé",
+      "keyPoints": "Points clés",
+      "soapNote": "Note SOAP"
+    },
+    "empty": "Cliquez sur Générer pour créer un résumé IA après la session."
+  }
+}

@@ -9,12 +9,14 @@ import { trpc } from "../../lib/trpc";
 import { Button } from "../../components/ui/button";
 import { useTranscriptSocket } from "../../hooks/use-transcript-socket";
 import { TalkSession } from "@sanotalk/db";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   session: TalkSession
 }
 
 export function LiveSessionRoom({ session }: Props) {
+  const { t } = useTranslation("sessions");
   const [token, setToken] = useState<string | null>(null);
   const [serverUrl, setServerUrl] = useState<string | null>(null);
 
@@ -37,14 +39,14 @@ export function LiveSessionRoom({ session }: Props) {
       <div className="flex flex-col items-center justify-center h-full gap-6 p-8">
         <div className="text-center space-y-2">
           <h2 className="text-2xl font-semibold">{session.hostId}</h2>
-          <p className="text-muted-foreground">Room: {session.roomName}</p>
+          <p className="text-muted-foreground">{t("room.room")}: {session.roomName}</p>
         </div>
         <Button
           size="lg"
           onClick={handleJoin}
           disabled={getTokenMutation.isPending}
         >
-          {getTokenMutation.isPending ? "Connecting…" : "Join Session"}
+          {getTokenMutation.isPending ? t("room.connecting") : t("room.join")}
         </Button>
       </div>
     );
@@ -69,6 +71,7 @@ export function LiveSessionRoom({ session }: Props) {
 
 function TranscriptionOverlay({ sessionId }: { sessionId: string }) {
   const { liveText, isRecording, micError } = useTranscriptSocket(sessionId);
+  const { t } = useTranslation("sessions");
 
   return (
     <>
@@ -76,7 +79,7 @@ function TranscriptionOverlay({ sessionId }: { sessionId: string }) {
         {isRecording && <span className="inline-block w-2 h-2 rounded-full bg-red-500 animate-pulse" />}
         {!isRecording && micError && <span className="inline-block w-2 h-2 rounded-full bg-yellow-500" />}
         {!isRecording && !micError && <span className="inline-block w-2 h-2 rounded-full bg-gray-500" />}
-        {micError ? `Mic: ${micError}` : isRecording ? "Recording" : "Connecting mic…"}
+        {micError ? t("room.micError", { error: micError }) : isRecording ? t("room.recording") : t("room.connectingMic")}
       </div>
       {liveText && (
         <div className="absolute bottom-20 left-1/2 -translate-x-1/2 bg-black/70 text-white px-4 py-2 rounded-lg max-w-xl text-center text-sm backdrop-blur-sm">

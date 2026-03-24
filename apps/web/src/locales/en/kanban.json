@@ -1,0 +1,24 @@
+{
+  "title": "Kanban Board",
+  "tasksTotal_one": "{{count}} task total",
+  "tasksTotal_other": "{{count}} tasks total",
+  "newTask": "New Task",
+  "noTasks": "No tasks here",
+  "columns": {
+    "not_assigned": "Not Assigned",
+    "assigned": "Assigned",
+    "completed": "Completed"
+  },
+  "dialog": {
+    "title": "New Task",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Enter task title",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "Enter task description (optional)"
+  },
+  "actions": {
+    "moveBack": "Move back",
+    "moveForward": "Move forward",
+    "delete": "Delete"
+  }
+}

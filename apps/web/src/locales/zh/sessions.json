@@ -1,0 +1,45 @@
+{
+  "new": {
+    "title": "新建会话",
+    "subtitle": "开始一次新的医疗咨询。",
+    "creating": "创建中…",
+    "start": "开始会话"
+  },
+  "detail": {
+    "loading": "加载会话中…",
+    "transcript": "转录",
+    "aiSummary": "AI 摘要"
+  },
+  "card": {
+    "liveNow": "直播中",
+    "statuses": {
+      "scheduled": "已预约",
+      "active": "进行中",
+      "completed": "已完成",
+      "cancelled": "已取消"
+    }
+  },
+  "room": {
+    "room": "房间",
+    "connecting": "连接中…",
+    "join": "加入会话",
+    "recording": "录制中",
+    "connectingMic": "麦克风连接中…",
+    "micError": "麦克风：{{error}}"
+  },
+  "transcript": {
+    "title": "实时转录",
+    "speaker": "发言人",
+    "empty": "会话期间转录内容将在此显示…"
+  },
+  "summary": {
+    "title": "AI 摘要",
+    "generate": "生成",
+    "sections": {
+      "summary": "摘要",
+      "keyPoints": "要点",
+      "soapNote": "SOAP 记录"
+    },
+    "empty": "点击「生成」以在会话结束后创建 AI 摘要。"
+  }
+}

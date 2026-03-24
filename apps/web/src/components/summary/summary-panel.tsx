@@ -3,12 +3,14 @@ import { Button } from "../../components/ui/button";
 import { trpc } from "../../lib/trpc";
 import { Sparkles, Loader2 } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   sessionId: string;
 }
 
 export function SummaryPanel({ sessionId }: Props) {
+  const { t } = useTranslation("sessions");
   const { data: summary, refetch } =
     trpc.transcripts.summaryBySession.useQuery({ sessionId });
 
@@ -30,7 +32,7 @@ export function SummaryPanel({ sessionId }: Props) {
       <div className="p-4 space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
-            AI Summary
+            {t("summary.title")}
           </h3>
           <Button
             size="sm"
@@ -43,14 +45,14 @@ export function SummaryPanel({ sessionId }: Props) {
             ) : (
               <Sparkles className="mr-1 h-3 w-3" />
             )}
-            Generate
+            {t("summary.generate")}
           </Button>
         </div>
 
         {summary ? (
           <div className="space-y-4">
             <section>
-              <h4 className="font-medium text-sm mb-1">Summary</h4>
+              <h4 className="font-medium text-sm mb-1">{t("summary.sections.summary")}</h4>
               <p className="text-sm text-muted-foreground leading-relaxed">
                 {summary.summary}
               </p>
@@ -58,7 +60,7 @@ export function SummaryPanel({ sessionId }: Props) {
 
             {summary.keyPoints && summary.keyPoints.length > 0 && (
               <section>
-                <h4 className="font-medium text-sm mb-2">Key Points</h4>
+                <h4 className="font-medium text-sm mb-2">{t("summary.sections.keyPoints")}</h4>
                 <ul className="space-y-1">
                   {summary.keyPoints.map((pt, i) => (
                     <li key={i} className="flex gap-2 text-sm">
@@ -72,7 +74,7 @@ export function SummaryPanel({ sessionId }: Props) {
 
             {summary.soapNote && (
               <section>
-                <h4 className="font-medium text-sm mb-2">SOAP Note</h4>
+                <h4 className="font-medium text-sm mb-2">{t("summary.sections.soapNote")}</h4>
                 <div className="space-y-2">
                   {(
                     [
@@ -97,8 +99,7 @@ export function SummaryPanel({ sessionId }: Props) {
           </div>
         ) : (
           <p className="text-sm text-muted-foreground text-center py-8">
-            Click <strong>Generate</strong> to create an AI summary after the
-            session.
+            {t("summary.empty")}
           </p>
         )}
       </div>
