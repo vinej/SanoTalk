@@ -1,5 +1,7 @@
 # SanoTalk 🩺🎙️
 
+> **Website:** [www.sanotalk.com](http://www.sanotalk.com) — currently under construction, coming soon!
+
 A real-time AI-powered medical conversation platform with transcription, live
 video/audio sessions, and intelligent note generation.
 
