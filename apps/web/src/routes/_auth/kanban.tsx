@@ -1,0 +1,287 @@
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { trpc } from "../../lib/trpc";
+import { Button } from "../../components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "../../components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "../../components/ui/dialog";
+import { Input } from "../../components/ui/input";
+import { Plus, Trash2, ArrowRight, ArrowLeft, User, Calendar } from "lucide-react";
+import type { Task } from "@sanotalk/db";
+
+export const Route = createFileRoute("/_auth/kanban")({
+  component: KanbanPage,
+});
+
+type TaskWithUser = Task & { assignedUser: { id: string; name: string } | null };
+
+const COLUMNS: {
+  status: Task["status"];
+  label: string;
+  dot: string;
+  border: string;
+  bg: string;
+  headerBg: string;
+  badgeBg: string;
+}[] = [
+  {
+    status: "not_assigned",
+    label: "Not Assigned",
+    dot: "#94a3b8",
+    border: "#cbd5e1",
+    bg: "#f8fafc",
+    headerBg: "#f1f5f9",
+    badgeBg: "#e2e8f0",
+  },
+  {
+    status: "assigned",
+    label: "Assigned",
+    dot: "#60a5fa",
+    border: "#bfdbfe",
+    bg: "#eff6ff",
+    headerBg: "#dbeafe",
+    badgeBg: "#bfdbfe",
+  },
+  {
+    status: "completed",
+    label: "Completed",
+    dot: "#34d399",
+    border: "#a7f3d0",
+    bg: "#f0fdf4",
+    headerBg: "#dcfce7",
+    badgeBg: "#bbf7d0",
+  },
+];
+
+const STATUS_ORDER: Task["status"][] = ["not_assigned", "assigned", "completed"];
+
+function KanbanPage() {
+  const [createOpen, setCreateOpen] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newDescription, setNewDescription] = useState("");
+
+  const utils = trpc.useUtils();
+  const { data: tasks = [], isLoading } = trpc.tasks.list.useQuery();
+
+  const createMutation = trpc.tasks.create.useMutation({
+    onSuccess: () => {
+      void utils.tasks.list.invalidate();
+      setCreateOpen(false);
+      setNewTitle("");
+      setNewDescription("");
+    },
+  });
+
+  const updateMutation = trpc.tasks.update.useMutation({
+    onSuccess: () => void utils.tasks.list.invalidate(),
+  });
+
+  const deleteMutation = trpc.tasks.delete.useMutation({
+    onSuccess: () => void utils.tasks.list.invalidate(),
+  });
+
+  function moveTask(task: TaskWithUser, direction: "forward" | "back") {
+    const idx = STATUS_ORDER.indexOf(task.status as Task["status"]);
+    const nextIdx = direction === "forward" ? idx + 1 : idx - 1;
+    if (nextIdx < 0 || nextIdx >= STATUS_ORDER.length) return;
+    updateMutation.mutate({ id: task.id, status: STATUS_ORDER[nextIdx] });
+  }
+
+  function handleCreate() {
+    if (!newTitle.trim()) return;
+    createMutation.mutate({
+      title: newTitle.trim(),
+      description: newDescription.trim() || undefined,
+    });
+  }
+
+  return (
+    <div style={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}>
+      {/* Page header */}
+      <div style={{ borderBottom: "1px solid #e2e8f0", backgroundColor: "white", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div>
+          <h1 style={{ fontSize: "20px", fontWeight: 600, margin: 0 }}>Kanban Board</h1>
+          <p style={{ fontSize: "13px", color: "#64748b", margin: "2px 0 0 0" }}>
+            {tasks.length} task{tasks.length !== 1 ? "s" : ""} total
+          </p>
+        </div>
+        <Button size="sm" onClick={() => setCreateOpen(true)}>
+          <Plus className="w-4 h-4 mr-1.5" />
+          New Task
+        </Button>
+      </div>
+
+      {/* Board */}
+      <div style={{ padding: "24px", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", alignItems: "start" }}>
+        {COLUMNS.map((col) => {
+          const colTasks = (tasks as TaskWithUser[]).filter(
+            (t) => t.status === col.status
+          );
+          return (
+            <div key={col.status} style={{ borderRadius: "12px", border: `2px solid ${col.border}`, backgroundColor: col.bg, boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+              {/* Column header */}
+              <div style={{ padding: "12px 16px", backgroundColor: col.headerBg, borderRadius: "10px 10px 0 0", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `1px solid ${col.border}` }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "50%", backgroundColor: col.dot, flexShrink: 0 }} />
+                  <span style={{ fontSize: "13px", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.05em", color: "#475569" }}>
+                    {col.label}
+                  </span>
+                </div>
+                <span style={{ fontSize: "12px", fontWeight: 600, backgroundColor: col.badgeBg, color: "#475569", borderRadius: "999px", padding: "2px 10px" }}>
+                  {colTasks.length}
+                </span>
+              </div>
+
+              {/* Cards */}
+              <div style={{ padding: "10px 12px 12px", display: "flex", flexDirection: "column", gap: "10px" }}>
+                {isLoading && (
+                  <>
+                    <div style={{ height: "80px", borderRadius: "8px", backgroundColor: "#e2e8f0" }} />
+                    <div style={{ height: "80px", borderRadius: "8px", backgroundColor: "#e2e8f0" }} />
+                  </>
+                )}
+
+                {!isLoading && colTasks.length === 0 && (
+                  <div style={{ padding: "24px 0", textAlign: "center", fontSize: "13px", color: "#94a3b8", fontStyle: "italic" }}>
+                    No tasks here
+                  </div>
+                )}
+
+                {colTasks.map((t) => (
+                  <TaskCard
+                    key={t.id}
+                    task={t}
+                    borderColor={col.border}
+                    onMoveForward={
+                      col.status !== "completed"
+                        ? () => moveTask(t, "forward")
+                        : undefined
+                    }
+                    onMoveBack={
+                      col.status !== "not_assigned"
+                        ? () => moveTask(t, "back")
+                        : undefined
+                    }
+                    onDelete={() => deleteMutation.mutate({ id: t.id })}
+                  />
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Create dialog */}
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>New Task</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-2">
+            <Input
+              placeholder="Title"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+              autoFocus
+            />
+            <Input
+              placeholder="Description (optional)"
+              value={newDescription}
+              onChange={(e) => setNewDescription(e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleCreate}
+              disabled={!newTitle.trim() || createMutation.isPending}
+            >
+              Create
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function TaskCard({
+  task,
+  borderColor,
+  onMoveForward,
+  onMoveBack,
+  onDelete,
+}: {
+  task: TaskWithUser;
+  borderColor: string;
+  onMoveForward?: (() => void) | undefined;
+  onMoveBack?: (() => void) | undefined;
+  onDelete: () => void;
+}) {
+  const createdDate = new Date(task.createdAt).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
+
+  return (
+    <Card className="shadow-sm hover:shadow-md transition-shadow" style={{ gap: 0, padding: 0, border: `1px solid ${borderColor}` }}>
+      <CardHeader style={{ padding: "14px 16px 8px" }}>
+        <CardTitle style={{ fontSize: "14px", lineHeight: "1.4" }}>{task.title}</CardTitle>
+      </CardHeader>
+
+      {task.description && (
+        <CardContent style={{ padding: "0 16px 10px" }}>
+          <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+            {task.description}
+          </p>
+        </CardContent>
+      )}
+
+      <CardFooter style={{ padding: "8px 12px", backgroundColor: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#64748b" }}>
+          {task.assignedUser ? (
+            <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "hsl(var(--primary))", fontWeight: 500 }}>
+              <User className="w-3 h-3" />
+              {task.assignedUser.name}
+            </span>
+          ) : (
+            <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+              <Calendar className="w-3 h-3" />
+              {createdDate}
+            </span>
+          )}
+        </div>
+
+        <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
+          {onMoveBack && (
+            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onMoveBack} title="Move back">
+              <ArrowLeft className="w-3.5 h-3.5" />
+            </Button>
+          )}
+          {onMoveForward && (
+            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onMoveForward} title="Move forward">
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Button>
+          )}
+          <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onDelete} title="Delete">
+            <Trash2 className="w-3.5 h-3.5 text-destructive" />
+          </Button>
+        </div>
+      </CardFooter>
+    </Card>
+  );
+}

@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
+import { Route as AuthKanbanRouteImport } from './routes/_auth/kanban'
 import { Route as AuthSessionsNewRouteImport } from './routes/_auth/sessions/new'
 import { Route as AuthSessionsSessionIdRouteImport } from './routes/_auth/sessions/$sessionId'
 
@@ -41,6 +42,11 @@ const AuthDashboardRoute = AuthDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthKanbanRoute = AuthKanbanRouteImport.update({
+  id: '/_auth/kanban',
+  path: '/kanban',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthSessionsNewRoute = AuthSessionsNewRouteImport.update({
   id: '/_auth/sessions/new',
   path: '/sessions/new',
@@ -57,6 +63,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/sign-up': typeof SignUpRoute
   '/dashboard': typeof AuthDashboardRoute
+  '/kanban': typeof AuthKanbanRoute
   '/sessions/new': typeof AuthSessionsNewRoute
   '/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
 }
@@ -65,6 +72,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/sign-up': typeof SignUpRoute
   '/dashboard': typeof AuthDashboardRoute
+  '/kanban': typeof AuthKanbanRoute
   '/sessions/new': typeof AuthSessionsNewRoute
   '/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
 }
@@ -74,15 +82,16 @@ export interface FileRoutesById {
   '/_auth/': typeof AuthIndexRoute
   '/login': typeof LoginRoute
   '/sign-up': typeof SignUpRoute
-  '/dashboard': typeof AuthDashboardRoute
+  '/_auth/dashboard': typeof AuthDashboardRoute
+  '/_auth/kanban': typeof AuthKanbanRoute
   '/_auth/sessions/new': typeof AuthSessionsNewRoute
   '/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/sign-up' | '/dashboard' | '/sessions/new' | '/sessions/$sessionId'
+  fullPaths: '/' | '/login' | '/sign-up' | '/dashboard' | '/kanban' | '/sessions/new' | '/sessions/$sessionId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/sign-up' | '/dashboard' | '/sessions/new' | '/sessions/$sessionId'
+  to: '/' | '/login' | '/sign-up' | '/dashboard' | '/kanban' | '/sessions/new' | '/sessions/$sessionId'
   id:
     | '__root__'
     | '/_auth'
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/sign-up'
     | '/_auth/dashboard'
+    | '/_auth/kanban'
     | '/_auth/sessions/new'
     | '/_auth/sessions/$sessionId'
   fileRoutesById: FileRoutesById
@@ -137,6 +147,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/kanban': {
+      id: '/_auth/kanban'
+      path: '/kanban'
+      fullPath: '/kanban'
+      preLoaderRoute: typeof AuthKanbanRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/sessions/new': {
       id: '/_auth/sessions/new'
       path: '/sessions/new'
@@ -157,6 +174,7 @@ declare module '@tanstack/react-router' {
 interface AuthRouteChildren {
   AuthIndexRoute: typeof AuthIndexRoute
   AuthDashboardRoute: typeof AuthDashboardRoute
+  AuthKanbanRoute: typeof AuthKanbanRoute
   AuthSessionsNewRoute: typeof AuthSessionsNewRoute
   AuthSessionsSessionIdRoute: typeof AuthSessionsSessionIdRoute
 }
@@ -164,6 +182,7 @@ interface AuthRouteChildren {
 const AuthRouteChildren: AuthRouteChildren = {
   AuthIndexRoute: AuthIndexRoute,
   AuthDashboardRoute: AuthDashboardRoute,
+  AuthKanbanRoute: AuthKanbanRoute,
   AuthSessionsNewRoute: AuthSessionsNewRoute,
   AuthSessionsSessionIdRoute: AuthSessionsSessionIdRoute,
 }
