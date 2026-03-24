@@ -36,6 +36,17 @@ video/audio sessions, and intelligent note generation.
 | Grafana + Loki | Observability & log aggregation |
 | OpenReplay | Session replay & analytics |
 
+## Features
+
+- Real-time audio/video medical consultations via LiveKit
+- Live speech-to-text transcription powered by Deepgram
+- AI-generated session notes and summaries via Claude (Anthropic)
+- Session recordings stored in MinIO (S3-compatible)
+- **Kanban board** for task management — assign tasks to users, track progress across *Not Assigned*, *Assigned*, and *Completed* columns
+- Fully internationalized UI (6 languages)
+- Session replay and analytics via OpenReplay
+- Observability with Grafana + Loki
+
 ## Getting Started
 
 ### Prerequisites
