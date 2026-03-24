@@ -10,9 +10,13 @@ export const Route = createFileRoute("/_auth/sessions/new")({
 function NewSessionPage() {
   const navigate = useNavigate();
   const { t } = useTranslation("sessions");
+  const utils = trpc.useUtils();
   const createSession = trpc.sessions.create.useMutation({
     onSuccess: (session) => {
-      if (session) navigate({ to: `/sessions/${session.id}` as any });
+      if (session) {
+        void utils.sessions.list.invalidate();
+        navigate({ to: `/sessions/${session.id}` as any });
+      }
     },
   });
 

@@ -8,7 +8,17 @@ export function startDeepgramWebSocket(server: Server) {
   const deepgram = createClient(process.env.DEEPGRAM_API_KEY ?? "");
 
   wss.on("connection", (ws: WebSocket, req) => {
-    logger.info({ url: req.url }, "Transcription WS client connected");
+    // Validate that a well-formed sessionId UUID was provided
+    const url = new URL(req.url ?? "", "http://localhost");
+    const sessionId = url.searchParams.get("sessionId");
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!sessionId || !uuidRegex.test(sessionId)) {
+      logger.warn({ url: req.url }, "WebSocket rejected: missing or invalid sessionId");
+      ws.close(1008, "Invalid sessionId");
+      return;
+    }
+
+    logger.info({ sessionId }, "Transcription WS client connected");
 
     const apiKey = process.env.DEEPGRAM_API_KEY;
     if (!apiKey) {

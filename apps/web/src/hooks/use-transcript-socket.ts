@@ -32,7 +32,12 @@ export function useTranscriptSocket(sessionId: string) {
     wsRef.current = ws;
 
     ws.onmessage = (event: MessageEvent) => {
-      const data = JSON.parse(event.data as string) as TranscriptMessage;
+      let data: TranscriptMessage;
+      try {
+        data = JSON.parse(event.data as string) as TranscriptMessage;
+      } catch {
+        return;
+      }
       if (data.type === "transcript") {
         setLiveText(data.text);
         if (data.isFinal && data.text.trim()) {

@@ -1,12 +1,41 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
-import { talkSession } from "@sanotalk/db";
-import { eq, desc } from "drizzle-orm";
+import { talkSession, sessionParticipant } from "@sanotalk/db";
+import { eq, desc, or, inArray } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import { TRPCError } from "@trpc/server";
+
+/** Returns the session (with participants+users) if the user is host or participant; throws otherwise. */
+async function assertSessionAccess(
+  db: Parameters<Parameters<typeof protectedProcedure.query>[0]>[0]["ctx"]["db"],
+  sessionId: string,
+  userId: string
+) {
+  const session = await db.query.talkSession.findFirst({
+    where: eq(talkSession.id, sessionId),
+    with: { participants: { with: { user: true } } },
+  });
+  if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
+  const hasAccess =
+    session.hostId === userId ||
+    session.participants.some((p) => p.userId === userId);
+  if (!hasAccess) throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
+  return session;
+}
 
 export const sessionsRouter = createTRPCRouter({
   list: protectedProcedure.query(async ({ ctx }) => {
+    // Single query using a subquery — user must be host OR a participant
+    const participantSubquery = ctx.db
+      .select({ id: sessionParticipant.sessionId })
+      .from(sessionParticipant)
+      .where(eq(sessionParticipant.userId, ctx.user.id));
+
     return ctx.db.query.talkSession.findMany({
+      where: or(
+        eq(talkSession.hostId, ctx.user.id),
+        inArray(talkSession.id, participantSubquery)
+      ),
       orderBy: [desc(talkSession.createdAt)],
       with: {
         participants: { with: { user: true } },
@@ -17,19 +46,7 @@ export const sessionsRouter = createTRPCRouter({
   byId: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
-      try {
-        const result = await ctx.db.query.talkSession.findFirst({
-          where: eq(talkSession.id, input.id),
-          with: {
-            participants: { with: { user: true } },
-          },
-        });
-        if (!result) throw new Error("Session not found");
-        return result;
-      } catch (e) {
-        console.error("[sessions.byId] error:", e);
-        throw e;
-      }
+      return assertSessionAccess(ctx.db, input.id, ctx.user.id);
     }),
 
   create: protectedProcedure
@@ -46,9 +63,7 @@ export const sessionsRouter = createTRPCRouter({
           roomName,
           hostId: ctx.user.id,
           scheduledAt: input.scheduledAt ? new Date(input.scheduledAt) : null,
-        }
-        )
-
+        })
         .returning();
 
       return created;
@@ -57,6 +72,12 @@ export const sessionsRouter = createTRPCRouter({
   start: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
+      const session = await ctx.db.query.talkSession.findFirst({
+        where: eq(talkSession.id, input.id),
+      });
+      if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
+      if (session.hostId !== ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the host can start a session" });
+
       const [updated] = await ctx.db
         .update(talkSession)
         .set({ status: "active", startedAt: new Date() })
@@ -68,6 +89,12 @@ export const sessionsRouter = createTRPCRouter({
   end: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
+      const session = await ctx.db.query.talkSession.findFirst({
+        where: eq(talkSession.id, input.id),
+      });
+      if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
+      if (session.hostId !== ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the host can end a session" });
+
       const [updated] = await ctx.db
         .update(talkSession)
         .set({ status: "completed", endedAt: new Date() })
