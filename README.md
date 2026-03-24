@@ -183,7 +183,8 @@ The UI is fully internationalized (i18n) and available in 6 languages:
 | `hi` | Hindi |
 
 ## Project Structure
-\`\`\`
+
+```text
 SanoTalk/
 ├── apps/
 │   ├── web/          # React 19 frontend (Vite)
@@ -193,8 +194,8 @@ SanoTalk/
 │   ├── trpc/         # Shared router types
 │   └── config/       # Shared ESLint & TS configs
 └── infra/            # Docker Compose & Grafana config
-\`\`\`
+```
 
 ## License
+
 MIT
-``*
