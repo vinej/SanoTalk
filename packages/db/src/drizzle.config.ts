@@ -1,10 +1,11 @@
 import { type Config } from "drizzle-kit";
+import "dotenv/config";
 
 export default {
   schema: "./src/schema/index.ts",
   dialect: "postgresql",
   dbCredentials: {
-    url: 'postgresql://postgres:REDACTED@localhost:5432/sanotalk',
+    url: process.env.DATABASE_URL!,
   },
   tablesFilter: ["sanotalk_*"],
   out: "./drizzle",
