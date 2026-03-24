@@ -55,37 +55,42 @@ video/audio sessions, and intelligent note generation.
 - Docker & Docker Compose
 
 ### 1. Clone & Install
-\`\`\`bash
+
+```bash
 git clone https://github.com/vinej/SanoTalk.git
 cd SanoTalk
 pnpm install
-\`\`\`
+```
 
 ### 2. Configure Environment
-\`\`\`bash
+
+```bash
 cp .env.example .env
 # Fill in your values in .env
-\`\`\`
+```
 
 ### 3. Start Infrastructure
-\`\`\`bash
+
+```bash
 docker compose -f infra/docker-compose.yml up -d
-\`\`\`
+```
 
 ### 4. Run Migrations
-\`\`\`bash
+
+```bash
 pnpm db:generate
 pnpm db:migrate
-\`\`\`
+```
 
 ### 5. Start Dev Servers
-\`\`\`bash
+
+```bash
 pnpm dev
 # Web:    http://localhost:5173
 # Server: http://localhost:3001
 # MinIO:  http://localhost:9001
 # Grafana:http://localhost:3000
-\`\`\`
+```
 
 ## Getting API Keys
 
