@@ -16,8 +16,9 @@ import {
   DialogTitle,
   DialogFooter,
 } from "../../components/ui/dialog";
-import { Input } from "../../components/ui/input";
 import { Plus, Trash2, ArrowRight, ArrowLeft, User, Calendar, LayoutDashboard } from "lucide-react";
+import { Label } from "../../components/ui/label";
+import { Input } from "../../components/ui/input";
 import { Link } from "@tanstack/react-router";
 import type { Task } from "@sanotalk/db";
 
@@ -197,19 +198,29 @@ function KanbanPage() {
           <DialogHeader>
             <DialogTitle>New Task</DialogTitle>
           </DialogHeader>
-          <div className="space-y-3 py-2">
-            <Input
-              placeholder="Title"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleCreate()}
-              autoFocus
-            />
-            <Input
-              placeholder="Description (optional)"
-              value={newDescription}
-              onChange={(e) => setNewDescription(e.target.value)}
-            />
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px", padding: "8px 0" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <Label htmlFor="task-title">Title</Label>
+              <Input
+                id="task-title"
+                placeholder="Enter task title"
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+                autoFocus
+                className="!border-slate-400"
+              />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <Label htmlFor="task-desc">Description</Label>
+              <Input
+                id="task-desc"
+                placeholder="Enter task description (optional)"
+                value={newDescription}
+                onChange={(e) => setNewDescription(e.target.value)}
+                className="!border-slate-400"
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setCreateOpen(false)}>
