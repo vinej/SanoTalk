@@ -3,10 +3,8 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db, user, session, account, verification } from "@sanotalk/db";
 import { Resend } from "resend";
 
-const resend = new Resend("re_fdJ3v5fJ_BXV7ii7TQyRbDMsstZJcvbSQ");
-
 export const auth = betterAuth({
-  baseURL: "http://localhost:3001",
+  baseURL: process.env.BETTER_AUTH_URL,
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: { user, session, account, verification },
@@ -17,6 +15,7 @@ export const auth = betterAuth({
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
+      const resend = new Resend(process.env.RESEND_API_KEY);
       const { error } = await resend.emails.send({
         from: process.env.EMAIL_FROM ?? "noreply@sanotalk.app",
         to: user.email,
@@ -30,5 +29,5 @@ export const auth = betterAuth({
     },
   },
   socialProviders: {},
-  trustedOrigins: ['http://localhost:3001', 'http://localhost:5173'],
+  trustedOrigins: [process.env.BETTER_AUTH_URL!, process.env.APP_URL!],
 });

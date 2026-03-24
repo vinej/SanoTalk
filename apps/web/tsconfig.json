@@ -16,6 +16,8 @@
     },
   }
   ,
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"],
   "references": [
     { "path": "../../packages/trpc"},
     { "path": "../../packages/db"}

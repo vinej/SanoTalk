@@ -12,14 +12,14 @@ import { runPendingAgents, triggerAgentRun } from "./mastra/index";
 import http from "http";
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT ?? 3001;
 
 // ─── CORS ─────────────────────────────────────────────────────────────────
 app.use(
   cors({
     origin: [
-      'http://localhost:3001' ,
-      "http://localhost:5173",
+      process.env.BETTER_AUTH_URL!,
+      process.env.APP_URL!,
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
