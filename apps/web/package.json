@@ -66,6 +66,7 @@
   "devDependencies": {
     "@sanotalk/db": "workspace:*",
     "@sanotalk/trpc": "workspace:*",
+    "@tailwindcss/postcss": "^4.2.2",
     "@tanstack/router-plugin": "^1.63.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
