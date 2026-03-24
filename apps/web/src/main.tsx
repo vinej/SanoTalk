@@ -6,13 +6,9 @@ import { queryClient } from "./lib/query-client";
 import { trpc, trpcClient } from "./lib/trpc";
 import { routeTree } from "./routeTree.gen";
 import "./styles/globals.css";
-import { initOpenReplay } from "./lib/openreplay";
 import "./lib/i18n";
 import { I18nextProvider } from "react-i18next";
 import i18n from "./lib/i18n";
-
-// Initialize OpenReplay
-//initOpenReplay();
 
 const router: any = createRouter({
   routeTree,
