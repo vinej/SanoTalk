@@ -19,7 +19,12 @@
   "actions": {
     "moveBack": "Reculer",
     "moveForward": "Avancer",
-    "delete": "Supprimer"
+    "delete": "Supprimer",
+    "edit": "Modifier"
+  },
+  "editDialog": {
+    "title": "Modifier la tâche",
+    "save": "Enregistrer"
   },
   "assign": {
     "placeholder": "Sélectionner un utilisateur...",

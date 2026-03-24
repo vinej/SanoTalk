@@ -17,7 +17,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "../../components/ui/dialog";
-import { Plus, Trash2, ArrowRight, ArrowLeft, User, Calendar, LayoutDashboard } from "lucide-react";
+import { Plus, Trash2, ArrowRight, ArrowLeft, User, Calendar, LayoutDashboard, Pencil } from "lucide-react";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { Link } from "@tanstack/react-router";
@@ -79,6 +79,11 @@ function KanbanPage() {
   const [pickUserOpen, setPickUserOpen] = useState(false);
   const [pickUserTask, setPickUserTask] = useState<TaskWithUser | null>(null);
   const [pickedUserId, setPickedUserId] = useState("");
+
+  // Edit dialog
+  const [editTask, setEditTask] = useState<TaskWithUser | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
 
   // Confirm unassign dialog (back arrow from assigned, or dropdown unassign)
   const [confirmUnassignOpen, setConfirmUnassignOpen] = useState(false);
@@ -173,6 +178,20 @@ function KanbanPage() {
     }
   }
 
+  function handleOpenEdit(task: TaskWithUser) {
+    setEditTask(task);
+    setEditTitle(task.title);
+    setEditDescription(task.description ?? "");
+  }
+
+  function handleSaveEdit() {
+    if (!editTask || !editTitle.trim()) return;
+    updateMutation.mutate(
+      { id: editTask.id, title: editTitle.trim(), description: editDescription.trim() || null },
+      { onSuccess: () => { setEditTask(null); } }
+    );
+  }
+
   function handleCreate() {
     if (!newTitle.trim()) return;
     createMutation.mutate({
@@ -258,6 +277,7 @@ function KanbanPage() {
                         : undefined
                     }
                     onDelete={() => deleteMutation.mutate({ id: t.id })}
+                    onEdit={() => handleOpenEdit(t)}
                     onAssignUser={(userId) => handleDropdownChange(t, userId)}
                     onUnassignUser={() => handleDropdownChange(t, "")}
                   />
@@ -347,6 +367,46 @@ function KanbanPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Edit dialog */}
+      <Dialog open={!!editTask} onOpenChange={(open) => { if (!open) setEditTask(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("kanban:editDialog.title")}</DialogTitle>
+          </DialogHeader>
+          <div style={{ display: "flex", flexDirection: "column", gap: "16px", padding: "8px 0" }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <Label htmlFor="edit-title">{t("kanban:dialog.titleLabel")}</Label>
+              <Input
+                id="edit-title"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSaveEdit()}
+                autoFocus
+                className="!border-slate-400"
+              />
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+              <Label htmlFor="edit-desc">{t("kanban:dialog.descriptionLabel")}</Label>
+              <Input
+                id="edit-desc"
+                placeholder={t("kanban:dialog.descriptionPlaceholder")}
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                className="!border-slate-400"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditTask(null)}>
+              {t("common:cancel")}
+            </Button>
+            <Button onClick={handleSaveEdit} disabled={!editTitle.trim() || updateMutation.isPending}>
+              {t("kanban:editDialog.save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Confirm unassign dialog */}
       <Dialog open={confirmUnassignOpen} onOpenChange={(open) => { if (!open) { setConfirmUnassignOpen(false); setConfirmUnassignTask(null); } }}>
         <DialogContent>
@@ -381,6 +441,7 @@ function TaskCard({
   onMoveForward,
   onMoveBack,
   onDelete,
+  onEdit,
   onAssignUser,
   onUnassignUser,
 }: {
@@ -390,6 +451,7 @@ function TaskCard({
   onMoveForward?: (() => void) | undefined;
   onMoveBack?: (() => void) | undefined;
   onDelete: () => void;
+  onEdit: () => void;
   onAssignUser: (userId: string) => void;
   onUnassignUser: () => void;
 }) {
@@ -462,6 +524,9 @@ function TaskCard({
               <ArrowRight className="w-3.5 h-3.5" />
             </Button>
           )}
+          <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onEdit} title={t("actions.edit")}>
+              <Pencil className="w-3.5 h-3.5" />
+            </Button>
           <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onDelete} title={t("actions.delete")}>
             <Trash2 className="w-3.5 h-3.5 text-destructive" />
           </Button>

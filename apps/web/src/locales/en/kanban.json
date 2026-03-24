@@ -19,7 +19,12 @@
   "actions": {
     "moveBack": "Move back",
     "moveForward": "Move forward",
-    "delete": "Delete"
+    "delete": "Delete",
+    "edit": "Edit"
+  },
+  "editDialog": {
+    "title": "Edit Task",
+    "save": "Save"
   },
   "assign": {
     "placeholder": "Select a user...",

@@ -19,7 +19,12 @@
   "actions": {
     "moveBack": "تحريك للخلف",
     "moveForward": "تحريك للأمام",
-    "delete": "حذف"
+    "delete": "حذف",
+    "edit": "تعديل"
+  },
+  "editDialog": {
+    "title": "تعديل المهمة",
+    "save": "حفظ"
   },
   "assign": {
     "placeholder": "اختر مستخدماً...",

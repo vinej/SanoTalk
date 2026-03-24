@@ -19,7 +19,12 @@
   "actions": {
     "moveBack": "向前移动",
     "moveForward": "向后移动",
-    "delete": "删除"
+    "delete": "删除",
+    "edit": "编辑"
+  },
+  "editDialog": {
+    "title": "编辑任务",
+    "save": "保存"
   },
   "assign": {
     "placeholder": "选择用户...",

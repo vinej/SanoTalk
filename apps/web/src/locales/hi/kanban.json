@@ -19,7 +19,12 @@
   "actions": {
     "moveBack": "पीछे ले जाएं",
     "moveForward": "आगे ले जाएं",
-    "delete": "हटाएं"
+    "delete": "हटाएं",
+    "edit": "संपादित करें"
+  },
+  "editDialog": {
+    "title": "कार्य संपादित करें",
+    "save": "सहेजें"
   },
   "assign": {
     "placeholder": "उपयोगकर्ता चुनें...",
