@@ -89,6 +89,10 @@ function KanbanPage() {
   const [confirmUnassignOpen, setConfirmUnassignOpen] = useState(false);
   const [confirmUnassignTask, setConfirmUnassignTask] = useState<TaskWithUser | null>(null);
 
+  // Confirm delete dialog
+  const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+  const [confirmDeleteTask, setConfirmDeleteTask] = useState<TaskWithUser | null>(null);
+
   const { t } = useTranslation(["kanban", "common"]);
 
   const utils = trpc.useUtils();
@@ -192,6 +196,19 @@ function KanbanPage() {
     );
   }
 
+  function handleDeleteClick(task: TaskWithUser) {
+    setConfirmDeleteTask(task);
+    setConfirmDeleteOpen(true);
+  }
+
+  function handleConfirmDelete() {
+    if (!confirmDeleteTask) return;
+    deleteMutation.mutate(
+      { id: confirmDeleteTask.id },
+      { onSuccess: () => { setConfirmDeleteOpen(false); setConfirmDeleteTask(null); } }
+    );
+  }
+
   function handleCreate() {
     if (!newTitle.trim()) return;
     createMutation.mutate({
@@ -276,7 +293,7 @@ function KanbanPage() {
                         ? () => handleMoveBack(t)
                         : undefined
                     }
-                    onDelete={() => deleteMutation.mutate({ id: t.id })}
+                    onDelete={() => handleDeleteClick(t)}
                     onEdit={() => handleOpenEdit(t)}
                     onAssignUser={(userId) => handleDropdownChange(t, userId)}
                     onUnassignUser={() => handleDropdownChange(t, "")}
@@ -402,6 +419,30 @@ function KanbanPage() {
             </Button>
             <Button onClick={handleSaveEdit} disabled={!editTitle.trim() || updateMutation.isPending}>
               {t("kanban:editDialog.save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirm delete dialog */}
+      <Dialog open={confirmDeleteOpen} onOpenChange={(open) => { if (!open) { setConfirmDeleteOpen(false); setConfirmDeleteTask(null); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("kanban:delete.dialogTitle")}</DialogTitle>
+          </DialogHeader>
+          <p style={{ fontSize: "13px", color: "#64748b", padding: "8px 0" }}>
+            {t("kanban:delete.dialogDescription", { title: confirmDeleteTask?.title ?? "" })}
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setConfirmDeleteOpen(false); setConfirmDeleteTask(null); }}>
+              {t("common:cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={deleteMutation.isPending}
+            >
+              {t("kanban:delete.confirm")}
             </Button>
           </DialogFooter>
         </DialogContent>

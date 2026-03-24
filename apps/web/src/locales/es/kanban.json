@@ -37,5 +37,10 @@
     "dialogTitle": "Eliminar asignación",
     "dialogDescription": "Esto moverá la tarea a 'Sin asignar' y eliminará el asignatario actual. ¿Continuar?",
     "confirm": "Eliminar asignación"
+  },
+  "delete": {
+    "dialogTitle": "Eliminar tarea",
+    "dialogDescription": "¿Estás seguro de que quieres eliminar «{{title}}»? Esta acción no se puede deshacer.",
+    "confirm": "Eliminar"
   }
 }

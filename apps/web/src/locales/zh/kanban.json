@@ -37,5 +37,10 @@
     "dialogTitle": "取消分配",
     "dialogDescription": "这将把任务移回「未分配」列并移除当前负责人。是否继续？",
     "confirm": "取消分配"
+  },
+  "delete": {
+    "dialogTitle": "删除任务",
+    "dialogDescription": "确定要删除「{{title}}」吗？此操作无法撤销。",
+    "confirm": "删除"
   }
 }

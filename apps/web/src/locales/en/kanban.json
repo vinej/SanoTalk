@@ -37,5 +37,10 @@
     "dialogTitle": "Remove Assignment",
     "dialogDescription": "This will move the task back to 'Not Assigned' and remove the current assignee. Continue?",
     "confirm": "Remove Assignment"
+  },
+  "delete": {
+    "dialogTitle": "Delete Task",
+    "dialogDescription": "Are you sure you want to delete \"{{title}}\"? This action cannot be undone.",
+    "confirm": "Delete"
   }
 }

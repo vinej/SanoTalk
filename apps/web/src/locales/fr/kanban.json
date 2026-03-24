@@ -37,5 +37,10 @@
     "dialogTitle": "Retirer l'assignation",
     "dialogDescription": "Cela déplacera la tâche vers 'Non assigné' et retirera l'assignataire actuel. Continuer ?",
     "confirm": "Retirer l'assignation"
+  },
+  "delete": {
+    "dialogTitle": "Supprimer la tâche",
+    "dialogDescription": "Êtes-vous sûr de vouloir supprimer « {{title}} » ? Cette action est irréversible.",
+    "confirm": "Supprimer"
   }
 }
