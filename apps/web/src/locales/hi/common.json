@@ -5,5 +5,25 @@
   "kanban": "कानबान",
   "cancel": "रद्द करें",
   "create": "बनाएं",
-  "back": "वापस"
+  "back": "वापस",
+  "signUp": {
+    "title": "अपना खाता बनाएं",
+    "name": "पूरा नाम",
+    "namePlaceholder": "राहुल शर्मा",
+    "email": "ईमेल",
+    "emailPlaceholder": "you@example.com",
+    "password": "पासवर्ड",
+    "role": "भूमिका",
+    "selectRole": "अपनी भूमिका चुनें",
+    "submit": "साइन अप करें",
+    "submitting": "साइन अप हो रहा है…",
+    "haveAccount": "पहले से खाता है?",
+    "signIn": "साइन इन करें"
+  },
+  "roles": {
+    "patient": "मरीज़",
+    "doctor": "डॉक्टर",
+    "pharmacist": "फार्मासिस्ट",
+    "ia_agent": "AI एजेंट"
+  }
 }

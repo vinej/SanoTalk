@@ -5,5 +5,25 @@
   "kanban": "看板",
   "cancel": "取消",
   "create": "创建",
-  "back": "返回"
+  "back": "返回",
+  "signUp": {
+    "title": "创建您的账户",
+    "name": "全名",
+    "namePlaceholder": "张三",
+    "email": "电子邮件",
+    "emailPlaceholder": "you@example.com",
+    "password": "密码",
+    "role": "角色",
+    "selectRole": "选择您的角色",
+    "submit": "注册",
+    "submitting": "注册中…",
+    "haveAccount": "已有账户？",
+    "signIn": "登录"
+  },
+  "roles": {
+    "patient": "患者",
+    "doctor": "医生",
+    "pharmacist": "药剂师",
+    "ia_agent": "AI 智能体"
+  }
 }

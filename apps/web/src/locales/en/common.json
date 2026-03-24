@@ -5,5 +5,25 @@
   "kanban": "Kanban",
   "cancel": "Cancel",
   "create": "Create",
-  "back": "Back"
+  "back": "Back",
+  "signUp": {
+    "title": "Create your account",
+    "name": "Full name",
+    "namePlaceholder": "John Doe",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "role": "Role",
+    "selectRole": "Select your role",
+    "submit": "Sign up",
+    "submitting": "Signing up…",
+    "haveAccount": "Already have an account?",
+    "signIn": "Sign in"
+  },
+  "roles": {
+    "patient": "Patient",
+    "doctor": "Doctor",
+    "pharmacist": "Pharmacist",
+    "ia_agent": "IA Agent"
+  }
 }
