@@ -28,6 +28,7 @@ export const Route = createFileRoute("/_auth/kanban")({
 });
 
 type TaskWithUser = Task & { assignedUser: { id: string; name: string } | null };
+type UserOption = { id: string; name: string; email: string; role: string };
 
 const COLUMNS: {
   status: Task["status"];
@@ -73,10 +74,21 @@ function KanbanPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
+
+  // User picker dialog (forward arrow from not_assigned)
+  const [pickUserOpen, setPickUserOpen] = useState(false);
+  const [pickUserTask, setPickUserTask] = useState<TaskWithUser | null>(null);
+  const [pickedUserId, setPickedUserId] = useState("");
+
+  // Confirm unassign dialog (back arrow from assigned, or dropdown unassign)
+  const [confirmUnassignOpen, setConfirmUnassignOpen] = useState(false);
+  const [confirmUnassignTask, setConfirmUnassignTask] = useState<TaskWithUser | null>(null);
+
   const { t } = useTranslation(["kanban", "common"]);
 
   const utils = trpc.useUtils();
   const { data: tasks = [], isLoading } = trpc.tasks.list.useQuery();
+  const { data: users = [] } = trpc.tasks.listUsers.useQuery();
 
   const createMutation = trpc.tasks.create.useMutation({
     onSuccess: () => {
@@ -95,11 +107,70 @@ function KanbanPage() {
     onSuccess: () => void utils.tasks.list.invalidate(),
   });
 
-  function moveTask(task: TaskWithUser, direction: "forward" | "back") {
-    const idx = STATUS_ORDER.indexOf(task.status as Task["status"]);
-    const nextIdx = direction === "forward" ? idx + 1 : idx - 1;
-    if (nextIdx < 0 || nextIdx >= STATUS_ORDER.length) return;
-    updateMutation.mutate({ id: task.id, status: STATUS_ORDER[nextIdx] });
+  function handleMoveForward(task: TaskWithUser) {
+    if (task.status === "not_assigned") {
+      // Must pick a user before moving to assigned
+      setPickUserTask(task);
+      setPickedUserId("");
+      setPickUserOpen(true);
+    } else {
+      const idx = STATUS_ORDER.indexOf(task.status as Task["status"]);
+      if (idx + 1 < STATUS_ORDER.length) {
+        updateMutation.mutate({ id: task.id, status: STATUS_ORDER[idx + 1] });
+      }
+    }
+  }
+
+  function handleMoveBack(task: TaskWithUser) {
+    if (task.status === "assigned") {
+      // Confirmation required before removing assignment
+      setConfirmUnassignTask(task);
+      setConfirmUnassignOpen(true);
+    } else {
+      const idx = STATUS_ORDER.indexOf(task.status as Task["status"]);
+      if (idx - 1 >= 0) {
+        updateMutation.mutate({ id: task.id, status: STATUS_ORDER[idx - 1] });
+      }
+    }
+  }
+
+  function handleConfirmAssign() {
+    if (!pickUserTask || !pickedUserId) return;
+    updateMutation.mutate({
+      id: pickUserTask.id,
+      status: "assigned",
+      assignedUserId: pickedUserId,
+    });
+    setPickUserOpen(false);
+    setPickUserTask(null);
+    setPickedUserId("");
+  }
+
+  function handleConfirmUnassign() {
+    if (!confirmUnassignTask) return;
+    updateMutation.mutate({
+      id: confirmUnassignTask.id,
+      status: "not_assigned",
+      assignedUserId: null,
+    });
+    setConfirmUnassignOpen(false);
+    setConfirmUnassignTask(null);
+  }
+
+  function handleDropdownChange(task: TaskWithUser, newUserId: string) {
+    if (newUserId === "") {
+      if (task.assignedUserId) {
+        setConfirmUnassignTask(task);
+        setConfirmUnassignOpen(true);
+      }
+    } else {
+      const newStatus: Task["status"] = task.status === "not_assigned" ? "assigned" : task.status;
+      updateMutation.mutate({
+        id: task.id,
+        assignedUserId: newUserId,
+        status: newStatus,
+      });
+    }
   }
 
   function handleCreate() {
@@ -174,18 +245,21 @@ function KanbanPage() {
                   <TaskCard
                     key={t.id}
                     task={t}
+                    users={users}
                     borderColor={col.border}
                     onMoveForward={
                       col.status !== "completed"
-                        ? () => moveTask(t, "forward")
+                        ? () => handleMoveForward(t)
                         : undefined
                     }
                     onMoveBack={
                       col.status !== "not_assigned"
-                        ? () => moveTask(t, "back")
+                        ? () => handleMoveBack(t)
                         : undefined
                     }
                     onDelete={() => deleteMutation.mutate({ id: t.id })}
+                    onAssignUser={(userId) => handleDropdownChange(t, userId)}
+                    onUnassignUser={() => handleDropdownChange(t, "")}
                   />
                 ))}
               </div>
@@ -237,28 +311,102 @@ function KanbanPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Pick user dialog (forward arrow from not_assigned) */}
+      <Dialog open={pickUserOpen} onOpenChange={(open) => { if (!open) { setPickUserOpen(false); setPickUserTask(null); setPickedUserId(""); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("kanban:assign.dialogTitle")}</DialogTitle>
+          </DialogHeader>
+          <div style={{ padding: "8px 0 4px" }}>
+            <p style={{ fontSize: "13px", color: "#64748b", marginBottom: "12px" }}>
+              {t("kanban:assign.dialogDescription")}
+            </p>
+            <select
+              value={pickedUserId}
+              onChange={(e) => setPickedUserId(e.target.value)}
+              style={{ width: "100%", padding: "8px 10px", fontSize: "13px", borderRadius: "6px", border: "1px solid #cbd5e1", backgroundColor: "white", color: "#1e293b", outline: "none" }}
+            >
+              <option value="">{t("kanban:assign.placeholder")}</option>
+              {users.map((u) => (
+                <option key={u.id} value={u.id}>{u.name}</option>
+              ))}
+            </select>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setPickUserOpen(false); setPickUserTask(null); setPickedUserId(""); }}>
+              {t("common:cancel")}
+            </Button>
+            <Button
+              onClick={handleConfirmAssign}
+              disabled={!pickedUserId || updateMutation.isPending}
+            >
+              {t("kanban:assign.confirm")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirm unassign dialog */}
+      <Dialog open={confirmUnassignOpen} onOpenChange={(open) => { if (!open) { setConfirmUnassignOpen(false); setConfirmUnassignTask(null); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("kanban:unassign.dialogTitle")}</DialogTitle>
+          </DialogHeader>
+          <p style={{ fontSize: "13px", color: "#64748b", padding: "8px 0" }}>
+            {t("kanban:unassign.dialogDescription")}
+          </p>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setConfirmUnassignOpen(false); setConfirmUnassignTask(null); }}>
+              {t("common:cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmUnassign}
+              disabled={updateMutation.isPending}
+            >
+              {t("kanban:unassign.confirm")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
 function TaskCard({
   task,
+  users,
   borderColor,
   onMoveForward,
   onMoveBack,
   onDelete,
+  onAssignUser,
+  onUnassignUser,
 }: {
   task: TaskWithUser;
+  users: UserOption[];
   borderColor: string;
   onMoveForward?: (() => void) | undefined;
   onMoveBack?: (() => void) | undefined;
   onDelete: () => void;
+  onAssignUser: (userId: string) => void;
+  onUnassignUser: () => void;
 }) {
   const { t } = useTranslation("kanban");
   const createdDate = new Date(task.createdAt).toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",
   });
+
+  function handleSelectChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const val = e.target.value;
+    if (val === "") {
+      onUnassignUser();
+    } else {
+      onAssignUser(val);
+    }
+  }
 
   return (
     <Card className="shadow-sm hover:shadow-md transition-shadow" style={{ gap: 0, padding: 0, border: `1px solid ${borderColor}` }}>
@@ -273,6 +421,20 @@ function TaskCard({
           </p>
         </CardContent>
       )}
+
+      {/* User assignment dropdown */}
+      <div style={{ padding: "0 12px 10px" }}>
+        <select
+          value={task.assignedUserId ?? ""}
+          onChange={handleSelectChange}
+          style={{ width: "100%", padding: "5px 8px", fontSize: "12px", borderRadius: "6px", border: "1px solid #e2e8f0", backgroundColor: task.assignedUserId ? "#eff6ff" : "#f8fafc", color: task.assignedUserId ? "#2563eb" : "#94a3b8", outline: "none", cursor: "pointer" }}
+        >
+          <option value="">{t("assign.unassigned")}</option>
+          {users.map((u) => (
+            <option key={u.id} value={u.id}>{u.name}</option>
+          ))}
+        </select>
+      </div>
 
       <CardFooter style={{ padding: "8px 12px", backgroundColor: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#64748b" }}>

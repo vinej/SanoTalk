@@ -20,5 +20,17 @@
     "moveBack": "Mover atrás",
     "moveForward": "Mover adelante",
     "delete": "Eliminar"
+  },
+  "assign": {
+    "placeholder": "Seleccionar usuario...",
+    "unassigned": "Sin asignar",
+    "dialogTitle": "Asignar usuario",
+    "dialogDescription": "Selecciona un usuario antes de mover la tarea a 'Asignada'.",
+    "confirm": "Asignar y mover"
+  },
+  "unassign": {
+    "dialogTitle": "Eliminar asignación",
+    "dialogDescription": "Esto moverá la tarea a 'Sin asignar' y eliminará el asignatario actual. ¿Continuar?",
+    "confirm": "Eliminar asignación"
   }
 }

@@ -20,5 +20,17 @@
     "moveBack": "向前移动",
     "moveForward": "向后移动",
     "delete": "删除"
+  },
+  "assign": {
+    "placeholder": "选择用户...",
+    "unassigned": "未分配",
+    "dialogTitle": "分配用户",
+    "dialogDescription": "请先选择一位用户，再将任务移至「已分配」列。",
+    "confirm": "分配并移动"
+  },
+  "unassign": {
+    "dialogTitle": "取消分配",
+    "dialogDescription": "这将把任务移回「未分配」列并移除当前负责人。是否继续？",
+    "confirm": "取消分配"
   }
 }

@@ -58,4 +58,11 @@ export const tasksRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       await ctx.db.delete(task).where(eq(task.id, input.id));
     }),
+
+  listUsers: protectedProcedure.query(async ({ ctx }) => {
+    return ctx.db.query.user.findMany({
+      columns: { id: true, name: true, email: true, role: true },
+      orderBy: (u, { asc }) => [asc(u.name)],
+    });
+  }),
 });

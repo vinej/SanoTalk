@@ -20,5 +20,17 @@
     "moveBack": "Move back",
     "moveForward": "Move forward",
     "delete": "Delete"
+  },
+  "assign": {
+    "placeholder": "Select a user...",
+    "unassigned": "Unassigned",
+    "dialogTitle": "Assign User",
+    "dialogDescription": "Select a user to assign before moving the task to 'Assigned'.",
+    "confirm": "Assign & Move"
+  },
+  "unassign": {
+    "dialogTitle": "Remove Assignment",
+    "dialogDescription": "This will move the task back to 'Not Assigned' and remove the current assignee. Continue?",
+    "confirm": "Remove Assignment"
   }
 }
