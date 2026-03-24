@@ -8,6 +8,20 @@
       "when": 1774010564203,
       "tag": "0000_last_blade",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1774364852084,
+      "tag": "0001_odd_boom_boom",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1774383056241,
+      "tag": "0002_exotic_thunderball",
+      "breakpoints": true
     }
   ]
 }

@@ -7,6 +7,11 @@ export const Route: any = createFileRoute("/_auth")({
     if (!session.data?.user) {
       throw redirect({ to: "/login" });
     }
+    const user = session.data.user as any;
+    // If 2FA has never been set up, send to the setup page first
+    if (!user.twoFactorEnabled) {
+      throw redirect({ to: "/setup-2fa" });
+    }
     return { user: session.data.user };
   },
   component: () => <Outlet />,

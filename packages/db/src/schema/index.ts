@@ -1,4 +1,5 @@
 export * from "./auth";
+export * from "./two-factor";
 export * from "./sessions"
 export * from "./transcripts";
 export * from "./recordings";

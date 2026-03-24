@@ -5,6 +5,7 @@ import {
   boolean,
   pgEnum,
 } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 
 export const createTable = pgTableCreator((name) => `sanotalk_${name}`);
 
@@ -24,6 +25,7 @@ export const user = createTable("user", {
     .default("patient"),
   specialty: text("specialty"),
   licenseNumber: text("license_number"),
+  twoFactorEnabled: boolean("two_factor_enabled").notNull().default(true),
 });
 
 export const session = createTable("session", {
@@ -65,6 +67,21 @@ export const verification = createTable("verification", {
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
+
+// ─── Relations (required for drizzle adapter experimental joins) ───────────
+
+export const userRelations = relations(user, ({ many }) => ({
+  accounts: many(account),
+  sessions: many(session),
+}));
+
+export const accountRelations = relations(account, ({ one }) => ({
+  user: one(user, { fields: [account.userId], references: [user.id] }),
+}));
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(user, { fields: [session.userId], references: [user.id] }),
+}));
 
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
