@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { trpc } from "../../lib/trpc";
 import { Button } from "../../components/ui/button";
 import { SessionCard } from "../../components/sessions/session-card";
-import { Plus } from "lucide-react";
+import { Plus, Kanban } from "lucide-react";
 import { TalkSession } from "@sanotalk/db";
 
 type Props = {
@@ -41,12 +41,20 @@ function DashboardPage() {
             Manage your medical consultations
           </p>
         </div>
-        <Button asChild>
-          <Link to="/sessions/new">
-            <Plus className="mr-2 h-4 w-4" />
-            New Session
-          </Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" asChild>
+            <Link to="/kanban">
+              <Kanban className="mr-2 h-4 w-4" />
+              Kanban
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link to="/sessions/new">
+              <Plus className="mr-2 h-4 w-4" />
+              New Session
+            </Link>
+          </Button>
+        </div>
       </div>
 
       {isLoading ? (

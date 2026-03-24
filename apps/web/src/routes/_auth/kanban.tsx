@@ -17,7 +17,8 @@ import {
   DialogFooter,
 } from "../../components/ui/dialog";
 import { Input } from "../../components/ui/input";
-import { Plus, Trash2, ArrowRight, ArrowLeft, User, Calendar } from "lucide-react";
+import { Plus, Trash2, ArrowRight, ArrowLeft, User, Calendar, LayoutDashboard } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import type { Task } from "@sanotalk/db";
 
 export const Route = createFileRoute("/_auth/kanban")({
@@ -116,10 +117,18 @@ function KanbanPage() {
             {tasks.length} task{tasks.length !== 1 ? "s" : ""} total
           </p>
         </div>
-        <Button size="sm" onClick={() => setCreateOpen(true)}>
-          <Plus className="w-4 h-4 mr-1.5" />
-          New Task
-        </Button>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <Button size="sm" variant="outline" asChild>
+            <Link to="/dashboard">
+              <LayoutDashboard className="w-4 h-4 mr-1.5" />
+              Dashboard
+            </Link>
+          </Button>
+          <Button size="sm" onClick={() => setCreateOpen(true)}>
+            <Plus className="w-4 h-4 mr-1.5" />
+            New Task
+          </Button>
+        </div>
       </div>
 
       {/* Board */}
