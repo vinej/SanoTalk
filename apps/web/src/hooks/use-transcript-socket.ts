@@ -27,7 +27,7 @@ export function useTranscriptSocket(sessionId: string) {
     setMicError(null);
     setIsRecording(false);
 
-    const wsUrl = `${import.meta.env.VITE_WS_URL ?? "ws://localhost:3001"}/ws/transcribe?sessionId=${sessionId}`;
+    const wsUrl = `${import.meta.env.VITE_WS_URL}/ws/transcribe?sessionId=${sessionId}`;
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 

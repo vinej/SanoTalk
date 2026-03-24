@@ -9,11 +9,11 @@ export const trpcClient = trpc.createClient({
   links: [
     loggerLink({
       enabled: (opts) =>
-        "development" === "development" ||
+        import.meta.env.DEV ||
         (opts.direction === "down" && opts.result instanceof Error),
     }),
     httpBatchLink({
-      url: 'http://localhost:3001/api/trpc',
+      url: `${import.meta.env.VITE_API_URL}/api/trpc`,
       transformer : superjson,
       headers() {
         return {};
