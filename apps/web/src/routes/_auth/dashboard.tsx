@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "../../components/language-switcher";
 import { signOut } from "../../lib/auth-client";
 import { tracker } from "../../lib/tracker";
+import { SanoTalkLogoV2 } from "../../components/logo-v2";
 
 export const Route = createFileRoute("/_auth/dashboard")({
   component: DashboardPage,
@@ -46,6 +47,10 @@ function DashboardPage() {
 
   return (
     <div className="container mx-auto py-8 space-y-6">
+      <div className="flex items-center justify-center mb-2">
+        <SanoTalkLogoV2 size={64} showText={true} />
+      </div>
+
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t("dashboard:title")}</h1>
