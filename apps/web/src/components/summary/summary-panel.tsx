@@ -4,6 +4,7 @@ import { trpc } from "../../lib/trpc";
 import { Sparkles, Loader2 } from "lucide-react";
 import { Badge } from "../../components/ui/badge";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 
 interface Props {
   sessionId: string;
@@ -11,17 +12,22 @@ interface Props {
 
 export function SummaryPanel({ sessionId }: Props) {
   const { t } = useTranslation("sessions");
+  const [isPolling, setIsPolling] = useState(false);
   const { data: summary, refetch } =
     trpc.transcripts.summaryBySession.useQuery({ sessionId });
 
   const generateMutation = trpc.agents.generateSummary.useMutation({
     onSuccess: () => {
       // Poll for completion — stop after 30s or when summary appears
+      setIsPolling(true);
       let attempts = 0;
       const interval = setInterval(() => {
         attempts++;
         void refetch().then((r) => {
-          if (r.data != null || attempts >= 15) clearInterval(interval);
+          if (r.data != null || attempts >= 15) {
+            clearInterval(interval);
+            setIsPolling(false);
+          }
         });
       }, 2000);
     },
@@ -38,14 +44,18 @@ export function SummaryPanel({ sessionId }: Props) {
             size="sm"
             variant="outline"
             onClick={() => generateMutation.mutate({ sessionId })}
-            disabled={generateMutation.isPending}
+            disabled={generateMutation.isPending || isPolling}
           >
-            {generateMutation.isPending ? (
+            {generateMutation.isPending || isPolling ? (
               <Loader2 className="mr-1 h-3 w-3 animate-spin" />
             ) : (
               <Sparkles className="mr-1 h-3 w-3" />
             )}
-            {t("summary.generate")}
+            {generateMutation.isPending
+              ? t("summary.generating")
+              : isPolling
+                ? t("summary.processing")
+                : t("summary.generate")}
           </Button>
         </div>
 

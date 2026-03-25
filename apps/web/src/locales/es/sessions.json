@@ -35,6 +35,8 @@
   "summary": {
     "title": "Resumen IA",
     "generate": "Generar",
+    "generating": "Generando…",
+    "processing": "Procesando…",
     "sections": {
       "summary": "Resumen",
       "keyPoints": "Puntos clave",

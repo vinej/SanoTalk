@@ -35,6 +35,8 @@
   "summary": {
     "title": "AI 摘要",
     "generate": "生成",
+    "generating": "生成中…",
+    "processing": "处理中…",
     "sections": {
       "summary": "摘要",
       "keyPoints": "要点",

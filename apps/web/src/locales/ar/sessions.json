@@ -35,6 +35,8 @@
   "summary": {
     "title": "ملخص الذكاء الاصطناعي",
     "generate": "توليد",
+    "generating": "جارٍ التوليد…",
+    "processing": "جارٍ المعالجة…",
     "sections": {
       "summary": "الملخص",
       "keyPoints": "النقاط الرئيسية",

@@ -35,6 +35,8 @@
   "summary": {
     "title": "AI Summary",
     "generate": "Generate",
+    "generating": "Generating…",
+    "processing": "Processing…",
     "sections": {
       "summary": "Summary",
       "keyPoints": "Key Points",

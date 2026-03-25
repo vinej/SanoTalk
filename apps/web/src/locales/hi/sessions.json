@@ -35,6 +35,8 @@
   "summary": {
     "title": "AI सारांश",
     "generate": "उत्पन्न करें",
+    "generating": "उत्पन्न हो रहा है…",
+    "processing": "प्रसंस्करण…",
     "sections": {
       "summary": "सारांश",
       "keyPoints": "मुख्य बिंदु",
