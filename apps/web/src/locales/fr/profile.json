@@ -1,0 +1,13 @@
+{
+  "title": "Modifier le profil",
+  "name": "Nom",
+  "email": "Courriel",
+  "doctor": "Mon médecin",
+  "pharmacist": "Mon pharmacien",
+  "specialty": "Spécialité",
+  "licenseNumber": "Numéro de licence",
+  "noDoctor": "Aucun médecin sélectionné",
+  "noPharmacist": "Aucun pharmacien sélectionné",
+  "saving": "Enregistrement…",
+  "saved": "Profil enregistré"
+}

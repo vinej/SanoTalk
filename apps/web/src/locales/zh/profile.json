@@ -1,0 +1,13 @@
+{
+  "title": "编辑个人资料",
+  "name": "姓名",
+  "email": "电子邮件",
+  "doctor": "我的医生",
+  "pharmacist": "我的药剂师",
+  "specialty": "专业领域",
+  "licenseNumber": "执照号码",
+  "noDoctor": "未选择医生",
+  "noPharmacist": "未选择药剂师",
+  "saving": "保存中…",
+  "saved": "个人资料已保存"
+}

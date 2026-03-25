@@ -1,14 +1,16 @@
+import { useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { trpc } from "../../lib/trpc";
 import { Button } from "../../components/ui/button";
 import { SessionCard } from "../../components/sessions/session-card";
-import { Plus, Kanban, LogOut } from "lucide-react";
+import { Plus, Kanban, LogOut, UserCircle } from "lucide-react";
 import { TalkSession } from "@sanotalk/db";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "../../components/language-switcher";
 import { signOut } from "../../lib/auth-client";
 import { tracker } from "../../lib/tracker";
 import { SanoTalkLogoV2 } from "../../components/logo-v2";
+import { ProfileEditDialog } from "../../components/profile/profile-edit-dialog";
 
 export const Route = createFileRoute("/_auth/dashboard")({
   component: DashboardPage,
@@ -31,8 +33,10 @@ function transformSessionDates(session: any): TalkSession {
 
 function DashboardPage() {
   const { data: sessions, isLoading } = trpc.sessions.list.useQuery();
+  const { data: profile } = trpc.user.profile.useQuery();
   const { t } = useTranslation(["dashboard", "common"]);
   const navigate = useNavigate();
+  const [profileOpen, setProfileOpen] = useState(false);
 
   async function handleLogout() {
     if (tracker) {
@@ -46,9 +50,18 @@ function DashboardPage() {
   const sessionsWithDates = sessions?.map(transformSessionDates) ?? [];
 
   return (
+    <>
+    <ProfileEditDialog open={profileOpen} onOpenChange={setProfileOpen} />
     <div className="container mx-auto py-8 space-y-6">
-      <div className="flex items-center justify-center mb-2">
+      <div className="relative flex items-center justify-center mb-2">
         <SanoTalkLogoV2 size={64} showText={true} />
+        {profile && (
+          <div className="absolute right-0 text-right text-sm leading-tight">
+            <div className="font-medium">{profile.name}</div>
+            <div className="text-muted-foreground">{profile.email}</div>
+            <div className="text-muted-foreground capitalize">{(profile as any).role}</div>
+          </div>
+        )}
       </div>
 
       <div className="flex items-center justify-between">
@@ -58,6 +71,10 @@ function DashboardPage() {
         </div>
         <div className="flex gap-2">
           <LanguageSwitcher />
+          <Button variant="outline" onClick={() => setProfileOpen(true)}>
+            <UserCircle className="mr-2 h-4 w-4" />
+            {t("dashboard:profile")}
+          </Button>
           <Button variant="outline" onClick={handleLogout}>
             <LogOut className="mr-2 h-4 w-4" />
             {t("common:logout")}
@@ -96,5 +113,6 @@ function DashboardPage() {
         </div>
       )}
     </div>
+    </>
   );
 }

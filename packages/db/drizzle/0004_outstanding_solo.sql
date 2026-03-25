@@ -1,0 +1,4 @@
+ALTER TABLE "sanotalk_user" ADD COLUMN "linked_doctor_id" text;--> statement-breakpoint
+ALTER TABLE "sanotalk_user" ADD COLUMN "linked_pharmacist_id" text;--> statement-breakpoint
+ALTER TABLE "sanotalk_user" ADD CONSTRAINT "sanotalk_user_linked_doctor_id_sanotalk_user_id_fk" FOREIGN KEY ("linked_doctor_id") REFERENCES "public"."sanotalk_user"("id") ON DELETE set null ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "sanotalk_user" ADD CONSTRAINT "sanotalk_user_linked_pharmacist_id_sanotalk_user_id_fk" FOREIGN KEY ("linked_pharmacist_id") REFERENCES "public"."sanotalk_user"("id") ON DELETE set null ON UPDATE no action;

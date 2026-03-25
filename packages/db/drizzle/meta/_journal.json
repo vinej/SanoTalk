@@ -29,6 +29,13 @@
       "when": 1774459366015,
       "tag": "0003_majestic_fenris",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1774463130289,
+      "tag": "0004_outstanding_solo",
+      "breakpoints": true
     }
   ]
 }

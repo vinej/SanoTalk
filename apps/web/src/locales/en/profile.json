@@ -1,0 +1,13 @@
+{
+  "title": "Edit Profile",
+  "name": "Name",
+  "email": "Email",
+  "doctor": "My Doctor",
+  "pharmacist": "My Pharmacist",
+  "specialty": "Specialty",
+  "licenseNumber": "License Number",
+  "noDoctor": "No doctor selected",
+  "noPharmacist": "No pharmacist selected",
+  "saving": "Saving…",
+  "saved": "Profile saved"
+}

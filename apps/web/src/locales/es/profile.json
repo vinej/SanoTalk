@@ -1,0 +1,13 @@
+{
+  "title": "Editar perfil",
+  "name": "Nombre",
+  "email": "Correo electrónico",
+  "doctor": "Mi médico",
+  "pharmacist": "Mi farmacéutico",
+  "specialty": "Especialidad",
+  "licenseNumber": "Número de licencia",
+  "noDoctor": "Ningún médico seleccionado",
+  "noPharmacist": "Ningún farmacéutico seleccionado",
+  "saving": "Guardando…",
+  "saved": "Perfil guardado"
+}

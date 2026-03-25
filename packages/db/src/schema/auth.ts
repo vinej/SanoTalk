@@ -25,6 +25,8 @@ export const user = createTable("user", {
     .default("patient"),
   specialty: text("specialty"),
   licenseNumber: text("license_number"),
+  linkedDoctorId: text("linked_doctor_id").references((): any => user.id, { onDelete: "set null" }),
+  linkedPharmacistId: text("linked_pharmacist_id").references((): any => user.id, { onDelete: "set null" }),
   twoFactorEnabled: boolean("two_factor_enabled").notNull().default(true),
 });
 
@@ -70,9 +72,19 @@ export const verification = createTable("verification", {
 
 // ─── Relations (required for drizzle adapter experimental joins) ───────────
 
-export const userRelations = relations(user, ({ many }) => ({
+export const userRelations = relations(user, ({ many, one }) => ({
   accounts: many(account),
   sessions: many(session),
+  linkedDoctor: one(user, {
+    fields: [user.linkedDoctorId],
+    references: [user.id],
+    relationName: "patientDoctor",
+  }),
+  linkedPharmacist: one(user, {
+    fields: [user.linkedPharmacistId],
+    references: [user.id],
+    relationName: "patientPharmacist",
+  }),
 }));
 
 export const accountRelations = relations(account, ({ one }) => ({

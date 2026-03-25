@@ -2,5 +2,6 @@
   "title": "Sessions",
   "subtitle": "Gérez vos consultations médicales",
   "newSession": "Nouvelle session",
-  "noSessions": "Aucune session pour l'instant. Créez votre première !"
+  "noSessions": "Aucune session pour l'instant. Créez votre première !",
+  "profile": "Profil"
 }
