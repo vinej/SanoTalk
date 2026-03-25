@@ -1,4 +1,6 @@
-# SanoTalk 🩺🎙️
+<img src="assets/logo.svg" alt="SanoTalk" width="240" />
+
+# SanoTalk
 
 > **Website:** [www.sanotalk.com](http://www.sanotalk.com) — currently under construction, coming soon!
 
