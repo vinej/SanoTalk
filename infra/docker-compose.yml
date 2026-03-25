@@ -6,8 +6,8 @@ services:
     image: postgres:16-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_USER: sanotalk
-      POSTGRES_PASSWORD: sanotalk
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: REDACTED
       POSTGRES_DB: sanotalk
     ports:
       - "5432:5432"

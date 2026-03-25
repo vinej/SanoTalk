@@ -176,6 +176,30 @@ Used for session replay and frontend analytics. Optional — the app runs fine w
 
 ---
 
+## Docker Services
+
+| Service | Image | Port(s) | Purpose |
+| --- | --- | --- | --- |
+| PostgreSQL | `postgres:16-alpine` | `5432` | Main relational database — users, sessions, messages |
+| MinIO | `minio/minio` | `9000` (API), `9001` (UI) | S3-compatible file storage — avatars, attachments, recordings |
+| MinIO Init | `minio/mc` | — | One-time job that creates the `sanotalk` bucket on startup |
+| Loki | `grafana/loki` | `3100` | Log aggregation — collects logs from the server |
+| Grafana | `grafana/grafana` | `3000` | Monitoring dashboard — visualize logs from Loki |
+
+**In short:** Postgres = data, MinIO = files, Loki + Grafana = logs & monitoring.
+
+- MinIO admin UI: [http://localhost:9001](http://localhost:9001) (`minioadmin` / `minioadmin`)
+- Grafana UI: [http://localhost:3000](http://localhost:3000) (`admin` / `admin`) — Loki is pre-configured as a datasource
+
+Start all services from the `infra/` folder:
+
+```bash
+cd infra
+docker compose up -d
+```
+
+---
+
 ## Supported Languages
 
 The UI is fully internationalized (i18n) and available in 6 languages:

@@ -13,6 +13,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogFooter,
@@ -307,7 +308,7 @@ function KanbanPage() {
 
       {/* Create dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent>
+        <DialogContent aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>{t("kanban:dialog.title")}</DialogTitle>
           </DialogHeader>
@@ -355,10 +356,10 @@ function KanbanPage() {
           <DialogHeader>
             <DialogTitle>{t("kanban:assign.dialogTitle")}</DialogTitle>
           </DialogHeader>
+          <DialogDescription style={{ fontSize: "13px", color: "#64748b", marginBottom: "12px" }}>
+            {t("kanban:assign.dialogDescription")}
+          </DialogDescription>
           <div style={{ padding: "8px 0 4px" }}>
-            <p style={{ fontSize: "13px", color: "#64748b", marginBottom: "12px" }}>
-              {t("kanban:assign.dialogDescription")}
-            </p>
             <select
               value={pickedUserId}
               onChange={(e) => setPickedUserId(e.target.value)}
@@ -386,7 +387,7 @@ function KanbanPage() {
 
       {/* Edit dialog */}
       <Dialog open={!!editTask} onOpenChange={(open) => { if (!open) setEditTask(null); }}>
-        <DialogContent>
+        <DialogContent aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>{t("kanban:editDialog.title")}</DialogTitle>
           </DialogHeader>
@@ -430,9 +431,9 @@ function KanbanPage() {
           <DialogHeader>
             <DialogTitle>{t("kanban:delete.dialogTitle")}</DialogTitle>
           </DialogHeader>
-          <p style={{ fontSize: "13px", color: "#64748b", padding: "8px 0" }}>
+          <DialogDescription style={{ fontSize: "13px", color: "#64748b", padding: "8px 0" }}>
             {t("kanban:delete.dialogDescription", { title: confirmDeleteTask?.title ?? "" })}
-          </p>
+          </DialogDescription>
           <DialogFooter>
             <Button variant="outline" onClick={() => { setConfirmDeleteOpen(false); setConfirmDeleteTask(null); }}>
               {t("common:cancel")}
@@ -454,9 +455,9 @@ function KanbanPage() {
           <DialogHeader>
             <DialogTitle>{t("kanban:unassign.dialogTitle")}</DialogTitle>
           </DialogHeader>
-          <p style={{ fontSize: "13px", color: "#64748b", padding: "8px 0" }}>
+          <DialogDescription style={{ fontSize: "13px", color: "#64748b", padding: "8px 0" }}>
             {t("kanban:unassign.dialogDescription")}
-          </p>
+          </DialogDescription>
           <DialogFooter>
             <Button variant="outline" onClick={() => { setConfirmUnassignOpen(false); setConfirmUnassignTask(null); }}>
               {t("common:cancel")}

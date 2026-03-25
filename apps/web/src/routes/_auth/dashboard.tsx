@@ -7,6 +7,7 @@ import { TalkSession } from "@sanotalk/db";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "../../components/language-switcher";
 import { signOut } from "../../lib/auth-client";
+import { tracker } from "../../lib/tracker";
 
 export const Route = createFileRoute("/_auth/dashboard")({
   component: DashboardPage,
@@ -33,6 +34,10 @@ function DashboardPage() {
   const navigate = useNavigate();
 
   async function handleLogout() {
+    if (tracker) {
+      tracker.stop();
+      console.log("[OpenReplay] tracker stopped");
+    }
     await signOut();
     navigate({ to: "/login" as any });
   }
