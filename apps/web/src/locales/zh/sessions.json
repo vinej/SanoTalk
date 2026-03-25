@@ -1,9 +1,11 @@
 {
   "new": {
     "title": "新建会话",
-    "subtitle": "开始一次新的医疗咨询。",
+    "subtitle": "为您的会话起一个标题，以便日后轻松查找。",
     "creating": "创建中…",
-    "start": "开始会话"
+    "start": "开始会话",
+    "titleLabel": "会话标题",
+    "titlePlaceholder": "例如：与马丁医生的随访"
   },
   "detail": {
     "loading": "加载会话中…",
@@ -20,7 +22,8 @@
       "active": "进行中",
       "completed": "已完成",
       "cancelled": "已取消"
-    }
+    },
+    "renameTitle": "重命名会话"
   },
   "room": {
     "room": "房间",

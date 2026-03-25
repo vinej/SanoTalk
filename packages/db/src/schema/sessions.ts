@@ -12,6 +12,7 @@ export const sessionStatusEnum = pgEnum("sanotalk_session_status", [
 
 export const talkSession = createTable("talk_session", {
   id: uuid("id").primaryKey().defaultRandom(),
+  title: text("title"),
   status: sessionStatusEnum("status").notNull().default("scheduled"),
   roomName: text("room_name").notNull().unique(),
   hostId: text("host_id")

@@ -1,9 +1,11 @@
 {
   "new": {
     "title": "Nouvelle session",
-    "subtitle": "Démarrez une nouvelle consultation médicale.",
+    "subtitle": "Donnez un titre à votre session pour la retrouver facilement.",
     "creating": "Création en cours…",
-    "start": "Démarrer la session"
+    "start": "Démarrer la session",
+    "titleLabel": "Titre de la session",
+    "titlePlaceholder": "ex. Suivi avec le Dr Martin"
   },
   "detail": {
     "loading": "Chargement de la session…",
@@ -20,7 +22,8 @@
       "active": "Active",
       "completed": "Terminée",
       "cancelled": "Annulée"
-    }
+    },
+    "renameTitle": "Renommer la session"
   },
   "room": {
     "room": "Salle",

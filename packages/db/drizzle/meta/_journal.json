@@ -36,6 +36,13 @@
       "when": 1774463130289,
       "tag": "0004_outstanding_solo",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1774467178674,
+      "tag": "0005_sticky_shriek",
+      "breakpoints": true
     }
   ]
 }

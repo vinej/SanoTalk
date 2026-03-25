@@ -52,6 +52,7 @@ export const sessionsRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
+        title: z.string().min(1).max(120).optional(),
         scheduledAt: z.string().datetime().optional(),
       })
     )
@@ -62,11 +63,29 @@ export const sessionsRouter = createTRPCRouter({
         .values({
           roomName,
           hostId: ctx.user.id,
+          ...(input.title ? { title: input.title } : {}),
           scheduledAt: input.scheduledAt ? new Date(input.scheduledAt) : null,
         })
         .returning();
 
       return created;
+    }),
+
+  rename: protectedProcedure
+    .input(z.object({ id: z.string().uuid(), title: z.string().min(1).max(120) }))
+    .mutation(async ({ ctx, input }) => {
+      const session = await ctx.db.query.talkSession.findFirst({
+        where: eq(talkSession.id, input.id),
+      });
+      if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
+      if (session.hostId !== ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the host can rename a session" });
+
+      const [updated] = await ctx.db
+        .update(talkSession)
+        .set({ title: input.title, updatedAt: new Date() })
+        .where(eq(talkSession.id, input.id))
+        .returning();
+      return updated;
     }),
 
   start: protectedProcedure

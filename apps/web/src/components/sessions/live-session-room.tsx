@@ -39,7 +39,7 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-6 p-8">
         <div className="text-center space-y-2">
-          <h2 className="text-2xl font-semibold">{session.hostId}</h2>
+          <h2 className="text-2xl font-semibold">{session.title ?? session.roomName}</h2>
           <p className="text-muted-foreground">{t("room.room")}: {session.roomName}</p>
         </div>
         <Button

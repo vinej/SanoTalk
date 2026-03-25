@@ -1,7 +1,9 @@
 {
   "new": {
     "title": "New Session",
-    "subtitle": "Start a new medical consultation session.",
+    "subtitle": "Give your session a title to find it easily later.",
+    "titleLabel": "Session title",
+    "titlePlaceholder": "e.g. Follow-up with Dr. Martin",
     "creating": "Creating…",
     "start": "Start Session"
   },
@@ -13,6 +15,7 @@
   },
   "card": {
     "liveNow": "Live now",
+    "renameTitle": "Rename session",
     "deleteTitle": "Delete session",
     "deleteConfirm": "This will permanently delete the session and all its data. This cannot be undone.",
     "statuses": {

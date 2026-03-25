@@ -9,6 +9,8 @@ import {
 } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Label } from "../../components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -17,7 +19,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from "../../components/ui/dialog";
-import { Calendar, Video, Trash2 } from "lucide-react";
+import { Calendar, Video, Trash2, Pencil } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { TalkSession } from "@sanotalk/db";
 import { useTranslation } from "react-i18next";
@@ -37,6 +39,8 @@ const statusColors = {
 export function SessionCard({ session }: Props) {
   const { t } = useTranslation(["sessions", "common"]);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [renameTitle, setRenameTitle] = useState(session.title ?? "");
   const utils = trpc.useUtils();
 
   const deleteMutation = trpc.sessions.delete.useMutation({
@@ -46,6 +50,27 @@ export function SessionCard({ session }: Props) {
     },
   });
 
+  const renameMutation = trpc.sessions.rename.useMutation({
+    onSuccess: () => {
+      void utils.sessions.list.invalidate();
+      setRenameOpen(false);
+    },
+  });
+
+  function handleRenameOpen(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setRenameTitle(session.title ?? "");
+    setRenameOpen(true);
+  }
+
+  function handleRename() {
+    if (!renameTitle.trim()) return;
+    renameMutation.mutate({ id: session.id, title: renameTitle.trim() });
+  }
+
+  const displayTitle = session.title || session.roomName;
+
   return (
     <>
       <div className="relative group">
@@ -54,7 +79,7 @@ export function SessionCard({ session }: Props) {
             <CardHeader className="pb-2">
               <div className="flex items-start justify-between gap-2">
                 <CardTitle className="text-base line-clamp-2 group-hover:text-primary transition-colors">
-                  {session.hostId}
+                  {displayTitle}
                 </CardTitle>
                 <Badge
                   variant="secondary"
@@ -84,7 +109,17 @@ export function SessionCard({ session }: Props) {
           </Card>
         </Link>
 
-        {/* Delete button — appears on hover */}
+        {/* Rename button */}
+        <Button
+          size="icon"
+          variant="outline"
+          className="absolute bottom-2 right-10 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+          onClick={handleRenameOpen}
+        >
+          <Pencil className="h-3.5 w-3.5" />
+        </Button>
+
+        {/* Delete button */}
         <Button
           size="icon"
           variant="destructive"
@@ -99,6 +134,38 @@ export function SessionCard({ session }: Props) {
         </Button>
       </div>
 
+      {/* Rename dialog */}
+      <Dialog open={renameOpen} onOpenChange={setRenameOpen}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>{t("sessions:card.renameTitle")}</DialogTitle>
+            <DialogDescription>{session.roomName}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-1 py-2">
+            <Label>{t("sessions:new.titleLabel")}</Label>
+            <Input
+              autoFocus
+              value={renameTitle}
+              onChange={(e) => setRenameTitle(e.target.value)}
+              onKeyDown={(e) => { if (e.key === "Enter") handleRename(); }}
+              maxLength={120}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setRenameOpen(false)}>
+              {t("common:cancel")}
+            </Button>
+            <Button
+              onClick={handleRename}
+              disabled={!renameTitle.trim() || renameMutation.isPending}
+            >
+              {t("common:save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirmation dialog */}
       <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <DialogContent>
           <DialogHeader>
