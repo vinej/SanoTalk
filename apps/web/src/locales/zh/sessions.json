@@ -23,7 +23,8 @@
       "completed": "已完成",
       "cancelled": "已取消"
     },
-    "renameTitle": "重命名会话"
+    "renameTitle": "重命名会话",
+    "closeSession": "关闭会话"
   },
   "room": {
     "room": "房间",

@@ -23,7 +23,8 @@
       "completed": "पूर्ण",
       "cancelled": "रद्द"
     },
-    "renameTitle": "सत्र का नाम बदलें"
+    "renameTitle": "सत्र का नाम बदलें",
+    "closeSession": "सत्र बंद करें"
   },
   "room": {
     "room": "कमरा",

@@ -23,7 +23,8 @@
       "completed": "مكتملة",
       "cancelled": "ملغاة"
     },
-    "renameTitle": "إعادة تسمية الجلسة"
+    "renameTitle": "إعادة تسمية الجلسة",
+    "closeSession": "إغلاق الجلسة"
   },
   "room": {
     "room": "الغرفة",

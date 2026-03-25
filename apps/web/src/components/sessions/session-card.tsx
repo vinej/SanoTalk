@@ -19,7 +19,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from "../../components/ui/dialog";
-import { Calendar, Video, Trash2, Pencil } from "lucide-react";
+import { Calendar, Video, Trash2, Pencil, CircleCheck } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { TalkSession } from "@sanotalk/db";
 import { useTranslation } from "react-i18next";
@@ -56,6 +56,12 @@ export function SessionCard({ session }: Props) {
       setRenameOpen(false);
     },
   });
+
+  const closeMutation = trpc.sessions.end.useMutation({
+    onSuccess: () => void utils.sessions.list.invalidate(),
+  });
+
+  const canClose = session.status === "scheduled" || session.status === "active";
 
   function handleRenameOpen(e: React.MouseEvent) {
     e.preventDefault();
@@ -108,6 +114,24 @@ export function SessionCard({ session }: Props) {
             </CardContent>
           </Card>
         </Link>
+
+        {/* Close session button — only for scheduled/active */}
+        {canClose && (
+          <Button
+            size="icon"
+            variant="outline"
+            className="absolute bottom-2 right-[4.5rem] h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-green-600 hover:text-green-700"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              closeMutation.mutate({ id: session.id });
+            }}
+            disabled={closeMutation.isPending}
+            title={t("sessions:card.closeSession")}
+          >
+            <CircleCheck className="h-3.5 w-3.5" />
+          </Button>
+        )}
 
         {/* Rename button */}
         <Button

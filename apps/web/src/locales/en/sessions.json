@@ -23,7 +23,8 @@
       "active": "Active",
       "completed": "Completed",
       "cancelled": "Cancelled"
-    }
+    },
+    "closeSession": "Close session"
   },
   "room": {
     "room": "Room",

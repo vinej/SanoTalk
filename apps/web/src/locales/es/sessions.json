@@ -23,7 +23,8 @@
       "completed": "Completada",
       "cancelled": "Cancelada"
     },
-    "renameTitle": "Renombrar sesión"
+    "renameTitle": "Renombrar sesión",
+    "closeSession": "Cerrar sesión"
   },
   "room": {
     "room": "Sala",
