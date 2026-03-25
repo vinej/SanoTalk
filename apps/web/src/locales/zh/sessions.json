@@ -45,7 +45,13 @@
       "keyPoints": "要点",
       "soapNote": "SOAP 记录"
     },
-    "empty": "点击「生成」以在会话结束后创建 AI 摘要。"
+    "empty": "点击「生成」以在会话结束后创建 AI 摘要。",
+    "send": "发送",
+    "sendTitle": "发送摘要",
+    "sendDesc": "选择将此 AI 摘要发送给谁。",
+    "sending": "发送中…",
+    "sent": "已发送！",
+    "noRecipients": "没有关联的医生或药剂师。请编辑个人资料以添加。"
   },
   "chat": {
     "placeholder": "提问健康相关问题…",

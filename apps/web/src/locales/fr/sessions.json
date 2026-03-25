@@ -45,7 +45,13 @@
       "keyPoints": "Points clés",
       "soapNote": "Note SOAP"
     },
-    "empty": "Cliquez sur Générer pour créer un résumé IA après la session."
+    "empty": "Cliquez sur Générer pour créer un résumé IA après la session.",
+    "send": "Envoyer",
+    "sendTitle": "Envoyer le résumé",
+    "sendDesc": "Choisissez à qui envoyer ce résumé IA.",
+    "sending": "Envoi…",
+    "sent": "Envoyé !",
+    "noRecipients": "Aucun médecin ou pharmacien lié. Modifiez votre profil pour en ajouter un."
   },
   "chat": {
     "placeholder": "Posez une question de santé…",

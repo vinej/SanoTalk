@@ -2,9 +2,7 @@ import { betterAuth } from "better-auth";
 import { twoFactor } from "better-auth/plugins";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db, user, session, account, verification, twoFactor as twoFactorTable } from "@sanotalk/db";
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import { resend } from "./lib/resend";
 
 // Wrap the drizzle adapter to:
 //  1. Force twoFactorEnabled=true on user creation (plugin always writes false explicitly,

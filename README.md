@@ -42,12 +42,35 @@ video/audio sessions, and intelligent note generation.
 
 ## Features
 
+### Consultations
+
 - Real-time audio/video medical consultations via LiveKit
 - Live speech-to-text transcription powered by Deepgram
-- AI-generated session notes and summaries via Claude (Anthropic)
+- AI-generated session summaries and SOAP notes via Claude (Anthropic)
 - Session recordings stored in MinIO (S3-compatible)
+
+### AI Health Assistant
+
+- In-session AI chat panel powered by Claude Sonnet — ask health questions and get informed responses in real time
+- Voice-to-AI: live transcript is automatically forwarded to the AI assistant, so speaking during a consultation also feeds the assistant
+- AI chat history is included as context when generating the session summary
+- Toggle voice mode on/off independently of the microphone
+
+### Summary Sharing
+
+- Once a summary is generated, patients can email it directly to their linked doctor or pharmacist with a single click
+- The dialog only shows providers already linked to the patient's profile — no free-form address entry
+
+### User Profiles
+
+- Role-based profile editing from the dashboard
+- Patients can link a doctor and a pharmacist from the registered users list
+- Doctors and pharmacists can set their specialty and license number
+
+### Platform
+
 - **Kanban board** for task management — assign tasks to users, track progress across *Not Assigned*, *Assigned*, and *Completed* columns
-- Fully internationalized UI (6 languages)
+- Fully internationalized UI (6 languages: English, French, Spanish, Chinese, Arabic, Hindi)
 - Session replay and analytics via OpenReplay
 - Observability with Grafana + Loki
 
@@ -68,10 +91,23 @@ pnpm install
 
 ### 2. Configure Environment
 
+The project uses two `.env` files — one for the server, one for the Vite frontend:
+
+#### Root (server)
+
 ```bash
 cp .env.example .env
-# Fill in your values in .env
+# Fill in your values — database, auth, API keys, email, etc.
 ```
+
+#### Frontend (`apps/web/`)
+
+```bash
+cp apps/web/.env.example apps/web/.env
+# Fill in the Vite-specific values — API URLs, OpenReplay
+```
+
+> Vite only reads `.env` files from its own package directory (`apps/web/`), not from the monorepo root. The root `.env` is used exclusively by the Node server.
 
 ### 3. Start Infrastructure
 

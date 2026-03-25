@@ -45,7 +45,13 @@
       "keyPoints": "Key Points",
       "soapNote": "SOAP Note"
     },
-    "empty": "Click Generate to create an AI summary after the session."
+    "empty": "Click Generate to create an AI summary after the session.",
+    "send": "Send",
+    "sendTitle": "Send Summary",
+    "sendDesc": "Choose who to send this AI summary to.",
+    "sending": "Sending…",
+    "sent": "Sent!",
+    "noRecipients": "No linked doctor or pharmacist. Edit your profile to add one."
   },
   "chat": {
     "placeholder": "Ask a health question…",

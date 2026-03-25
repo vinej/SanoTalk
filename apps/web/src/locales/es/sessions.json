@@ -45,7 +45,13 @@
       "keyPoints": "Puntos clave",
       "soapNote": "Nota SOAP"
     },
-    "empty": "Haz clic en Generar para crear un resumen IA tras la sesión."
+    "empty": "Haz clic en Generar para crear un resumen IA tras la sesión.",
+    "send": "Enviar",
+    "sendTitle": "Enviar resumen",
+    "sendDesc": "Elige a quién enviar este resumen IA.",
+    "sending": "Enviando…",
+    "sent": "¡Enviado!",
+    "noRecipients": "No hay médico ni farmacéutico vinculado. Edita tu perfil para añadir uno."
   },
   "chat": {
     "placeholder": "Haz una pregunta de salud…",
