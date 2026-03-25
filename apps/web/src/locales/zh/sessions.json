@@ -8,10 +8,13 @@
   "detail": {
     "loading": "加载会话中…",
     "transcript": "转录",
-    "aiSummary": "AI 摘要"
+    "aiSummary": "AI 摘要",
+    "aiAssistant": "AI 助手"
   },
   "card": {
     "liveNow": "直播中",
+    "deleteTitle": "删除会话",
+    "deleteConfirm": "这将永久删除该会话及其所有数据，此操作无法撤销。",
     "statuses": {
       "scheduled": "已预约",
       "active": "进行中",
@@ -43,5 +46,12 @@
       "soapNote": "SOAP 记录"
     },
     "empty": "点击「生成」以在会话结束后创建 AI 摘要。"
+  },
+  "chat": {
+    "placeholder": "提问健康相关问题…",
+    "empty": "提问即可开始。",
+    "listening": "正在监听 — 您的语音将发送给 AI",
+    "voiceOn": "语音模式已开启",
+    "voiceOff": "语音模式已关闭"
   }
 }

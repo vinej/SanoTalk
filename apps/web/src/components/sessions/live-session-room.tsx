@@ -12,10 +12,11 @@ import { TalkSession } from "@sanotalk/db";
 import { useTranslation } from "react-i18next";
 
 type Props = {
-  session: TalkSession
+  session: TalkSession;
+  onFinalTranscript?: (text: string) => void;
 }
 
-export function LiveSessionRoom({ session }: Props) {
+export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
   const { t } = useTranslation("sessions");
   const [token, setToken] = useState<string | null>(null);
   const [serverUrl, setServerUrl] = useState<string | null>(null);
@@ -64,13 +65,13 @@ export function LiveSessionRoom({ session }: Props) {
     >
       <VideoConference />
       <RoomAudioRenderer />
-      <TranscriptionOverlay sessionId={session.id} />
+      <TranscriptionOverlay sessionId={session.id} {...(onFinalTranscript ? { onFinalTranscript } : {})} />
     </LiveKitRoom>
   );
 }
 
-function TranscriptionOverlay({ sessionId }: { sessionId: string }) {
-  const { liveText, isRecording, micError } = useTranscriptSocket(sessionId);
+function TranscriptionOverlay({ sessionId, onFinalTranscript }: { sessionId: string; onFinalTranscript?: (text: string) => void }) {
+  const { liveText, isRecording, micError } = useTranscriptSocket(sessionId, onFinalTranscript ? { onFinalTranscript } : {});
   const { t } = useTranslation("sessions");
 
   return (

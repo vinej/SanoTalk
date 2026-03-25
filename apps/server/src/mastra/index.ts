@@ -1,7 +1,8 @@
 import { Mastra } from "@mastra/core";
 import { summaryAgent } from "./agents/summary.js";
 import { soapNoteAgent } from "./agents/soap-note.js";
-import { db, agentRun, transcriptSummary, transcript } from "@sanotalk/db";
+import { healthChatAgent } from "./agents/health-chat.js";
+import { db, agentRun, transcriptSummary, transcript, chatMessage } from "@sanotalk/db";
 import { eq, asc } from "drizzle-orm";
 import { logger } from "../logger.js";
 import { PinoLogger } from '@mastra/loggers'
@@ -11,7 +12,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: "../../.env" });
 
 export const mastra = new Mastra({
-  agents: { summaryAgent, soapNoteAgent },
+  agents: { summaryAgent, soapNoteAgent, healthChatAgent },
   logger: new PinoLogger({ name: 'Mastra', level: 'info' }),
 });
 
@@ -37,6 +38,18 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
       });
       logger.info({ runId: run.id, rowCount: rows.length }, "Transcript rows found");
       transcriptContent = rows.map((r) => r.content).join("\n");
+
+      // Also include AI assistant conversation
+      const chatRows = await db.query.chatMessage.findMany({
+        where: eq(chatMessage.sessionId, sessionId),
+        orderBy: [asc(chatMessage.createdAt)],
+      });
+      if (chatRows.length > 0) {
+        const chatContent = chatRows
+          .map((m) => `[${m.role === "user" ? "Patient" : "AI Assistant"}]: ${m.content}`)
+          .join("\n");
+        transcriptContent += "\n\n--- AI Assistant Conversation ---\n" + chatContent;
+      }
     }
 
     if (!transcriptContent) {
@@ -112,4 +125,16 @@ export function triggerAgentRun(runId: string) {
     });
     if (run) void executeRun(run);
   })();
+}
+
+export async function callHealthChat(
+  history: Array<{ role: "user" | "assistant"; content: string }>,
+  userMessage: string
+): Promise<string> {
+  const messages = [
+    ...history,
+    { role: "user" as const, content: userMessage },
+  ];
+  const result = await healthChatAgent.generate(messages as any);
+  return result.text;
 }

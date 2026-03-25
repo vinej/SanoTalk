@@ -8,10 +8,13 @@
   "detail": {
     "loading": "Loading session…",
     "transcript": "Transcript",
-    "aiSummary": "AI Summary"
+    "aiSummary": "AI Summary",
+    "aiAssistant": "AI Assistant"
   },
   "card": {
     "liveNow": "Live now",
+    "deleteTitle": "Delete session",
+    "deleteConfirm": "This will permanently delete the session and all its data. This cannot be undone.",
     "statuses": {
       "scheduled": "Scheduled",
       "active": "Active",
@@ -43,5 +46,12 @@
       "soapNote": "SOAP Note"
     },
     "empty": "Click Generate to create an AI summary after the session."
+  },
+  "chat": {
+    "placeholder": "Ask a health question…",
+    "empty": "Ask a health question to get started.",
+    "listening": "Listening — your voice is being sent to the AI",
+    "voiceOn": "Voice mode on",
+    "voiceOff": "Voice mode off"
   }
 }

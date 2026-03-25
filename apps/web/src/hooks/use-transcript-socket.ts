@@ -8,7 +8,10 @@ interface TranscriptMessage {
   confidence: number;
 }
 
-export function useTranscriptSocket(sessionId: string) {
+export function useTranscriptSocket(
+  sessionId: string,
+  options?: { onFinalTranscript?: (text: string) => void }
+) {
   const [liveText, setLiveText] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [micError, setMicError] = useState<string | null>(null);
@@ -46,6 +49,7 @@ export function useTranscriptSocket(sessionId: string) {
             content: data.text,
             confidence: data.confidence,
           });
+          options?.onFinalTranscript?.(data.text);
           setTimeout(() => setLiveText(""), 2000);
         }
       }

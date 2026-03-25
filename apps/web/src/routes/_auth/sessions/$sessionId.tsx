@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState, useCallback } from "react";
 import { trpc } from "../../../lib/trpc";
 import { LiveSessionRoom } from "../../../components/sessions/live-session-room";
 import { TranscriptPanel } from "../../../components/transcript/transcript-panel";
 import { SummaryPanel } from "../../../components/summary/summary-panel";
+import { AiChatPanel } from "../../../components/chat/ai-chat-panel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "../../../components/ui/button";
@@ -17,6 +19,10 @@ function SessionPage() {
   const { sessionId } = Route.useParams();
   const { t } = useTranslation(["sessions", "common"]);
   const { data: session, isLoading } = trpc.sessions.byId.useQuery({ id: sessionId });
+  const [pendingVoiceText, setPendingVoiceText] = useState<string | undefined>();
+  const handleFinalTranscript = useCallback((text: string) => {
+    setPendingVoiceText(text);
+  }, []);
 
   if (isLoading) {
     return (
@@ -54,18 +60,19 @@ function SessionPage() {
         </Button>
       </div>
       <div className="flex-1 min-h-0">
-        <div className="grid grid-cols-1 lg:grid-cols-3 h-full gap-0">
-          {/* Live Room — occupies 2/3 on desktop */}
-          <div className="lg:col-span-2 border-r">
-            <LiveSessionRoom session ={ sessionWithDates } />
+        <div className="grid grid-cols-1 lg:grid-cols-2 h-full gap-0">
+          {/* Live Room — occupies 1/2 on desktop */}
+          <div className="border-r">
+            <LiveSessionRoom session={sessionWithDates} onFinalTranscript={handleFinalTranscript} />
           </div>
 
           {/* Side panel */}
           <div className="flex flex-col h-full overflow-hidden">
-            <Tabs defaultValue="transcript" className="flex flex-col h-full">
+            <Tabs defaultValue="chat" className="flex flex-col h-full">
               <TabsList className="m-2 shrink-0">
                 <TabsTrigger value="transcript">{t("sessions:detail.transcript")}</TabsTrigger>
                 <TabsTrigger value="summary">{t("sessions:detail.aiSummary")}</TabsTrigger>
+                <TabsTrigger value="chat">{t("sessions:detail.aiAssistant")}</TabsTrigger>
               </TabsList>
               <TabsContent
                 value="transcript"
@@ -78,6 +85,12 @@ function SessionPage() {
                 className="flex-1 min-h-0 overflow-hidden m-0 p-2"
               >
                 <SummaryPanel sessionId={sessionId} />
+              </TabsContent>
+              <TabsContent
+                value="chat"
+                className="flex-1 min-h-0 overflow-hidden m-0 p-2"
+              >
+                <AiChatPanel sessionId={sessionId} {...(pendingVoiceText ? { pendingVoiceText } : {})} onVoiceTextConsumed={() => setPendingVoiceText(undefined)} />
               </TabsContent>
             </Tabs>
           </div>

@@ -8,10 +8,13 @@
   "detail": {
     "loading": "Cargando sesión…",
     "transcript": "Transcripción",
-    "aiSummary": "Resumen IA"
+    "aiSummary": "Resumen IA",
+    "aiAssistant": "Asistente IA"
   },
   "card": {
     "liveNow": "En vivo",
+    "deleteTitle": "Eliminar sesión",
+    "deleteConfirm": "Esto eliminará permanentemente la sesión y todos sus datos. Esta acción no se puede deshacer.",
     "statuses": {
       "scheduled": "Programada",
       "active": "Activa",
@@ -43,5 +46,12 @@
       "soapNote": "Nota SOAP"
     },
     "empty": "Haz clic en Generar para crear un resumen IA tras la sesión."
+  },
+  "chat": {
+    "placeholder": "Haz una pregunta de salud…",
+    "empty": "Haz una pregunta para comenzar.",
+    "listening": "Escuchando — tu voz se envía a la IA",
+    "voiceOn": "Modo voz activado",
+    "voiceOff": "Modo voz desactivado"
   }
 }

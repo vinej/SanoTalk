@@ -8,10 +8,13 @@
   "detail": {
     "loading": "Chargement de la session…",
     "transcript": "Transcription",
-    "aiSummary": "Résumé IA"
+    "aiSummary": "Résumé IA",
+    "aiAssistant": "Assistant IA"
   },
   "card": {
     "liveNow": "En direct",
+    "deleteTitle": "Supprimer la session",
+    "deleteConfirm": "Cette action supprimera définitivement la session et toutes ses données. Elle est irréversible.",
     "statuses": {
       "scheduled": "Planifiée",
       "active": "Active",
@@ -43,5 +46,12 @@
       "soapNote": "Note SOAP"
     },
     "empty": "Cliquez sur Générer pour créer un résumé IA après la session."
+  },
+  "chat": {
+    "placeholder": "Posez une question de santé…",
+    "empty": "Posez une question pour commencer.",
+    "listening": "Écoute — votre voix est envoyée à l'IA",
+    "voiceOn": "Mode vocal activé",
+    "voiceOff": "Mode vocal désactivé"
   }
 }

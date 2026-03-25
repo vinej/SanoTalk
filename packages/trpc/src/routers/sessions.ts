@@ -102,4 +102,16 @@ export const sessionsRouter = createTRPCRouter({
         .returning();
       return updated;
     }),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const session = await ctx.db.query.talkSession.findFirst({
+        where: eq(talkSession.id, input.id),
+      });
+      if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
+      if (session.hostId !== ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the host can delete a session" });
+
+      await ctx.db.delete(talkSession).where(eq(talkSession.id, input.id));
+    }),
 });

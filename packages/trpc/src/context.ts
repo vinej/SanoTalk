@@ -4,6 +4,10 @@ import { auth } from "./auth";
 
 interface ContextExtras {
   triggerAgentRun?: (runId: string) => void;
+  callHealthChat?: (
+    history: Array<{ role: "user" | "assistant"; content: string }>,
+    userMessage: string
+  ) => Promise<string>;
 }
 
 export async function createTRPCContext(opts: CreateHTTPContextOptions, extras: ContextExtras = {}) {
@@ -18,6 +22,7 @@ export async function createTRPCContext(opts: CreateHTTPContextOptions, extras: 
     req: opts.req,
     res: opts.res,
     triggerAgentRun: extras.triggerAgentRun ?? (() => {}),
+    callHealthChat: extras.callHealthChat ?? (async () => ""),
   };
 }
 
