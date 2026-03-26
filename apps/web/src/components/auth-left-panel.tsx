@@ -20,7 +20,7 @@ export function AuthLeftPanel() {
                     text-white relative overflow-hidden">
 
       {/* Background decorative circles */}
-      <div className="absolute -top-24 -left-24 w-140 h-85 rounded-full bg-white/5" />
+      <div className="absolute -top-24 -left-24 w-140 h-84 rounded-full bg-white/5" />
       <div className="absolute -bottom-32 -right-20 w-[28rem] h-[28rem] rounded-full bg-white/5" />
       <div className="absolute top-1/2 -right-16 w-64 h-64 rounded-full bg-white/5" />
 
@@ -30,7 +30,7 @@ export function AuthLeftPanel() {
       </div>
 
       {/* Centre content */}
-      <div className="relative z-10 space-y-8">
+      <div className="relative z-10 space-y-4">
         {/* Illustration — abstract sound/health waves */}
         <svg viewBox="0 0 280 120" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full max-w-xs opacity-80">
           {/* Heartbeat line */}
