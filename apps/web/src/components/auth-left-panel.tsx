@@ -20,7 +20,7 @@ export function AuthLeftPanel() {
                     text-white relative overflow-hidden">
 
       {/* Background decorative circles */}
-      <div className="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-white/5" />
+      <div className="absolute -top-24 -left-24 w-140 h-85 rounded-full bg-white/5" />
       <div className="absolute -bottom-32 -right-20 w-[28rem] h-[28rem] rounded-full bg-white/5" />
       <div className="absolute top-1/2 -right-16 w-64 h-64 rounded-full bg-white/5" />
 
