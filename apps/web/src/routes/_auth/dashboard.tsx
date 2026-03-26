@@ -107,10 +107,10 @@ function DashboardPage() {
       </Dialog>
 
       <div className="container mx-auto py-8 space-y-6">
-        <div className="relative flex items-center justify-center mb-2">
+        <div className="relative flex items-center justify-between mb-2">
           <SanoTalkLogoV2 size={64} showText={true} />
           {profile && (
-            <div className="absolute right-0 text-sm grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-0">
+            <div className="text-sm grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-0">
               <span className="font-medium text-right">{profile.name}</span>
               <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => setProfileOpen(true)}>
                 <UserCircle className="h-3 w-3 mr-1" />

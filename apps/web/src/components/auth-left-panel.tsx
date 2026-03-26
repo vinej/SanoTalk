@@ -15,7 +15,7 @@ export function AuthLeftPanel() {
   const { t } = useTranslation("auth");
 
   return (
-    <div className="hidden lg:flex flex-col justify-between h-full px-12 py-10
+    <div className="hidden lg:flex flex-col justify-between min-h-screen px-12 py-10
                     bg-gradient-to-br from-indigo-600 via-sky-500 to-teal-400
                     text-white relative overflow-hidden">
 
@@ -26,7 +26,7 @@ export function AuthLeftPanel() {
 
       {/* Logo */}
       <div className="relative z-10">
-        <SanoTalkLogoV2 size={56} showText={true} light={true} />
+        <SanoTalkLogoV2 size={48} showText={true} light={true} />
       </div>
 
       {/* Centre content */}

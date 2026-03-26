@@ -50,7 +50,7 @@ function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen grid lg:grid-cols-2">
+    <div className="grid lg:grid-cols-2 min-h-screen">
       <AuthLeftPanel />
 
       {/* Right panel */}
