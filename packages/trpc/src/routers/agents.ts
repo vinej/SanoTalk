@@ -2,7 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { agentRun, talkSession as talkSessionTable, chatMessage, transcript, user, transcriptSummary } from "@sanotalk/db";
 import { resend } from "../lib/resend";
-import { eq, asc, desc } from "drizzle-orm";
+import { eq, asc, desc, isNull, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 /** Throws FORBIDDEN if the user is not the host or a participant of the session. */
@@ -41,9 +41,14 @@ export const agentsRouter = createTRPCRouter({
   runStatus: protectedProcedure
     .input(z.object({ runId: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
-      return ctx.db.query.agentRun.findFirst({
+      const run = await ctx.db.query.agentRun.findFirst({
         where: eq(agentRun.id, input.runId),
       });
+      if (!run) throw new TRPCError({ code: "NOT_FOUND", message: "Run not found" });
+      const sessionId = (run.input as { sessionId?: string } | null)?.sessionId;
+      if (!sessionId) throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
+      await assertSessionAccess(ctx.db, sessionId, ctx.user.id);
+      return run;
     }),
 
   chatHistory: protectedProcedure
@@ -120,6 +125,88 @@ export const agentsRouter = createTRPCRouter({
       return { message: assistantText };
     }),
 
+  generalChatHistory: protectedProcedure
+    .query(async ({ ctx }) => {
+      return ctx.db.query.chatMessage.findMany({
+        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "general")),
+        orderBy: [asc(chatMessage.createdAt)],
+      });
+    }),
+
+  sendGeneralChatMessage: protectedProcedure
+    .input(z.object({
+      message: z.string().min(1).max(2000),
+      language: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const pastMessages = await ctx.db.query.chatMessage.findMany({
+        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "general")),
+        orderBy: [asc(chatMessage.createdAt)],
+        limit: 20,
+      });
+
+      const history: Array<{ role: "user" | "assistant"; content: string }> = pastMessages.map(
+        (msg) => ({ role: msg.role as "user" | "assistant", content: msg.content })
+      );
+
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "general", role: "user", content: input.message });
+
+      const assistantText = await ctx.callHealthChat(history, input.message, input.language ?? "en");
+
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "general", role: "assistant", content: assistantText });
+
+      return { message: assistantText };
+    }),
+
+  companionChatHistory: protectedProcedure
+    .query(async ({ ctx }) => {
+      return ctx.db.query.chatMessage.findMany({
+        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "companion")),
+        orderBy: [asc(chatMessage.createdAt)],
+      });
+    }),
+
+  sendCompanionChatMessage: protectedProcedure
+    .input(z.object({
+      message: z.string().min(1).max(2000),
+      language: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const pastMessages = await ctx.db.query.chatMessage.findMany({
+        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "companion")),
+        orderBy: [asc(chatMessage.createdAt)],
+        limit: 20,
+      });
+
+      const history: Array<{ role: "user" | "assistant"; content: string }> = pastMessages.map(
+        (msg) => ({ role: msg.role as "user" | "assistant", content: msg.content })
+      );
+
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "companion", role: "user", content: input.message });
+
+      const assistantText = await ctx.callCompanionChat(history, input.message, input.language ?? "en");
+
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "companion", role: "assistant", content: assistantText });
+
+      return { message: assistantText };
+    }),
+
+  clearGeneralChat: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      await ctx.db.delete(chatMessage).where(
+        and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "general"))
+      );
+      return { cleared: true };
+    }),
+
+  clearCompanionChat: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      await ctx.db.delete(chatMessage).where(
+        and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "companion"))
+      );
+      return { cleared: true };
+    }),
+
   sendSummary: protectedProcedure
     .input(z.object({
       sessionId: z.string().uuid(),
@@ -154,35 +241,30 @@ export const agentsRouter = createTRPCRouter({
       }
 
       const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
-      const keyPointsHtml = ((summary.keyPoints ?? []) as string[])
-        .map((pt) => `<li style="margin-bottom:4px">${pt}</li>`)
-        .join("");
-      const soap = (summary.soapNote ?? {}) as any;
+      const appUrl = process.env.APP_URL ?? "";
+      const summaryUrl = `${appUrl}/sessions/${input.sessionId}?tab=summary`;
 
       await resend.emails.send({
         from,
         to: recipient.email,
-        subject: `SanoTalk — Consultation summary for ${sender.name}`,
+        subject: `SanoTalk — Consultation summary available for ${sender.name}`,
         html: `
           <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-            <h2 style="color:#1a1a1a">Consultation Summary</h2>
-            <p style="color:#555">Patient: <strong>${sender.name}</strong></p>
+            <h2 style="color:#1a1a1a">Consultation Summary Available</h2>
+            <p style="color:#555">A new consultation summary from <strong>${sender.name}</strong> is ready to view.</p>
             <hr style="border:none;border-top:1px solid #eee;margin:16px 0"/>
-            <h3 style="color:#1a1a1a">Summary</h3>
-            <p style="color:#333;line-height:1.6">${summary.summary}</p>
-            ${keyPointsHtml ? `
-              <h3 style="color:#1a1a1a">Key Points</h3>
-              <ul style="color:#333;line-height:1.6">${keyPointsHtml}</ul>
-            ` : ""}
-            ${soap ? `
-              <h3 style="color:#1a1a1a">SOAP Note</h3>
-              <p><strong>S (Subjective):</strong> ${soap.subjective ?? ""}</p>
-              <p><strong>O (Objective):</strong> ${soap.objective ?? ""}</p>
-              <p><strong>A (Assessment):</strong> ${soap.assessment ?? ""}</p>
-              <p><strong>P (Plan):</strong> ${soap.plan ?? ""}</p>
-            ` : ""}
-            <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
-            <p style="color:#999;font-size:12px">Sent from SanoTalk. This summary was generated by AI and is for informational purposes only.</p>
+            <p style="color:#333">For security and privacy reasons, medical details are not included in this email.</p>
+            <p>
+              <a href="${summaryUrl}" style="display:inline-block;padding:12px 24px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;font-weight:600">
+                View Summary
+              </a>
+            </p>
+            <p style="color:#999;font-size:12px;margin-top:24px">
+              You must be logged in to SanoTalk to view the summary.
+              If you did not expect this notification, you can ignore it.
+            </p>
+            <hr style="border:none;border-top:1px solid #eee;margin:16px 0"/>
+            <p style="color:#999;font-size:11px">Sent from SanoTalk. This summary was generated by AI and is for informational purposes only.</p>
           </div>
         `,
       });

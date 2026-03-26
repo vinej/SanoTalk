@@ -13,7 +13,10 @@ if (!connectionString) {
 }
 
 // Disable prefetch as it's not supported for "Transaction" pool mode
-const client = postgres(connectionString, { prepare: false });
+const client = postgres(connectionString, {
+  prepare: false,
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: true } : false,
+});
 
 export const db = drizzle(client, { schema });
 export type DB = typeof db;

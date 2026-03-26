@@ -3,5 +3,7 @@
   "subtitle": "管理您的医疗咨询",
   "newSession": "新建会话",
   "noSessions": "暂无会话，立即创建您的第一个！",
-  "profile": "个人资料"
+  "profile": "个人资料",
+  "aiAssistant": "健康 AI 助手",
+  "companion": "健康伴侣"
 }

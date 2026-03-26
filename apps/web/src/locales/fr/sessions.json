@@ -11,7 +11,7 @@
     "loading": "Chargement de la session…",
     "transcript": "Transcription",
     "aiSummary": "Résumé IA",
-    "aiAssistant": "Assistant IA"
+    "aiAssistant": "Assistant IA Santé"
   },
   "card": {
     "liveNow": "En direct",
@@ -70,6 +70,9 @@
     "empty": "Posez une question pour commencer.",
     "listening": "Écoute — votre voix est envoyée à l'IA",
     "voiceOn": "Mode vocal activé",
-    "voiceOff": "Mode vocal désactivé"
+    "voiceOff": "Mode vocal désactivé",
+    "emptyCompanion": "Je suis là pour vous. Partagez ce qui vous pèse.",
+    "placeholderCompanion": "Comment vous sentez-vous aujourd'hui…",
+    "clearConversation": "Effacer la conversation"
   }
 }

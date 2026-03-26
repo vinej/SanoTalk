@@ -13,10 +13,14 @@ import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/_auth/sessions/$sessionId")({
   component: SessionPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: (search.tab as string) ?? "chat",
+  }),
 });
 
 function SessionPage() {
   const { sessionId } = Route.useParams();
+  const { tab } = Route.useSearch();
   const { t } = useTranslation(["sessions", "common"]);
   const { data: session, isLoading } = trpc.sessions.byId.useQuery({ id: sessionId });
   const [pendingVoiceText, setPendingVoiceText] = useState<string | undefined>();
@@ -68,7 +72,7 @@ function SessionPage() {
 
           {/* Side panel */}
           <div className="flex flex-col h-full overflow-hidden">
-            <Tabs defaultValue="chat" className="flex flex-col h-full">
+            <Tabs defaultValue={tab} className="flex flex-col h-full">
               <TabsList className="m-2 shrink-0">
                 <TabsTrigger value="transcript">{t("sessions:detail.transcript")}</TabsTrigger>
                 <TabsTrigger value="summary">{t("sessions:detail.aiSummary")}</TabsTrigger>

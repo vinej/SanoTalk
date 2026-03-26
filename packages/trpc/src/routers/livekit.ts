@@ -37,7 +37,7 @@ export const livekitRouter = createTRPCRouter({
       const at = new AccessToken(apiKey, apiSecret, {
         identity: ctx.user.id,
         name: input.participantName ?? ctx.user.name,
-        ttl: "2h",
+        ttl: "1h",
       });
 
       at.addGrant({

@@ -11,7 +11,7 @@
     "loading": "सत्र लोड हो रहा है…",
     "transcript": "प्रतिलिपि",
     "aiSummary": "AI सारांश",
-    "aiAssistant": "AI सहायक"
+    "aiAssistant": "स्वास्थ्य AI सहायक"
   },
   "card": {
     "liveNow": "अभी लाइव",
@@ -70,6 +70,9 @@
     "empty": "शुरू करने के लिए प्रश्न पूछें।",
     "listening": "सुन रहा है — आपकी आवाज़ AI को भेजी जा रही है",
     "voiceOn": "वॉयस मोड चालू",
-    "voiceOff": "वॉयस मोड बंद"
+    "voiceOff": "वॉयस मोड बंद",
+    "emptyCompanion": "मैं यहाँ आपके लिए हूँ। अपने मन की बात साझा करें।",
+    "placeholderCompanion": "आज आप कैसा महसूस कर रहे हैं…",
+    "clearConversation": "बातचीत साफ़ करें"
   }
 }

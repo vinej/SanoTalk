@@ -3,9 +3,10 @@ import { useTranslation } from "react-i18next";
 interface LogoProps {
   size?: number;
   showText?: boolean;
+  light?: boolean;
 }
 
-export function SanoTalkLogoV2({ size = 64, showText = true }: LogoProps) {
+export function SanoTalkLogoV2({ size = 64, showText = true, light = false }: LogoProps) {
   const { t } = useTranslation("common");
   return (
     <div className="flex items-center gap-4 select-none">
@@ -95,10 +96,16 @@ export function SanoTalkLogoV2({ size = 64, showText = true }: LogoProps) {
 
       {showText && (
         <div className="flex flex-col leading-none gap-0.5">
-          <span className="text-3xl font-black tracking-tight bg-gradient-to-r from-indigo-500 via-sky-500 to-teal-400 bg-clip-text text-transparent">
+          <span className={light
+            ? "text-3xl font-black tracking-tight text-white"
+            : "text-3xl font-black tracking-tight bg-gradient-to-r from-indigo-500 via-sky-500 to-teal-400 bg-clip-text text-transparent"
+          }>
             SanoTalk
           </span>
-          <span className="text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
+          <span className={light
+            ? "text-[11px] font-medium tracking-widest text-white/70 uppercase"
+            : "text-[11px] font-medium tracking-widest text-muted-foreground uppercase"
+          }>
             {t("appSubtitle")}
           </span>
         </div>

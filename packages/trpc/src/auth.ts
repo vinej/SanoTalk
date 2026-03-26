@@ -117,7 +117,7 @@ export const auth = betterAuth({
   },
   plugins: [
     twoFactor({
-      skipVerificationOnEnable: true,
+      skipVerificationOnEnable: false,
       otpOptions: {
         async sendOTP({ user, otp }) {
           const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";

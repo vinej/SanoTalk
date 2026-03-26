@@ -5,7 +5,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { SessionCard } from "../../components/sessions/session-card";
-import { Plus, Kanban, LogOut, UserCircle } from "lucide-react";
+import { Plus, Kanban, LogOut, UserCircle, Bot, Heart } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -110,10 +110,19 @@ function DashboardPage() {
         <div className="relative flex items-center justify-center mb-2">
           <SanoTalkLogoV2 size={64} showText={true} />
           {profile && (
-            <div className="absolute right-0 text-right text-sm leading-tight">
-              <div className="font-medium">{profile.name}</div>
-              <div className="text-muted-foreground">{profile.email}</div>
-              <div className="text-muted-foreground capitalize">{(profile as any).role}</div>
+            <div className="absolute right-0 text-sm grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-0">
+              <span className="font-medium text-right">{profile.name}</span>
+              <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => setProfileOpen(true)}>
+                <UserCircle className="h-3 w-3 mr-1" />
+                {t("dashboard:profile")}
+              </Button>
+              <span className="text-muted-foreground text-right">{profile.email}</span>
+              <LanguageSwitcher />
+              <span className="text-muted-foreground capitalize text-right">{(profile as any).role}</span>
+              <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={handleLogout}>
+                <LogOut className="h-3 w-3 mr-1" />
+                {t("common:logout")}
+              </Button>
             </div>
           )}
         </div>
@@ -124,14 +133,17 @@ function DashboardPage() {
             <p className="text-muted-foreground mt-1">{t("dashboard:subtitle")}</p>
           </div>
           <div className="flex gap-2">
-            <LanguageSwitcher />
-            <Button variant="outline" onClick={() => setProfileOpen(true)}>
-              <UserCircle className="mr-2 h-4 w-4" />
-              {t("dashboard:profile")}
+            <Button variant="outline" asChild>
+              <Link to="/companion">
+                <Heart className="mr-2 h-4 w-4 text-rose-500" />
+                {t("dashboard:companion")}
+              </Link>
             </Button>
-            <Button variant="outline" onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              {t("common:logout")}
+            <Button variant="outline" asChild>
+              <Link to="/ai-assistant">
+                <Bot className="mr-2 h-4 w-4" />
+                {t("dashboard:aiAssistant")}
+              </Link>
             </Button>
             <Button variant="outline" asChild>
               <Link to="/kanban">

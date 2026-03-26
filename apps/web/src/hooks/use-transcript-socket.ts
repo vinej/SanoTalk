@@ -9,8 +9,12 @@ interface TranscriptMessage {
 }
 
 export function useTranscriptSocket(
-  sessionId: string,
-  options?: { onFinalTranscript?: (text: string) => void; language?: string }
+  sessionId: string | undefined,
+  options?: {
+    enabled?: boolean;
+    onFinalTranscript?: (text: string) => void;
+    language?: string;
+  }
 ) {
   const [liveText, setLiveText] = useState("");
   const [isRecording, setIsRecording] = useState(false);
@@ -21,17 +25,23 @@ export function useTranscriptSocket(
 
   const saveMutation = trpc.transcripts.save.useMutation({
     onSuccess: () => {
-      void utils.transcripts.bySession.invalidate({ sessionId });
+      if (sessionId) void utils.transcripts.bySession.invalidate({ sessionId });
     },
   });
 
+  const enabled = options?.enabled ?? true;
+
   useEffect(() => {
-    // Reset state for this mount
+    if (!enabled) return;
+
     setMicError(null);
     setIsRecording(false);
 
     const lang = options?.language ?? "en";
-    const wsUrl = `${import.meta.env.VITE_WS_URL}/ws/transcribe?sessionId=${sessionId}&language=${lang}`;
+    const qs = sessionId
+      ? `sessionId=${sessionId}&language=${lang}`
+      : `language=${lang}`;
+    const wsUrl = `${import.meta.env.VITE_WS_URL}/ws/transcribe?${qs}`;
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
@@ -45,11 +55,14 @@ export function useTranscriptSocket(
       if (data.type === "transcript") {
         setLiveText(data.text);
         if (data.isFinal && data.text.trim()) {
-          saveMutation.mutate({
-            sessionId,
-            content: data.text,
-            confidence: data.confidence,
-          });
+          // Only save to session transcript when a sessionId is present
+          if (sessionId) {
+            saveMutation.mutate({
+              sessionId,
+              content: data.text,
+              confidence: data.confidence,
+            });
+          }
           options?.onFinalTranscript?.(data.text);
           setTimeout(() => setLiveText(""), 2000);
         }
@@ -91,7 +104,7 @@ export function useTranscriptSocket(
       recorderRef.current = null;
       ws.close();
     };
-  }, [sessionId]);
+  }, [sessionId, enabled]);
 
   return { liveText, isRecording, micError };
 }

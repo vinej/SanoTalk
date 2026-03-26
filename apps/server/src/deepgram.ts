@@ -2,21 +2,66 @@ import { createClient, LiveTranscriptionEvents } from "@deepgram/sdk";
 import { WebSocket, WebSocketServer } from "ws";
 import type { Server } from "http";
 import { logger } from "./logger";
+import { auth } from "@sanotalk/trpc/auth";
+import { db } from "@sanotalk/db";
+import { talkSession, sessionParticipant } from "@sanotalk/db";
+import { eq, and } from "drizzle-orm";
 
 export function startDeepgramWebSocket(server: Server) {
   const wss = new WebSocketServer({ server, path: "/ws/transcribe" });
   const deepgram = createClient(process.env.DEEPGRAM_API_KEY ?? "");
 
-  wss.on("connection", (ws: WebSocket, req) => {
-    // Validate that a well-formed sessionId UUID was provided
+  wss.on("connection", async (ws: WebSocket, req) => {
     const url = new URL(req.url ?? "", "http://localhost");
     const sessionId = url.searchParams.get("sessionId");
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!sessionId || !uuidRegex.test(sessionId)) {
-      logger.warn({ url: req.url }, "WebSocket rejected: missing or invalid sessionId");
+
+    // If a sessionId is provided it must be a valid UUID
+    if (sessionId && !uuidRegex.test(sessionId)) {
+      logger.warn({ url: req.url }, "WebSocket rejected: invalid sessionId format");
       ws.close(1008, "Invalid sessionId");
       return;
     }
+
+    // Verify the caller is authenticated
+    const sessionData = await auth.api.getSession({
+      headers: new Headers(req.headers as Record<string, string>),
+    });
+    if (!sessionData?.user) {
+      logger.warn({ sessionId }, "WebSocket rejected: unauthenticated");
+      ws.close(1008, "Unauthorized");
+      return;
+    }
+    const userId = sessionData.user.id;
+
+    // When a sessionId is provided, verify the user belongs to that session
+    if (sessionId) {
+      const talk = await db.query.talkSession.findFirst({
+        where: eq(talkSession.id, sessionId),
+      });
+      if (!talk) {
+        logger.warn({ sessionId, userId }, "WebSocket rejected: session not found");
+        ws.close(1008, "Session not found");
+        return;
+      }
+
+      const isHost = talk.hostId === userId;
+      if (!isHost) {
+        const participant = await db.query.sessionParticipant.findFirst({
+          where: and(
+            eq(sessionParticipant.sessionId, sessionId),
+            eq(sessionParticipant.userId, userId)
+          ),
+        });
+        if (!participant) {
+          logger.warn({ sessionId, userId }, "WebSocket rejected: user not in session");
+          ws.close(1008, "Access denied");
+          return;
+        }
+      }
+    }
+
+    logger.info({ sessionId: sessionId ?? "general", userId }, "WebSocket authorized");
 
     // Map i18n language codes to Deepgram-compatible BCP-47 codes
     const langMap: Record<string, string> = {
@@ -43,7 +88,7 @@ export function startDeepgramWebSocket(server: Server) {
       diarize: true,
       punctuate: true,
       interim_results: true,
-      utterance_end_ms: 1000,
+      utterance_end_ms: 2000,
     });
 
     dgConnection.on(LiveTranscriptionEvents.Error, (err) => {
@@ -75,19 +120,43 @@ export function startDeepgramWebSocket(server: Server) {
       }
       audioBuffer.length = 0;
 
+      // Accumulate final transcript text; only flush on UtteranceEnd
+      let accumulatedText = "";
+      let accumulatedConfidence = 1;
+
       dgConnection.on(LiveTranscriptionEvents.Transcript, (data) => {
         const transcript = data.channel.alternatives[0];
-        logger.info({ text: transcript?.transcript, isFinal: data.is_final }, "Deepgram transcript event");
-        if (transcript && ws.readyState === WebSocket.OPEN) {
-          ws.send(
-            JSON.stringify({
-              type: "transcript",
-              text: transcript.transcript,
-              isFinal: data.is_final,
-              confidence: transcript.confidence,
-              words: transcript.words,
-            })
-          );
+        if (!transcript) return;
+
+        if (data.is_final && transcript.transcript.trim()) {
+          // Append to accumulated buffer — do NOT send isFinal yet
+          accumulatedText += (accumulatedText ? " " : "") + transcript.transcript.trim();
+          accumulatedConfidence = transcript.confidence;
+        }
+
+        // Always send interim text for live display
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({
+            type: "transcript",
+            text: accumulatedText || transcript.transcript,
+            isFinal: false, // never trigger send until UtteranceEnd
+            confidence: transcript.confidence,
+            words: transcript.words,
+          }));
+        }
+      });
+
+      dgConnection.on(LiveTranscriptionEvents.UtteranceEnd, () => {
+        logger.info({ accumulatedText }, "Deepgram UtteranceEnd — flushing to client");
+        if (accumulatedText.trim() && ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({
+            type: "transcript",
+            text: accumulatedText.trim(),
+            isFinal: true,
+            confidence: accumulatedConfidence,
+            words: [],
+          }));
+          accumulatedText = "";
         }
       });
     });

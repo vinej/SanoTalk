@@ -14,7 +14,7 @@ import { auth } from "@sanotalk/trpc/auth";
 import { toNodeHandler } from "better-auth/node";
 import { logger } from "./logger";
 import { startDeepgramWebSocket } from "./deepgram";
-import { runPendingAgents, triggerAgentRun, callHealthChat } from "./mastra/index";
+import { runPendingAgents, triggerAgentRun, callHealthChat, callCompanionChat } from "./mastra/index";
 import http from "http";
 
 const app = express();
@@ -22,7 +22,31 @@ const PORT = process.env.PORT ?? 3001;
 
 // ─── Security Headers ──────────────────────────────────────────────────────
 app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" },
+  crossOriginResourcePolicy: { policy: "same-origin" },
+  strictTransportSecurity: {
+    maxAge: 31536000,
+    includeSubDomains: true,
+    preload: true,
+  },
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      fontSrc: ["'self'"],
+      connectSrc: [
+        "'self'",
+        process.env.LIVEKIT_URL ?? "",
+        process.env.VITE_API_URL ?? "",
+      ].filter(Boolean),
+      frameSrc: ["'none'"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      upgradeInsecureRequests: [],
+    },
+  },
 }));
 
 // ─── CORS ─────────────────────────────────────────────────────────────────
@@ -55,6 +79,15 @@ const apiLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+// Stricter limiter for AI-heavy medical endpoints (summary generation, email sending)
+const medicalLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests, please try again later." },
+});
+
 app.use(express.json({ limit: "10mb" }));
 
 // ─── Better Auth ───────────────────────────────────────────────────────────
@@ -62,11 +95,13 @@ app.use("/api/auth", authLimiter, toNodeHandler(auth));
 
 // ─── tRPC ─────────────────────────────────────────────────────────────────
 app.use("/api/trpc", apiLimiter);
+app.use("/api/trpc/agents.generateSummary", medicalLimiter);
+app.use("/api/trpc/agents.sendSummary", medicalLimiter);
 app.use(
   "/api/trpc",
   createExpressMiddleware({
     router: appRouter,
-    createContext: (opts) => createTRPCContext(opts, { triggerAgentRun, callHealthChat }),
+    createContext: (opts) => createTRPCContext(opts, { triggerAgentRun, callHealthChat, callCompanionChat }),
     onError({ path, error }) {
       logger.error({ path, error }, "tRPC error");
     },

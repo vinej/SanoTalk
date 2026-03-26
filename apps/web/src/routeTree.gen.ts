@@ -18,6 +18,8 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
 import { Route as AuthKanbanRouteImport } from './routes/_auth/kanban'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
+import { Route as AuthCompanionRouteImport } from './routes/_auth/companion'
+import { Route as AuthAiAssistantRouteImport } from './routes/_auth/ai-assistant'
 import { Route as AuthSessionsNewRouteImport } from './routes/_auth/sessions/new'
 import { Route as AuthSessionsSessionIdRouteImport } from './routes/_auth/sessions/$sessionId'
 
@@ -65,6 +67,16 @@ const AuthDashboardRoute = AuthDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthCompanionRoute = AuthCompanionRouteImport.update({
+  id: '/companion',
+  path: '/companion',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthAiAssistantRoute = AuthAiAssistantRouteImport.update({
+  id: '/ai-assistant',
+  path: '/ai-assistant',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthSessionsNewRoute = AuthSessionsNewRouteImport.update({
   id: '/sessions/new',
   path: '/sessions/new',
@@ -83,6 +95,8 @@ export interface FileRoutesByFullPath {
   '/sign-up': typeof SignUpRoute
   '/two-factor': typeof TwoFactorRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/ai-assistant': typeof AuthAiAssistantRoute
+  '/companion': typeof AuthCompanionRoute
   '/dashboard': typeof AuthDashboardRoute
   '/kanban': typeof AuthKanbanRoute
   '/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
@@ -94,6 +108,8 @@ export interface FileRoutesByTo {
   '/sign-up': typeof SignUpRoute
   '/two-factor': typeof TwoFactorRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/ai-assistant': typeof AuthAiAssistantRoute
+  '/companion': typeof AuthCompanionRoute
   '/dashboard': typeof AuthDashboardRoute
   '/kanban': typeof AuthKanbanRoute
   '/': typeof AuthIndexRoute
@@ -108,6 +124,8 @@ export interface FileRoutesById {
   '/sign-up': typeof SignUpRoute
   '/two-factor': typeof TwoFactorRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/_auth/ai-assistant': typeof AuthAiAssistantRoute
+  '/_auth/companion': typeof AuthCompanionRoute
   '/_auth/dashboard': typeof AuthDashboardRoute
   '/_auth/kanban': typeof AuthKanbanRoute
   '/_auth/': typeof AuthIndexRoute
@@ -123,6 +141,8 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/two-factor'
     | '/verify-email'
+    | '/ai-assistant'
+    | '/companion'
     | '/dashboard'
     | '/kanban'
     | '/sessions/$sessionId'
@@ -134,6 +154,8 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/two-factor'
     | '/verify-email'
+    | '/ai-assistant'
+    | '/companion'
     | '/dashboard'
     | '/kanban'
     | '/'
@@ -147,6 +169,8 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/two-factor'
     | '/verify-email'
+    | '/_auth/ai-assistant'
+    | '/_auth/companion'
     | '/_auth/dashboard'
     | '/_auth/kanban'
     | '/_auth/'
@@ -228,6 +252,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthDashboardRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/companion': {
+      id: '/_auth/companion'
+      path: '/companion'
+      fullPath: '/companion'
+      preLoaderRoute: typeof AuthCompanionRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/ai-assistant': {
+      id: '/_auth/ai-assistant'
+      path: '/ai-assistant'
+      fullPath: '/ai-assistant'
+      preLoaderRoute: typeof AuthAiAssistantRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/sessions/new': {
       id: '/_auth/sessions/new'
       path: '/sessions/new'
@@ -246,6 +284,8 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthRouteChildren {
+  AuthAiAssistantRoute: typeof AuthAiAssistantRoute
+  AuthCompanionRoute: typeof AuthCompanionRoute
   AuthDashboardRoute: typeof AuthDashboardRoute
   AuthKanbanRoute: typeof AuthKanbanRoute
   AuthIndexRoute: typeof AuthIndexRoute
@@ -254,6 +294,8 @@ interface AuthRouteChildren {
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
+  AuthAiAssistantRoute: AuthAiAssistantRoute,
+  AuthCompanionRoute: AuthCompanionRoute,
   AuthDashboardRoute: AuthDashboardRoute,
   AuthKanbanRoute: AuthKanbanRoute,
   AuthIndexRoute: AuthIndexRoute,

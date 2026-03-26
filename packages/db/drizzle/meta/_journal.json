@@ -50,6 +50,20 @@
       "when": 1774488650022,
       "tag": "0006_steep_pyro",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1774900000000,
+      "tag": "0007_general_chat",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1774900100000,
+      "tag": "0008_companion_chat",
+      "breakpoints": true
     }
   ]
 }

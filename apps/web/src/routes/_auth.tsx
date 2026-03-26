@@ -3,9 +3,13 @@ import { authClient } from "../lib/auth-client";
 import { tracker } from "../lib/tracker";
 
 export const Route: any = createFileRoute("/_auth")({
-  beforeLoad: async () => {
+  beforeLoad: async ({ location }) => {
     const session = await authClient.getSession();
     if (!session.data?.user) {
+      const intended = location.pathname + (location.searchStr ?? "");
+      if (intended && intended !== "/") {
+        sessionStorage.setItem("postLoginRedirect", intended);
+      }
       throw redirect({ to: "/login" });
     }
     const user = session.data.user as any;

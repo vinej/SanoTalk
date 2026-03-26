@@ -1,13 +1,15 @@
 import { text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { createTable } from "./auth";
+import { createTable, user } from "./auth";
 import { talkSession } from "./sessions";
 
 export const chatMessage = createTable("chat_message", {
   id: uuid("id").primaryKey().defaultRandom(),
   sessionId: uuid("session_id")
-    .notNull()
     .references(() => talkSession.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .references(() => user.id, { onDelete: "cascade" }),
+  chatType: text("chat_type"), // "general" | "companion", null for session messages
   role: text("role").notNull(), // "user" | "assistant"
   content: text("content").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -17,6 +19,10 @@ export const chatMessageRelations = relations(chatMessage, ({ one }) => ({
   session: one(talkSession, {
     fields: [chatMessage.sessionId],
     references: [talkSession.id],
+  }),
+  user: one(user, {
+    fields: [chatMessage.userId],
+    references: [user.id],
   }),
 }));
 

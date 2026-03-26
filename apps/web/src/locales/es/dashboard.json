@@ -3,5 +3,7 @@
   "subtitle": "Gestiona tus consultas médicas",
   "newSession": "Nueva sesión",
   "noSessions": "Aún no hay sesiones. ¡Crea tu primera!",
-  "profile": "Perfil"
+  "profile": "Perfil",
+  "aiAssistant": "Asistente IA de Salud",
+  "companion": "Compañero de Bienestar"
 }
