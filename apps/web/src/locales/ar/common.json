@@ -1,6 +1,7 @@
 {
   "appName": "SanoTalk",
   "appTagline": "استشارات طبية مدعومة بالذكاء الاصطناعي",
+  "appSubtitle": "منصة الصوت الطبي",
   "dashboard": "لوحة التحكم",
   "kanban": "كانبان",
   "logout": "تسجيل الخروج",

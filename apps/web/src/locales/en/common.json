@@ -1,6 +1,7 @@
 {
   "appName": "SanoTalk",
   "appTagline": "AI-powered medical consultations",
+  "appSubtitle": "Medical Voice Platform",
   "dashboard": "Dashboard",
   "kanban": "Kanban",
   "logout": "Logout",

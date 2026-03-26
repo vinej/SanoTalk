@@ -1,6 +1,7 @@
 {
   "appName": "SanoTalk",
   "appTagline": "Consultations médicales par intelligence artificielle",
+  "appSubtitle": "Plateforme Vocale Médicale",
   "dashboard": "Tableau de bord",
   "kanban": "Kanban",
   "logout": "Déconnexion",

@@ -1,9 +1,12 @@
+import { useTranslation } from "react-i18next";
+
 interface LogoProps {
   size?: number;
   showText?: boolean;
 }
 
 export function SanoTalkLogoV2({ size = 64, showText = true }: LogoProps) {
+  const { t } = useTranslation("common");
   return (
     <div className="flex items-center gap-4 select-none">
       <svg
@@ -96,7 +99,7 @@ export function SanoTalkLogoV2({ size = 64, showText = true }: LogoProps) {
             SanoTalk
           </span>
           <span className="text-[11px] font-medium tracking-widest text-muted-foreground uppercase">
-            Medical Voice Platform
+            {t("appSubtitle")}
           </span>
         </div>
       )}
