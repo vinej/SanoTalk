@@ -2,7 +2,7 @@ import { Mastra } from "@mastra/core";
 import { summaryAgent } from "./agents/summary.js";
 import { soapNoteAgent } from "./agents/soap-note.js";
 import { healthChatAgent } from "./agents/health-chat.js";
-import { db, agentRun, transcriptSummary, transcript, chatMessage } from "@sanotalk/db";
+import { db, agentRun, transcriptSummary, transcript, chatMessage, talkSession } from "@sanotalk/db";
 import { eq, asc } from "drizzle-orm";
 import { logger } from "../logger.js";
 import { PinoLogger } from '@mastra/loggers'
@@ -31,7 +31,13 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
 
     // Fetch transcript content for the session
     let transcriptContent = "";
+    let sessionLanguage = "en";
     if (sessionId) {
+      const sessionRow = await db.query.talkSession.findFirst({
+        where: eq(talkSession.id, sessionId),
+      });
+      if (sessionRow) sessionLanguage = sessionRow.language;
+
       const rows = await db.query.transcript.findMany({
         where: eq(transcript.sessionId, sessionId),
         orderBy: [asc(transcript.startMs)],
@@ -61,8 +67,9 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
     }
 
     const agent = mastra.getAgent(run.agentName as "summaryAgent");
-    logger.info({ runId: run.id }, "Calling agent...");
-    const result = await agent.generate(transcriptContent);
+    logger.info({ runId: run.id, sessionLanguage }, "Calling agent...");
+    const promptWithLanguage = `Respond in language code "${sessionLanguage}". All text fields in the JSON output must be written in that language.\n\n${transcriptContent}`;
+    const result = await agent.generate(promptWithLanguage);
     logger.info({ runId: run.id, textLength: result.text.length, preview: result.text.slice(0, 100) }, "Agent responded");
 
     // Parse JSON from agent output and save to transcriptSummary
@@ -129,9 +136,14 @@ export function triggerAgentRun(runId: string) {
 
 export async function callHealthChat(
   history: Array<{ role: "user" | "assistant"; content: string }>,
-  userMessage: string
+  userMessage: string,
+  language = "en"
 ): Promise<string> {
+  const languageInstruction = { role: "user" as const, content: `Respond in language code "${language}". All your replies must be in that language.` };
+  const languageAck = { role: "assistant" as const, content: "Understood. I will respond in the requested language." };
   const messages = [
+    languageInstruction,
+    languageAck,
     ...history,
     { role: "user" as const, content: userMessage },
   ];

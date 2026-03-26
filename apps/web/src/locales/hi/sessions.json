@@ -32,7 +32,15 @@
     "join": "सत्र में शामिल हों",
     "recording": "रिकॉर्डिंग",
     "connectingMic": "माइक्रोफ़ोन जोड़ा जा रहा है…",
-    "micError": "माइक: {{error}}"
+    "micError": "माइक: {{error}}",
+    "controls": {
+      "microphone": "माइक्रोफ़ोन",
+      "camera": "कैमरा",
+      "screenShare": "स्क्रीन साझा करें",
+      "screenShareStop": "साझाकरण बंद करें",
+      "chat": "चैट",
+      "leave": "छोड़ें"
+    }
   },
   "transcript": {
     "title": "लाइव प्रतिलिपि",

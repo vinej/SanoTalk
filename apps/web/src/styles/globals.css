@@ -2,6 +2,44 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* LiveKit: stack chat panel below video instead of side-by-side */
+.lk-video-conference {
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.lk-video-conference-inner {
+  flex: 1;
+  min-height: 0;
+}
+
+.lk-video-conference-inner > .lk-grid-layout,
+.lk-video-conference-inner > .lk-focus-layout-container {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.lk-chat {
+  width: 100%;
+  border-left: none;
+  border-top: 1px solid var(--lk-border-color);
+  height: 300px;
+  flex-shrink: 0;
+}
+
+/* Fix LiveKit huddle theme missing background variables for dropdowns/menus */
+[data-lk-theme="huddle"] {
+  --lk-bg: whitesmoke;
+  --lk-bg2: #e8e8e8;
+  --lk-bg3: #d8d8d8;
+  --lk-bg4: #c8c8c8;
+  --lk-fg: #111;
+  --lk-border-color: rgba(0, 0, 0, 0.15);
+  --lk-box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @layer base {

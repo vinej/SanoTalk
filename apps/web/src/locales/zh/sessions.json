@@ -32,7 +32,15 @@
     "join": "加入会话",
     "recording": "录制中",
     "connectingMic": "麦克风连接中…",
-    "micError": "麦克风：{{error}}"
+    "micError": "麦克风：{{error}}",
+    "controls": {
+      "microphone": "麦克风",
+      "camera": "摄像头",
+      "screenShare": "共享屏幕",
+      "screenShareStop": "停止共享",
+      "chat": "聊天",
+      "leave": "离开"
+    }
   },
   "transcript": {
     "title": "实时转录",

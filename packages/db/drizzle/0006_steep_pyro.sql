@@ -1,0 +1,1 @@
+ALTER TABLE "sanotalk_talk_session" ADD COLUMN "language" text DEFAULT 'en' NOT NULL;

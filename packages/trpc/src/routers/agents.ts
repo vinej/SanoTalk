@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
-import { agentRun, talkSession, chatMessage, transcript, user, transcriptSummary } from "@sanotalk/db";
+import { agentRun, talkSession as talkSessionTable, chatMessage, transcript, user, transcriptSummary } from "@sanotalk/db";
 import { resend } from "../lib/resend";
 import { eq, asc, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
@@ -12,7 +12,7 @@ async function assertSessionAccess(
   userId: string
 ) {
   const session = await db.query.talkSession.findFirst({
-    where: eq(talkSession.id, sessionId),
+    where: eq(talkSessionTable.id, sessionId),
     with: { participants: true },
   });
   if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
@@ -64,6 +64,12 @@ export const agentsRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       await assertSessionAccess(ctx.db, input.sessionId, ctx.user.id);
 
+      // Get session language for AI response language
+      const sessionRow = await ctx.db.query.talkSession.findFirst({
+        where: eq(talkSessionTable.id, input.sessionId),
+      });
+      const sessionLanguage = sessionRow?.language ?? "en";
+
       // Fetch last 20 chat messages as conversation history
       const pastMessages = await ctx.db.query.chatMessage.findMany({
         where: eq(chatMessage.sessionId, input.sessionId),
@@ -102,7 +108,7 @@ export const agentsRouter = createTRPCRouter({
       });
 
       // Call AI agent
-      const assistantText = await ctx.callHealthChat(history, input.message);
+      const assistantText = await ctx.callHealthChat(history, input.message, sessionLanguage);
 
       // Persist assistant response
       await ctx.db.insert(chatMessage).values({

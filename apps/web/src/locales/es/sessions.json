@@ -32,7 +32,15 @@
     "join": "Unirse a la sesión",
     "recording": "Grabando",
     "connectingMic": "Conectando micrófono…",
-    "micError": "Mic: {{error}}"
+    "micError": "Mic: {{error}}",
+    "controls": {
+      "microphone": "Micrófono",
+      "camera": "Cámara",
+      "screenShare": "Compartir pantalla",
+      "screenShareStop": "Dejar de compartir",
+      "chat": "Chat",
+      "leave": "Salir"
+    }
   },
   "transcript": {
     "title": "Transcripción en vivo",

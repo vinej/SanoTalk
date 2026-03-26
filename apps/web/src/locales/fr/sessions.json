@@ -32,7 +32,15 @@
     "join": "Rejoindre la session",
     "recording": "Enregistrement",
     "connectingMic": "Connexion du micro…",
-    "micError": "Micro : {{error}}"
+    "micError": "Micro : {{error}}",
+    "controls": {
+      "microphone": "Microphone",
+      "camera": "Caméra",
+      "screenShare": "Partager l'écran",
+      "screenShareStop": "Arrêter le partage",
+      "chat": "Chat",
+      "leave": "Quitter"
+    }
   },
   "transcript": {
     "title": "Transcription en direct",

@@ -10,7 +10,7 @@ interface TranscriptMessage {
 
 export function useTranscriptSocket(
   sessionId: string,
-  options?: { onFinalTranscript?: (text: string) => void }
+  options?: { onFinalTranscript?: (text: string) => void; language?: string }
 ) {
   const [liveText, setLiveText] = useState("");
   const [isRecording, setIsRecording] = useState(false);
@@ -30,7 +30,8 @@ export function useTranscriptSocket(
     setMicError(null);
     setIsRecording(false);
 
-    const wsUrl = `${import.meta.env.VITE_WS_URL}/ws/transcribe?sessionId=${sessionId}`;
+    const lang = options?.language ?? "en";
+    const wsUrl = `${import.meta.env.VITE_WS_URL}/ws/transcribe?sessionId=${sessionId}&language=${lang}`;
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 

@@ -6,7 +6,8 @@ interface ContextExtras {
   triggerAgentRun?: (runId: string) => void;
   callHealthChat?: (
     history: Array<{ role: "user" | "assistant"; content: string }>,
-    userMessage: string
+    userMessage: string,
+    language?: string
   ) => Promise<string>;
 }
 

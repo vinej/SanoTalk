@@ -40,7 +40,7 @@ function transformSessionDates(session: any): TalkSession {
 function DashboardPage() {
   const { data: sessions, isLoading } = trpc.sessions.list.useQuery();
   const { data: profile } = trpc.user.profile.useQuery();
-  const { t } = useTranslation(["dashboard", "common", "sessions"]);
+  const { t, i18n } = useTranslation(["dashboard", "common", "sessions"]);
   const navigate = useNavigate();
   const utils = trpc.useUtils();
   const [profileOpen, setProfileOpen] = useState(false);
@@ -69,7 +69,7 @@ function DashboardPage() {
 
   function handleNewSession() {
     if (!newTitle.trim()) return;
-    createSession.mutate({ title: newTitle.trim() });
+    createSession.mutate({ title: newTitle.trim(), language: i18n.language });
   }
 
   const sessionsWithDates = sessions?.map(transformSessionDates) ?? [];

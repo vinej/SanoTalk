@@ -1,10 +1,7 @@
 import { useCallback, useState } from "react";
-import {
-  LiveKitRoom,
-  VideoConference,
-  RoomAudioRenderer,
-} from "@livekit/components-react";
+import { LiveKitRoom, RoomAudioRenderer } from "@livekit/components-react";
 import "@livekit/components-styles";
+import { LocalizedVideoConference } from "./localized-video-conference";
 import { trpc } from "../../lib/trpc";
 import { Button } from "../../components/ui/button";
 import { useTranscriptSocket } from "../../hooks/use-transcript-socket";
@@ -60,18 +57,18 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
       connect={true}
       video={true}
       audio={true}
-      data-lk-theme="default"
+      data-lk-theme="huddle"
       style={{ height: "100%", width: "100%" }}
     >
-      <VideoConference />
+      <LocalizedVideoConference />
       <RoomAudioRenderer />
-      <TranscriptionOverlay sessionId={session.id} {...(onFinalTranscript ? { onFinalTranscript } : {})} />
+      <TranscriptionOverlay sessionId={session.id} language={session.language} {...(onFinalTranscript ? { onFinalTranscript } : {})} />
     </LiveKitRoom>
   );
 }
 
-function TranscriptionOverlay({ sessionId, onFinalTranscript }: { sessionId: string; onFinalTranscript?: (text: string) => void }) {
-  const { liveText, isRecording, micError } = useTranscriptSocket(sessionId, onFinalTranscript ? { onFinalTranscript } : {});
+function TranscriptionOverlay({ sessionId, language, onFinalTranscript }: { sessionId: string; language: string; onFinalTranscript?: (text: string) => void }) {
+  const { liveText, isRecording, micError } = useTranscriptSocket(sessionId, { language, ...(onFinalTranscript ? { onFinalTranscript } : {}) });
   const { t } = useTranslation("sessions");
 
   return (

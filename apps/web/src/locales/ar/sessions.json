@@ -32,7 +32,15 @@
     "join": "الانضمام إلى الجلسة",
     "recording": "تسجيل",
     "connectingMic": "جارٍ توصيل الميكروفون…",
-    "micError": "الميكروفون: {{error}}"
+    "micError": "الميكروفون: {{error}}",
+    "controls": {
+      "microphone": "الميكروفون",
+      "camera": "الكاميرا",
+      "screenShare": "مشاركة الشاشة",
+      "screenShareStop": "إيقاف المشاركة",
+      "chat": "الدردشة",
+      "leave": "مغادرة"
+    }
   },
   "transcript": {
     "title": "النص المباشر",

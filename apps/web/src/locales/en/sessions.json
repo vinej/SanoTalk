@@ -32,7 +32,15 @@
     "join": "Join Session",
     "recording": "Recording",
     "connectingMic": "Connecting mic…",
-    "micError": "Mic: {{error}}"
+    "micError": "Mic: {{error}}",
+    "controls": {
+      "microphone": "Microphone",
+      "camera": "Camera",
+      "screenShare": "Share screen",
+      "screenShareStop": "Stop sharing",
+      "chat": "Chat",
+      "leave": "Leave"
+    }
   },
   "transcript": {
     "title": "Live Transcript",

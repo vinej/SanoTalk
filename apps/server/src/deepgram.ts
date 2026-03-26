@@ -18,7 +18,14 @@ export function startDeepgramWebSocket(server: Server) {
       return;
     }
 
-    logger.info({ sessionId }, "Transcription WS client connected");
+    // Map i18n language codes to Deepgram-compatible BCP-47 codes
+    const langMap: Record<string, string> = {
+      zh: "zh-CN",
+    };
+    const rawLang = url.searchParams.get("language") ?? "en";
+    const dgLanguage = langMap[rawLang] ?? rawLang;
+
+    logger.info({ sessionId, language: dgLanguage }, "Transcription WS client connected");
 
     const apiKey = process.env.DEEPGRAM_API_KEY;
     if (!apiKey) {
@@ -31,7 +38,7 @@ export function startDeepgramWebSocket(server: Server) {
 
     const dgConnection = deepgram.listen.live({
       model: "nova-2",
-      language: "en",
+      language: dgLanguage,
       smart_format: true,
       diarize: true,
       punctuate: true,
