@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   GridLayout,
   ParticipantTile,
@@ -12,13 +12,42 @@ import {
   FocusLayout,
   CarouselLayout,
   useCreateLayoutContext,
-  ConnectionStateToast,
   MediaDeviceMenu,
   usePinnedTracks,
   useTrackToggle,
+  useConnectionState,
+  Toast,
 } from "@livekit/components-react";
+import { ConnectionState } from "livekit-client";
 import { Track } from "livekit-client";
 import { useTranslation } from "react-i18next";
+
+function AutoHideConnectionToast() {
+  const state = useConnectionState();
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (state === ConnectionState.Reconnecting) {
+      setVisible(true);
+      return;
+    }
+    if (state === ConnectionState.Disconnected) {
+      setVisible(true);
+      const timer = setTimeout(() => setVisible(false), 3000);
+      return () => clearTimeout(timer);
+    }
+    setVisible(false);
+  }, [state]);
+
+  if (!visible) return null;
+
+  return (
+    <Toast className="lk-toast-connection-state">
+      {state === ConnectionState.Reconnecting && "Reconnecting…"}
+      {state === ConnectionState.Disconnected && "Disconnected"}
+    </Toast>
+  );
+}
 
 function LocalizedControlBar() {
   const { t } = useTranslation("sessions");
@@ -92,7 +121,7 @@ export function LocalizedVideoConference() {
         <VideoConferenceInner />
         <Chat style={{ display: widgetState.showChat ? "grid" : "none" }} />
       </LayoutContextProvider>
-      <ConnectionStateToast />
+      <AutoHideConnectionToast />
     </div>
   );
 }

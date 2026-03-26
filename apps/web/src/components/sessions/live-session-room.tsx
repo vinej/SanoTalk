@@ -32,6 +32,11 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
     getTokenMutation.mutate({ roomName: session.roomName });
   }, [session, getTokenMutation, startMutation]);
 
+  const handleDisconnected = useCallback(() => {
+    setToken(null);
+    setServerUrl(null);
+  }, []);
+
   if (!token || !serverUrl) {
     return (
       <div className="flex flex-col items-center justify-center h-full gap-6 p-8">
@@ -59,6 +64,7 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
       audio={true}
       data-lk-theme="huddle"
       style={{ height: "100%", width: "100%" }}
+      onDisconnected={handleDisconnected}
     >
       <LocalizedVideoConference />
       <RoomAudioRenderer />
