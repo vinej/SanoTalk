@@ -9,6 +9,8 @@
     "db:generate": "turbo db:generate",
     "db:migrate": "turbo db:migrate",
     "db:studio": "pnpm --filter @sanotalk/db studio",
+    "test": "turbo test",
+    "test:e2e": "pnpm --filter @sanotalk/web test:e2e",
     "typecheck": "turbo typecheck",
     "build:db": "pnpm --filter @sanotalk/db build",
     "build:trpc": "pnpm --filter @sanotalk/trpc build",

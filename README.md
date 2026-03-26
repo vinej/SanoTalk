@@ -251,6 +251,69 @@ The UI is fully internationalized (i18n) and available in 6 languages:
 | `ar` | Arabic |
 | `hi` | Hindi |
 
+## Automated testing
+
+Testing is organized by application layer. Each layer uses the tool best suited to what it needs to verify.
+
+### Layer 1 — Database (`packages/db`)
+
+**Tool:** [Vitest](https://vitest.dev/)
+
+Integration tests that run queries against a real PostgreSQL instance. These tests validate Drizzle schema definitions, migrations, and query correctness.
+
+> Requires a real `DATABASE_URL` pointing to a test database.
+
+```bash
+DATABASE_URL=postgresql://... pnpm --filter @sanotalk/db test
+```
+
+### Layer 2 — tRPC routers (`packages/trpc`)
+
+**Tool:** [Vitest](https://vitest.dev/) + tRPC `createCallerFactory`
+
+Unit tests for every router procedure. The database is injected via the tRPC context and fully mocked with `vi.fn()` stubs — no database connection required. Tests cover business logic, authorization guards (`UNAUTHORIZED`, `FORBIDDEN`), and error cases (`NOT_FOUND`).
+
+```bash
+pnpm --filter @sanotalk/trpc test           # run once
+pnpm --filter @sanotalk/trpc test:watch    # watch mode
+pnpm --filter @sanotalk/trpc test:coverage
+```
+
+Test files: `packages/trpc/src/__tests__/`. Reusable helpers (`createAuthedCaller`, `createMockDb`) are in `src/__tests__/helpers/`.
+
+### Layer 3 — Server / API (`apps/server`)
+
+**Tool:** [Vitest](https://vitest.dev/) + [Supertest](https://github.com/ladjs/supertest)
+
+Integration tests that spin up the Express server in-process and make real HTTP requests. Used to test middleware, authentication endpoints, and WebSocket behaviour.
+
+```bash
+pnpm --filter @sanotalk/server test
+```
+
+### Layer 4 — Web UI (`apps/web`)
+
+**Tool:** [Playwright](https://playwright.dev/)
+
+End-to-end tests that run in a real Chromium browser. Tests cover full user journeys: authentication, session creation, joining a room, and UI interactions. The dev server is started automatically during test runs.
+
+```bash
+pnpm --filter @sanotalk/web test:e2e       # headless
+pnpm --filter @sanotalk/web test:e2e:ui    # Playwright UI mode
+```
+
+E2E test files: `apps/web/e2e/`.
+
+### Run all unit tests at once
+
+```bash
+pnpm test
+```
+
+Turbo runs Vitest across layers 1–3 in parallel. E2E tests are excluded and must be triggered separately with `pnpm test:e2e`.
+
+---
+
 ## Project Structure
 
 ```text
@@ -261,7 +324,6 @@ SanoTalk/
 ├── packages/
 │   ├── db/           # Drizzle schema & migrations
 │   ├── trpc/         # Shared router types
-│   └── config/       # Shared ESLint & TS configs
 └── infra/            # Docker Compose & Grafana config
 ```
 
