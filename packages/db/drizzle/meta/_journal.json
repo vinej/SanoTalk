@@ -64,6 +64,20 @@
       "when": 1774900100000,
       "tag": "0008_companion_chat",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1774900200000,
+      "tag": "0009_user_properties",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1774900300000,
+      "tag": "0010_user_properties_language",
+      "breakpoints": true
     }
   ]
 }

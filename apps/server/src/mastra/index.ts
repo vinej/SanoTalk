@@ -135,16 +135,30 @@ export function triggerAgentRun(runId: string) {
   })();
 }
 
+type UserProperty = { key: string; value: string };
+
+function buildPropertyContext(userProperties?: UserProperty[], propertiesLanguage = "en"): Array<{ role: "user" | "assistant"; content: string }> {
+  if (!userProperties || userProperties.length === 0) return [];
+  const lines = userProperties.map((p) => `- ${p.key}: ${p.value}`).join("\n");
+  return [
+    { role: "user" as const, content: `Personal context about me (written in language "${propertiesLanguage}"):\n${lines}` },
+    { role: "assistant" as const, content: "Understood. I'll use this personal context throughout our conversation, regardless of the language it was written in." },
+  ];
+}
+
 export async function callCompanionChat(
   history: Array<{ role: "user" | "assistant"; content: string }>,
   userMessage: string,
-  language = "en"
+  language = "en",
+  userProperties?: UserProperty[],
+  propertiesLanguage = "en"
 ): Promise<string> {
   const languageInstruction = { role: "user" as const, content: `Respond in language code "${language}". All your replies must be in that language.` };
   const languageAck = { role: "assistant" as const, content: "Understood. I will respond in the requested language." };
   const messages = [
     languageInstruction,
     languageAck,
+    ...buildPropertyContext(userProperties, propertiesLanguage),
     ...history,
     { role: "user" as const, content: userMessage },
   ];
@@ -155,13 +169,16 @@ export async function callCompanionChat(
 export async function callHealthChat(
   history: Array<{ role: "user" | "assistant"; content: string }>,
   userMessage: string,
-  language = "en"
+  language = "en",
+  userProperties?: UserProperty[],
+  propertiesLanguage = "en"
 ): Promise<string> {
   const languageInstruction = { role: "user" as const, content: `Respond in language code "${language}". All your replies must be in that language.` };
   const languageAck = { role: "assistant" as const, content: "Understood. I will respond in the requested language." };
   const messages = [
     languageInstruction,
     languageAck,
+    ...buildPropertyContext(userProperties, propertiesLanguage),
     ...history,
     { role: "user" as const, content: userMessage },
   ];

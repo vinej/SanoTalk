@@ -28,6 +28,7 @@ export const user = createTable("user", {
   linkedDoctorId: text("linked_doctor_id").references((): any => user.id, { onDelete: "set null" }),
   linkedPharmacistId: text("linked_pharmacist_id").references((): any => user.id, { onDelete: "set null" }),
   twoFactorEnabled: boolean("two_factor_enabled").notNull().default(true),
+  propertiesLanguage: text("properties_language").notNull().default("en"),
 });
 
 export const session = createTable("session", {

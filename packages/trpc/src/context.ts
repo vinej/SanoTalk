@@ -2,17 +2,23 @@ import type { CreateHTTPContextOptions } from "@trpc/server/adapters/standalone"
 import { db } from "@sanotalk/db";
 import { auth } from "./auth";
 
+export type UserProperty = { key: string; value: string };
+
 interface ContextExtras {
   triggerAgentRun?: (runId: string) => void;
   callHealthChat?: (
     history: Array<{ role: "user" | "assistant"; content: string }>,
     userMessage: string,
-    language?: string
+    language?: string,
+    userProperties?: UserProperty[],
+    propertiesLanguage?: string
   ) => Promise<string>;
   callCompanionChat?: (
     history: Array<{ role: "user" | "assistant"; content: string }>,
     userMessage: string,
-    language?: string
+    language?: string,
+    userProperties?: UserProperty[],
+    propertiesLanguage?: string
   ) => Promise<string>;
 }
 

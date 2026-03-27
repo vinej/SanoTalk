@@ -1,9 +1,29 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
-import { agentRun, talkSession as talkSessionTable, chatMessage, transcript, user, transcriptSummary } from "@sanotalk/db";
+import { agentRun, talkSession as talkSessionTable, chatMessage, transcript, user, transcriptSummary, userProperty } from "@sanotalk/db";
 import { resend } from "../lib/resend";
 import { eq, asc, desc, isNull, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
+
+type DB = Parameters<Parameters<typeof protectedProcedure.query>[0]>[0]["ctx"]["db"];
+
+/** Fetches all key/value properties + propertiesLanguage for a user to pass as AI context. */
+async function getUserContext(db: DB, userId: string) {
+  const [properties, userRow] = await Promise.all([
+    db
+      .select({ key: userProperty.key, value: userProperty.value })
+      .from(userProperty)
+      .where(eq(userProperty.userId, userId)),
+    db
+      .select({ propertiesLanguage: user.propertiesLanguage })
+      .from(user)
+      .where(eq(user.id, userId)),
+  ]);
+  return {
+    properties,
+    propertiesLanguage: userRow[0]?.propertiesLanguage ?? "en",
+  };
+}
 
 /** Throws FORBIDDEN if the user is not the host or a participant of the session. */
 async function assertSessionAccess(
@@ -112,8 +132,11 @@ export const agentsRouter = createTRPCRouter({
         content: input.message,
       });
 
+      // Fetch user properties + language for AI context
+      const { properties: userProperties, propertiesLanguage } = await getUserContext(ctx.db, ctx.user.id);
+
       // Call AI agent
-      const assistantText = await ctx.callHealthChat(history, input.message, sessionLanguage);
+      const assistantText = await ctx.callHealthChat(history, input.message, sessionLanguage, userProperties, propertiesLanguage);
 
       // Persist assistant response
       await ctx.db.insert(chatMessage).values({
@@ -151,7 +174,8 @@ export const agentsRouter = createTRPCRouter({
 
       await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "general", role: "user", content: input.message });
 
-      const assistantText = await ctx.callHealthChat(history, input.message, input.language ?? "en");
+      const { properties: userProperties, propertiesLanguage } = await getUserContext(ctx.db, ctx.user.id);
+      const assistantText = await ctx.callHealthChat(history, input.message, input.language ?? "en", userProperties, propertiesLanguage);
 
       await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "general", role: "assistant", content: assistantText });
 
@@ -184,7 +208,8 @@ export const agentsRouter = createTRPCRouter({
 
       await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "companion", role: "user", content: input.message });
 
-      const assistantText = await ctx.callCompanionChat(history, input.message, input.language ?? "en");
+      const { properties: userProperties, propertiesLanguage } = await getUserContext(ctx.db, ctx.user.id);
+      const assistantText = await ctx.callCompanionChat(history, input.message, input.language ?? "en", userProperties, propertiesLanguage);
 
       await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "companion", role: "assistant", content: assistantText });
 
