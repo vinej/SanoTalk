@@ -72,6 +72,7 @@ function DashboardPage() {
     createSession.mutate({ title: newTitle.trim(), language: i18n.language });
   }
 
+  const isAdmin = (profile as any)?.role === "admin";
   const sessionsWithDates = sessions?.map(transformSessionDates) ?? [];
 
   return (
@@ -167,7 +168,7 @@ function DashboardPage() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {sessionsWithDates.map((session: TalkSession) => (
-              <SessionCard key={session.id} session={session} />
+              <SessionCard key={session.id} session={session} readOnly={isAdmin} />
             ))}
             {!sessions?.length && (
               <div className="col-span-3 text-center py-16 text-muted-foreground">

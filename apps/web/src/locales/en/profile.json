@@ -1,5 +1,6 @@
 {
   "title": "Edit Profile",
+  "adminReadOnly": "Administrator accounts do not have editable profile fields.",
   "name": "Name",
   "email": "Email",
   "doctor": "My Doctor",

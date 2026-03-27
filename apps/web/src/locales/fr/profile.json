@@ -1,5 +1,6 @@
 {
   "title": "Modifier le profil",
+  "adminReadOnly": "Les comptes administrateurs n'ont pas de champs de profil modifiables.",
   "name": "Nom",
   "email": "Courriel",
   "doctor": "Mon médecin",

@@ -39,6 +39,11 @@
     "dialogDescription": "Sélectionnez un utilisateur avant de déplacer la tâche vers 'Assigné'.",
     "confirm": "Assigner & Déplacer"
   },
+  "reassign": {
+    "dialogTitle": "Réassigner la tâche",
+    "dialogDescription": "Vous êtes actuellement assigné à cette tâche. La réassigner vous retirera l'accès en modification. Voulez-vous continuer ?",
+    "confirm": "Réassigner"
+  },
   "unassign": {
     "dialogTitle": "Retirer l'assignation",
     "dialogDescription": "Cela déplacera la tâche vers 'Non assigné' et retirera l'assignataire actuel. Continuer ?",

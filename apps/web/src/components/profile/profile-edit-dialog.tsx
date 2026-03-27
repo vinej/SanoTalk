@@ -44,6 +44,7 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
   const role = (profile as any)?.role as string | undefined;
   const isPatient = role === "patient";
   const isProfessional = role === "doctor" || role === "pharmacist";
+  const isAdmin = role === "admin";
 
   const { data: doctors } = trpc.user.listByRole.useQuery(
     { role: "doctor" },
@@ -155,6 +156,13 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
             <Label>{t("email")}</Label>
             <Input value={profile?.email ?? ""} disabled className="bg-muted" />
           </div>
+
+          {/* Admin notice */}
+          {isAdmin && (
+            <p className="text-sm text-muted-foreground rounded-md border border-dashed p-3">
+              {t("adminReadOnly")}
+            </p>
+          )}
 
           {/* Patient fields */}
           {isPatient && (

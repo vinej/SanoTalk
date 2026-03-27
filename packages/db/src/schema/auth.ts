@@ -20,7 +20,7 @@ export const user = createTable("user", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
   // SanoTalk-specific profile fields
-  role: text("role", { enum: ["patient", "doctor", "pharmacist", "ia_agent"] })
+  role: text("role", { enum: ["patient", "doctor", "pharmacist", "ia_agent", "admin"] })
     .notNull()
     .default("patient"),
   specialty: text("specialty"),

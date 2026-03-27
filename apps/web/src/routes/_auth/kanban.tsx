@@ -96,9 +96,17 @@ function KanbanPage() {
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
   const [confirmDeleteTask, setConfirmDeleteTask] = useState<TaskWithUser | null>(null);
 
+  // Confirm reassign dialog (shown when current user is losing edit access)
+  const [confirmReassignOpen, setConfirmReassignOpen] = useState(false);
+  const [confirmReassignTask, setConfirmReassignTask] = useState<TaskWithUser | null>(null);
+  const [confirmReassignNewUserId, setConfirmReassignNewUserId] = useState("");
+
   const { t } = useTranslation(["kanban", "common"]);
 
   const utils = trpc.useUtils();
+  const { data: profile } = trpc.user.profile.useQuery();
+  const currentUserId = (profile as any)?.id as string | undefined;
+  const isAdmin = (profile as any)?.role === "admin";
   const { data: tasks = [], isLoading } = trpc.tasks.list.useQuery();
   const { data: users = [] } = trpc.tasks.listUsers.useQuery();
 
@@ -176,13 +184,25 @@ function KanbanPage() {
         setConfirmUnassignOpen(true);
       }
     } else {
-      const newStatus: Task["status"] = task.status === "not_assigned" ? "assigned" : task.status;
-      updateMutation.mutate({
-        id: task.id,
-        assignedUserId: newUserId,
-        status: newStatus,
-      });
+      // Warn if the current user is the assignee — they will lose edit access
+      if (task.assignedUserId === currentUserId) {
+        setConfirmReassignTask(task);
+        setConfirmReassignNewUserId(newUserId);
+        setConfirmReassignOpen(true);
+      } else {
+        const newStatus: Task["status"] = task.status === "not_assigned" ? "assigned" : task.status;
+        updateMutation.mutate({ id: task.id, assignedUserId: newUserId, status: newStatus });
+      }
     }
+  }
+
+  function handleConfirmReassign() {
+    if (!confirmReassignTask || !confirmReassignNewUserId) return;
+    const newStatus: Task["status"] = confirmReassignTask.status === "not_assigned" ? "assigned" : confirmReassignTask.status;
+    updateMutation.mutate(
+      { id: confirmReassignTask.id, assignedUserId: confirmReassignNewUserId, status: newStatus },
+      { onSuccess: () => { setConfirmReassignOpen(false); setConfirmReassignTask(null); setConfirmReassignNewUserId(""); } }
+    );
   }
 
   function handleOpenEdit(task: TaskWithUser) {
@@ -246,10 +266,12 @@ function KanbanPage() {
               {t("common:dashboard")}
             </Link>
           </Button>
-          <Button size="sm" onClick={() => setCreateOpen(true)}>
-            <Plus className="w-4 h-4 mr-1.5" />
-            {t("kanban:newTask")}
-          </Button>
+          {!isAdmin && (
+            <Button size="sm" onClick={() => setCreateOpen(true)}>
+              <Plus className="w-4 h-4 mr-1.5" />
+              {t("kanban:newTask")}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -295,20 +317,13 @@ function KanbanPage() {
                     task={t}
                     users={users}
                     borderColor={col.border}
-                    onMoveForward={
-                      col.status !== "completed"
-                        ? () => handleMoveForward(t)
-                        : undefined
-                    }
-                    onMoveBack={
-                      col.status !== "not_assigned" && !(t.taskType === "summary_review" && col.status === "assigned")
-                        ? () => handleMoveBack(t)
-                        : undefined
-                    }
-                    {...(t.taskType !== "summary_review" ? { onDelete: () => handleDeleteClick(t) } : {})}
-                    onEdit={() => handleOpenEdit(t)}
-                    onAssignUser={(userId) => handleDropdownChange(t, userId)}
-                    onUnassignUser={() => handleDropdownChange(t, "")}
+                    {...(!isAdmin && col.status !== "completed" ? { onMoveForward: () => handleMoveForward(t) } : {})}
+                    {...(!isAdmin && col.status !== "not_assigned" && !(t.taskType === "summary_review" && col.status === "assigned") ? { onMoveBack: () => handleMoveBack(t) } : {})}
+                    {...(!isAdmin && t.taskType !== "summary_review" ? { onDelete: () => handleDeleteClick(t) } : {})}
+                    {...(!isAdmin && t.assignedUserId === currentUserId ? { onEdit: () => handleOpenEdit(t) } : {})}
+                    {...(!isAdmin ? { onAssignUser: (userId: string) => handleDropdownChange(t, userId) } : {})}
+                    {...(!isAdmin ? { onUnassignUser: () => handleDropdownChange(t, "") } : {})}
+                    readOnly={isAdmin}
                     minimized={minimizedTasks.has(t.id)}
                     onToggleMinimize={() => setMinimizedTasks((prev) => {
                       const next = new Set(prev);
@@ -490,6 +505,26 @@ function KanbanPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Confirm reassign dialog — warns current assignee they will lose edit access */}
+      <Dialog open={confirmReassignOpen} onOpenChange={(open) => { if (!open) { setConfirmReassignOpen(false); setConfirmReassignTask(null); setConfirmReassignNewUserId(""); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("kanban:reassign.dialogTitle")}</DialogTitle>
+          </DialogHeader>
+          <DialogDescription style={{ fontSize: "13px", color: "#64748b", padding: "8px 0" }}>
+            {t("kanban:reassign.dialogDescription")}
+          </DialogDescription>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setConfirmReassignOpen(false); setConfirmReassignTask(null); setConfirmReassignNewUserId(""); }}>
+              {t("common:cancel")}
+            </Button>
+            <Button onClick={handleConfirmReassign} disabled={updateMutation.isPending}>
+              {t("kanban:reassign.confirm")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Confirm unassign dialog */}
       <Dialog open={confirmUnassignOpen} onOpenChange={(open) => { if (!open) { setConfirmUnassignOpen(false); setConfirmUnassignTask(null); } }}>
         <DialogContent>
@@ -529,6 +564,7 @@ function TaskCard({
   onUnassignUser,
   minimized,
   onToggleMinimize,
+  readOnly,
 }: {
   task: TaskWithUser;
   users: UserOption[];
@@ -536,11 +572,12 @@ function TaskCard({
   onMoveForward?: (() => void) | undefined;
   onMoveBack?: (() => void) | undefined;
   onDelete?: () => void;
-  onEdit: () => void;
-  onAssignUser: (userId: string) => void;
-  onUnassignUser: () => void;
+  onEdit?: () => void;
+  onAssignUser?: (userId: string) => void;
+  onUnassignUser?: () => void;
   minimized: boolean;
   onToggleMinimize: () => void;
+  readOnly?: boolean;
 }) {
   const { t } = useTranslation("kanban");
   const createdDate = new Date(task.createdAt).toLocaleDateString(undefined, {
@@ -551,9 +588,9 @@ function TaskCard({
   function handleSelectChange(e: React.ChangeEvent<HTMLSelectElement>) {
     const val = e.target.value;
     if (val === "") {
-      onUnassignUser();
+      onUnassignUser?.();
     } else {
-      onAssignUser(val);
+      onAssignUser?.(val);
     }
   }
 
@@ -577,9 +614,15 @@ function TaskCard({
                   {t("dialog.descriptionLabel")}
                 </p>
                 {/^https?:\/\//.test(task.description) ? (
-                  <a href={task.description} target="_blank" rel="noopener noreferrer" style={{ fontSize: "13px", color: "#2563eb", fontWeight: 500, textDecoration: "underline" }}>
-                    {t("viewSummary")}
-                  </a>
+                  readOnly ? (
+                    <p style={{ fontSize: "13px", color: "#94a3b8", fontWeight: 500, margin: 0 }}>
+                      {t("viewSummary")}
+                    </p>
+                  ) : (
+                    <a href={task.description} target="_blank" rel="noopener noreferrer" style={{ fontSize: "13px", color: "#2563eb", fontWeight: 500, textDecoration: "underline" }}>
+                      {t("viewSummary")}
+                    </a>
+                  )
                 ) : (
                   <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
                     {task.description}
@@ -642,9 +685,11 @@ function TaskCard({
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Button>
               )}
-              <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onEdit} title={t("actions.edit")}>
-                <Pencil className="w-3.5 h-3.5" />
-              </Button>
+              {onEdit && (
+                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onEdit} title={t("actions.edit")}>
+                  <Pencil className="w-3.5 h-3.5" />
+                </Button>
+              )}
           {onDelete && (
             <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onDelete} title={t("actions.delete")}>
               <Trash2 className="w-3.5 h-3.5 text-destructive" />

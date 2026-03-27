@@ -1,5 +1,6 @@
 {
   "title": "Editar perfil",
+  "adminReadOnly": "Las cuentas de administrador no tienen campos de perfil editables.",
   "name": "Nombre",
   "email": "Correo electrónico",
   "doctor": "Mi médico",

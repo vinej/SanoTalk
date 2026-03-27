@@ -27,6 +27,7 @@ import { trpc } from "../../lib/trpc";
 
 type Props = {
   session: TalkSession;
+  readOnly?: boolean;
 };
 
 const statusColors = {
@@ -36,7 +37,7 @@ const statusColors = {
   cancelled: "bg-red-100 text-red-700",
 } as const;
 
-export function SessionCard({ session }: Props) {
+export function SessionCard({ session, readOnly = false }: Props) {
   const { t } = useTranslation(["sessions", "common"]);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
@@ -80,13 +81,11 @@ export function SessionCard({ session }: Props) {
   return (
     <>
       <div className="relative group">
-        <Link to="/sessions/$sessionId" params={{ sessionId: session.id }}>
-          <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
+        {readOnly ? (
+          <Card className="h-full">
             <CardHeader className="pb-2">
               <div className="flex items-start justify-between gap-2">
-                <CardTitle className="text-base line-clamp-2 group-hover:text-primary transition-colors">
-                  {displayTitle}
-                </CardTitle>
+                <CardTitle className="text-base line-clamp-2">{displayTitle}</CardTitle>
                 <Badge
                   variant="secondary"
                   className={cn("shrink-0 capitalize", statusColors[session.status])}
@@ -113,49 +112,86 @@ export function SessionCard({ session }: Props) {
               )}
             </CardContent>
           </Card>
-        </Link>
+        ) : (
+          <>
+            <Link to="/sessions/$sessionId" params={{ sessionId: session.id }}>
+              <Card className="h-full hover:shadow-md transition-shadow cursor-pointer">
+                <CardHeader className="pb-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <CardTitle className="text-base line-clamp-2 group-hover:text-primary transition-colors">
+                      {displayTitle}
+                    </CardTitle>
+                    <Badge
+                      variant="secondary"
+                      className={cn("shrink-0 capitalize", statusColors[session.status])}
+                    >
+                      {t(`sessions:card.statuses.${session.status}`)}
+                    </Badge>
+                  </div>
+                  <CardDescription className="text-xs truncate">
+                    {session.roomName}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-xs text-muted-foreground space-y-1">
+                  {session.scheduledAt && (
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      {new Date(session.scheduledAt).toLocaleString()}
+                    </div>
+                  )}
+                  {session.status === "active" && (
+                    <div className="flex items-center gap-1 text-green-600 font-medium">
+                      <Video className="h-3 w-3 animate-pulse" />
+                      {t("sessions:card.liveNow")}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </Link>
 
-        {/* Close session button — only for scheduled/active */}
-        {canClose && (
-          <Button
-            size="icon"
-            variant="outline"
-            className="absolute bottom-2 right-[4.5rem] h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-green-600 hover:text-green-700"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              closeMutation.mutate({ id: session.id });
-            }}
-            disabled={closeMutation.isPending}
-            title={t("sessions:card.closeSession")}
-          >
-            <CircleCheck className="h-3.5 w-3.5" />
-          </Button>
+            {/* Close session button — only for scheduled/active */}
+            {canClose && (
+              <Button
+                size="icon"
+                variant="outline"
+                className="absolute bottom-2 right-[4.5rem] h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity text-green-600 hover:text-green-700"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  closeMutation.mutate({ id: session.id });
+                }}
+                disabled={closeMutation.isPending}
+                title={t("sessions:card.closeSession")}
+              >
+                <CircleCheck className="h-3.5 w-3.5" />
+              </Button>
+            )}
+
+            {/* Rename button */}
+            <Button
+              size="icon"
+              variant="outline"
+              className="absolute bottom-2 right-10 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={handleRenameOpen}
+            >
+              <Pencil className="h-3.5 w-3.5" />
+            </Button>
+
+            {/* Delete button */}
+            <Button
+              size="icon"
+              variant="destructive"
+              className="absolute bottom-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setConfirmOpen(true);
+              }}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </>
         )}
-
-        {/* Rename button */}
-        <Button
-          size="icon"
-          variant="outline"
-          className="absolute bottom-2 right-10 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-          onClick={handleRenameOpen}
-        >
-          <Pencil className="h-3.5 w-3.5" />
-        </Button>
-
-        {/* Delete button */}
-        <Button
-          size="icon"
-          variant="destructive"
-          className="absolute bottom-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            setConfirmOpen(true);
-          }}
-        >
-          <Trash2 className="h-3.5 w-3.5" />
-        </Button>
       </div>
 
       {/* Rename dialog */}

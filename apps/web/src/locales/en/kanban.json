@@ -39,6 +39,11 @@
     "dialogDescription": "Select a user to assign before moving the task to 'Assigned'.",
     "confirm": "Assign & Move"
   },
+  "reassign": {
+    "dialogTitle": "Reassign Task",
+    "dialogDescription": "You are currently assigned to this task. Reassigning it will remove your edit access. Are you sure you want to continue?",
+    "confirm": "Reassign"
+  },
   "unassign": {
     "dialogTitle": "Remove Assignment",
     "dialogDescription": "This will move the task back to 'Not Assigned' and remove the current assignee. Continue?",

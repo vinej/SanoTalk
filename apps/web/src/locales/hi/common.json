@@ -28,6 +28,7 @@
     "patient": "मरीज़",
     "doctor": "डॉक्टर",
     "pharmacist": "फार्मासिस्ट",
-    "ia_agent": "AI एजेंट"
+    "ia_agent": "AI एजेंट",
+    "admin": "व्यवस्थापक"
   }
 }

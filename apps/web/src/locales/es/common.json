@@ -28,6 +28,7 @@
     "patient": "Paciente",
     "doctor": "Médico",
     "pharmacist": "Farmacéutico",
-    "ia_agent": "Agente IA"
+    "ia_agent": "Agente IA",
+    "admin": "Administrador"
   }
 }

@@ -39,6 +39,11 @@
     "dialogDescription": "Selecciona un usuario antes de mover la tarea a 'Asignada'.",
     "confirm": "Asignar y mover"
   },
+  "reassign": {
+    "dialogTitle": "Reasignar tarea",
+    "dialogDescription": "Actualmente estás asignado a esta tarea. Reasignarla te quitará el acceso de edición. ¿Deseas continuar?",
+    "confirm": "Reasignar"
+  },
   "unassign": {
     "dialogTitle": "Eliminar asignación",
     "dialogDescription": "Esto moverá la tarea a 'Sin asignar' y eliminará el asignatario actual. ¿Continuar?",

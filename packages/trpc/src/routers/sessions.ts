@@ -4,6 +4,7 @@ import { talkSession, sessionParticipant } from "@sanotalk/db";
 import { eq, desc, or, inArray } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { TRPCError } from "@trpc/server";
+import { verifyAdminFromDb } from "../lib/verify-admin";
 
 /** Returns the session (with participants+users) if the user is host or participant; throws otherwise. */
 async function assertSessionAccess(
@@ -25,6 +26,15 @@ async function assertSessionAccess(
 
 export const sessionsRouter = createTRPCRouter({
   list: protectedProcedure.query(async ({ ctx }) => {
+    const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+    if (isAdmin) {
+      // Admin sees all sessions — only session metadata fetched here
+      // (transcripts, chat, recordings are in separate tables and not included)
+      return ctx.db.query.talkSession.findMany({
+        orderBy: [desc(talkSession.createdAt)],
+        with: { participants: { with: { user: true } } },
+      });
+    }
     // Single query using a subquery — user must be host OR a participant
     const participantSubquery = ctx.db
       .select({ id: sessionParticipant.sessionId })
