@@ -69,7 +69,7 @@ export const tasksRouter = createTRPCRouter({
       const { id, ...fields } = input;
       const existing = await ctx.db.query.task.findFirst({ where: eq(task.id, id) });
       if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "Task not found" });
-      if (existing.assignedUserId !== ctx.user.id) {
+      if (existing.assignedUserId !== null && existing.assignedUserId !== ctx.user.id) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Only the assigned user can edit this task" });
       }
       if (existing?.taskType === "summary_review") {

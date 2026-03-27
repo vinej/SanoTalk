@@ -44,6 +44,11 @@
     "dialogDescription": "您当前是此任务的负责人。重新分配后，您将失去编辑权限。是否确认继续？",
     "confirm": "确认分配"
   },
+  "assignOther": {
+    "dialogTitle": "分配给其他用户",
+    "dialogDescription": "您即将将此任务分配给其他用户。分配后，您将无法在看板中看到此任务。确定要继续吗？",
+    "confirm": "确认分配"
+  },
   "unassign": {
     "dialogTitle": "取消分配",
     "dialogDescription": "这将把任务移回「未分配」列并移除当前负责人。是否继续？",

@@ -44,6 +44,11 @@
     "dialogDescription": "Actualmente estás asignado a esta tarea. Reasignarla te quitará el acceso de edición. ¿Deseas continuar?",
     "confirm": "Reasignar"
   },
+  "assignOther": {
+    "dialogTitle": "Asignar a otro usuario",
+    "dialogDescription": "Vas a asignar esta tarea a otro usuario. Una vez asignada, ya no podrás verla en tu tablero. ¿Seguro que deseas continuar?",
+    "confirm": "Asignar"
+  },
   "unassign": {
     "dialogTitle": "Eliminar asignación",
     "dialogDescription": "Esto moverá la tarea a 'Sin asignar' y eliminará el asignatario actual. ¿Continuar?",

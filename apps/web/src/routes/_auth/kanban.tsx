@@ -100,6 +100,8 @@ function KanbanPage() {
   const [confirmReassignOpen, setConfirmReassignOpen] = useState(false);
   const [confirmReassignTask, setConfirmReassignTask] = useState<TaskWithUser | null>(null);
   const [confirmReassignNewUserId, setConfirmReassignNewUserId] = useState("");
+  // true when assigning an unassigned task to someone else (uses assignOther keys instead of reassign)
+  const [confirmReassignIsAssignOther, setConfirmReassignIsAssignOther] = useState(false);
 
   const { t } = useTranslation(["kanban", "common"]);
 
@@ -184,10 +186,16 @@ function KanbanPage() {
         setConfirmUnassignOpen(true);
       }
     } else {
-      // Warn if the current user is the assignee — they will lose edit access
-      if (task.assignedUserId === currentUserId) {
+      // Warn whenever the current user will lose visibility after the assignment
+      // (assigning to someone else from not_assigned, or reassigning away from self)
+      const isAssignOther = task.status === "not_assigned" && newUserId !== currentUserId;
+      const willLoseVisibility =
+        (task.status === "not_assigned" || task.assignedUserId === currentUserId) &&
+        newUserId !== currentUserId;
+      if (willLoseVisibility) {
         setConfirmReassignTask(task);
         setConfirmReassignNewUserId(newUserId);
+        setConfirmReassignIsAssignOther(isAssignOther);
         setConfirmReassignOpen(true);
       } else {
         const newStatus: Task["status"] = task.status === "not_assigned" ? "assigned" : task.status;
@@ -201,7 +209,7 @@ function KanbanPage() {
     const newStatus: Task["status"] = confirmReassignTask.status === "not_assigned" ? "assigned" : confirmReassignTask.status;
     updateMutation.mutate(
       { id: confirmReassignTask.id, assignedUserId: confirmReassignNewUserId, status: newStatus },
-      { onSuccess: () => { setConfirmReassignOpen(false); setConfirmReassignTask(null); setConfirmReassignNewUserId(""); } }
+      { onSuccess: () => { setConfirmReassignOpen(false); setConfirmReassignTask(null); setConfirmReassignNewUserId(""); setConfirmReassignIsAssignOther(false); } }
     );
   }
 
@@ -505,21 +513,24 @@ function KanbanPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Confirm reassign dialog — warns current assignee they will lose edit access */}
-      <Dialog open={confirmReassignOpen} onOpenChange={(open) => { if (!open) { setConfirmReassignOpen(false); setConfirmReassignTask(null); setConfirmReassignNewUserId(""); } }}>
+      {/* Confirm reassign dialog — warns current assignee they will lose edit access,
+           or warns any user they won't see the task after assigning it to someone else */}
+      <Dialog open={confirmReassignOpen} onOpenChange={(open) => { if (!open) { setConfirmReassignOpen(false); setConfirmReassignTask(null); setConfirmReassignNewUserId(""); setConfirmReassignIsAssignOther(false); } }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("kanban:reassign.dialogTitle")}</DialogTitle>
+            <DialogTitle>
+              {confirmReassignIsAssignOther ? t("kanban:assignOther.dialogTitle") : t("kanban:reassign.dialogTitle")}
+            </DialogTitle>
           </DialogHeader>
           <DialogDescription style={{ fontSize: "13px", color: "#64748b", padding: "8px 0" }}>
-            {t("kanban:reassign.dialogDescription")}
+            {confirmReassignIsAssignOther ? t("kanban:assignOther.dialogDescription") : t("kanban:reassign.dialogDescription")}
           </DialogDescription>
           <DialogFooter>
-            <Button variant="outline" onClick={() => { setConfirmReassignOpen(false); setConfirmReassignTask(null); setConfirmReassignNewUserId(""); }}>
+            <Button variant="outline" onClick={() => { setConfirmReassignOpen(false); setConfirmReassignTask(null); setConfirmReassignNewUserId(""); setConfirmReassignIsAssignOther(false); }}>
               {t("common:cancel")}
             </Button>
             <Button onClick={handleConfirmReassign} disabled={updateMutation.isPending}>
-              {t("kanban:reassign.confirm")}
+              {confirmReassignIsAssignOther ? t("kanban:assignOther.confirm") : t("kanban:reassign.confirm")}
             </Button>
           </DialogFooter>
         </DialogContent>

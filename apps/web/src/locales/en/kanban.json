@@ -44,6 +44,11 @@
     "dialogDescription": "You are currently assigned to this task. Reassigning it will remove your edit access. Are you sure you want to continue?",
     "confirm": "Reassign"
   },
+  "assignOther": {
+    "dialogTitle": "Assign to Another User",
+    "dialogDescription": "You are assigning this task to another user. Once assigned, you will no longer be able to see it in your board. Are you sure you want to continue?",
+    "confirm": "Assign"
+  },
   "unassign": {
     "dialogTitle": "Remove Assignment",
     "dialogDescription": "This will move the task back to 'Not Assigned' and remove the current assignee. Continue?",

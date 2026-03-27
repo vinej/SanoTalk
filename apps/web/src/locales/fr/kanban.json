@@ -44,6 +44,11 @@
     "dialogDescription": "Vous êtes actuellement assigné à cette tâche. La réassigner vous retirera l'accès en modification. Voulez-vous continuer ?",
     "confirm": "Réassigner"
   },
+  "assignOther": {
+    "dialogTitle": "Assigner à un autre utilisateur",
+    "dialogDescription": "Vous allez assigner cette tâche à un autre utilisateur. Une fois assignée, vous ne pourrez plus la voir dans votre tableau. Êtes-vous sûr de vouloir continuer ?",
+    "confirm": "Assigner"
+  },
   "unassign": {
     "dialogTitle": "Retirer l'assignation",
     "dialogDescription": "Cela déplacera la tâche vers 'Non assigné' et retirera l'assignataire actuel. Continuer ?",
