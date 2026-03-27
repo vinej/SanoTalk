@@ -24,7 +24,10 @@
   },
   "editDialog": {
     "title": "Modifier la tâche",
-    "save": "Enregistrer"
+    "save": "Enregistrer",
+    "remarkLabel": "Remarque",
+    "remarkPlaceholder": "Ajouter une remarque (optionnel)",
+    "lastUpdated": "Dernière mise à jour : {{date}}"
   },
   "assign": {
     "placeholder": "Sélectionner un utilisateur...",

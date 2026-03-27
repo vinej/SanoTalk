@@ -24,7 +24,10 @@
   },
   "editDialog": {
     "title": "Editar tarea",
-    "save": "Guardar"
+    "save": "Guardar",
+    "remarkLabel": "Observación",
+    "remarkPlaceholder": "Añadir una observación (opcional)",
+    "lastUpdated": "Última actualización: {{date}}"
   },
   "assign": {
     "placeholder": "Seleccionar usuario...",

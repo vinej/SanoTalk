@@ -85,6 +85,7 @@ function KanbanPage() {
   const [editTask, setEditTask] = useState<TaskWithUser | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editDescription, setEditDescription] = useState("");
+  const [editRemark, setEditRemark] = useState("");
 
   // Confirm unassign dialog (back arrow from assigned, or dropdown unassign)
   const [confirmUnassignOpen, setConfirmUnassignOpen] = useState(false);
@@ -187,14 +188,23 @@ function KanbanPage() {
     setEditTask(task);
     setEditTitle(task.title);
     setEditDescription(task.description ?? "");
+    setEditRemark(task.remark ?? "");
   }
 
   function handleSaveEdit() {
-    if (!editTask || !editTitle.trim()) return;
-    updateMutation.mutate(
-      { id: editTask.id, title: editTitle.trim(), description: editDescription.trim() || null },
-      { onSuccess: () => { setEditTask(null); } }
-    );
+    if (!editTask) return;
+    if (editTask.taskType === "summary_review") {
+      updateMutation.mutate(
+        { id: editTask.id, remark: editRemark.trim() || null },
+        { onSuccess: () => { setEditTask(null); } }
+      );
+    } else {
+      if (!editTitle.trim()) return;
+      updateMutation.mutate(
+        { id: editTask.id, title: editTitle.trim(), description: editDescription.trim() || null, remark: editRemark.trim() || null },
+        { onSuccess: () => { setEditTask(null); } }
+      );
+    }
   }
 
   function handleDeleteClick(task: TaskWithUser) {
@@ -290,11 +300,11 @@ function KanbanPage() {
                         : undefined
                     }
                     onMoveBack={
-                      col.status !== "not_assigned"
+                      col.status !== "not_assigned" && !(t.taskType === "summary_review" && col.status === "assigned")
                         ? () => handleMoveBack(t)
                         : undefined
                     }
-                    onDelete={() => handleDeleteClick(t)}
+                    {...(t.taskType !== "summary_review" ? { onDelete: () => handleDeleteClick(t) } : {})}
                     onEdit={() => handleOpenEdit(t)}
                     onAssignUser={(userId) => handleDropdownChange(t, userId)}
                     onUnassignUser={() => handleDropdownChange(t, "")}
@@ -392,33 +402,57 @@ function KanbanPage() {
             <DialogTitle>{t("kanban:editDialog.title")}</DialogTitle>
           </DialogHeader>
           <div style={{ display: "flex", flexDirection: "column", gap: "16px", padding: "8px 0" }}>
+            {editTask?.taskType !== "summary_review" && (
+              <>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <Label htmlFor="edit-title">{t("kanban:dialog.titleLabel")}</Label>
+                  <Input
+                    id="edit-title"
+                    value={editTitle}
+                    onChange={(e) => setEditTitle(e.target.value)}
+                    autoFocus
+                    className="!border-slate-400"
+                  />
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                  <Label htmlFor="edit-desc">{t("kanban:dialog.descriptionLabel")}</Label>
+                  <Input
+                    id="edit-desc"
+                    placeholder={t("kanban:dialog.descriptionPlaceholder")}
+                    value={editDescription}
+                    onChange={(e) => setEditDescription(e.target.value)}
+                    className="!border-slate-400"
+                  />
+                </div>
+              </>
+            )}
             <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <Label htmlFor="edit-title">{t("kanban:dialog.titleLabel")}</Label>
+              <Label htmlFor="edit-remark">{t("kanban:editDialog.remarkLabel")}</Label>
               <Input
-                id="edit-title"
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSaveEdit()}
-                autoFocus
+                id="edit-remark"
+                placeholder={t("kanban:editDialog.remarkPlaceholder")}
+                value={editRemark}
+                onChange={(e) => setEditRemark(e.target.value)}
+                autoFocus={editTask?.taskType === "summary_review"}
                 className="!border-slate-400"
               />
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              <Label htmlFor="edit-desc">{t("kanban:dialog.descriptionLabel")}</Label>
-              <Input
-                id="edit-desc"
-                placeholder={t("kanban:dialog.descriptionPlaceholder")}
-                value={editDescription}
-                onChange={(e) => setEditDescription(e.target.value)}
-                className="!border-slate-400"
-              />
-            </div>
+            {editTask && (
+              <p style={{ fontSize: "12px", color: "#94a3b8", margin: 0 }}>
+                {t("kanban:editDialog.lastUpdated", {
+                  date: new Date(editTask.updatedAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }),
+                })}
+              </p>
+            )}
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditTask(null)}>
               {t("common:cancel")}
             </Button>
-            <Button onClick={handleSaveEdit} disabled={!editTitle.trim() || updateMutation.isPending}>
+            <Button
+              onClick={handleSaveEdit}
+              disabled={(editTask?.taskType !== "summary_review" && !editTitle.trim()) || updateMutation.isPending}
+            >
               {t("kanban:editDialog.save")}
             </Button>
           </DialogFooter>
@@ -492,7 +526,7 @@ function TaskCard({
   borderColor: string;
   onMoveForward?: (() => void) | undefined;
   onMoveBack?: (() => void) | undefined;
-  onDelete: () => void;
+  onDelete?: () => void;
   onEdit: () => void;
   onAssignUser: (userId: string) => void;
   onUnassignUser: () => void;
@@ -514,31 +548,58 @@ function TaskCard({
 
   return (
     <Card className="shadow-sm hover:shadow-md transition-shadow" style={{ gap: 0, padding: 0, border: `1px solid ${borderColor}` }}>
-      <CardHeader style={{ padding: "14px 16px 8px" }}>
-        <CardTitle style={{ fontSize: "14px", lineHeight: "1.4" }}>{task.title}</CardTitle>
-      </CardHeader>
-
-      {task.description && (
-        <CardContent style={{ padding: "0 16px 10px" }}>
-          <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-            {task.description}
+      <CardContent style={{ padding: "14px 16px 10px", display: "flex", flexDirection: "column", gap: "8px" }}>
+        <div>
+          <p style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "2px" }}>
+            {t("dialog.titleLabel")}
           </p>
-        </CardContent>
-      )}
+          <p style={{ fontSize: "14px", fontWeight: 600, lineHeight: "1.4", margin: 0 }}>{task.title}</p>
+        </div>
 
-      {/* User assignment dropdown */}
-      <div style={{ padding: "0 12px 10px" }}>
-        <select
-          value={task.assignedUserId ?? ""}
-          onChange={handleSelectChange}
-          style={{ width: "100%", padding: "5px 8px", fontSize: "12px", borderRadius: "6px", border: "1px solid #e2e8f0", backgroundColor: task.assignedUserId ? "#eff6ff" : "#f8fafc", color: task.assignedUserId ? "#2563eb" : "#94a3b8", outline: "none", cursor: "pointer" }}
-        >
-          <option value="">{t("assign.unassigned")}</option>
-          {users.map((u) => (
-            <option key={u.id} value={u.id}>{u.name}</option>
-          ))}
-        </select>
-      </div>
+        {task.description && (
+          <div>
+            <p style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "2px" }}>
+              {t("dialog.descriptionLabel")}
+            </p>
+            {/^https?:\/\//.test(task.description) ? (
+              <a href={task.description} target="_blank" rel="noopener noreferrer" style={{ fontSize: "13px", color: "#2563eb", fontWeight: 500, textDecoration: "underline" }}>
+                View Summary
+              </a>
+            ) : (
+              <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                {task.description}
+              </p>
+            )}
+          </div>
+        )}
+
+        {task.remark && (
+          <div>
+            <p style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "2px" }}>
+              {t("editDialog.remarkLabel")}
+            </p>
+            <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+              {task.remark}
+            </p>
+          </div>
+        )}
+      </CardContent>
+
+      {/* User assignment dropdown (hidden for summary_review tasks) */}
+      {task.taskType !== "summary_review" && (
+        <div style={{ padding: "0 12px 10px" }}>
+          <select
+            value={task.assignedUserId ?? ""}
+            onChange={handleSelectChange}
+            style={{ width: "100%", padding: "5px 8px", fontSize: "12px", borderRadius: "6px", border: "1px solid #e2e8f0", backgroundColor: task.assignedUserId ? "#eff6ff" : "#f8fafc", color: task.assignedUserId ? "#2563eb" : "#94a3b8", outline: "none", cursor: "pointer" }}
+          >
+            <option value="">{t("assign.unassigned")}</option>
+            {users.map((u) => (
+              <option key={u.id} value={u.id}>{u.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <CardFooter style={{ padding: "8px 12px", backgroundColor: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#64748b" }}>
@@ -569,9 +630,11 @@ function TaskCard({
           <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onEdit} title={t("actions.edit")}>
               <Pencil className="w-3.5 h-3.5" />
             </Button>
-          <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onDelete} title={t("actions.delete")}>
-            <Trash2 className="w-3.5 h-3.5 text-destructive" />
-          </Button>
+          {onDelete && (
+            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onDelete} title={t("actions.delete")}>
+              <Trash2 className="w-3.5 h-3.5 text-destructive" />
+            </Button>
+          )}
         </div>
       </CardFooter>
     </Card>

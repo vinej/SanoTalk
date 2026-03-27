@@ -14,6 +14,12 @@ export const task = createTable("task", {
   assignedUserId: text("assigned_user_id").references(() => user.id, {
     onDelete: "set null",
   }),
+  taskType: text("task_type", {
+    enum: ["standard", "summary_review"],
+  })
+    .notNull()
+    .default("standard"),
+  remark: text("remark"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

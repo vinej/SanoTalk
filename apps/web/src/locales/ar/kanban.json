@@ -24,7 +24,10 @@
   },
   "editDialog": {
     "title": "تعديل المهمة",
-    "save": "حفظ"
+    "save": "حفظ",
+    "remarkLabel": "ملاحظة",
+    "remarkPlaceholder": "أضف ملاحظة (اختياري)",
+    "lastUpdated": "آخر تحديث: {{date}}"
   },
   "assign": {
     "placeholder": "اختر مستخدماً...",

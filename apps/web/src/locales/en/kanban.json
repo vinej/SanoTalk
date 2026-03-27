@@ -24,7 +24,10 @@
   },
   "editDialog": {
     "title": "Edit Task",
-    "save": "Save"
+    "save": "Save",
+    "remarkLabel": "Remark",
+    "remarkPlaceholder": "Add a remark (optional)",
+    "lastUpdated": "Last updated: {{date}}"
   },
   "assign": {
     "placeholder": "Select a user...",

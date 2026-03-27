@@ -24,7 +24,10 @@
   },
   "editDialog": {
     "title": "कार्य संपादित करें",
-    "save": "सहेजें"
+    "save": "सहेजें",
+    "remarkLabel": "टिप्पणी",
+    "remarkPlaceholder": "टिप्पणी जोड़ें (वैकल्पिक)",
+    "lastUpdated": "अंतिम अपडेट: {{date}}"
   },
   "assign": {
     "placeholder": "उपयोगकर्ता चुनें...",

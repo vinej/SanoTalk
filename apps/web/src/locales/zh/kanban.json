@@ -24,7 +24,10 @@
   },
   "editDialog": {
     "title": "编辑任务",
-    "save": "保存"
+    "save": "保存",
+    "remarkLabel": "备注",
+    "remarkPlaceholder": "添加备注（可选）",
+    "lastUpdated": "最后更新：{{date}}"
   },
   "assign": {
     "placeholder": "选择用户...",
