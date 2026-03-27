@@ -21,7 +21,7 @@ function NewSessionPage() {
   });
 
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="flex items-center justify-center flex-1">
       <div className="text-center space-y-4">
         <h1 className="text-2xl font-bold">{t("new.title")}</h1>
         <p className="text-muted-foreground">{t("new.subtitle")}</p>

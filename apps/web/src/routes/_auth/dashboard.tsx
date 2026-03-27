@@ -5,7 +5,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { SessionCard } from "../../components/sessions/session-card";
-import { Plus, Kanban, LogOut, UserCircle, Bot, Heart } from "lucide-react";
+import { Plus, Kanban, Bot, Heart } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -16,11 +16,6 @@ import {
 } from "../../components/ui/dialog";
 import { TalkSession } from "@sanotalk/db";
 import { useTranslation } from "react-i18next";
-import { LanguageSwitcher } from "../../components/language-switcher";
-import { signOut } from "../../lib/auth-client";
-import { tracker } from "../../lib/tracker";
-import { SanoTalkLogoV2 } from "../../components/logo-v2";
-import { ProfileEditDialog } from "../../components/profile/profile-edit-dialog";
 
 export const Route = createFileRoute("/_auth/dashboard")({
   component: DashboardPage,
@@ -43,7 +38,6 @@ function DashboardPage() {
   const { t, i18n } = useTranslation(["dashboard", "common", "sessions"]);
   const navigate = useNavigate();
   const utils = trpc.useUtils();
-  const [profileOpen, setProfileOpen] = useState(false);
   const [newSessionOpen, setNewSessionOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
 
@@ -58,15 +52,6 @@ function DashboardPage() {
     },
   });
 
-  async function handleLogout() {
-    if (tracker) {
-      tracker.stop();
-      console.log("[OpenReplay] tracker stopped");
-    }
-    await signOut();
-    navigate({ to: "/login" as any });
-  }
-
   function handleNewSession() {
     if (!newTitle.trim()) return;
     createSession.mutate({ title: newTitle.trim(), language: i18n.language });
@@ -77,8 +62,6 @@ function DashboardPage() {
 
   return (
     <>
-      <ProfileEditDialog open={profileOpen} onOpenChange={setProfileOpen} />
-
       <Dialog open={newSessionOpen} onOpenChange={(v) => { setNewSessionOpen(v); if (!v) setNewTitle(""); }}>
         <DialogContent className="sm:max-w-sm">
           <DialogHeader>
@@ -108,26 +91,6 @@ function DashboardPage() {
       </Dialog>
 
       <div className="px-6 py-6 space-y-6">
-        <div className="relative flex items-center justify-between mb-2">
-          <SanoTalkLogoV2 size={64} showText={true} />
-          {profile && (
-            <div className="text-sm grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-0">
-              <span className="font-medium text-right">{profile.name}</span>
-              <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => setProfileOpen(true)}>
-                <UserCircle className="h-3 w-3 mr-1" />
-                {t("dashboard:profile")}
-              </Button>
-              <span className="text-muted-foreground text-right">{profile.email}</span>
-              <LanguageSwitcher />
-              <span className="text-muted-foreground capitalize text-right">{(profile as any).role}</span>
-              <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={handleLogout}>
-                <LogOut className="h-3 w-3 mr-1" />
-                {t("common:logout")}
-              </Button>
-            </div>
-          )}
-        </div>
-
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{t("dashboard:title")}</h1>

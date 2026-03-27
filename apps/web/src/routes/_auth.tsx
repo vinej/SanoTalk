@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { authClient } from "../lib/auth-client";
 import { tracker } from "../lib/tracker";
+import { AppHeader } from "../components/app-header";
 
 export const Route: any = createFileRoute("/_auth")({
   beforeLoad: async ({ location }) => {
@@ -23,5 +24,12 @@ export const Route: any = createFileRoute("/_auth")({
     }
     return { user: session.data.user };
   },
-  component: () => <Outlet />,
+  component: () => (
+    <div className="min-h-screen flex flex-col">
+      <AppHeader />
+      <div className="flex-1 flex flex-col">
+        <Outlet />
+      </div>
+    </div>
+  ),
 });

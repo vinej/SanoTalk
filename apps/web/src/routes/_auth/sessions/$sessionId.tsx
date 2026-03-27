@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState, useCallback } from "react";
 import { trpc } from "../../../lib/trpc";
 import { LiveSessionRoom } from "../../../components/sessions/live-session-room";
@@ -6,8 +6,6 @@ import { TranscriptPanel } from "../../../components/transcript/transcript-panel
 import { SummaryPanel } from "../../../components/summary/summary-panel";
 import { AiChatPanel } from "../../../components/chat/ai-chat-panel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
-import { ArrowLeft } from "lucide-react";
-import { Button } from "../../../components/ui/button";
 import { useTranslation } from "react-i18next";
 
 
@@ -30,7 +28,7 @@ function SessionPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center flex-1">
         <div className="animate-pulse text-muted-foreground">
           {t("detail.loading")}
         </div>
@@ -54,15 +52,7 @@ function SessionPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen">
-      <div className="flex items-center gap-2 px-3 py-2 border-b shrink-0">
-        <Button size="sm" variant="ghost" asChild>
-          <Link to="/dashboard">
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            {t("common:back")}
-          </Link>
-        </Button>
-      </div>
+    <div className="flex-1 flex flex-col min-h-0">
       <div className="flex-1 min-h-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 h-full gap-0">
           {/* Live Room — occupies 1/2 on desktop */}

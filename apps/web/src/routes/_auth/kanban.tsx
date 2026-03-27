@@ -18,10 +18,9 @@ import {
   DialogTitle,
   DialogFooter,
 } from "../../components/ui/dialog";
-import { Plus, Trash2, ArrowRight, ArrowLeft, User, Calendar, LayoutDashboard, Pencil, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Trash2, ArrowRight, ArrowLeft, User, Calendar, Pencil, ChevronDown, ChevronUp } from "lucide-react";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
-import { Link } from "@tanstack/react-router";
 import type { Task } from "@sanotalk/db";
 
 export const Route = createFileRoute("/_auth/kanban")({
@@ -258,7 +257,7 @@ function KanbanPage() {
   }
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}>
+    <div style={{ flex: 1, backgroundColor: "#f8fafc" }}>
       {/* Page header */}
       <div style={{ borderBottom: "1px solid #e2e8f0", backgroundColor: "white", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
@@ -268,12 +267,6 @@ function KanbanPage() {
           </p>
         </div>
         <div style={{ display: "flex", gap: "8px" }}>
-          <Button size="sm" variant="outline" asChild>
-            <Link to="/dashboard">
-              <LayoutDashboard className="w-4 h-4 mr-1.5" />
-              {t("common:dashboard")}
-            </Link>
-          </Button>
           {!isAdmin && (
             <Button size="sm" onClick={() => setCreateOpen(true)}>
               <Plus className="w-4 h-4 mr-1.5" />
