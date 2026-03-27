@@ -13,7 +13,7 @@ export const trpcClient = trpc.createClient({
         (opts.direction === "down" && opts.result instanceof Error),
     }),
     httpBatchLink({
-      url: `${import.meta.env.VITE_API_URL}/api/trpc`,
+      url: `${typeof window !== "undefined" ? window.location.origin : import.meta.env.VITE_API_URL}/api/trpc`,
       transformer : superjson,
       headers() {
         return {};

@@ -107,7 +107,7 @@ function DashboardPage() {
         </DialogContent>
       </Dialog>
 
-      <div className="container mx-auto py-8 space-y-6">
+      <div className="px-6 py-6 space-y-6">
         <div className="relative flex items-center justify-between mb-2">
           <SanoTalkLogoV2 size={64} showText={true} />
           {profile && (

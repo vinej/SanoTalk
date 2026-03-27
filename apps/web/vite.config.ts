@@ -18,7 +18,7 @@ export default defineConfig({
     },
   },
   server: {
-    allowedHosts: ["localhost","figurable-belkis-unfixable.ngrok-free.dev"],
+    allowedHosts: true,
     port: 5173,
 proxy: {
       "/api": {

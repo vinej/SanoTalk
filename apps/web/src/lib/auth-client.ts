@@ -3,7 +3,7 @@ import { inferAdditionalFields, twoFactorClient } from "better-auth/client/plugi
 import type { auth } from "@sanotalk/trpc/auth";
 
 export const authClient = createAuthClient({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: typeof window !== "undefined" ? window.location.origin : import.meta.env.VITE_API_URL,
   plugins: [
     inferAdditionalFields<typeof auth>(),
     twoFactorClient({
