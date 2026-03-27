@@ -4,6 +4,7 @@
   "tasksTotal_other": "{{count}} tasks total",
   "newTask": "New Task",
   "noTasks": "No tasks here",
+  "viewSummary": "View Summary",
   "columns": {
     "not_assigned": "Not Assigned",
     "assigned": "Assigned",
@@ -20,7 +21,9 @@
     "moveBack": "Move back",
     "moveForward": "Move forward",
     "delete": "Delete",
-    "edit": "Edit"
+    "edit": "Edit",
+    "minimize": "Minimize",
+    "expand": "Expand"
   },
   "editDialog": {
     "title": "Edit Task",

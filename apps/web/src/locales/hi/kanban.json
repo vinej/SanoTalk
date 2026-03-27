@@ -4,6 +4,7 @@
   "tasksTotal_other": "कुल {{count}} कार्य",
   "newTask": "नया कार्य",
   "noTasks": "यहाँ कोई कार्य नहीं",
+  "viewSummary": "सारांश देखें",
   "columns": {
     "not_assigned": "असाइन नहीं",
     "assigned": "असाइन किया गया",
@@ -20,7 +21,9 @@
     "moveBack": "पीछे ले जाएं",
     "moveForward": "आगे ले जाएं",
     "delete": "हटाएं",
-    "edit": "संपादित करें"
+    "edit": "संपादित करें",
+    "minimize": "छोटा करें",
+    "expand": "बड़ा करें"
   },
   "editDialog": {
     "title": "कार्य संपादित करें",

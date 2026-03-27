@@ -18,7 +18,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "../../components/ui/dialog";
-import { Plus, Trash2, ArrowRight, ArrowLeft, User, Calendar, LayoutDashboard, Pencil } from "lucide-react";
+import { Plus, Trash2, ArrowRight, ArrowLeft, User, Calendar, LayoutDashboard, Pencil, ChevronDown, ChevronUp } from "lucide-react";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
 import { Link } from "@tanstack/react-router";
@@ -72,6 +72,7 @@ const COLUMNS: {
 const STATUS_ORDER: Task["status"][] = ["not_assigned", "assigned", "completed"];
 
 function KanbanPage() {
+  const [minimizedTasks, setMinimizedTasks] = useState<Set<string>>(new Set());
   const [createOpen, setCreateOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDescription, setNewDescription] = useState("");
@@ -308,6 +309,12 @@ function KanbanPage() {
                     onEdit={() => handleOpenEdit(t)}
                     onAssignUser={(userId) => handleDropdownChange(t, userId)}
                     onUnassignUser={() => handleDropdownChange(t, "")}
+                    minimized={minimizedTasks.has(t.id)}
+                    onToggleMinimize={() => setMinimizedTasks((prev) => {
+                      const next = new Set(prev);
+                      next.has(t.id) ? next.delete(t.id) : next.add(t.id);
+                      return next;
+                    })}
                   />
                 ))}
               </div>
@@ -520,6 +527,8 @@ function TaskCard({
   onEdit,
   onAssignUser,
   onUnassignUser,
+  minimized,
+  onToggleMinimize,
 }: {
   task: TaskWithUser;
   users: UserOption[];
@@ -530,6 +539,8 @@ function TaskCard({
   onEdit: () => void;
   onAssignUser: (userId: string) => void;
   onUnassignUser: () => void;
+  minimized: boolean;
+  onToggleMinimize: () => void;
 }) {
   const { t } = useTranslation("kanban");
   const createdDate = new Date(task.createdAt).toLocaleDateString(undefined, {
@@ -548,95 +559,101 @@ function TaskCard({
 
   return (
     <Card className="shadow-sm hover:shadow-md transition-shadow" style={{ gap: 0, padding: 0, border: `1px solid ${borderColor}` }}>
-      <CardContent style={{ padding: "14px 16px 10px", display: "flex", flexDirection: "column", gap: "8px" }}>
-        <div>
-          <p style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "2px" }}>
-            {t("dialog.titleLabel")}
-          </p>
-          <p style={{ fontSize: "14px", fontWeight: 600, lineHeight: "1.4", margin: 0 }}>{task.title}</p>
-        </div>
+      {/* Title row — always visible */}
+      <div style={{ padding: "10px 12px 10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
+        <p style={{ fontSize: "14px", fontWeight: 600, lineHeight: "1.4", margin: 0, flex: 1 }}>{task.title}</p>
+        <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0" onClick={onToggleMinimize} title={minimized ? t("actions.expand") : t("actions.minimize")}>
+          {minimized ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
+        </Button>
+      </div>
 
-        {task.description && (
-          <div>
-            <p style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "2px" }}>
-              {t("dialog.descriptionLabel")}
-            </p>
-            {/^https?:\/\//.test(task.description) ? (
-              <a href={task.description} target="_blank" rel="noopener noreferrer" style={{ fontSize: "13px", color: "#2563eb", fontWeight: 500, textDecoration: "underline" }}>
-                View Summary
-              </a>
-            ) : (
-              <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                {task.description}
-              </p>
+      {/* Expanded content */}
+      {!minimized && (
+        <>
+          <CardContent style={{ padding: "0 16px 10px", display: "flex", flexDirection: "column", gap: "8px" }}>
+            {task.description && (
+              <div>
+                <p style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "2px" }}>
+                  {t("dialog.descriptionLabel")}
+                </p>
+                {/^https?:\/\//.test(task.description) ? (
+                  <a href={task.description} target="_blank" rel="noopener noreferrer" style={{ fontSize: "13px", color: "#2563eb", fontWeight: 500, textDecoration: "underline" }}>
+                    {t("viewSummary")}
+                  </a>
+                ) : (
+                  <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                    {task.description}
+                  </p>
+                )}
+              </div>
             )}
-          </div>
-        )}
 
-        {task.remark && (
-          <div>
-            <p style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "2px" }}>
-              {t("editDialog.remarkLabel")}
-            </p>
-            <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-              {task.remark}
-            </p>
-          </div>
-        )}
-      </CardContent>
+            {task.remark && (
+              <div>
+                <p style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "2px" }}>
+                  {t("editDialog.remarkLabel")}
+                </p>
+                <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                  {task.remark}
+                </p>
+              </div>
+            )}
+          </CardContent>
 
-      {/* User assignment dropdown (hidden for summary_review tasks) */}
-      {task.taskType !== "summary_review" && (
-        <div style={{ padding: "0 12px 10px" }}>
-          <select
-            value={task.assignedUserId ?? ""}
-            onChange={handleSelectChange}
-            style={{ width: "100%", padding: "5px 8px", fontSize: "12px", borderRadius: "6px", border: "1px solid #e2e8f0", backgroundColor: task.assignedUserId ? "#eff6ff" : "#f8fafc", color: task.assignedUserId ? "#2563eb" : "#94a3b8", outline: "none", cursor: "pointer" }}
-          >
-            <option value="">{t("assign.unassigned")}</option>
-            {users.map((u) => (
-              <option key={u.id} value={u.id}>{u.name}</option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      <CardFooter style={{ padding: "8px 12px", backgroundColor: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#64748b" }}>
-          {task.assignedUser ? (
-            <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "hsl(var(--primary))", fontWeight: 500 }}>
-              <User className="w-3 h-3" />
-              {task.assignedUser.name}
-            </span>
-          ) : (
-            <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
-              <Calendar className="w-3 h-3" />
-              {createdDate}
-            </span>
+          {/* User assignment dropdown (hidden for summary_review tasks) */}
+          {task.taskType !== "summary_review" && (
+            <div style={{ padding: "0 12px 10px" }}>
+              <select
+                value={task.assignedUserId ?? ""}
+                onChange={handleSelectChange}
+                style={{ width: "100%", padding: "5px 8px", fontSize: "12px", borderRadius: "6px", border: "1px solid #e2e8f0", backgroundColor: task.assignedUserId ? "#eff6ff" : "#f8fafc", color: task.assignedUserId ? "#2563eb" : "#94a3b8", outline: "none", cursor: "pointer" }}
+              >
+                <option value="">{t("assign.unassigned")}</option>
+                {users.map((u) => (
+                  <option key={u.id} value={u.id}>{u.name}</option>
+                ))}
+              </select>
+            </div>
           )}
-        </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
-          {onMoveBack && (
-            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onMoveBack} title={t("actions.moveBack")}>
-              <ArrowLeft className="w-3.5 h-3.5" />
-            </Button>
-          )}
-          {onMoveForward && (
-            <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onMoveForward} title={t("actions.moveForward")}>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Button>
-          )}
-          <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onEdit} title={t("actions.edit")}>
-              <Pencil className="w-3.5 h-3.5" />
-            </Button>
+          <CardFooter style={{ padding: "8px 12px", backgroundColor: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#64748b" }}>
+              {task.assignedUser ? (
+                <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "hsl(var(--primary))", fontWeight: 500 }}>
+                  <User className="w-3 h-3" />
+                  {task.assignedUser.name}
+                </span>
+              ) : (
+                <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                  <Calendar className="w-3 h-3" />
+                  {createdDate}
+                </span>
+              )}
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
+              {onMoveBack && (
+                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onMoveBack} title={t("actions.moveBack")}>
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                </Button>
+              )}
+              {onMoveForward && (
+                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onMoveForward} title={t("actions.moveForward")}>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Button>
+              )}
+              <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onEdit} title={t("actions.edit")}>
+                <Pencil className="w-3.5 h-3.5" />
+              </Button>
           {onDelete && (
             <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onDelete} title={t("actions.delete")}>
               <Trash2 className="w-3.5 h-3.5 text-destructive" />
             </Button>
           )}
-        </div>
-      </CardFooter>
+            </div>
+          </CardFooter>
+        </>
+      )}
     </Card>
   );
 }

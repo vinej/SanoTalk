@@ -4,6 +4,7 @@
   "tasksTotal_other": "共 {{count}} 个任务",
   "newTask": "新建任务",
   "noTasks": "暂无任务",
+  "viewSummary": "查看摘要",
   "columns": {
     "not_assigned": "未分配",
     "assigned": "已分配",
@@ -20,7 +21,9 @@
     "moveBack": "向前移动",
     "moveForward": "向后移动",
     "delete": "删除",
-    "edit": "编辑"
+    "edit": "编辑",
+    "minimize": "折叠",
+    "expand": "展开"
   },
   "editDialog": {
     "title": "编辑任务",

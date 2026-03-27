@@ -4,6 +4,7 @@
   "tasksTotal_other": "{{count}} مهام",
   "newTask": "مهمة جديدة",
   "noTasks": "لا توجد مهام هنا",
+  "viewSummary": "عرض الملخص",
   "columns": {
     "not_assigned": "غير معين",
     "assigned": "معين",
@@ -20,7 +21,9 @@
     "moveBack": "تحريك للخلف",
     "moveForward": "تحريك للأمام",
     "delete": "حذف",
-    "edit": "تعديل"
+    "edit": "تعديل",
+    "minimize": "تصغير",
+    "expand": "توسيع"
   },
   "editDialog": {
     "title": "تعديل المهمة",

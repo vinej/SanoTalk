@@ -30,8 +30,10 @@ export function SendSummaryDialog({ sessionId, open, onOpenChange }: Props) {
   const linkedPharmacist = (profile as any)?.linkedPharmacist as { name: string; email: string; specialty?: string | null } | null | undefined;
   const hasRecipients = !!linkedDoctor || !!linkedPharmacist;
 
+  const utils = trpc.useUtils();
   const sendMutation = trpc.agents.sendSummary.useMutation({
     onSuccess: () => {
+      void utils.tasks.list.invalidate();
       setSent(true);
       setTimeout(() => {
         setSent(false);

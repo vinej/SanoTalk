@@ -4,6 +4,7 @@
   "tasksTotal_other": "{{count}} tareas en total",
   "newTask": "Nueva tarea",
   "noTasks": "No hay tareas aquí",
+  "viewSummary": "Ver resumen",
   "columns": {
     "not_assigned": "Sin asignar",
     "assigned": "Asignada",
@@ -20,7 +21,9 @@
     "moveBack": "Mover atrás",
     "moveForward": "Mover adelante",
     "delete": "Eliminar",
-    "edit": "Editar"
+    "edit": "Editar",
+    "minimize": "Minimizar",
+    "expand": "Expandir"
   },
   "editDialog": {
     "title": "Editar tarea",

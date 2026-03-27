@@ -265,6 +265,21 @@ export const agentsRouter = createTRPCRouter({
         throw new TRPCError({ code: "NOT_FOUND", message: "No summary available yet" });
       }
 
+      const session = await ctx.db.query.talkSession.findFirst({
+        where: eq(talkSessionTable.id, input.sessionId),
+      });
+      const sessionLanguage = session?.language ?? "en";
+
+      const taskTitleByLang: Record<string, string> = {
+        en: `Review summary for patient ${sender.name}`,
+        fr: `Réviser le résumé du patient ${sender.name}`,
+        es: `Revisar el resumen del paciente ${sender.name}`,
+        zh: `查看患者 ${sender.name} 的摘要`,
+        ar: `مراجعة ملخص المريض ${sender.name}`,
+        hi: `मरीज़ ${sender.name} का सारांश देखें`,
+      };
+      const taskTitle = taskTitleByLang[sessionLanguage] ?? taskTitleByLang["en"]!;
+
       const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
       const appUrl = process.env.APP_URL ?? "";
       const summaryUrl = `${appUrl}/sessions/${input.sessionId}?tab=summary`;
@@ -295,7 +310,7 @@ export const agentsRouter = createTRPCRouter({
       });
 
       await ctx.db.insert(task).values({
-        title: `review summary for patient ${sender.name}`,
+        title: taskTitle,
         description: summaryUrl,
         status: "assigned",
         assignedUserId: recipient.id,
