@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { talkSession, sessionParticipant } from "@sanotalk/db";
-import { eq, desc, or, inArray } from "drizzle-orm";
+import { eq, desc, or, inArray, and } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { TRPCError } from "@trpc/server";
 import { verifyAdminFromDb } from "../lib/verify-admin";
@@ -144,5 +144,43 @@ export const sessionsRouter = createTRPCRouter({
       if (session.hostId !== ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the host can delete a session" });
 
       await ctx.db.delete(talkSession).where(eq(talkSession.id, input.id));
+    }),
+
+  addParticipant: protectedProcedure
+    .input(z.object({ sessionId: z.string().uuid(), userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const session = await ctx.db.query.talkSession.findFirst({
+        where: eq(talkSession.id, input.sessionId),
+        with: { participants: true },
+      });
+      if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
+      if (session.hostId !== ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the host can add participants" });
+
+      const alreadyAdded = session.participants.some((p) => p.userId === input.userId);
+      if (alreadyAdded) return;
+
+      await ctx.db.insert(sessionParticipant).values({
+        sessionId: input.sessionId,
+        userId: input.userId,
+      });
+    }),
+
+  removeParticipant: protectedProcedure
+    .input(z.object({ sessionId: z.string().uuid(), userId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const session = await ctx.db.query.talkSession.findFirst({
+        where: eq(talkSession.id, input.sessionId),
+      });
+      if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
+      if (session.hostId !== ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the host can remove participants" });
+
+      await ctx.db
+        .delete(sessionParticipant)
+        .where(
+          and(
+            eq(sessionParticipant.sessionId, input.sessionId),
+            eq(sessionParticipant.userId, input.userId)
+          )
+        );
     }),
 });

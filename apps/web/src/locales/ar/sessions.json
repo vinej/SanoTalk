@@ -26,6 +26,15 @@
     "renameTitle": "إعادة تسمية الجلسة",
     "closeSession": "إغلاق الجلسة"
   },
+  "participants": {
+    "title": "المشاركون",
+    "selectUser": "اختر مستخدماً…",
+    "add": "إضافة",
+    "remove": "إزالة",
+    "empty": "لم يُضَف أي مشارك بعد",
+    "connected": "متصل",
+    "notConnected": "غير متصل"
+  },
   "room": {
     "room": "الغرفة",
     "connecting": "جارٍ الاتصال…",

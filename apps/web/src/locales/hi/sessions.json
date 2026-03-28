@@ -26,6 +26,15 @@
     "renameTitle": "सत्र का नाम बदलें",
     "closeSession": "सत्र बंद करें"
   },
+  "participants": {
+    "title": "प्रतिभागी",
+    "selectUser": "उपयोगकर्ता चुनें…",
+    "add": "जोड़ें",
+    "remove": "हटाएं",
+    "empty": "अभी तक कोई प्रतिभागी नहीं जोड़ा गया",
+    "connected": "जुड़े हुए",
+    "notConnected": "नहीं जुड़े"
+  },
   "room": {
     "room": "कमरा",
     "connecting": "जोड़ा जा रहा है…",

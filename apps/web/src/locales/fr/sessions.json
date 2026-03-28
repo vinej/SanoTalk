@@ -26,6 +26,15 @@
     "renameTitle": "Renommer la session",
     "closeSession": "Clore la session"
   },
+  "participants": {
+    "title": "Participants",
+    "selectUser": "Sélectionner un utilisateur…",
+    "add": "Ajouter",
+    "remove": "Retirer",
+    "empty": "Aucun participant ajouté pour l'instant",
+    "connected": "Connecté",
+    "notConnected": "Non connecté"
+  },
   "room": {
     "room": "Salle",
     "connecting": "Connexion…",

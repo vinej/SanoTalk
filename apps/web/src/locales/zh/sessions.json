@@ -26,6 +26,15 @@
     "renameTitle": "重命名会话",
     "closeSession": "关闭会话"
   },
+  "participants": {
+    "title": "参与者",
+    "selectUser": "选择用户…",
+    "add": "添加",
+    "remove": "移除",
+    "empty": "尚未添加参与者",
+    "connected": "已连接",
+    "notConnected": "未连接"
+  },
   "room": {
     "room": "房间",
     "connecting": "连接中…",

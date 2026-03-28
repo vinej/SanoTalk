@@ -26,6 +26,15 @@
     },
     "closeSession": "Close session"
   },
+  "participants": {
+    "title": "Participants",
+    "selectUser": "Select a user…",
+    "add": "Add",
+    "remove": "Remove",
+    "empty": "No participants added yet",
+    "connected": "Connected",
+    "notConnected": "Not connected"
+  },
   "room": {
     "room": "Room",
     "connecting": "Connecting…",

@@ -25,9 +25,9 @@ export const Route: any = createFileRoute("/_auth")({
     return { user: session.data.user };
   },
   component: () => (
-    <div className="min-h-screen flex flex-col">
+    <div className="h-screen flex flex-col">
       <AppHeader />
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 min-h-0 flex flex-col overflow-y-auto">
         <Outlet />
       </div>
     </div>

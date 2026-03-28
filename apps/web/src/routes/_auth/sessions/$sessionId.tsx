@@ -54,7 +54,7 @@ function SessionPage() {
   return (
     <div className="flex-1 flex flex-col min-h-0">
       <div className="flex-1 min-h-0">
-        <div className="grid grid-cols-1 lg:grid-cols-2 h-full gap-0">
+        <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-1 h-full gap-0">
           {/* Live Room — occupies 1/2 on desktop */}
           <div className="border-r h-full overflow-hidden">
             <LiveSessionRoom session={sessionWithDates} onFinalTranscript={handleFinalTranscript} />
