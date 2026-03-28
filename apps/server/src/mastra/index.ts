@@ -71,7 +71,7 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
     logger.info({ runId: run.id, sessionLanguage }, "Calling agent...");
     const promptWithLanguage = `Respond in language code "${sessionLanguage}". All text fields in the JSON output must be written in that language.\n\n${transcriptContent}`;
     const result = await agent.generate(promptWithLanguage);
-    logger.info({ runId: run.id, textLength: result.text.length, preview: result.text.slice(0, 100) }, "Agent responded");
+    logger.info({ runId: run.id, textLength: result.text.length }, "Agent responded");
 
     // Parse JSON from agent output and save to transcriptSummary
     if (sessionId) {
@@ -104,7 +104,7 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
           });
         logger.info({ runId: run.id, sessionId }, "transcriptSummary saved to DB");
       } catch (parseErr) {
-        logger.error({ runId: run.id, rawText: result.text.slice(0, 500), parseErr }, "Failed to parse agent JSON output");
+        logger.error({ runId: run.id, parseErr }, "Failed to parse agent JSON output");
       }
     }
 

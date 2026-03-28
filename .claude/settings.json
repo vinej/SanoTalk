@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/SanoTalk/SanoTalk -name docker-compose* -o -name Dockerfile*)",
+      "Bash(grep -r VITE_ /c/SanoTalk/SanoTalk --include=*.ts --include=*.tsx --include=*.env*)",
+      "Bash(grep -r fs. /c/SanoTalk/SanoTalk/apps/server/src --include=*.ts)"
+    ]
+  }
+}

@@ -99,7 +99,7 @@ export const auth = betterAuth({
       const appUrl = process.env.APP_URL ?? "http://localhost:5173";
       const verifyUrl = `${appUrl}/verify-email?token=${token}`;
       const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
-      console.info(`[auth] Sending verification email to ${user.email} from ${from}`);
+      console.info(`[auth] Sending verification email to ${user.email.slice(0, 3)}*** from ${from}`);
       const { error } = await resend.emails.send({
         from,
         to: user.email,
@@ -111,7 +111,7 @@ export const auth = betterAuth({
         // Do NOT throw — a failed verification email must not block sign-up.
         // The user can request a resend from the verify-email page.
       } else {
-        console.info(`[auth] Verification email sent to ${user.email}`);
+        console.info(`[auth] Verification email sent to ${user.email.slice(0, 3)}***`);
       }
     },
   },

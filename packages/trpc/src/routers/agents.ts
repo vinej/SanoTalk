@@ -257,6 +257,11 @@ export const agentsRouter = createTRPCRouter({
         throw new TRPCError({ code: "BAD_REQUEST", message: "No linked provider of that type" });
       }
 
+      const expectedRole = input.recipientType === "doctor" ? "doctor" : "pharmacist";
+      if ((recipient as any).role !== expectedRole) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Linked provider does not have the required role" });
+      }
+
       const summary = await ctx.db.query.transcriptSummary.findFirst({
         where: eq(transcriptSummary.sessionId, input.sessionId),
       });
