@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
-import { agentRun, talkSession as talkSessionTable, chatMessage, transcript, user, transcriptSummary, userProperty, task } from "@sanotalk/db";
+import { agentRun, talkSession as talkSessionTable, chatMessage, transcript, user, transcriptSummary, userProperty, task, savedConversation } from "@sanotalk/db";
 import { resend } from "../lib/resend";
 import { eq, asc, desc, isNull, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
@@ -323,5 +323,119 @@ export const agentsRouter = createTRPCRouter({
       });
 
       return { sent: true, to: recipient.email };
+    }),
+
+  listSavedConversations: protectedProcedure
+    .input(z.object({ chatType: z.enum(["general", "companion"]) }))
+    .query(async ({ ctx, input }) => {
+      return ctx.db
+        .select({
+          id: savedConversation.id,
+          title: savedConversation.title,
+          chatType: savedConversation.chatType,
+          createdAt: savedConversation.createdAt,
+        })
+        .from(savedConversation)
+        .where(
+          and(
+            eq(savedConversation.userId, ctx.user.id),
+            eq(savedConversation.chatType, input.chatType)
+          )
+        )
+        .orderBy(desc(savedConversation.createdAt));
+    }),
+
+  saveConversation: protectedProcedure
+    .input(z.object({
+      chatType: z.enum(["general", "companion"]),
+      title: z.string().min(1).max(120),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const liveMessages = await ctx.db.query.chatMessage.findMany({
+        where: and(
+          isNull(chatMessage.sessionId),
+          eq(chatMessage.userId, ctx.user.id),
+          eq(chatMessage.chatType, input.chatType)
+        ),
+        orderBy: [asc(chatMessage.createdAt)],
+      });
+      if (liveMessages.length === 0) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "No messages to save" });
+      }
+      const snapshot = liveMessages.map((m) => ({ role: m.role, content: m.content }));
+
+      const existing = await ctx.db.query.savedConversation.findFirst({
+        where: and(
+          eq(savedConversation.userId, ctx.user.id),
+          eq(savedConversation.chatType, input.chatType),
+          eq(savedConversation.title, input.title)
+        ),
+      });
+
+      if (existing) {
+        const [updated] = await ctx.db
+          .update(savedConversation)
+          .set({ messages: snapshot, createdAt: new Date() })
+          .where(eq(savedConversation.id, existing.id))
+          .returning();
+        return updated;
+      }
+
+      const [saved] = await ctx.db
+        .insert(savedConversation)
+        .values({
+          userId: ctx.user.id,
+          chatType: input.chatType,
+          title: input.title,
+          messages: snapshot,
+        })
+        .returning();
+      return saved;
+    }),
+
+  loadSavedConversation: protectedProcedure
+    .input(z.object({ savedId: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const saved = await ctx.db.query.savedConversation.findFirst({
+        where: and(
+          eq(savedConversation.id, input.savedId),
+          eq(savedConversation.userId, ctx.user.id)
+        ),
+      });
+      if (!saved) throw new TRPCError({ code: "NOT_FOUND", message: "Saved conversation not found" });
+      const chatType = saved.chatType as "general" | "companion";
+      await ctx.db.delete(chatMessage).where(
+        and(
+          isNull(chatMessage.sessionId),
+          eq(chatMessage.userId, ctx.user.id),
+          eq(chatMessage.chatType, chatType)
+        )
+      );
+      const msgs = saved.messages as Array<{ role: string; content: string }>;
+      if (msgs.length > 0) {
+        await ctx.db.insert(chatMessage).values(
+          msgs.map((m) => ({
+            userId: ctx.user.id,
+            chatType,
+            role: m.role,
+            content: m.content,
+          }))
+        );
+      }
+      return { loaded: true, chatType };
+    }),
+
+  deleteSavedConversation: protectedProcedure
+    .input(z.object({ savedId: z.string().uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const existing = await ctx.db.query.savedConversation.findFirst({
+        where: and(
+          eq(savedConversation.id, input.savedId),
+          eq(savedConversation.userId, ctx.user.id)
+        ),
+      });
+      if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "Saved conversation not found" });
+      await ctx.db.delete(savedConversation).where(eq(savedConversation.id, input.savedId));
+      return { deleted: true };
     }),
 });

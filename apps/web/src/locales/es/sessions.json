@@ -83,6 +83,31 @@
     "emptyCompanion": "Estoy aquí para ti. Comparte lo que tienes en mente.",
     "placeholderCompanion": "¿Cómo te sientes hoy…",
     "clearConversation": "Borrar conversación",
+    "clearDialog": {
+      "title": "¿Borrar conversación?",
+      "desc": "¿Deseas guardar esta conversación antes de borrarla?",
+      "titleLabel": "Título de la conversación",
+      "titlePlaceholder": "ej. Revisión de salud — marzo 2026",
+      "cancel": "Cancelar",
+      "clearOnly": "Borrar sin guardar",
+      "saveFirst": "Sí, guardar primero",
+      "saveAndClear": "Guardar y borrar"
+    },
+    "saved": {
+      "toggle": "Conversaciones guardadas",
+      "panelTitle": "Conversaciones guardadas",
+      "empty": "Aún no hay conversaciones guardadas.",
+      "load": "Restaurar esta conversación",
+      "delete": "Eliminar conversación guardada",
+      "saveNow": "Guardar conversación actual",
+      "titlePrompt": "Introduce un título para esta conversación",
+      "deleteDialog": {
+        "title": "¿Eliminar conversación guardada?",
+        "desc": "«{{title}}» se eliminará permanentemente. Esta acción no se puede deshacer.",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar"
+      }
+    },
     "titleCompanion": "Compañero de Bienestar",
     "titleGeneral": "Asistente IA de Salud"
   }

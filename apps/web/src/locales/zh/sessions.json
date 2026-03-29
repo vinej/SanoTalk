@@ -83,6 +83,31 @@
     "emptyCompanion": "我在这里陪伴您，请分享您的心情。",
     "placeholderCompanion": "您今天感觉怎么样…",
     "clearConversation": "清除对话",
+    "clearDialog": {
+      "title": "清除对话？",
+      "desc": "清除前是否要保存此对话？",
+      "titleLabel": "对话标题",
+      "titlePlaceholder": "例如：健康检查 — 2026年3月",
+      "cancel": "取消",
+      "clearOnly": "直接清除",
+      "saveFirst": "是，先保存",
+      "saveAndClear": "保存并清除"
+    },
+    "saved": {
+      "toggle": "已保存的对话",
+      "panelTitle": "已保存的对话",
+      "empty": "尚无已保存的对话。",
+      "load": "恢复此对话",
+      "delete": "删除已保存对话",
+      "saveNow": "保存当前对话",
+      "titlePrompt": "请输入此对话的标题",
+      "deleteDialog": {
+        "title": "删除已保存的对话？",
+        "desc": "「{{title}}」将被永久删除，此操作无法撤销。",
+        "cancel": "取消",
+        "confirm": "删除"
+      }
+    },
     "titleCompanion": "健康伴侣",
     "titleGeneral": "健康 AI 助手"
   }

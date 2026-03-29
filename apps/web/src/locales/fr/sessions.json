@@ -83,6 +83,31 @@
     "emptyCompanion": "Je suis là pour vous. Partagez ce qui vous pèse.",
     "placeholderCompanion": "Comment vous sentez-vous aujourd'hui…",
     "clearConversation": "Effacer la conversation",
+    "clearDialog": {
+      "title": "Effacer la conversation ?",
+      "desc": "Souhaitez-vous sauvegarder cette conversation avant de l'effacer ?",
+      "titleLabel": "Titre de la conversation",
+      "titlePlaceholder": "ex. Bilan santé — mars 2026",
+      "cancel": "Annuler",
+      "clearOnly": "Effacer sans sauvegarder",
+      "saveFirst": "Oui, sauvegarder d'abord",
+      "saveAndClear": "Sauvegarder et effacer"
+    },
+    "saved": {
+      "toggle": "Conversations sauvegardées",
+      "panelTitle": "Conversations sauvegardées",
+      "empty": "Aucune conversation sauvegardée pour l'instant.",
+      "load": "Restaurer cette conversation",
+      "delete": "Supprimer la conversation sauvegardée",
+      "saveNow": "Sauvegarder la conversation actuelle",
+      "titlePrompt": "Saisissez un titre pour cette conversation",
+      "deleteDialog": {
+        "title": "Supprimer la conversation sauvegardée ?",
+        "desc": "« {{title}} » sera supprimée définitivement. Cette action est irréversible.",
+        "cancel": "Annuler",
+        "confirm": "Supprimer"
+      }
+    },
     "titleCompanion": "Compagnon Bien-être",
     "titleGeneral": "Assistant IA Santé"
   }
