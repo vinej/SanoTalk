@@ -139,10 +139,11 @@ type UserProperty = { key: string; value: string };
 
 function buildPropertyContext(userProperties?: UserProperty[], propertiesLanguage = "en"): Array<{ role: "user" | "assistant"; content: string }> {
   if (!userProperties || userProperties.length === 0) return [];
+  const today = new Date().toISOString().split("T")[0];
   const lines = userProperties.map((p) => `- ${p.key}: ${p.value}`).join("\n");
   return [
-    { role: "user" as const, content: `Personal context about me (written in language "${propertiesLanguage}"):\n${lines}` },
-    { role: "assistant" as const, content: "Understood. I'll use this personal context throughout our conversation, regardless of the language it was written in." },
+    { role: "user" as const, content: `Today's date is ${today} (YYYY-MM-DD). Personal context about me (written in language "${propertiesLanguage}"):\n${lines}` },
+    { role: "assistant" as const, content: "Understood. I'll use this personal context and today's date throughout our conversation, regardless of the language it was written in." },
   ];
 }
 
