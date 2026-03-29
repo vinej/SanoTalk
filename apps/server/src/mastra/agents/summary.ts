@@ -1,7 +1,5 @@
 import { Agent } from "@mastra/core/agent";
-import { createAnthropic } from "@ai-sdk/anthropic";
-
-const anthropic = createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+import { smallModel } from "../model.js";
 
 export const summaryAgent = new Agent({
   id: "transcript-summary",
@@ -25,5 +23,5 @@ Always respond with valid JSON matching the schema:
     "plan": "string"
   }
 }`,
-  model: anthropic("claude-haiku-4-5-20251001"),
+  model: smallModel,
 });

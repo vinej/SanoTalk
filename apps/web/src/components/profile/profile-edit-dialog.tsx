@@ -302,11 +302,14 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
               const available = PREDEFINED_KEYS.filter((k) => !usedKeys.has(k));
               return available.length > 0 ? (
                 <div className="flex flex-wrap gap-1">
-                  {available.map((key) => (
+                  {available.map((key, hint) => (
                     <button
                       key={key}
                       type="button"
-                      onClick={() => { setPropKey(key); setTimeout(() => propValueRef.current?.focus(), 0); }}
+                      onClick={() => { 
+                        setPropKey(key); 
+                        setPropValue(tProps(`properties.hints.${key}`));
+                        setTimeout(() => propValueRef.current?.focus(), 0); }}
                       className="px-2 py-0.5 text-xs rounded-full border border-input hover:bg-muted transition-colors"
                     >
                       {tProps(`properties.keys.${key}`)}

@@ -23,6 +23,9 @@ importers:
       '@ai-sdk/anthropic':
         specifier: ^3.0.63
         version: 3.0.63(zod@3.25.76)
+      '@ai-sdk/openai':
+        specifier: ^3.0.48
+        version: 3.0.48(zod@3.25.76)
       '@deepgram/sdk':
         specifier: '4'
         version: 4.11.3(bufferutil@4.1.0)(utf-8-validate@5.0.10)
@@ -387,9 +390,6 @@ importers:
         specifier: ^3.23.8
         version: 3.25.76
     devDependencies:
-      '@sanotalk/trpc':
-        specifier: workspace:*
-        version: 'link:'
       '@types/node':
         specifier: ^22.7.5
         version: 22.19.15
@@ -411,6 +411,12 @@ packages:
 
   '@ai-sdk/anthropic@3.0.63':
     resolution: {integrity: sha512-SiLosFr0FfKfrNpAAj8mD/i3S5YBB/z5orb1DH3pN1yATuBNjjPMLnRE4P3Dn7Y5cQsro0uzw5g5117hkShWoQ==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/openai@3.0.48':
+    resolution: {integrity: sha512-ALmj/53EXpcRqMbGpPJPP4UOSWw0q4VGpnDo7YctvsynjkrKDmoneDG/1a7VQnSPYHnJp6tTRMf5ZdxZ5whulg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -6770,6 +6776,12 @@ snapshots:
       - supports-color
 
   '@ai-sdk/anthropic@3.0.63(zod@3.25.76)':
+    dependencies:
+      '@ai-sdk/provider': 3.0.8
+      '@ai-sdk/provider-utils': 4.0.21(zod@3.25.76)
+      zod: 3.25.76
+
+  '@ai-sdk/openai@3.0.48(zod@3.25.76)':
     dependencies:
       '@ai-sdk/provider': 3.0.8
       '@ai-sdk/provider-utils': 4.0.21(zod@3.25.76)

@@ -1,7 +1,5 @@
 import { Agent } from "@mastra/core/agent";
-import { createAnthropic } from "@ai-sdk/anthropic";
-
-const anthropic = createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+import { largeModel } from "../model.js";
 
 export const companionChatAgent = new Agent({
   id: "companionChatAgent",
@@ -23,5 +21,5 @@ Your role:
 If someone expresses thoughts of self-harm or suicide, respond with calm compassion, take it seriously, gently encourage them to reach out to a crisis line or emergency services, and stay present in the conversation.
 
 Always end with warmth — a caring follow-up question, a word of encouragement, or simply an invitation to keep sharing. Never end with disclaimers.`,
-  model: anthropic("claude-sonnet-4-5"),
+  model: largeModel,
 });

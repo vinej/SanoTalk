@@ -136,5 +136,5 @@ export const auth = betterAuth({
     }),
   ],
   socialProviders: {},
-  trustedOrigins: [process.env.BETTER_AUTH_URL!, process.env.APP_URL!, ...(process.env.NGROK_URL ? [process.env.NGROK_URL] : [])],
+  trustedOrigins: [process.env.BETTER_AUTH_URL!, process.env.APP_URL!, ...(process.env.NGROK_URL ? [process.env.NGROK_URL] : []), "http://localhost:5173", "http://localhost:3001"],
 });

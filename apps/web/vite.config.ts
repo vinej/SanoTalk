@@ -20,7 +20,8 @@ export default defineConfig({
   server: {
     allowedHosts: true,
     port: 5173,
-proxy: {
+    host: true,
+    proxy: {
       "/api": {
         target: process.env.VITE_API_URL ?? "http://localhost:3001",
         changeOrigin: true,

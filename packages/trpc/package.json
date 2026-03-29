@@ -26,7 +26,6 @@
   },
   "devDependencies": {
     "@sanotalk/db": "workspace:*",
-    "@sanotalk/trpc": "workspace:*",
     "@types/node": "^22.7.5",
     "@vitest/coverage-v8": "^2.1.9",
     "typescript": "^5.6.3",

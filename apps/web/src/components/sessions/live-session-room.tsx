@@ -33,9 +33,11 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
   const startMutation = trpc.sessions.start.useMutation();
 
   const handleJoin = useCallback(async () => {
-    await startMutation.mutateAsync({ id: session.id});
+    if (isHost) {
+      await startMutation.mutateAsync({ id: session.id });
+    }
     getTokenMutation.mutate({ roomName: session.roomName });
-  }, [session, getTokenMutation, startMutation]);
+  }, [session, isHost, getTokenMutation, startMutation]);
 
   const handleDisconnected = useCallback(() => {
     setToken(null);

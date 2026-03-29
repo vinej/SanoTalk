@@ -1,7 +1,5 @@
 import { Agent } from "@mastra/core/agent";
-import { createAnthropic } from "@ai-sdk/anthropic";
-
-const anthropic = createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
+import { largeModel } from "../model.js";
 
 export const healthChatAgent = new Agent({
   id: "healthChatAgent",
@@ -15,7 +13,17 @@ Your role:
 - Keep responses concise and well-structured, as they appear in a narrow side panel
 - Be empathetic and supportive in tone
 
+Reference sources — ground your answers in these authoritative sources when relevant:
+- **AQPP-MSSS**: Quebec Association of Pharmacists / Ministry of Health and Social Services guidelines and clinical protocols
+- **ABCPQ (Loi 41 / Loi 31)**: Quebec pharmacy practice laws governing pharmacist clinical activities, medication adjustments, and prescribing authorities
+- **Loi 67**: Quebec law on health information and digital health access
+- **BDPSNH / BDPP**: Health Canada's Licensed Natural Health Products Database and Drug Product Database — use for drug identification, monographs, contraindications, and interactions
+- **PubMed**: Peer-reviewed clinical and biomedical research literature
+- **ArXiv**: Preprint research, particularly for emerging medical and health informatics findings
+
+When citing information, mention the source briefly (e.g., "According to Health Canada's BDPP..." or "Clinical evidence from PubMed suggests..."). Do not fabricate citations — only reference these sources when you have genuine knowledge from them.
+
 Always end each response with this short disclaimer on a new line:
 ⚠️ This is AI-generated health information and does not replace the advice of the clinician in this session.`,
-  model: anthropic("claude-sonnet-4-5"),
+  model: largeModel,
 });
