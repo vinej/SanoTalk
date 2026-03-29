@@ -26,19 +26,23 @@ interface Props {
 
 export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, onVoiceTextConsumed }: Props) {
   const { t, i18n } = useTranslation("sessions");
+
+  const isSessionMode = !!sessionId;
+  const isCompanion = !isSessionMode && variant === "companion";
+  const chatTypeArg = isCompanion ? "companion" : "general";
+  const titleStorageKey = `sanotalk_chat_loaded_title_${chatTypeArg}`;
+
   const [inputValue, setInputValue] = useState("");
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [showClearDialog, setShowClearDialog] = useState(false);
   const [showSavedPanel, setShowSavedPanel] = useState(false);
   const [saveTitle, setSaveTitle] = useState("");
   const [showSaveInput, setShowSaveInput] = useState(false);
-  const [loadedConversationTitle, setLoadedConversationTitle] = useState<string | null>(null);
+  const [loadedConversationTitle, setLoadedConversationTitle] = useState<string | null>(() => {
+    try { return localStorage.getItem(titleStorageKey); } catch { return null; }
+  });
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
-
-  const isSessionMode = !!sessionId;
-  const isCompanion = !isSessionMode && variant === "companion";
-  const chatTypeArg = isCompanion ? "companion" : "general";
 
   // ── Queries ────────────────────────────────────────────────────────────────
   const { data: sessionMessages = [], refetch: refetchSession } = trpc.agents.chatHistory.useQuery(
@@ -69,9 +73,17 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
     onSuccess: () => { void refetch(); setShowSavedPanel(false); },
   });
 
+  function persistLoadedTitle(title: string | null) {
+    setLoadedConversationTitle(title);
+    try {
+      if (title) localStorage.setItem(titleStorageKey, title);
+      else localStorage.removeItem(titleStorageKey);
+    } catch { /* ignore */ }
+  }
+
   function handleLoadSaved(id: string, title: string) {
     loadSavedMutation.mutate({ savedId: id }, {
-      onSuccess: () => setLoadedConversationTitle(title),
+      onSuccess: () => persistLoadedTitle(title),
     });
   }
   const deleteSavedMutation = trpc.agents.deleteSavedConversation.useMutation({
@@ -124,7 +136,7 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
         setShowClearDialog(false);
         setShowSaveInput(false);
         setSaveTitle("");
-        setLoadedConversationTitle(null);
+        persistLoadedTitle(null);
       },
     });
   }
@@ -218,7 +230,12 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
                 </p>
               )}
               {savedList.map((item) => (
-                <div key={item.id} className="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50">
+                <div
+                  key={item.id}
+                  className="flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted/50 cursor-pointer"
+                  onClick={() => handleLoadSaved(item.id, item.title)}
+                  title={t("chat.saved.load")}
+                >
                   <span className="flex-1 text-sm truncate">{item.title}</span>
                   <span className="text-xs text-muted-foreground shrink-0">
                     {new Date(item.createdAt).toLocaleDateString()}
@@ -229,7 +246,7 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
                     className="h-6 w-6 shrink-0"
                     title={t("chat.saved.load")}
                     disabled={loadSavedMutation.isPending}
-                    onClick={() => handleLoadSaved(item.id, item.title)}
+                    onClick={(e) => { e.stopPropagation(); handleLoadSaved(item.id, item.title); }}
                   >
                     <BookmarkCheck className="h-3 w-3" />
                   </Button>
@@ -239,7 +256,7 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
                     className="h-6 w-6 shrink-0 text-muted-foreground hover:text-destructive"
                     title={t("chat.saved.delete")}
                     disabled={deleteSavedMutation.isPending}
-                    onClick={() => setDeleteTarget({ id: item.id, title: item.title })}
+                    onClick={(e) => { e.stopPropagation(); setDeleteTarget({ id: item.id, title: item.title }); }}
                   >
                     <BookmarkX className="h-3 w-3" />
                   </Button>
@@ -293,7 +310,10 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
                 onClick={() => {
                   const title = window.prompt(t("chat.saved.titlePrompt"), loadedConversationTitle ?? "");
                   if (title?.trim()) {
-                    saveConversationMutation.mutate({ chatType: chatTypeArg, title: title.trim() });
+                    saveConversationMutation.mutate(
+                      { chatType: chatTypeArg, title: title.trim() },
+                      { onSuccess: () => persistLoadedTitle(title.trim()) }
+                    );
                   }
                 }}
               >
