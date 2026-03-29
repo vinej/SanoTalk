@@ -42,7 +42,9 @@
       "country": "भारत, कनाडा",
       "region": "महाराष्ट्र, क्यूबेक",
       "phone": "+91 98765 43210",
-      "birth_date": "1990-03-26"
+      "birth_date": "1990-03-26",
+      "marital_status": "अविवाहित",
+      "living_situation": "अकेले"
     },
     "keys": {
       "blood_type": "रक्त समूह",
@@ -64,7 +66,9 @@
       "country": "देश",
       "region": "क्षेत्र",
       "phone": "फ़ोन",
-      "birth_date": "जन्म तिथि"
+      "birth_date": "जन्म तिथि",
+      "marital_status": "वैवाहिक स्थिति",
+      "living_situation": "रहने की स्थिति"
     }
   }
 }

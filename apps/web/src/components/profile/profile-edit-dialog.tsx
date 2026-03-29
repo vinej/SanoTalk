@@ -23,7 +23,7 @@ const PREDEFINED_KEYS = [
   "blood_type", "allergies", "chronic_conditions", "current_medications",
   "height", "weight", "bmi", "diet", "physical_activity", "smoking_status",
   "alcohol_consumption", "sleep_hours", "stress_level", "mood_baseline", "therapy_status",
-  "city", "country", "region", "birth_date",
+  "city", "country", "region", "birth_date", "marital_status", "living_situation",
 ];
 
 const SUPPORTED_LANGUAGES = [
