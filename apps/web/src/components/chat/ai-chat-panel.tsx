@@ -100,7 +100,7 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
       {!isSessionMode && (
         <div className={cn(
           "px-4 py-3 border-b font-semibold text-sm",
-          isCompanion ? "bg-teal-50 dark:bg-teal-950/30 text-teal-700 dark:text-teal-300" : "bg-muted/50 text-foreground"
+          isCompanion ? "bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300" : "bg-muted/50 text-foreground"
         )}>
           {t(isCompanion ? "chat.titleCompanion" : "chat.titleGeneral")}
         </div>
@@ -121,7 +121,7 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
                 msg.role === "user"
                   ? "ml-auto bg-primary text-primary-foreground"
                   : isCompanion
-                    ? "mr-auto bg-teal-100 dark:bg-teal-950 text-foreground"
+                    ? "mr-auto bg-sky-50 dark:bg-sky-950/30 text-foreground"
                     : "mr-auto bg-muted text-foreground"
               )}
             >
