@@ -82,6 +82,8 @@
     "voiceOff": "وضع الصوت معطّل",
     "emptyCompanion": "أنا هنا من أجلك. شارك ما يدور في ذهنك.",
     "placeholderCompanion": "كيف تشعر اليوم…",
-    "clearConversation": "مسح المحادثة"
+    "clearConversation": "مسح المحادثة",
+    "titleCompanion": "رفيق العافية",
+    "titleGeneral": "مساعد الصحة الذكي"
   }
 }

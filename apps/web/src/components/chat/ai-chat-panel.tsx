@@ -97,6 +97,14 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
 
   return (
     <div className="flex flex-col h-full border rounded-lg bg-card overflow-hidden">
+      {!isSessionMode && (
+        <div className={cn(
+          "px-4 py-3 border-b font-semibold text-sm",
+          isCompanion ? "bg-teal-50 dark:bg-teal-950/30 text-teal-700 dark:text-teal-300" : "bg-muted/50 text-foreground"
+        )}>
+          {t(isCompanion ? "chat.titleCompanion" : "chat.titleGeneral")}
+        </div>
+      )}
       <ScrollArea className="flex-1 min-h-0">
         <div className="p-3 space-y-3">
           {messages.length === 0 && !isPending && (
@@ -113,7 +121,7 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
                 msg.role === "user"
                   ? "ml-auto bg-primary text-primary-foreground"
                   : isCompanion
-                    ? "mr-auto bg-rose-100 dark:bg-rose-950 text-foreground"
+                    ? "mr-auto bg-teal-100 dark:bg-teal-950 text-foreground"
                     : "mr-auto bg-muted text-foreground"
               )}
             >

@@ -82,6 +82,8 @@
     "voiceOff": "语音模式已关闭",
     "emptyCompanion": "我在这里陪伴您，请分享您的心情。",
     "placeholderCompanion": "您今天感觉怎么样…",
-    "clearConversation": "清除对话"
+    "clearConversation": "清除对话",
+    "titleCompanion": "健康伴侣",
+    "titleGeneral": "健康 AI 助手"
   }
 }

@@ -82,6 +82,8 @@
     "voiceOff": "Mode vocal désactivé",
     "emptyCompanion": "Je suis là pour vous. Partagez ce qui vous pèse.",
     "placeholderCompanion": "Comment vous sentez-vous aujourd'hui…",
-    "clearConversation": "Effacer la conversation"
+    "clearConversation": "Effacer la conversation",
+    "titleCompanion": "Compagnon Bien-être",
+    "titleGeneral": "Assistant IA Santé"
   }
 }

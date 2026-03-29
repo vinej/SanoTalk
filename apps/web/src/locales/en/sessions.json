@@ -82,6 +82,8 @@
     "voiceOff": "Voice mode off",
     "emptyCompanion": "I'm here for you. Share what's on your mind.",
     "placeholderCompanion": "How are you feeling today…",
-    "clearConversation": "Clear conversation"
+    "clearConversation": "Clear conversation",
+    "titleCompanion": "Wellness Companion",
+    "titleGeneral": "Health AI Assistant"
   }
 }

@@ -82,6 +82,8 @@
     "voiceOff": "वॉयस मोड बंद",
     "emptyCompanion": "मैं यहाँ आपके लिए हूँ। अपने मन की बात साझा करें।",
     "placeholderCompanion": "आज आप कैसा महसूस कर रहे हैं…",
-    "clearConversation": "बातचीत साफ़ करें"
+    "clearConversation": "बातचीत साफ़ करें",
+    "titleCompanion": "वेलनेस साथी",
+    "titleGeneral": "स्वास्थ्य AI सहायक"
   }
 }
