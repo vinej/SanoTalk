@@ -28,7 +28,7 @@ export const Route = createFileRoute("/_auth/kanban")({
 });
 
 type TaskWithUser = Task & { assignedUser: { id: string; name: string } | null };
-type UserOption = { id: string; name: string; email: string; role: string };
+type UserOption = { id: string; name: string; role: string };
 
 const COLUMNS: {
   status: Task["status"];

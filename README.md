@@ -109,6 +109,35 @@ cp apps/web/.env.example apps/web/.env
 
 > Vite only reads `.env` files from its own package directory (`apps/web/`), not from the monorepo root. The root `.env` is used exclusively by the Node server.
 
+#### Cloudflare Security
+
+A **Content Security Policy** is enforced via a Cloudflare Transform Rule (HTTP Response Header) on `www.sanotalk.com`.
+
+**Dashboard:** Cloudflare → your domain → Rules → Transform Rules → Modify Response Header
+
+| Field       | Value                              |
+| ----------- | ---------------------------------- |
+| Rule name   | `CSP - Frontend`                   |
+| When        | Hostname equals `www.sanotalk.com` |
+| Then        | Set static header                  |
+| Header name | `Content-Security-Policy`          |
+
+**Header value:**
+
+```text
+default-src 'self';
+script-src 'self' 'sha256-Z2/iFzh9VMlVkEOar1f/oSHWwQk3ve1qk/C2WdsC4Xk=' https://static.cloudflareinsights.com;
+style-src 'self' 'unsafe-inline';
+img-src 'self' data: https:;
+font-src 'self';
+connect-src 'self' https://api.sanotalk.com wss://api.sanotalk.com https://api.openreplay.com https://*.livekit.cloud wss://*.livekit.cloud;
+frame-ancestors 'none';
+form-action 'self';
+base-uri 'self';
+```
+
+> **Note:** The `sha256-...` hash covers the inline modulepreload script Vite injects into `index.html`. It will change if Vite is upgraded or `vite.config.ts` is modified — update the hash from the new CSP violation message in the browser console.
+
 ### 3. Start Infrastructure
 
 ```bash

@@ -89,7 +89,7 @@ export const auth = betterAuth({
     // Disabled while Resend delivery to Hotmail/Outlook is unreliable with the
     // shared onboarding@resend.dev sender. Re-enable once a verified sending
     // domain is configured (EMAIL_FROM=noreply@yourdomain.com).
-    requireEmailVerification: false,
+    requireEmailVerification: true,
   },
   emailVerification: {
     sendOnSignUp: true,
