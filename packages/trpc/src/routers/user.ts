@@ -20,7 +20,7 @@ export const userRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       return ctx.db.query.user.findMany({
         where: eq(user.role, input.role),
-        columns: { id: true, name: true, email: true, specialty: true, licenseNumber: true },
+        columns: { id: true, name: true, specialty: true },
       });
     }),
 

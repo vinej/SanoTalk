@@ -42,9 +42,9 @@ export function useTranscriptSocket(
     const lang = options?.language ?? "en";
     const params = new URLSearchParams({ language: lang });
     if (sessionId) params.set("sessionId", sessionId);
-    if (authToken) params.set("token", authToken);
     const wsUrl = `${import.meta.env.VITE_WS_URL}/ws/transcribe?${params.toString()}`;
-    const ws = new WebSocket(wsUrl);
+    // Pass the auth token as a WebSocket subprotocol so it never appears in URLs or logs.
+    const ws = authToken ? new WebSocket(wsUrl, [`token.${authToken}`]) : new WebSocket(wsUrl);
     wsRef.current = ws;
 
     ws.onmessage = (event: MessageEvent) => {

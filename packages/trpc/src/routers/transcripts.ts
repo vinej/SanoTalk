@@ -52,7 +52,6 @@ export const transcriptsRouter = createTRPCRouter({
         confidence: z.number().optional(),
         startMs: z.number().optional(),
         endMs: z.number().optional(),
-        rawDeepgramResult: z.unknown().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {

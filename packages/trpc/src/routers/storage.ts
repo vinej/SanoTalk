@@ -68,14 +68,14 @@ export const storageRouter = createTRPCRouter({
     }),
 
   getDownloadUrl: protectedProcedure
-    .input(z.object({ key: z.string().max(500), bucket: z.string().max(100).optional() }))
+    .input(z.object({ key: z.string().max(500) }))
     .query(async ({ ctx, input }) => {
       const sessionId = extractSessionId(input.key);
       if (!sessionId) throw new TRPCError({ code: "FORBIDDEN", message: "Invalid file key" });
       await assertSessionAccess(ctx.db, sessionId, ctx.user.id);
 
       const client = getMinioClient();
-      const bucket = input.bucket ?? process.env.MINIO_BUCKET ?? "sanotalk";
+      const bucket = process.env.MINIO_BUCKET ?? "sanotalk";
       const url = await client.presignedGetObject(bucket, input.key, 3600);
       return { url };
     }),

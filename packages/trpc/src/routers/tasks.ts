@@ -100,15 +100,19 @@ export const tasksRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       if (await verifyAdminFromDb(ctx.db, ctx.user.id)) throw new TRPCError({ code: "FORBIDDEN", message: "Admins cannot delete tasks" });
       const existing = await ctx.db.query.task.findFirst({ where: eq(task.id, input.id) });
-      if (existing?.taskType === "summary_review") {
+      if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "Task not found" });
+      if (existing.taskType === "summary_review") {
         throw new TRPCError({ code: "FORBIDDEN", message: "Cannot delete a summary review task" });
+      }
+      if (existing.assignedUserId !== null && existing.assignedUserId !== ctx.user.id) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Only the assigned user can delete this task" });
       }
       await ctx.db.delete(task).where(eq(task.id, input.id));
     }),
 
   listUsers: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.query.user.findMany({
-      columns: { id: true, name: true, email: true, role: true },
+      columns: { id: true, name: true, role: true },
       orderBy: (u, { asc }) => [asc(u.name)],
     });
   }),

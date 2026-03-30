@@ -54,7 +54,7 @@ app.use(helmet({
 const allowedOrigins = [
   process.env.BETTER_AUTH_URL,
   process.env.APP_URL,
-  process.env.NGROK_URL,
+  ...(process.env.NODE_ENV !== "production" ? [process.env.NGROK_URL] : []),
 ].filter((o): o is string => typeof o === "string" && o.startsWith("http"));
 
 app.use(

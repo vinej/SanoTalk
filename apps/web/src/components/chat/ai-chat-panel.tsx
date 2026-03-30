@@ -44,6 +44,7 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
   const [showSavedPanel, setShowSavedPanel] = useState(false);
   const [saveTitle, setSaveTitle] = useState("");
   const [showSaveInput, setShowSaveInput] = useState(false);
+  const [showSaveNowDialog, setShowSaveNowDialog] = useState(false);
   const [loadedConversationTitle, setLoadedConversationTitle] = useState<string | null>(null);
 
   useEffect(() => {
@@ -352,15 +353,7 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
                 disabled={saveConversationMutation.isPending}
                 title={t("chat.saved.saveNow")}
                 className="text-muted-foreground"
-                onClick={() => {
-                  const title = window.prompt(t("chat.saved.titlePrompt"), loadedConversationTitle ?? "");
-                  if (title?.trim()) {
-                    saveConversationMutation.mutate(
-                      { chatType: chatTypeArg, title: title.trim() },
-                      { onSuccess: () => persistLoadedTitle(title.trim()) }
-                    );
-                  }
-                }}
+                onClick={() => { setSaveTitle(loadedConversationTitle ?? ""); setShowSaveNowDialog(true); }}
               >
                 {saveConversationMutation.isPending
                   ? <Loader2 className="h-3 w-3 animate-spin" />
@@ -497,6 +490,51 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
                   : t("chat.clearDialog.saveAndClear")}
               </Button>
             )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Save now dialog */}
+      <Dialog open={showSaveNowDialog} onOpenChange={(open) => { if (!open) { setShowSaveNowDialog(false); setSaveTitle(""); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("chat.saved.saveNow")}</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-2 pt-1">
+            <Label htmlFor="save-now-title" className="text-sm">{t("chat.clearDialog.titleLabel")}</Label>
+            <Input
+              id="save-now-title"
+              value={saveTitle}
+              onChange={(e) => setSaveTitle(e.target.value)}
+              placeholder={t("chat.clearDialog.titlePlaceholder")}
+              className="text-sm"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && saveTitle.trim()) {
+                  saveConversationMutation.mutate(
+                    { chatType: chatTypeArg, title: saveTitle.trim() },
+                    { onSuccess: () => { persistLoadedTitle(saveTitle.trim()); setShowSaveNowDialog(false); setSaveTitle(""); } }
+                  );
+                }
+              }}
+              autoFocus
+            />
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" size="sm" onClick={() => { setShowSaveNowDialog(false); setSaveTitle(""); }}>
+              {t("chat.clearDialog.cancel")}
+            </Button>
+            <Button
+              size="sm"
+              disabled={!saveTitle.trim() || saveConversationMutation.isPending}
+              onClick={() => {
+                saveConversationMutation.mutate(
+                  { chatType: chatTypeArg, title: saveTitle.trim() },
+                  { onSuccess: () => { persistLoadedTitle(saveTitle.trim()); setShowSaveNowDialog(false); setSaveTitle(""); } }
+                );
+              }}
+            >
+              {saveConversationMutation.isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : t("chat.saved.saveNow")}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

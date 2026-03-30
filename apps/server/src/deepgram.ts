@@ -18,19 +18,16 @@ export function startDeepgramWebSocket(server: Server) {
 
     // If a sessionId is provided it must be a valid UUID
     if (sessionId && !uuidRegex.test(sessionId)) {
-      logger.warn({ url: req.url }, "WebSocket rejected: invalid sessionId format");
+      logger.warn({ sessionId: "[redacted]" }, "WebSocket rejected: invalid sessionId format");
       ws.close(1008, "Invalid sessionId");
       return;
     }
 
     // Verify the caller is authenticated.
     // Cookie auth works for same-domain setups; behind Cloudflare the auth cookie
-    // may not be forwarded for cross-subdomain WS upgrades, so we also accept a
-    // session token passed as a query param (set by the client via useSession).
-    const token = url.searchParams.get("token");
-
-    // Try cookie-based auth first (same-domain); fall back to token query param
-    // (needed when Cloudflare proxies cross-subdomain WS upgrades without cookies).
+    // may not be forwarded for cross-subdomain WS upgrades, so the client passes
+    // the session token as a WebSocket subprotocol ("bearer <token>").
+    // The token is never placed in the URL to avoid log exposure.
     let userId: string | undefined;
 
     const cookieSession = await auth.api.getSession({
@@ -38,11 +35,17 @@ export function startDeepgramWebSocket(server: Server) {
     });
     if (cookieSession?.user) {
       userId = cookieSession.user.id;
-    } else if (token) {
-      const dbSession = await db.query.session.findFirst({
-        where: and(eq(sessionTable.token, token), gt(sessionTable.expiresAt, new Date())),
-      });
-      if (dbSession) userId = dbSession.userId;
+    } else {
+      // Extract token from Sec-WebSocket-Protocol: "token.<value>"
+      const protocols = (req.headers["sec-websocket-protocol"] ?? "").split(",").map((p) => p.trim());
+      const tokenEntry = protocols.find((p) => p.startsWith("token."));
+      const token = tokenEntry?.slice("token.".length);
+      if (token) {
+        const dbSession = await db.query.session.findFirst({
+          where: and(eq(sessionTable.token, token), gt(sessionTable.expiresAt, new Date())),
+        });
+        if (dbSession) userId = dbSession.userId;
+      }
     }
 
     if (!userId) {
@@ -164,7 +167,7 @@ export function startDeepgramWebSocket(server: Server) {
       });
 
       dgConnection.on(LiveTranscriptionEvents.UtteranceEnd, () => {
-        logger.info({ accumulatedText }, "Deepgram UtteranceEnd — flushing to client");
+        logger.info({ chars: accumulatedText.length }, "Deepgram UtteranceEnd — flushing to client");
         if (accumulatedText.trim() && ws.readyState === WebSocket.OPEN) {
           ws.send(JSON.stringify({
             type: "transcript",

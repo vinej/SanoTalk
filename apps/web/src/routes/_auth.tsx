@@ -15,8 +15,8 @@ export const Route: any = createFileRoute("/_auth")({
     }
     const user = session.data.user as any;
     if (tracker) {
-      tracker.setUserID(user.email);
-      console.log("[OpenReplay] setUserID:", user.email);
+      void tracker.start().catch(() => {});
+      tracker.setUserID(user.id);
     }
     // If 2FA has never been set up, send to the setup page first
     if (!user.twoFactorEnabled) {

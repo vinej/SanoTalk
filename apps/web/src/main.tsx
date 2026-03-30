@@ -9,9 +9,7 @@ import "./styles/globals.css";
 import "./lib/i18n";
 import { I18nextProvider } from "react-i18next";
 import i18n from "./lib/i18n";
-import { tracker } from "./lib/tracker";
-
-tracker?.start().then(() => console.log("[OpenReplay] tracker started")).catch((e) => console.error("[OpenReplay] start failed", e));
+// tracker.start() is called in _auth.tsx after the user is authenticated.
 
 const router: any = createRouter({
   routeTree,
