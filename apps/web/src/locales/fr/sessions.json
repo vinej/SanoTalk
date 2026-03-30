@@ -112,6 +112,9 @@
     "ttsOn": "Synthèse vocale activée",
     "ttsOff": "Synthèse vocale désactivée",
     "titleCompanion": "Compagnon Bien-être",
-    "titleGeneral": "Assistant IA Santé"
+    "titleGeneral": "Assistant IA Santé",
+    "titleNews": "Actualités",
+    "emptyNews": "Posez-moi une question sur l'actualité aux États-Unis ou au Canada.",
+    "placeholderNews": "Que se passe-t-il dans l'actualité…"
   }
 }

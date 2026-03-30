@@ -3,6 +3,7 @@ import { summaryAgent } from "./agents/summary.js";
 import { soapNoteAgent } from "./agents/soap-note.js";
 import { healthChatAgent } from "./agents/health-chat.js";
 import { companionChatAgent } from "./agents/companion-chat.js";
+import { newsChatAgent } from "./agents/news_chat.js";
 import { db, agentRun, transcriptSummary, transcript, chatMessage, talkSession } from "@sanotalk/db";
 import { eq, asc } from "drizzle-orm";
 import { logger } from "../logger.js";
@@ -13,7 +14,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: "../../.env" });
 
 export const mastra = new Mastra({
-  agents: { summaryAgent, soapNoteAgent, healthChatAgent, companionChatAgent },
+  agents: { summaryAgent, soapNoteAgent, healthChatAgent, companionChatAgent, newsChatAgent },
   logger: new PinoLogger({ name: 'Mastra', level: 'info' }),
 });
 
@@ -164,6 +165,26 @@ export async function callCompanionChat(
     { role: "user" as const, content: userMessage },
   ];
   const result = await companionChatAgent.generate(messages as any);
+  return result.text;
+}
+
+export async function callNewsChat(
+  history: Array<{ role: "user" | "assistant"; content: string }>,
+  userMessage: string,
+  language = "en",
+  userProperties?: UserProperty[],
+  propertiesLanguage = "en"
+): Promise<string> {
+  const languageInstruction = { role: "user" as const, content: `Respond in language code "${language}". All your replies must be in that language.` };
+  const languageAck = { role: "assistant" as const, content: "Understood. I will respond in the requested language." };
+  const messages = [
+    languageInstruction,
+    languageAck,
+    ...buildPropertyContext(userProperties, propertiesLanguage),
+    ...history,
+    { role: "user" as const, content: userMessage },
+  ];
+  const result = await newsChatAgent.generate(messages as any);
   return result.text;
 }
 

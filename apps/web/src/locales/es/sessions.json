@@ -112,6 +112,9 @@
     "ttsOn": "Voz activada",
     "ttsOff": "Voz desactivada",
     "titleCompanion": "Compañero de Bienestar",
-    "titleGeneral": "Asistente IA de Salud"
+    "titleGeneral": "Asistente IA de Salud",
+    "titleNews": "Noticias",
+    "emptyNews": "Pregúntame sobre las últimas noticias en EE.UU. o Canadá.",
+    "placeholderNews": "¿Qué está pasando en las noticias…"
   }
 }

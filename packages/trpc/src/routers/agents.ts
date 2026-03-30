@@ -148,22 +148,22 @@ export const agentsRouter = createTRPCRouter({
       return { message: assistantText };
     }),
 
-  generalChatHistory: protectedProcedure
+  healthChatHistory: protectedProcedure
     .query(async ({ ctx }) => {
       return ctx.db.query.chatMessage.findMany({
-        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "general")),
+        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "health")),
         orderBy: [asc(chatMessage.createdAt)],
       });
     }),
 
-  sendGeneralChatMessage: protectedProcedure
+  sendHealthChatMessage: protectedProcedure
     .input(z.object({
       message: z.string().min(1).max(2000),
       language: z.string().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       const pastMessages = await ctx.db.query.chatMessage.findMany({
-        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "general")),
+        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "health")),
         orderBy: [asc(chatMessage.createdAt)],
         limit: 20,
       });
@@ -172,12 +172,12 @@ export const agentsRouter = createTRPCRouter({
         (msg) => ({ role: msg.role as "user" | "assistant", content: msg.content })
       );
 
-      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "general", role: "user", content: input.message });
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "health", role: "user", content: input.message });
 
       const { properties: userProperties, propertiesLanguage } = await getUserContext(ctx.db, ctx.user.id);
       const assistantText = await ctx.callHealthChat(history, input.message, input.language ?? "en", userProperties, propertiesLanguage);
 
-      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "general", role: "assistant", content: assistantText });
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "health", role: "assistant", content: assistantText });
 
       return { message: assistantText };
     }),
@@ -216,10 +216,10 @@ export const agentsRouter = createTRPCRouter({
       return { message: assistantText };
     }),
 
-  clearGeneralChat: protectedProcedure
+  clearHealthChat: protectedProcedure
     .mutation(async ({ ctx }) => {
       await ctx.db.delete(chatMessage).where(
-        and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "general"))
+        and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "health"))
       );
       return { cleared: true };
     }),
@@ -228,6 +228,48 @@ export const agentsRouter = createTRPCRouter({
     .mutation(async ({ ctx }) => {
       await ctx.db.delete(chatMessage).where(
         and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "companion"))
+      );
+      return { cleared: true };
+    }),
+
+  newsChatHistory: protectedProcedure
+    .query(async ({ ctx }) => {
+      return ctx.db.query.chatMessage.findMany({
+        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "news")),
+        orderBy: [asc(chatMessage.createdAt)],
+      });
+    }),
+
+  sendNewsChatMessage: protectedProcedure
+    .input(z.object({
+      message: z.string().min(1).max(2000),
+      language: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const pastMessages = await ctx.db.query.chatMessage.findMany({
+        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "news")),
+        orderBy: [asc(chatMessage.createdAt)],
+        limit: 20,
+      });
+
+      const history: Array<{ role: "user" | "assistant"; content: string }> = pastMessages.map(
+        (msg) => ({ role: msg.role as "user" | "assistant", content: msg.content })
+      );
+
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "news", role: "user", content: input.message });
+
+      const { properties: userProperties, propertiesLanguage } = await getUserContext(ctx.db, ctx.user.id);
+      const assistantText = await ctx.callNewsChat(history, input.message, input.language ?? "en", userProperties, propertiesLanguage);
+
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "news", role: "assistant", content: assistantText });
+
+      return { message: assistantText };
+    }),
+
+  clearNewsChat: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      await ctx.db.delete(chatMessage).where(
+        and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "news"))
       );
       return { cleared: true };
     }),
@@ -326,7 +368,7 @@ export const agentsRouter = createTRPCRouter({
     }),
 
   listSavedConversations: protectedProcedure
-    .input(z.object({ chatType: z.enum(["general", "companion"]) }))
+    .input(z.object({ chatType: z.enum(["health", "companion", "news"]) }))
     .query(async ({ ctx, input }) => {
       return ctx.db
         .select({
@@ -347,7 +389,7 @@ export const agentsRouter = createTRPCRouter({
 
   saveConversation: protectedProcedure
     .input(z.object({
-      chatType: z.enum(["general", "companion"]),
+      chatType: z.enum(["health", "companion", "news"]),
       title: z.string().min(1).max(120),
     }))
     .mutation(async ({ ctx, input }) => {
@@ -403,7 +445,7 @@ export const agentsRouter = createTRPCRouter({
         ),
       });
       if (!saved) throw new TRPCError({ code: "NOT_FOUND", message: "Saved conversation not found" });
-      const chatType = saved.chatType as "general" | "companion";
+      const chatType = saved.chatType as "health" | "companion" | "news";
       await ctx.db.delete(chatMessage).where(
         and(
           isNull(chatMessage.sessionId),

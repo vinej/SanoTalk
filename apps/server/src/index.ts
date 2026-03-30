@@ -14,7 +14,7 @@ import { auth } from "@sanotalk/trpc/auth";
 import { toNodeHandler } from "better-auth/node";
 import { logger } from "./logger";
 import { startDeepgramWebSocket } from "./deepgram";
-import { runPendingAgents, triggerAgentRun, callHealthChat, callCompanionChat } from "./mastra/index";
+import { runPendingAgents, triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat } from "./mastra/index";
 import http from "http";
 
 const app = express();
@@ -103,7 +103,7 @@ app.use(
   "/api/trpc",
   createExpressMiddleware({
     router: appRouter,
-    createContext: (opts) => createTRPCContext(opts, { triggerAgentRun, callHealthChat, callCompanionChat }),
+    createContext: (opts) => createTRPCContext(opts, { triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat }),
     onError({ path, error }) {
       logger.error({ path, error }, "tRPC error");
     },

@@ -20,6 +20,13 @@ interface ContextExtras {
     userProperties?: UserProperty[],
     propertiesLanguage?: string
   ) => Promise<string>;
+  callNewsChat?: (
+    history: Array<{ role: "user" | "assistant"; content: string }>,
+    userMessage: string,
+    language?: string,
+    userProperties?: UserProperty[],
+    propertiesLanguage?: string
+  ) => Promise<string>;
 }
 
 export async function createTRPCContext(opts: CreateHTTPContextOptions, extras: ContextExtras = {}) {
@@ -36,6 +43,7 @@ export async function createTRPCContext(opts: CreateHTTPContextOptions, extras: 
     triggerAgentRun: extras.triggerAgentRun ?? (() => {}),
     callHealthChat: extras.callHealthChat ?? (async () => ""),
     callCompanionChat: extras.callCompanionChat ?? (async () => ""),
+    callNewsChat: extras.callNewsChat ?? (async () => ""),
   };
 }
 

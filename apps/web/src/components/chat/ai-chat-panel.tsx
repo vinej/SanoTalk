@@ -21,19 +21,20 @@ import { useSession } from "../../lib/auth-client";
 
 interface Props {
   sessionId?: string;
-  variant?: "general" | "companion";
+  variant?: "health" | "companion" | "news";
   pendingVoiceText?: string;
   onVoiceTextConsumed?: () => void;
 }
 
-export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, onVoiceTextConsumed }: Props) {
+export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, onVoiceTextConsumed }: Props) {
   const { t, i18n } = useTranslation("sessions");
   const { data: sessionData } = useSession();
   const userId = sessionData?.user?.id;
 
   const isSessionMode = !!sessionId;
   const isCompanion = !isSessionMode && variant === "companion";
-  const chatTypeArg = isCompanion ? "companion" : "general";
+  const isNews = !isSessionMode && variant === "news";
+  const chatTypeArg = isCompanion ? "companion" : isNews ? "news" : "health";
   const titleStorageKey = userId
     ? `sanotalk_chat_loaded_title_${chatTypeArg}_${userId}`
     : null;
@@ -64,17 +65,21 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
     { sessionId: sessionId! },
     { enabled: isSessionMode }
   );
-  const { data: generalMessages = [], refetch: refetchGeneral } = trpc.agents.generalChatHistory.useQuery(
+  const { data: healthMessages = [], refetch: refetchHealth } = trpc.agents.healthChatHistory.useQuery(
     undefined,
-    { enabled: !isSessionMode && !isCompanion }
+    { enabled: !isSessionMode && !isCompanion && !isNews }
   );
   const { data: companionMessages = [], refetch: refetchCompanion } = trpc.agents.companionChatHistory.useQuery(
     undefined,
     { enabled: isCompanion }
   );
+  const { data: newsMessages = [], refetch: refetchNews } = trpc.agents.newsChatHistory.useQuery(
+    undefined,
+    { enabled: isNews }
+  );
 
-  const messages = isSessionMode ? sessionMessages : isCompanion ? companionMessages : generalMessages;
-  const refetch = isSessionMode ? refetchSession : isCompanion ? refetchCompanion : refetchGeneral;
+  const messages = isSessionMode ? sessionMessages : isCompanion ? companionMessages : isNews ? newsMessages : healthMessages;
+  const refetch = isSessionMode ? refetchSession : isCompanion ? refetchCompanion : isNews ? refetchNews : refetchHealth;
 
   // ── Saved conversations ────────────────────────────────────────────────────
   const { data: savedList = [], refetch: refetchSaved } = trpc.agents.listSavedConversations.useQuery(
@@ -108,16 +113,20 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
 
   // ── Mutations ──────────────────────────────────────────────────────────────
   const sendSessionMessage = trpc.agents.sendChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
-  const sendGeneralMessage = trpc.agents.sendGeneralChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
+  const sendHealthMessage = trpc.agents.sendHealthChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
   const sendCompanionMessage = trpc.agents.sendCompanionChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
-  const clearGeneral = trpc.agents.clearGeneralChat.useMutation({ onSuccess: () => { void refetch(); } });
+  const sendNewsMessage = trpc.agents.sendNewsChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
+  const clearHealth = trpc.agents.clearHealthChat.useMutation({ onSuccess: () => { void refetch(); } });
   const clearCompanion = trpc.agents.clearCompanionChat.useMutation({ onSuccess: () => { void refetch(); } });
+  const clearNews = trpc.agents.clearNewsChat.useMutation({ onSuccess: () => { void refetch(); } });
 
   const isPending = isSessionMode
     ? sendSessionMessage.isPending
     : isCompanion
       ? sendCompanionMessage.isPending
-      : sendGeneralMessage.isPending;
+      : isNews
+        ? sendNewsMessage.isPending
+        : sendHealthMessage.isPending;
 
   // ── Voice (non-session modes) ──────────────────────────────────────────────
   const { isRecording, micError } = useTranscriptSocket(undefined, {
@@ -127,8 +136,10 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
     onFinalTranscript: (text) => {
       if (isCompanion) {
         sendCompanionMessage.mutate({ message: text, language: i18n.language });
+      } else if (isNews) {
+        sendNewsMessage.mutate({ message: text, language: i18n.language });
       } else {
-        sendGeneralMessage.mutate({ message: text, language: i18n.language });
+        sendHealthMessage.mutate({ message: text, language: i18n.language });
       }
     },
   });
@@ -164,14 +175,16 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
       sendSessionMessage.mutate({ sessionId: sessionId!, message: trimmed });
     } else if (isCompanion) {
       sendCompanionMessage.mutate({ message: trimmed, language: i18n.language });
+    } else if (isNews) {
+      sendNewsMessage.mutate({ message: trimmed, language: i18n.language });
     } else {
-      sendGeneralMessage.mutate({ message: trimmed, language: i18n.language });
+      sendHealthMessage.mutate({ message: trimmed, language: i18n.language });
     }
   }
 
   function handleClearConfirmed() {
     stopTts();
-    (isCompanion ? clearCompanion : clearGeneral).mutate(undefined, {
+    (isCompanion ? clearCompanion : isNews ? clearNews : clearHealth).mutate(undefined, {
       onSuccess: () => {
         setShowClearDialog(false);
         setShowSaveInput(false);
@@ -207,10 +220,12 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
       {!isSessionMode && (
         <div className={cn(
           "px-4 py-3 border-b font-semibold text-sm",
-          isCompanion ? "bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300" : "bg-muted/50 text-foreground"
+          isCompanion ? "bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300"
+          : isNews ? "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300"
+          : "bg-muted/50 text-foreground"
         )}>
           <div className="flex items-center gap-2 min-w-0">
-            <span className="shrink-0">{t(isCompanion ? "chat.titleCompanion" : "chat.titleGeneral")}</span>
+            <span className="shrink-0">{t(isCompanion ? "chat.titleCompanion" : isNews ? "chat.titleNews" : "chat.titleGeneral")}</span>
             {loadedConversationTitle && (
               <>
                 <span className="shrink-0 opacity-40">·</span>
@@ -224,7 +239,7 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
         <div className="p-3 space-y-3">
           {messages.length === 0 && !isPending && (
             <p className="text-sm text-muted-foreground text-center py-8">
-              {t(isCompanion ? "chat.emptyCompanion" : "chat.empty")}
+              {t(isCompanion ? "chat.emptyCompanion" : isNews ? "chat.emptyNews" : "chat.empty")}
             </p>
           )}
 
@@ -237,7 +252,9 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
                   ? "ml-auto bg-primary text-primary-foreground"
                   : isCompanion
                     ? "mr-auto bg-sky-50 dark:bg-sky-950/30 text-foreground"
-                    : "mr-auto bg-muted text-foreground"
+                    : isNews
+                      ? "mr-auto bg-amber-50 dark:bg-amber-950/30 text-foreground"
+                      : "mr-auto bg-muted text-foreground"
               )}
             >
               {msg.content}
@@ -331,7 +348,7 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
               size="sm"
               variant="ghost"
               onClick={() => { setSaveTitle(loadedConversationTitle ?? ""); setShowClearDialog(true); }}
-              disabled={messages.length === 0 || clearGeneral.isPending || clearCompanion.isPending}
+              disabled={messages.length === 0 || clearHealth.isPending || clearCompanion.isPending}
               title={t("chat.clearConversation")}
               className="text-muted-foreground hover:text-destructive"
             >
@@ -389,7 +406,7 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
               handleSend();
             }
           }}
-          placeholder={t(isCompanion ? "chat.placeholderCompanion" : "chat.placeholder")}
+          placeholder={t(isCompanion ? "chat.placeholderCompanion" : isNews ? "chat.placeholderNews" : "chat.placeholder")}
           disabled={isPending}
           className="flex-1 text-sm"
         />
@@ -470,7 +487,7 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
             <Button
               variant="destructive"
               size="sm"
-              disabled={clearGeneral.isPending || clearCompanion.isPending}
+              disabled={clearHealth.isPending || clearCompanion.isPending}
               onClick={handleClearConfirmed}
             >
               {t("chat.clearDialog.clearOnly")}
@@ -482,7 +499,7 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
             ) : (
               <Button
                 size="sm"
-                disabled={!saveTitle.trim() || saveConversationMutation.isPending || clearGeneral.isPending || clearCompanion.isPending}
+                disabled={!saveTitle.trim() || saveConversationMutation.isPending || clearHealth.isPending || clearCompanion.isPending}
                 onClick={handleSaveAndClear}
               >
                 {saveConversationMutation.isPending

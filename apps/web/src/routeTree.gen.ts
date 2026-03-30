@@ -16,6 +16,7 @@ import { Route as Setup2faRouteImport } from './routes/setup-2fa'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
+import { Route as AuthNewsRouteImport } from './routes/_auth/news'
 import { Route as AuthKanbanRouteImport } from './routes/_auth/kanban'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
 import { Route as AuthCompanionRouteImport } from './routes/_auth/companion'
@@ -55,6 +56,11 @@ const AuthRoute = AuthRouteImport.update({
 const AuthIndexRoute = AuthIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthNewsRoute = AuthNewsRouteImport.update({
+  id: '/news',
+  path: '/news',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthKanbanRoute = AuthKanbanRouteImport.update({
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/companion': typeof AuthCompanionRoute
   '/dashboard': typeof AuthDashboardRoute
   '/kanban': typeof AuthKanbanRoute
+  '/news': typeof AuthNewsRoute
   '/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
   '/sessions/new': typeof AuthSessionsNewRoute
 }
@@ -112,6 +119,7 @@ export interface FileRoutesByTo {
   '/companion': typeof AuthCompanionRoute
   '/dashboard': typeof AuthDashboardRoute
   '/kanban': typeof AuthKanbanRoute
+  '/news': typeof AuthNewsRoute
   '/': typeof AuthIndexRoute
   '/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
   '/sessions/new': typeof AuthSessionsNewRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   '/_auth/companion': typeof AuthCompanionRoute
   '/_auth/dashboard': typeof AuthDashboardRoute
   '/_auth/kanban': typeof AuthKanbanRoute
+  '/_auth/news': typeof AuthNewsRoute
   '/_auth/': typeof AuthIndexRoute
   '/_auth/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
   '/_auth/sessions/new': typeof AuthSessionsNewRoute
@@ -145,6 +154,7 @@ export interface FileRouteTypes {
     | '/companion'
     | '/dashboard'
     | '/kanban'
+    | '/news'
     | '/sessions/$sessionId'
     | '/sessions/new'
   fileRoutesByTo: FileRoutesByTo
@@ -158,6 +168,7 @@ export interface FileRouteTypes {
     | '/companion'
     | '/dashboard'
     | '/kanban'
+    | '/news'
     | '/'
     | '/sessions/$sessionId'
     | '/sessions/new'
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/_auth/companion'
     | '/_auth/dashboard'
     | '/_auth/kanban'
+    | '/_auth/news'
     | '/_auth/'
     | '/_auth/sessions/$sessionId'
     | '/_auth/sessions/new'
@@ -238,6 +250,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthIndexRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/news': {
+      id: '/_auth/news'
+      path: '/news'
+      fullPath: '/news'
+      preLoaderRoute: typeof AuthNewsRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/kanban': {
       id: '/_auth/kanban'
       path: '/kanban'
@@ -288,6 +307,7 @@ interface AuthRouteChildren {
   AuthCompanionRoute: typeof AuthCompanionRoute
   AuthDashboardRoute: typeof AuthDashboardRoute
   AuthKanbanRoute: typeof AuthKanbanRoute
+  AuthNewsRoute: typeof AuthNewsRoute
   AuthIndexRoute: typeof AuthIndexRoute
   AuthSessionsSessionIdRoute: typeof AuthSessionsSessionIdRoute
   AuthSessionsNewRoute: typeof AuthSessionsNewRoute
@@ -298,6 +318,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthCompanionRoute: AuthCompanionRoute,
   AuthDashboardRoute: AuthDashboardRoute,
   AuthKanbanRoute: AuthKanbanRoute,
+  AuthNewsRoute: AuthNewsRoute,
   AuthIndexRoute: AuthIndexRoute,
   AuthSessionsSessionIdRoute: AuthSessionsSessionIdRoute,
   AuthSessionsNewRoute: AuthSessionsNewRoute,

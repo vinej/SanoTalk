@@ -5,7 +5,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { SessionCard } from "../../components/sessions/session-card";
-import { Plus, Kanban, Bot, Heart } from "lucide-react";
+import { Plus, Kanban, Bot, Heart, Newspaper } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -107,6 +107,12 @@ function DashboardPage() {
               <Link to="/ai-assistant">
                 <Bot className="mr-2 h-4 w-4" />
                 {t("dashboard:aiAssistant")}
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/news">
+                <Newspaper className="mr-2 h-4 w-4 text-amber-600" />
+                {t("dashboard:newsAgent")}
               </Link>
             </Button>
             <Button variant="outline" asChild>

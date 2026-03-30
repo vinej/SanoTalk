@@ -112,6 +112,9 @@
     "ttsOn": "Voice output on",
     "ttsOff": "Voice output off",
     "titleCompanion": "Wellness Companion",
-    "titleGeneral": "Health AI Assistant"
+    "titleGeneral": "Health AI Assistant",
+    "titleNews": "News",
+    "emptyNews": "Ask me about the latest news in the US or Canada.",
+    "placeholderNews": "What's happening in the news…"
   }
 }

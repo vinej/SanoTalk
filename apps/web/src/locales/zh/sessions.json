@@ -112,6 +112,9 @@
     "ttsOn": "语音输出已开启",
     "ttsOff": "语音输出已关闭",
     "titleCompanion": "健康伴侣",
-    "titleGeneral": "健康 AI 助手"
+    "titleGeneral": "健康 AI 助手",
+    "titleNews": "新闻",
+    "emptyNews": "向我询问美国或加拿大的最新新闻。",
+    "placeholderNews": "最近有什么新闻…"
   }
 }
