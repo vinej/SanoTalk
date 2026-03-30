@@ -17,7 +17,7 @@ export default defineConfig({
   // Start the dev server automatically during e2e runs
   webServer: {
     command: "pnpm dev",
-    url: "http://localhost:5173",
+    url: "https://www.sanotalk.com",
     reuseExistingServer: !process.env["CI"],
   },
 });

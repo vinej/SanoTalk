@@ -14,6 +14,7 @@ export function useTranscriptSocket(
     enabled?: boolean;
     onFinalTranscript?: (text: string) => void;
     language?: string;
+    authToken?: string | undefined;
   }
 ) {
   const [liveText, setLiveText] = useState("");
@@ -30,6 +31,7 @@ export function useTranscriptSocket(
   });
 
   const enabled = options?.enabled ?? true;
+  const authToken = options?.authToken;
 
   useEffect(() => {
     if (!enabled) return;
@@ -38,10 +40,10 @@ export function useTranscriptSocket(
     setIsRecording(false);
 
     const lang = options?.language ?? "en";
-    const qs = sessionId
-      ? `sessionId=${sessionId}&language=${lang}`
-      : `language=${lang}`;
-    const wsUrl = `${import.meta.env.VITE_WS_URL}/ws/transcribe?${qs}`;
+    const params = new URLSearchParams({ language: lang });
+    if (sessionId) params.set("sessionId", sessionId);
+    if (authToken) params.set("token", authToken);
+    const wsUrl = `${import.meta.env.VITE_WS_URL}/ws/transcribe?${params.toString()}`;
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
@@ -104,7 +106,7 @@ export function useTranscriptSocket(
       recorderRef.current = null;
       ws.close();
     };
-  }, [sessionId, enabled]);
+  }, [sessionId, enabled, authToken]);
 
   return { liveText, isRecording, micError };
 }

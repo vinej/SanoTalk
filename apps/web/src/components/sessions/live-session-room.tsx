@@ -8,6 +8,7 @@ import { useTranscriptSocket } from "../../hooks/use-transcript-socket";
 import { TalkSession } from "@sanotalk/db";
 import { useTranslation } from "react-i18next";
 import { X, UserPlus } from "lucide-react";
+import { useSession } from "../../lib/auth-client";
 
 type Props = {
   session: TalkSession;
@@ -159,7 +160,9 @@ function ParticipantsPanel({ sessionId, session, onUpdate }: { sessionId: string
 }
 
 function TranscriptionOverlay({ sessionId, language, onFinalTranscript }: { sessionId: string; language: string; onFinalTranscript?: (text: string) => void }) {
-  const { liveText, isRecording, micError } = useTranscriptSocket(sessionId, { language, ...(onFinalTranscript ? { onFinalTranscript } : {}) });
+  const { data: sessionData } = useSession();
+  const authToken = sessionData?.session?.token;
+  const { liveText, isRecording, micError } = useTranscriptSocket(sessionId, { enabled: !!authToken, language, authToken, ...(onFinalTranscript ? { onFinalTranscript } : {}) });
   const { t } = useTranslation("sessions");
 
   return (

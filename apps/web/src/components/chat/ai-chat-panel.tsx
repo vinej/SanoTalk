@@ -17,6 +17,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "../ui/dialog";
+import { useSession } from "../../lib/auth-client";
 
 interface Props {
   sessionId?: string;
@@ -27,11 +28,15 @@ interface Props {
 
 export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, onVoiceTextConsumed }: Props) {
   const { t, i18n } = useTranslation("sessions");
+  const { data: sessionData } = useSession();
+  const userId = sessionData?.user?.id;
 
   const isSessionMode = !!sessionId;
   const isCompanion = !isSessionMode && variant === "companion";
   const chatTypeArg = isCompanion ? "companion" : "general";
-  const titleStorageKey = `sanotalk_chat_loaded_title_${chatTypeArg}`;
+  const titleStorageKey = userId
+    ? `sanotalk_chat_loaded_title_${chatTypeArg}_${userId}`
+    : null;
 
   const [inputValue, setInputValue] = useState("");
   const [voiceEnabled, setVoiceEnabled] = useState(false);
@@ -39,9 +44,12 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
   const [showSavedPanel, setShowSavedPanel] = useState(false);
   const [saveTitle, setSaveTitle] = useState("");
   const [showSaveInput, setShowSaveInput] = useState(false);
-  const [loadedConversationTitle, setLoadedConversationTitle] = useState<string | null>(() => {
-    try { return localStorage.getItem(titleStorageKey); } catch { return null; }
-  });
+  const [loadedConversationTitle, setLoadedConversationTitle] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!titleStorageKey) return;
+    try { setLoadedConversationTitle(localStorage.getItem(titleStorageKey)); } catch { /* ignore */ }
+  }, [titleStorageKey]);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
   const ttsStorageKey = `sanotalk_chat_tts_${chatTypeArg}`;
   const [ttsEnabled, setTtsEnabled] = useState(() => {
@@ -81,6 +89,7 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
 
   function persistLoadedTitle(title: string | null) {
     setLoadedConversationTitle(title);
+    if (!titleStorageKey) return;
     try {
       if (title) localStorage.setItem(titleStorageKey, title);
       else localStorage.removeItem(titleStorageKey);
@@ -111,8 +120,9 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
 
   // ── Voice (non-session modes) ──────────────────────────────────────────────
   const { isRecording, micError } = useTranscriptSocket(undefined, {
-    enabled: !isSessionMode && voiceEnabled,
+    enabled: !isSessionMode && voiceEnabled && !!sessionData?.session?.token,
     language: i18n.language,
+    authToken: sessionData?.session?.token,
     onFinalTranscript: (text) => {
       if (isCompanion) {
         sendCompanionMessage.mutate({ message: text, language: i18n.language });

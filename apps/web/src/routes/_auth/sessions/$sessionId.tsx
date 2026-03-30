@@ -12,7 +12,7 @@ import { useTranslation } from "react-i18next";
 export const Route = createFileRoute("/_auth/sessions/$sessionId")({
   component: SessionPage,
   validateSearch: (search: Record<string, unknown>) => ({
-    tab: (search.tab as string) ?? "chat",
+    tab: (search.tab as string) ?? "transcript",
   }),
 });
 

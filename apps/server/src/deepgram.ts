@@ -4,8 +4,8 @@ import type { Server } from "http";
 import { logger } from "./logger";
 import { auth } from "@sanotalk/trpc/auth";
 import { db } from "@sanotalk/db";
-import { talkSession, sessionParticipant } from "@sanotalk/db";
-import { eq, and } from "drizzle-orm";
+import { talkSession, sessionParticipant, session as sessionTable } from "@sanotalk/db";
+import { eq, and, gt } from "drizzle-orm";
 
 export function startDeepgramWebSocket(server: Server) {
   const wss = new WebSocketServer({ server, path: "/ws/transcribe" });
@@ -23,16 +23,33 @@ export function startDeepgramWebSocket(server: Server) {
       return;
     }
 
-    // Verify the caller is authenticated
-    const sessionData = await auth.api.getSession({
+    // Verify the caller is authenticated.
+    // Cookie auth works for same-domain setups; behind Cloudflare the auth cookie
+    // may not be forwarded for cross-subdomain WS upgrades, so we also accept a
+    // session token passed as a query param (set by the client via useSession).
+    const token = url.searchParams.get("token");
+
+    // Try cookie-based auth first (same-domain); fall back to token query param
+    // (needed when Cloudflare proxies cross-subdomain WS upgrades without cookies).
+    let userId: string | undefined;
+
+    const cookieSession = await auth.api.getSession({
       headers: new Headers(req.headers as Record<string, string>),
     });
-    if (!sessionData?.user) {
+    if (cookieSession?.user) {
+      userId = cookieSession.user.id;
+    } else if (token) {
+      const dbSession = await db.query.session.findFirst({
+        where: and(eq(sessionTable.token, token), gt(sessionTable.expiresAt, new Date())),
+      });
+      if (dbSession) userId = dbSession.userId;
+    }
+
+    if (!userId) {
       logger.warn({ sessionId }, "WebSocket rejected: unauthenticated");
       ws.close(1008, "Unauthorized");
       return;
     }
-    const userId = sessionData.user.id;
 
     // When a sessionId is provided, verify the user belongs to that session
     if (sessionId) {

@@ -10,7 +10,7 @@ const LANG_MAP: Record<string, string> = {
 };
 
 function getBCP47(lang: string): string {
-  const prefix = lang.split("-")[0].toLowerCase();
+  const prefix = (lang.split("-")[0] ?? "en").toLowerCase();
   return LANG_MAP[prefix] ?? lang;
 }
 
