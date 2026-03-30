@@ -108,6 +108,9 @@
         "confirm": "हटाएं"
       }
     },
+    "speaking": "बोल रहा है…",
+    "ttsOn": "वॉयस आउटपुट चालू",
+    "ttsOff": "वॉयस आउटपुट बंद",
     "titleCompanion": "वेलनेस साथी",
     "titleGeneral": "स्वास्थ्य AI सहायक"
   }

@@ -4,10 +4,11 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { trpc } from "../../lib/trpc";
-import { Loader2, Send, Mic, MicOff, Trash2, Bookmark, BookmarkCheck, BookmarkX } from "lucide-react";
+import { Loader2, Send, Mic, MicOff, Trash2, Bookmark, BookmarkCheck, BookmarkX, Volume2, VolumeX } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "../../lib/utils";
 import { useTranscriptSocket } from "../../hooks/use-transcript-socket";
+import { useTts } from "../../hooks/use-tts";
 import {
   Dialog,
   DialogContent,
@@ -42,7 +43,12 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
     try { return localStorage.getItem(titleStorageKey); } catch { return null; }
   });
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
+  const ttsStorageKey = `sanotalk_chat_tts_${chatTypeArg}`;
+  const [ttsEnabled, setTtsEnabled] = useState(() => {
+    try { return localStorage.getItem(ttsStorageKey) === "true"; } catch { return false; }
+  });
   const bottomRef = useRef<HTMLDivElement>(null);
+  const prevMsgCountRef = useRef(0);
 
   // ── Queries ────────────────────────────────────────────────────────────────
   const { data: sessionMessages = [], refetch: refetchSession } = trpc.agents.chatHistory.useQuery(
@@ -116,6 +122,28 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
     },
   });
 
+  // ── TTS ────────────────────────────────────────────────────────────────────
+  const { speak, stop: stopTts, isSpeaking, isSupported: ttsSupported } = useTts();
+
+  function toggleTts() {
+    const next = !ttsEnabled;
+    setTtsEnabled(next);
+    try { localStorage.setItem(ttsStorageKey, String(next)); } catch { /* ignore */ }
+    if (!next) stopTts();
+  }
+
+  useEffect(() => {
+    if (!ttsEnabled || messages.length === 0) {
+      prevMsgCountRef.current = messages.length;
+      return;
+    }
+    if (messages.length > prevMsgCountRef.current) {
+      const last = messages[messages.length - 1];
+      if (last?.role === "assistant") speak(last.content, i18n.language);
+    }
+    prevMsgCountRef.current = messages.length;
+  }, [messages.length]);
+
   // ── Send ───────────────────────────────────────────────────────────────────
   function handleSend() {
     const trimmed = inputValue.trim();
@@ -131,6 +159,7 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
   }
 
   function handleClearConfirmed() {
+    stopTts();
     (isCompanion ? clearCompanion : clearGeneral).mutate(undefined, {
       onSuccess: () => {
         setShowClearDialog(false);
@@ -267,6 +296,12 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
         </div>
       )}
 
+      {isSpeaking && (
+        <div className="border-t px-3 py-1.5 flex items-center gap-2 bg-sky-500/10 shrink-0">
+          <span className="inline-block w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
+          <span className="text-xs text-sky-600 font-medium">{t("chat.speaking")}</span>
+        </div>
+      )}
       {listening && (
         <div className="border-t px-3 py-1.5 flex items-center gap-2 bg-red-500/10 shrink-0">
           <span className="inline-block w-2 h-2 rounded-full bg-red-500 animate-pulse" />
@@ -323,6 +358,16 @@ export function AiChatPanel({ sessionId, variant = "general", pendingVoiceText, 
               </Button>
             )}
           </>
+        )}
+        {ttsSupported && !isSessionMode && (
+          <Button
+            size="sm"
+            variant={ttsEnabled ? "default" : "outline"}
+            onClick={toggleTts}
+            title={ttsEnabled ? t("chat.ttsOn") : t("chat.ttsOff")}
+          >
+            {ttsEnabled ? <Volume2 className="h-3 w-3" /> : <VolumeX className="h-3 w-3" />}
+          </Button>
         )}
         <Button
           size="sm"

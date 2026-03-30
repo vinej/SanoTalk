@@ -108,6 +108,9 @@
         "confirm": "删除"
       }
     },
+    "speaking": "正在朗读…",
+    "ttsOn": "语音输出已开启",
+    "ttsOff": "语音输出已关闭",
     "titleCompanion": "健康伴侣",
     "titleGeneral": "健康 AI 助手"
   }

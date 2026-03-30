@@ -108,6 +108,9 @@
         "confirm": "Supprimer"
       }
     },
+    "speaking": "Lecture en cours…",
+    "ttsOn": "Synthèse vocale activée",
+    "ttsOff": "Synthèse vocale désactivée",
     "titleCompanion": "Compagnon Bien-être",
     "titleGeneral": "Assistant IA Santé"
   }

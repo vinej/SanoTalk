@@ -108,6 +108,9 @@
         "confirm": "Eliminar"
       }
     },
+    "speaking": "Hablando…",
+    "ttsOn": "Voz activada",
+    "ttsOff": "Voz desactivada",
     "titleCompanion": "Compañero de Bienestar",
     "titleGeneral": "Asistente IA de Salud"
   }

@@ -108,6 +108,9 @@
         "confirm": "Delete"
       }
     },
+    "speaking": "Speaking…",
+    "ttsOn": "Voice output on",
+    "ttsOff": "Voice output off",
     "titleCompanion": "Wellness Companion",
     "titleGeneral": "Health AI Assistant"
   }

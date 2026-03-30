@@ -108,6 +108,9 @@
         "confirm": "حذف"
       }
     },
+    "speaking": "جارٍ النطق…",
+    "ttsOn": "الصوت مفعّل",
+    "ttsOff": "الصوت معطّل",
     "titleCompanion": "رفيق العافية",
     "titleGeneral": "مساعد الصحة الذكي"
   }
