@@ -36,7 +36,7 @@ const SUPPORTED_LANGUAGES = [
 ];
 
 export function ProfileEditDialog({ open, onOpenChange }: Props) {
-  const { t, i18n } = useTranslation("profile");
+  const { t, i18n } = useTranslation(["profile", "common"]);
   const utils = trpc.useUtils();
 
   const { data: profile } = trpc.user.profile.useQuery(undefined, { enabled: open });
@@ -249,7 +249,9 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
               <ul className="space-y-1">
                 {properties.map((prop) => (
                   <li key={prop.id} className="flex items-center gap-2 text-sm">
-                    <span className="font-mono bg-muted px-2 py-0.5 rounded text-xs shrink-0">{prop.key}</span>
+                    <span className="font-mono bg-muted px-2 py-0.5 rounded text-xs shrink-0">
+                      {PREDEFINED_KEYS.includes(prop.key as any) ? t(`properties.keys.${prop.key}`) : prop.key}
+                    </span>
                     <span className="flex-1 truncate text-muted-foreground">{prop.value}</span>
                     <Button
                       size="icon"
@@ -302,17 +304,18 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
               const available = PREDEFINED_KEYS.filter((k) => !usedKeys.has(k));
               return available.length > 0 ? (
                 <div className="flex flex-wrap gap-1">
-                  {available.map((key, hint) => (
+                  {available.map((key) => (
                     <button
                       key={key}
                       type="button"
-                      onClick={() => { 
-                        setPropKey(key); 
+                      onClick={() => {
+                        setPropKey(tProps(`properties.keys.${key}`));
                         setPropValue(tProps(`properties.hints.${key}`));
-                        setTimeout(() => propValueRef.current?.focus(), 0); }}
+                        setTimeout(() => propValueRef.current?.focus(), 0);
+                      }}
                       className="px-2 py-0.5 text-xs rounded-full border border-input hover:bg-muted transition-colors"
                     >
-                      {tProps(`properties.keys.${key}`)}
+                      {t(`properties.keys.${key}`)}
                     </button>
                   ))}
                 </div>
@@ -323,7 +326,7 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
             <div className="flex gap-2">
               <Input
                 className="h-8 text-xs"
-                placeholder={tProps("properties.keyPlaceholder")}
+                placeholder={t("properties.keyPlaceholder")}
                 value={propKey}
                 onChange={(e) => setPropKey(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") handleAddProperty(); }}
@@ -333,8 +336,8 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
                 className="h-8 text-xs"
                 placeholder={
                   propKey && PREDEFINED_KEYS.includes(propKey)
-                    ? tProps(`properties.hints.${propKey}`)
-                    : tProps("properties.valuePlaceholder")
+                    ? t(`properties.hints.${propKey}`)
+                    : t("properties.valuePlaceholder")
                 }
                 ref={propValueRef}
                 value={propValue}
@@ -356,10 +359,10 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
-            Cancel
+            {t("common:cancel")}
           </Button>
           <Button onClick={handleSave} disabled={isPending || saved || (!isPatient && !isProfessional)}>
-            {saved ? t("saved") : isPending ? t("saving") : "Save"}
+            {saved ? t("saved") : isPending ? t("saving") : t("common:save")}
           </Button>
         </DialogFooter>
       </DialogContent>

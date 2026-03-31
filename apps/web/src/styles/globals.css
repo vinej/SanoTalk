@@ -2,6 +2,18 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* Hide browser-native password reveal / autofill buttons (Edge, Chrome, Safari) */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+input::-webkit-credentials-auto-fill-button,
+input::-webkit-contacts-auto-fill-button,
+input::-webkit-textfield-decoration-container {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 /* LiveKit: stack chat panel below video instead of side-by-side */
 .lk-video-conference {
   flex-direction: column;

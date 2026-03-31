@@ -1,9 +1,11 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { z } from "zod";
 import { useEffect, useState } from "react";
 import { authClient } from "../lib/auth-client";
+import { useTranslation } from "react-i18next";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
+import { MailCheck, MailX, Loader2 } from "lucide-react";
 
 const searchSchema = z.object({
   token: z.string(),
@@ -16,7 +18,7 @@ export const Route = createFileRoute("/verify-email")({
 
 function VerifyEmailPage() {
   const { token } = Route.useSearch();
-  const navigate = useNavigate();
+  const { t } = useTranslation("common");
   const [status, setStatus] = useState<"verifying" | "success" | "error">("verifying");
   const [errorMessage, setErrorMessage] = useState("");
   const [resendEmail, setResendEmail] = useState("");
@@ -30,7 +32,6 @@ function VerifyEmailPage() {
           setStatus("error");
         } else {
           setStatus("success");
-          setTimeout(() => navigate({ to: "/dashboard" as any }), 2000);
         }
       })
       .catch(() => {
@@ -42,7 +43,7 @@ function VerifyEmailPage() {
   async function handleResend(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setResendStatus("sending");
-    const { error } = await authClient.sendVerificationEmail({ email: resendEmail, callbackURL: "/dashboard" });
+    const { error } = await authClient.sendVerificationEmail({ email: resendEmail, callbackURL: "/verify-email" });
     if (error) {
       setResendStatus("error");
     } else {
@@ -55,25 +56,30 @@ function VerifyEmailPage() {
       <div className="text-center space-y-4 max-w-md px-4">
         {status === "verifying" && (
           <>
-            <h1 className="text-2xl font-bold">Verifying your email…</h1>
-            <p className="text-muted-foreground">Please wait.</p>
+            <Loader2 className="h-12 w-12 animate-spin text-muted-foreground mx-auto" />
+            <h1 className="text-2xl font-bold">{t("verifyEmail.verifying")}</h1>
+            <p className="text-muted-foreground">{t("verifyEmail.verifyingDesc")}</p>
           </>
         )}
+
         {status === "success" && (
           <>
-            <h1 className="text-2xl font-bold text-green-600">Email verified!</h1>
-            <p className="text-muted-foreground">Redirecting you to the dashboard…</p>
+            <MailCheck className="h-12 w-12 text-green-600 mx-auto" />
+            <h1 className="text-2xl font-bold text-green-600">{t("verifyEmail.success")}</h1>
+            <p className="text-muted-foreground">{t("verifyEmail.successDesc")}</p>
           </>
         )}
+
         {status === "error" && (
           <>
-            <h1 className="text-2xl font-bold text-destructive">Verification failed</h1>
+            <MailX className="h-12 w-12 text-destructive mx-auto" />
+            <h1 className="text-2xl font-bold text-destructive">{t("verifyEmail.failed")}</h1>
             <p className="text-muted-foreground">{errorMessage}</p>
 
             <div className="pt-2 space-y-3 text-left">
-              <p className="text-sm font-medium text-center">Resend verification email</p>
+              <p className="text-sm font-medium text-center">{t("verifyEmail.resendTitle")}</p>
               {resendStatus === "sent" ? (
-                <p className="text-sm text-green-600 text-center">Verification email sent — check your inbox.</p>
+                <p className="text-sm text-green-600 text-center">{t("verifyEmail.resendSent")}</p>
               ) : (
                 <form onSubmit={handleResend} className="flex gap-2">
                   <Input
@@ -84,18 +90,18 @@ function VerifyEmailPage() {
                     required
                   />
                   <Button type="submit" disabled={resendStatus === "sending"}>
-                    {resendStatus === "sending" ? "Sending…" : "Resend"}
+                    {resendStatus === "sending" ? t("verifyEmail.resending") : t("verifyEmail.resend")}
                   </Button>
                 </form>
               )}
               {resendStatus === "error" && (
-                <p className="text-sm text-destructive text-center">Failed to send — check your email address.</p>
+                <p className="text-sm text-destructive text-center">{t("verifyEmail.resendError")}</p>
               )}
             </div>
 
-            <a href="/login" className="text-primary underline text-sm block">
-              Back to login
-            </a>
+            <Link to="/login" className="text-primary underline text-sm block">
+              {t("verifyEmail.backToLogin")}
+            </Link>
           </>
         )}
       </div>

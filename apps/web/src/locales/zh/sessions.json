@@ -33,7 +33,11 @@
     "remove": "移除",
     "empty": "尚未添加参与者",
     "connected": "已连接",
-    "notConnected": "未连接"
+    "notConnected": "未连接",
+    "unaddedTitle": "参与者未添加",
+    "unaddedDesc": "已选择「{{name}}」，但尚未将其添加到会话中。是否在加入前先添加？",
+    "addAndJoin": "添加并加入",
+    "joinWithout": "不添加直接加入"
   },
   "room": {
     "room": "房间",

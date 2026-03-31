@@ -33,7 +33,11 @@
     "remove": "Remove",
     "empty": "No participants added yet",
     "connected": "Connected",
-    "notConnected": "Not connected"
+    "notConnected": "Not connected",
+    "unaddedTitle": "Participant not added",
+    "unaddedDesc": "\"{{name}}\" is selected but has not been added to the session yet. Would you like to add them before joining?",
+    "addAndJoin": "Add & Join",
+    "joinWithout": "Join without adding"
   },
   "room": {
     "room": "Room",

@@ -17,12 +17,42 @@
     "email": "Correo electrónico",
     "emailPlaceholder": "tu@ejemplo.com",
     "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "passwordMismatch": "Las contraseñas no coinciden",
     "role": "Rol",
     "selectRole": "Selecciona tu rol",
     "submit": "Registrarse",
     "submitting": "Registrando…",
     "haveAccount": "¿Ya tienes una cuenta?",
-    "signIn": "Iniciar sesión"
+    "signIn": "Iniciar sesión",
+    "verifyTitle": "Revisa tu correo",
+    "verifyMessage": "Enviamos un enlace de verificación a <strong>{{email}}</strong>. Haz clic en el enlace del correo para activar tu cuenta antes de iniciar sesión.",
+    "verifyGoToLogin": "Ir a iniciar sesión"
+  },
+  "verifyEmail": {
+    "verifying": "Verificando tu correo…",
+    "verifyingDesc": "Por favor espera.",
+    "success": "¡Correo verificado!",
+    "successDesc": "Tu cuenta ya está activa. Puedes iniciar sesión.",
+    "goToLogin": "Iniciar sesión",
+    "failed": "Error de verificación",
+    "resendTitle": "Reenviar correo de verificación",
+    "resendSent": "Correo de verificación enviado — revisa tu bandeja de entrada.",
+    "resendError": "Error al enviar — verifica tu dirección de correo.",
+    "resend": "Reenviar",
+    "resending": "Enviando…",
+    "backToLogin": "Volver a iniciar sesión"
+  },
+  "login": {
+    "title": "Inicia sesión en tu cuenta",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "tu@ejemplo.com",
+    "password": "Contraseña",
+    "submit": "Iniciar sesión",
+    "submitting": "Iniciando sesión…",
+    "noAccount": "¿No tienes una cuenta?",
+    "signUp": "Registrarse",
+    "forgotPassword": "¿Olvidaste tu contraseña?"
   },
   "roles": {
     "patient": "Paciente",

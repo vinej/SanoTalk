@@ -17,12 +17,42 @@
     "email": "电子邮件",
     "emailPlaceholder": "you@example.com",
     "password": "密码",
+    "confirmPassword": "确认密码",
+    "passwordMismatch": "密码不匹配",
     "role": "角色",
     "selectRole": "选择您的角色",
     "submit": "注册",
     "submitting": "注册中…",
     "haveAccount": "已有账户？",
-    "signIn": "登录"
+    "signIn": "登录",
+    "verifyTitle": "请查收您的邮件",
+    "verifyMessage": "我们已向 <strong>{{email}}</strong> 发送了验证链接。请点击邮件中的链接以激活账户后再登录。",
+    "verifyGoToLogin": "前往登录"
+  },
+  "verifyEmail": {
+    "verifying": "正在验证您的邮箱…",
+    "verifyingDesc": "请稍候。",
+    "success": "邮箱已验证！",
+    "successDesc": "您的账户已激活，可以登录了。",
+    "goToLogin": "登录",
+    "failed": "验证失败",
+    "resendTitle": "重新发送验证邮件",
+    "resendSent": "验证邮件已发送 — 请查收您的收件箱。",
+    "resendError": "发送失败 — 请检查您的邮箱地址。",
+    "resend": "重新发送",
+    "resending": "发送中…",
+    "backToLogin": "返回登录"
+  },
+  "login": {
+    "title": "登录您的账户",
+    "email": "电子邮件",
+    "emailPlaceholder": "you@example.com",
+    "password": "密码",
+    "submit": "登录",
+    "submitting": "登录中…",
+    "noAccount": "没有账户？",
+    "signUp": "注册",
+    "forgotPassword": "忘记密码？"
   },
   "roles": {
     "patient": "患者",

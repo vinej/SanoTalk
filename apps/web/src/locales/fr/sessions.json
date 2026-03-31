@@ -33,7 +33,11 @@
     "remove": "Retirer",
     "empty": "Aucun participant ajouté pour l'instant",
     "connected": "Connecté",
-    "notConnected": "Non connecté"
+    "notConnected": "Non connecté",
+    "unaddedTitle": "Participant non ajouté",
+    "unaddedDesc": "«\u00a0{{name}}\u00a0» est sélectionné mais n'a pas encore été ajouté à la session. Souhaitez-vous l'ajouter avant de rejoindre\u00a0?",
+    "addAndJoin": "Ajouter & Rejoindre",
+    "joinWithout": "Rejoindre sans ajouter"
   },
   "room": {
     "room": "Salle",

@@ -9,6 +9,14 @@ import { TalkSession } from "@sanotalk/db";
 import { useTranslation } from "react-i18next";
 import { X, UserPlus } from "lucide-react";
 import { useSession } from "../../lib/auth-client";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "../../components/ui/dialog";
 
 type Props = {
   session: TalkSession;
@@ -19,10 +27,15 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
   const { t } = useTranslation("sessions");
   const [token, setToken] = useState<string | null>(null);
   const [serverUrl, setServerUrl] = useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState("");
+  const [showUnaddedDialog, setShowUnaddedDialog] = useState(false);
   const utils = trpc.useUtils();
 
   const { data: profile } = trpc.user.profile.useQuery();
+  const { data: allUsers = [] } = trpc.user.listAll.useQuery();
   const isHost = profile?.id === session.hostId;
+
+  const selectedUserName = allUsers.find((u) => u.id === selectedUserId)?.name ?? selectedUserId;
 
   const getTokenMutation = trpc.livekit.getToken.useMutation({
     onSuccess(data) {
@@ -33,12 +46,29 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
 
   const startMutation = trpc.sessions.start.useMutation();
 
-  const handleJoin = useCallback(async () => {
+  const addForJoinMutation = trpc.sessions.addParticipant.useMutation({
+    onSuccess: () => {
+      setSelectedUserId("");
+      setShowUnaddedDialog(false);
+      void utils.sessions.byId.invalidate({ id: session.id });
+      void performJoin();
+    },
+  });
+
+  const performJoin = useCallback(async () => {
     if (isHost) {
       await startMutation.mutateAsync({ id: session.id });
     }
     getTokenMutation.mutate({ roomName: session.roomName });
   }, [session, isHost, getTokenMutation, startMutation]);
+
+  const handleJoin = useCallback(async () => {
+    if (selectedUserId) {
+      setShowUnaddedDialog(true);
+      return;
+    }
+    await performJoin();
+  }, [selectedUserId, performJoin]);
 
   const handleDisconnected = useCallback(() => {
     setToken(null);
@@ -47,24 +77,66 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
 
   if (!token || !serverUrl) {
     return (
-      <div className="overflow-y-auto h-full">
-        <div className="flex flex-col items-center justify-center min-h-full gap-6 p-8">
-          <div className="text-center space-y-2">
-            <h2 className="text-2xl font-semibold">{session.title ?? session.roomName}</h2>
-            <p className="text-muted-foreground">{t("room.room")}: {session.roomName}</p>
+      <>
+        <div className="overflow-y-auto h-full">
+          <div className="flex flex-col items-center justify-center min-h-full gap-6 p-8">
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl font-semibold">{session.title ?? session.roomName}</h2>
+              <p className="text-muted-foreground">{t("room.room")}: {session.roomName}</p>
+            </div>
+            {isHost && session.status !== "completed" && session.status !== "cancelled" && (
+              <ParticipantsPanel
+                sessionId={session.id}
+                session={session}
+                selectedUserId={selectedUserId}
+                onSelectedUserChange={setSelectedUserId}
+                onUpdate={() => utils.sessions.byId.invalidate({ id: session.id })}
+              />
+            )}
+            <Button
+              size="lg"
+              onClick={handleJoin}
+              disabled={getTokenMutation.isPending}
+            >
+              {getTokenMutation.isPending ? t("room.connecting") : t("room.join")}
+            </Button>
           </div>
-          {isHost && session.status !== "completed" && session.status !== "cancelled" && (
-            <ParticipantsPanel sessionId={session.id} session={session} onUpdate={() => utils.sessions.byId.invalidate({ id: session.id })} />
-          )}
-          <Button
-            size="lg"
-            onClick={handleJoin}
-            disabled={getTokenMutation.isPending}
-          >
-            {getTokenMutation.isPending ? t("room.connecting") : t("room.join")}
-          </Button>
         </div>
-      </div>
+
+        <Dialog open={showUnaddedDialog} onOpenChange={setShowUnaddedDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{t("participants.unaddedTitle")}</DialogTitle>
+              <DialogDescription>
+                {t("participants.unaddedDesc", { name: selectedUserName })}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="gap-2">
+              <Button variant="outline" size="sm" onClick={() => setShowUnaddedDialog(false)}>
+                {t("chat.clearDialog.cancel")}
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSelectedUserId("");
+                  setShowUnaddedDialog(false);
+                  void performJoin();
+                }}
+              >
+                {t("participants.joinWithout")}
+              </Button>
+              <Button
+                size="sm"
+                disabled={addForJoinMutation.isPending}
+                onClick={() => addForJoinMutation.mutate({ sessionId: session.id, userId: selectedUserId })}
+              >
+                {t("participants.addAndJoin")}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }
 
@@ -86,9 +158,20 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
   );
 }
 
-function ParticipantsPanel({ sessionId, session, onUpdate }: { sessionId: string; session: TalkSession; onUpdate: () => void }) {
+function ParticipantsPanel({
+  sessionId,
+  session,
+  selectedUserId,
+  onSelectedUserChange,
+  onUpdate,
+}: {
+  sessionId: string;
+  session: TalkSession;
+  selectedUserId: string;
+  onSelectedUserChange: (id: string) => void;
+  onUpdate: () => void;
+}) {
   const { t } = useTranslation("sessions");
-  const [selectedUserId, setSelectedUserId] = useState("");
 
   const participants: Array<{ id: string; userId: string; user?: { id: string; name: string | null } }> =
     (session as any).participants ?? [];
@@ -102,7 +185,7 @@ function ParticipantsPanel({ sessionId, session, onUpdate }: { sessionId: string
 
   const addMutation = trpc.sessions.addParticipant.useMutation({
     onSuccess: () => {
-      setSelectedUserId("");
+      onSelectedUserChange("");
       onUpdate();
     },
   });
@@ -118,7 +201,7 @@ function ParticipantsPanel({ sessionId, session, onUpdate }: { sessionId: string
       <div className="flex gap-2">
         <select
           value={selectedUserId}
-          onChange={(e) => setSelectedUserId(e.target.value)}
+          onChange={(e) => onSelectedUserChange(e.target.value)}
           className="flex-1 h-8 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
         >
           <option value="">{t("participants.selectUser")}</option>

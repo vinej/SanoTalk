@@ -17,12 +17,42 @@
     "email": "Email",
     "emailPlaceholder": "you@example.com",
     "password": "Password",
+    "confirmPassword": "Confirm password",
+    "passwordMismatch": "Passwords do not match",
     "role": "Role",
     "selectRole": "Select your role",
     "submit": "Sign up",
     "submitting": "Signing up…",
     "haveAccount": "Already have an account?",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "verifyTitle": "Check your email",
+    "verifyMessage": "We sent a verification link to <strong>{{email}}</strong>. Please click the link in the email to activate your account before signing in.",
+    "verifyGoToLogin": "Go to sign in"
+  },
+  "verifyEmail": {
+    "verifying": "Verifying your email…",
+    "verifyingDesc": "Please wait.",
+    "success": "Email verified!",
+    "successDesc": "Your account is now active. You can sign in.",
+    "goToLogin": "Sign in",
+    "failed": "Verification failed",
+    "resendTitle": "Resend verification email",
+    "resendSent": "Verification email sent — check your inbox.",
+    "resendError": "Failed to send — check your email address.",
+    "resend": "Resend",
+    "resending": "Sending…",
+    "backToLogin": "Back to sign in"
+  },
+  "login": {
+    "title": "Sign in to your account",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "password": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "noAccount": "Don't have an account?",
+    "signUp": "Sign up",
+    "forgotPassword": "Forgot password?"
   },
   "roles": {
     "patient": "Patient",
