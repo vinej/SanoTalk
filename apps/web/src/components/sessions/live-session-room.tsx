@@ -34,12 +34,13 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
   const { data: profile } = trpc.user.profile.useQuery();
   const { data: linkedUsers = [] } = trpc.user.listLinkedUsers.useQuery();
   const { data: friends = [] } = trpc.user.listFriends.useQuery();
-  const candidateUsers = [...linkedUsers, ...friends].filter(
+  const isHost = profile?.id === session.hostId;
+  const hostRole = (profile as any)?.role as string | undefined;
+
+  const allCandidates = [...linkedUsers, ...friends].filter(
     (u, i, arr) => u && arr.findIndex((x) => x?.id === u.id) === i
   );
-  const isHost = profile?.id === session.hostId;
-
-  const selectedUserName = candidateUsers.find((u) => u?.id === selectedUserId)?.name ?? selectedUserId;
+  const selectedUserName = allCandidates.find((u) => u?.id === selectedUserId)?.name ?? selectedUserId;
 
   const getTokenMutation = trpc.livekit.getToken.useMutation({
     onSuccess(data) {
@@ -92,7 +93,9 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
               <ParticipantsPanel
                 sessionId={session.id}
                 session={session}
-                candidateUsers={candidateUsers}
+                linkedUsers={linkedUsers}
+                friends={friends}
+                hostRole={hostRole}
                 selectedUserId={selectedUserId}
                 onSelectedUserChange={setSelectedUserId}
                 onUpdate={() => utils.sessions.byId.invalidate({ id: session.id })}
@@ -166,14 +169,18 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
 function ParticipantsPanel({
   sessionId,
   session,
-  candidateUsers,
+  linkedUsers,
+  friends,
+  hostRole,
   selectedUserId,
   onSelectedUserChange,
   onUpdate,
 }: {
   sessionId: string;
   session: TalkSession;
-  candidateUsers: Array<{ id?: string; name?: string | null } | null>;
+  linkedUsers: Array<{ id?: string; name?: string | null } | null>;
+  friends: Array<{ id?: string; name?: string | null } | null>;
+  hostRole: string | undefined;
   selectedUserId: string;
   onSelectedUserChange: (id: string) => void;
   onUpdate: () => void;
@@ -184,9 +191,27 @@ function ParticipantsPanel({
     (session as any).participants ?? [];
 
   const addedUserIds = new Set(participants.map((p) => p.userId));
-  const availableUsers = candidateUsers.filter(
-    (u) => u?.id && u.id !== session.hostId && !addedUserIds.has(u.id)
+
+  const linkedIds = new Set(linkedUsers.map((u) => u?.id).filter(Boolean));
+  const friendIds = new Set(friends.map((u) => u?.id).filter(Boolean));
+
+  // For doctor/pharmacist: block mixing patients and friends as participants
+  const isProfessional = hostRole === "doctor" || hostRole === "pharmacist";
+  const hasPatientParticipant = isProfessional && participants.some((p) => linkedIds.has(p.userId));
+  const hasFriendParticipant  = isProfessional && participants.some((p) => friendIds.has(p.userId));
+
+  const candidateUsers = [...linkedUsers, ...friends].filter(
+    (u, i, arr) => u && arr.findIndex((x) => x?.id === u.id) === i
   );
+
+  const availableUsers = candidateUsers.filter((u) => {
+    if (!u?.id || u.id === session.hostId || addedUserIds.has(u.id)) return false;
+    if (isProfessional) {
+      if (hasPatientParticipant && friendIds.has(u.id)) return false;
+      if (hasFriendParticipant  && linkedIds.has(u.id)) return false;
+    }
+    return true;
+  });
 
   const addMutation = trpc.sessions.addParticipant.useMutation({
     onSuccess: () => {
