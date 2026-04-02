@@ -6,5 +6,14 @@
   "profile": "Perfil",
   "aiAssistant": "Asistente IA de Salud",
   "companion": "Compañero de Bienestar",
-  "newsAgent": "Noticias"
+  "newsAgent": "Noticias",
+  "kanban": "Kanban",
+  "requests": "Solicitudes",
+  "requestsTitle": "Solicitudes de conexión",
+  "requestsEmpty": "No hay solicitudes pendientes",
+  "requestsDesc": "Personas que quieren conectarse contigo",
+  "accept": "Aceptar",
+  "refuse": "Rechazar",
+  "linkRequest": "{{name}} ({{role}}) quiere conectarse contigo",
+  "friendRequest": "{{name}} quiere añadirte como amigo"
 }

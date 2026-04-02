@@ -4,7 +4,8 @@
   "private": false,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./lib/ws-tickets": "./src/lib/ws-tickets.ts"
   },
   "scripts": {
     "build": "tsc",

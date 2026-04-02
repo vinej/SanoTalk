@@ -14,7 +14,6 @@ export function useTranscriptSocket(
     enabled?: boolean;
     onFinalTranscript?: (text: string) => void;
     language?: string;
-    authToken?: string | undefined;
   }
 ) {
   const [liveText, setLiveText] = useState("");
@@ -30,8 +29,9 @@ export function useTranscriptSocket(
     },
   });
 
+  const getTicketMutation = trpc.ws.getTicket.useMutation();
+
   const enabled = options?.enabled ?? true;
-  const authToken = options?.authToken;
 
   useEffect(() => {
     if (!enabled) return;
@@ -39,74 +39,82 @@ export function useTranscriptSocket(
     setMicError(null);
     setIsRecording(false);
 
+    let intentionallyClosed = false;
+
     const lang = options?.language ?? "en";
     const params = new URLSearchParams({ language: lang });
     if (sessionId) params.set("sessionId", sessionId);
     const wsUrl = `${import.meta.env.VITE_WS_URL}/ws/transcribe?${params.toString()}`;
-    // Pass the auth token as a WebSocket subprotocol so it never appears in URLs or logs.
-    const ws = authToken ? new WebSocket(wsUrl, [`token.${authToken}`]) : new WebSocket(wsUrl);
-    wsRef.current = ws;
 
-    ws.onmessage = (event: MessageEvent) => {
-      let data: TranscriptMessage;
-      try {
-        data = JSON.parse(event.data as string) as TranscriptMessage;
-      } catch {
-        return;
-      }
-      if (data.type === "transcript") {
-        setLiveText(data.text);
-        if (data.isFinal && data.text.trim()) {
-          // Only save to session transcript when a sessionId is present
-          if (sessionId) {
-            saveMutation.mutate({
-              sessionId,
-              content: data.text,
-              confidence: data.confidence,
-            });
+    getTicketMutation.mutate(undefined, {
+      onSuccess: ({ ticket }) => {
+        if (intentionallyClosed) return;
+        const ws = new WebSocket(wsUrl, [`ticket.${ticket}`]);
+        wsRef.current = ws;
+
+        ws.onmessage = (event: MessageEvent) => {
+          let data: TranscriptMessage;
+          try {
+            data = JSON.parse(event.data as string) as TranscriptMessage;
+          } catch {
+            return;
           }
-          options?.onFinalTranscript?.(data.text);
-          setTimeout(() => setLiveText(""), 2000);
-        }
-      }
-    };
-
-    ws.onopen = () => {
-      navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-        .then((stream) => {
-          const recorder = new MediaRecorder(stream, { mimeType: "audio/webm;codecs=opus" });
-          recorderRef.current = recorder;
-
-          recorder.ondataavailable = (e) => {
-            if (e.data.size > 0 && ws.readyState === WebSocket.OPEN) {
-              ws.send(e.data);
+          if (data.type === "transcript") {
+            setLiveText(data.text);
+            if (data.isFinal && data.text.trim()) {
+              if (sessionId) {
+                saveMutation.mutate({
+                  sessionId,
+                  content: data.text,
+                  confidence: data.confidence,
+                });
+              }
+              options?.onFinalTranscript?.(data.text);
+              setTimeout(() => setLiveText(""), 2000);
             }
-          };
+          }
+        };
 
-          recorder.onstart = () => setIsRecording(true);
-          recorder.onstop = () => setIsRecording(false);
+        ws.onopen = () => {
+          navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+            .then((stream) => {
+              const recorder = new MediaRecorder(stream, { mimeType: "audio/webm;codecs=opus" });
+              recorderRef.current = recorder;
 
-          recorder.start(250);
-        })
-        .catch((err: Error) => {
-          console.error("[transcript] mic access denied:", err);
-          setMicError(err.message);
-        });
-    };
+              recorder.ondataavailable = (e) => {
+                if (e.data.size > 0 && ws.readyState === WebSocket.OPEN) {
+                  ws.send(e.data);
+                }
+              };
 
-    let intentionallyClosed = false;
-    ws.onerror = () => {
-      if (!intentionallyClosed) setMicError("WebSocket connection failed");
-    };
+              recorder.onstart = () => setIsRecording(true);
+              recorder.onstop = () => setIsRecording(false);
+
+              recorder.start(250);
+            })
+            .catch((err: Error) => {
+              console.error("[transcript] mic access denied:", err);
+              setMicError(err.message);
+            });
+        };
+
+        ws.onerror = () => {
+          if (!intentionallyClosed) setMicError("WebSocket connection failed");
+        };
+      },
+      onError: () => {
+        if (!intentionallyClosed) setMicError("Failed to obtain WS ticket");
+      },
+    });
 
     return () => {
       intentionallyClosed = true;
       recorderRef.current?.stop();
       recorderRef.current?.stream.getTracks().forEach((t) => t.stop());
       recorderRef.current = null;
-      ws.close();
+      wsRef.current?.close();
     };
-  }, [sessionId, enabled, authToken]);
+  }, [sessionId, enabled, options?.language]);
 
   return { liveText, isRecording, micError };
 }

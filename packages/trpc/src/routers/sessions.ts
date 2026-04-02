@@ -63,7 +63,7 @@ export const sessionsRouter = createTRPCRouter({
     .input(
       z.object({
         title: z.string().min(1).max(120).optional(),
-        language: z.string().default("en"),
+        language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).default("en"),
         scheduledAt: z.string().datetime().optional(),
       })
     )

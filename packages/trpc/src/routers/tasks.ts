@@ -69,7 +69,13 @@ export const tasksRouter = createTRPCRouter({
       const { id, ...fields } = input;
       const existing = await ctx.db.query.task.findFirst({ where: eq(task.id, id) });
       if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "Task not found" });
-      if (existing.assignedUserId !== null && existing.assignedUserId !== ctx.user.id) {
+      const role = (ctx.user as any).role as string;
+      // Patients may only update tasks explicitly assigned to them
+      if (role === "patient" && existing.assignedUserId !== ctx.user.id) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Patients can only edit tasks assigned to them" });
+      }
+      // Non-patients may not edit tasks assigned to someone else
+      if (role !== "patient" && existing.assignedUserId !== null && existing.assignedUserId !== ctx.user.id) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Only the assigned user can edit this task" });
       }
       if (existing?.taskType === "summary_review") {

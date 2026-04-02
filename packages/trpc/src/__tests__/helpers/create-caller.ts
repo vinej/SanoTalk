@@ -18,8 +18,6 @@ export const mockUser = {
   twoFactorEnabled: null,
   specialty: null,
   licenseNumber: null,
-  linkedDoctorId: null,
-  linkedPharmacistId: null,
   createdAt: new Date("2024-01-01"),
   updatedAt: new Date("2024-01-01"),
 };

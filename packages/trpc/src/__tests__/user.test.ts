@@ -4,22 +4,12 @@ import { createAuthedCaller, createUnauthCaller, mockUser } from "./helpers/crea
 
 const OTHER_ID = "cccccccc-dddd-eeee-ffff-000000000000";
 
-function makeUserRecord(overrides: Record<string, unknown> = {}) {
-  return {
-    ...mockUser,
-    linkedDoctor: null,
-    linkedPharmacist: null,
-    ...overrides,
-  };
-}
-
 // ── user.profile ──────────────────────────────────────────────────────────────
 
 describe("user.profile", () => {
-  it("returns the authenticated user's profile with linked providers", async () => {
+  it("returns the authenticated user's profile", async () => {
     const db = createMockDb();
-    const profile = makeUserRecord({ linkedDoctor: { id: OTHER_ID, name: "Dr. Smith" } });
-    db.query.user.findFirst.mockResolvedValue(profile);
+    db.query.user.findFirst.mockResolvedValue(mockUser);
 
     const caller = createAuthedCaller(db);
     const result = await caller.user.profile();
@@ -85,21 +75,9 @@ describe("user.listByRole", () => {
 // ── user.update ───────────────────────────────────────────────────────────────
 
 describe("user.update", () => {
-  it("allows a patient to link a doctor", async () => {
-    const db = createMockDb();
-    const updatedUser = makeUserRecord({ role: "patient", linkedDoctorId: OTHER_ID });
-    db._chain.returning.mockResolvedValue([updatedUser]);
-
-    const patientCaller = createAuthedCaller(db, { role: "patient" });
-    const result = await patientCaller.user.update({ linkedDoctorId: OTHER_ID });
-
-    expect(db.update).toHaveBeenCalled();
-    expect(result).toMatchObject({ linkedDoctorId: OTHER_ID });
-  });
-
   it("allows a doctor to update specialty and license", async () => {
     const db = createMockDb();
-    const updatedUser = makeUserRecord({ specialty: "Cardiology", licenseNumber: "DOC-123" });
+    const updatedUser = { ...mockUser, specialty: "Cardiology", licenseNumber: "DOC-123" };
     db._chain.returning.mockResolvedValue([updatedUser]);
 
     const caller = createAuthedCaller(db);
@@ -115,7 +93,6 @@ describe("user.update", () => {
     const caller = createAuthedCaller(db);
     const result = await caller.user.update({});
 
-    // No DB update should happen when nothing changed
     expect(db.update).not.toHaveBeenCalled();
     expect(result).toBeUndefined();
   });

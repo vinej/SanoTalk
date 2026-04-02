@@ -6,6 +6,7 @@ import { agentsRouter } from "./routers/agents";
 import { storageRouter } from "./routers/storage";
 import { tasksRouter } from "./routers/tasks";
 import { userRouter } from "./routers/user";
+import { wsRouter } from "./routers/ws";
 
 export const appRouter = createTRPCRouter({
   sessions: sessionsRouter,
@@ -15,6 +16,7 @@ export const appRouter = createTRPCRouter({
   storage: storageRouter,
   tasks: tasksRouter,
   user: userRouter,
+  ws: wsRouter,
 });
 
 export type AppRouterSonoTalk = typeof appRouter;

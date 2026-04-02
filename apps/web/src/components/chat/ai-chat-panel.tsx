@@ -132,7 +132,6 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
   const { isRecording, micError } = useTranscriptSocket(undefined, {
     enabled: !isSessionMode && voiceEnabled && !!sessionData?.session?.token,
     language: i18n.language,
-    authToken: sessionData?.session?.token,
     onFinalTranscript: (text) => {
       if (isCompanion) {
         sendCompanionMessage.mutate({ message: text, language: i18n.language });

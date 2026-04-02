@@ -12,8 +12,6 @@ import {
 } from "../ui/dialog";
 import { Send } from "lucide-react";
 
-type RecipientType = "doctor" | "pharmacist";
-
 type Props = {
   sessionId: string;
   open: boolean;
@@ -22,13 +20,11 @@ type Props = {
 
 export function SendSummaryDialog({ sessionId, open, onOpenChange }: Props) {
   const { t } = useTranslation("sessions");
-  const [selected, setSelected] = useState<RecipientType | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
 
-  const { data: profile } = trpc.user.profile.useQuery(undefined, { enabled: open });
-  const linkedDoctor = (profile as any)?.linkedDoctor as { name: string; email: string; specialty?: string | null } | null | undefined;
-  const linkedPharmacist = (profile as any)?.linkedPharmacist as { name: string; email: string; specialty?: string | null } | null | undefined;
-  const hasRecipients = !!linkedDoctor || !!linkedPharmacist;
+  const { data: linkedUsers = [] } = trpc.user.listLinkedUsers.useQuery(undefined, { enabled: open });
+  const hasRecipients = linkedUsers.length > 0;
 
   const utils = trpc.useUtils();
   const sendMutation = trpc.agents.sendSummary.useMutation({
@@ -37,20 +33,20 @@ export function SendSummaryDialog({ sessionId, open, onOpenChange }: Props) {
       setSent(true);
       setTimeout(() => {
         setSent(false);
-        setSelected(null);
+        setSelectedId(null);
         onOpenChange(false);
       }, 1500);
     },
   });
 
   function handleSend() {
-    if (!selected) return;
-    sendMutation.mutate({ sessionId, recipientType: selected });
+    if (!selectedId) return;
+    sendMutation.mutate({ sessionId, recipientUserId: selectedId });
   }
 
   function handleOpenChange(v: boolean) {
     if (!v) {
-      setSelected(null);
+      setSelectedId(null);
       setSent(false);
     }
     onOpenChange(v);
@@ -68,42 +64,24 @@ export function SendSummaryDialog({ sessionId, open, onOpenChange }: Props) {
 
         <div className="space-y-2 py-2">
           {hasRecipients ? (
-            <>
-              {linkedDoctor && (
-                <button
-                  type="button"
-                  onClick={() => setSelected("doctor")}
-                  className={`w-full text-left rounded-lg border px-4 py-3 text-sm transition-colors ${
-                    selected === "doctor"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
-                  }`}
-                >
-                  <div className="font-medium">{linkedDoctor.name}</div>
-                  {linkedDoctor.specialty && (
-                    <div className="text-muted-foreground text-xs">{linkedDoctor.specialty}</div>
-                  )}
-                  <div className="text-muted-foreground text-xs">{linkedDoctor.email}</div>
-                </button>
-              )}
-              {linkedPharmacist && (
-                <button
-                  type="button"
-                  onClick={() => setSelected("pharmacist")}
-                  className={`w-full text-left rounded-lg border px-4 py-3 text-sm transition-colors ${
-                    selected === "pharmacist"
-                      ? "border-primary bg-primary/5"
-                      : "border-border hover:border-primary/50"
-                  }`}
-                >
-                  <div className="font-medium">{linkedPharmacist.name}</div>
-                  {linkedPharmacist.specialty && (
-                    <div className="text-muted-foreground text-xs">{linkedPharmacist.specialty}</div>
-                  )}
-                  <div className="text-muted-foreground text-xs">{linkedPharmacist.email}</div>
-                </button>
-              )}
-            </>
+            linkedUsers.map((u) => (
+              <button
+                key={u?.id}
+                type="button"
+                onClick={() => setSelectedId(u?.id ?? null)}
+                className={`w-full text-left rounded-lg border px-4 py-3 text-sm transition-colors ${
+                  selectedId === u?.id
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/50"
+                }`}
+              >
+                <div className="font-medium">{u?.name}</div>
+                {(u as any)?.specialty && (
+                  <div className="text-muted-foreground text-xs">{(u as any).specialty}</div>
+                )}
+                <div className="text-muted-foreground text-xs">{(u as any)?.email}</div>
+              </button>
+            ))
           ) : (
             <p className="text-sm text-muted-foreground text-center py-4">
               {t("summary.noRecipients")}
@@ -117,7 +95,7 @@ export function SendSummaryDialog({ sessionId, open, onOpenChange }: Props) {
           </Button>
           <Button
             onClick={handleSend}
-            disabled={!selected || isPending || sent || !hasRecipients}
+            disabled={!selectedId || isPending || sent || !hasRecipients}
           >
             <Send className="mr-1 h-3 w-3" />
             {sent ? t("summary.sent") : isPending ? t("summary.sending") : t("summary.send")}

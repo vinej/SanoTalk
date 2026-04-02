@@ -32,10 +32,14 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
   const utils = trpc.useUtils();
 
   const { data: profile } = trpc.user.profile.useQuery();
-  const { data: allUsers = [] } = trpc.user.listAll.useQuery();
+  const { data: linkedUsers = [] } = trpc.user.listLinkedUsers.useQuery();
+  const { data: friends = [] } = trpc.user.listFriends.useQuery();
+  const candidateUsers = [...linkedUsers, ...friends].filter(
+    (u, i, arr) => u && arr.findIndex((x) => x?.id === u.id) === i
+  );
   const isHost = profile?.id === session.hostId;
 
-  const selectedUserName = allUsers.find((u) => u.id === selectedUserId)?.name ?? selectedUserId;
+  const selectedUserName = candidateUsers.find((u) => u?.id === selectedUserId)?.name ?? selectedUserId;
 
   const getTokenMutation = trpc.livekit.getToken.useMutation({
     onSuccess(data) {
@@ -88,6 +92,7 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
               <ParticipantsPanel
                 sessionId={session.id}
                 session={session}
+                candidateUsers={candidateUsers}
                 selectedUserId={selectedUserId}
                 onSelectedUserChange={setSelectedUserId}
                 onUpdate={() => utils.sessions.byId.invalidate({ id: session.id })}
@@ -161,12 +166,14 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
 function ParticipantsPanel({
   sessionId,
   session,
+  candidateUsers,
   selectedUserId,
   onSelectedUserChange,
   onUpdate,
 }: {
   sessionId: string;
   session: TalkSession;
+  candidateUsers: Array<{ id?: string; name?: string | null } | null>;
   selectedUserId: string;
   onSelectedUserChange: (id: string) => void;
   onUpdate: () => void;
@@ -176,11 +183,9 @@ function ParticipantsPanel({
   const participants: Array<{ id: string; userId: string; user?: { id: string; name: string | null } }> =
     (session as any).participants ?? [];
 
-  const { data: allUsers = [] } = trpc.user.listAll.useQuery();
-
   const addedUserIds = new Set(participants.map((p) => p.userId));
-  const availableUsers = allUsers.filter(
-    (u) => u.id !== session.hostId && !addedUserIds.has(u.id)
+  const availableUsers = candidateUsers.filter(
+    (u) => u?.id && u.id !== session.hostId && !addedUserIds.has(u.id)
   );
 
   const addMutation = trpc.sessions.addParticipant.useMutation({
@@ -206,7 +211,7 @@ function ParticipantsPanel({
         >
           <option value="">{t("participants.selectUser")}</option>
           {availableUsers.map((u) => (
-            <option key={u.id} value={u.id}>{u.name ?? u.id}</option>
+            <option key={u?.id} value={u?.id}>{u?.name ?? u?.id}</option>
           ))}
         </select>
         <Button
@@ -244,8 +249,8 @@ function ParticipantsPanel({
 
 function TranscriptionOverlay({ sessionId, language, onFinalTranscript }: { sessionId: string; language: string; onFinalTranscript?: (text: string) => void }) {
   const { data: sessionData } = useSession();
-  const authToken = sessionData?.session?.token;
-  const { liveText, isRecording, micError } = useTranscriptSocket(sessionId, { enabled: !!authToken, language, authToken, ...(onFinalTranscript ? { onFinalTranscript } : {}) });
+  const isAuthenticated = !!sessionData?.session?.token;
+  const { liveText, isRecording, micError } = useTranscriptSocket(sessionId, { enabled: isAuthenticated, language, ...(onFinalTranscript ? { onFinalTranscript } : {}) });
   const { t } = useTranslation("sessions");
 
   return (

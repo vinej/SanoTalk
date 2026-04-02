@@ -13,5 +13,15 @@ export const tracker = enabled && projectKey
       projectKey,
       ...(ingestPoint ? { ingestPoint } : {}),
       __DISABLE_SECURE_MODE: import.meta.env.DEV,
+      obscureTextEmails: true,
+      obscureInputNumbers: true,
+      defaultInputMode: 1, // mask all inputs by default
+      network: {
+        capturePayload: false,
+        sessionTokenHeader: false,
+        failuresOnly: false,
+        ignoreHeaders: true,
+        captureInIframes: false,
+      },
     })
   : null;

@@ -2,19 +2,25 @@ import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { trpc } from "../lib/trpc";
 import { Button } from "./ui/button";
-import { UserCircle, LogOut } from "lucide-react";
+import { UserCircle, LogOut, Bell } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "./language-switcher";
 import { signOut } from "../lib/auth-client";
 import { tracker } from "../lib/tracker";
 import { SanoTalkLogoV2 } from "./logo-v2";
 import { ProfileEditDialog } from "./profile/profile-edit-dialog";
+import { ConnectionRequestsDialog } from "./profile/connection-requests-dialog";
 
 export function AppHeader() {
   const { data: profile } = trpc.user.profile.useQuery();
+  const { data: pendingRequests = [] } = trpc.user.listPendingRequests.useQuery(
+    undefined,
+    { refetchInterval: 30_000 }
+  );
   const { t } = useTranslation(["dashboard", "common"]);
   const navigate = useNavigate();
   const [profileOpen, setProfileOpen] = useState(false);
+  const [requestsOpen, setRequestsOpen] = useState(false);
 
   async function handleLogout() {
     if (tracker) {
@@ -25,9 +31,12 @@ export function AppHeader() {
     navigate({ to: "/login" as any });
   }
 
+  const pendingCount = pendingRequests.length;
+
   return (
     <>
       <ProfileEditDialog open={profileOpen} onOpenChange={setProfileOpen} />
+      <ConnectionRequestsDialog open={requestsOpen} onOpenChange={setRequestsOpen} />
       <div className="flex items-center justify-between px-6 py-3 bg-white border-b shrink-0">
         <Link to="/dashboard">
           <SanoTalkLogoV2 size={64} showText={true} />
@@ -35,10 +44,26 @@ export function AppHeader() {
         {profile && (
           <div className="text-sm grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-0">
             <span className="font-medium text-right">{profile.name}</span>
-            <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => setProfileOpen(true)}>
-              <UserCircle className="h-3 w-3 mr-1" />
-              {t("dashboard:profile")}
-            </Button>
+            <div className="flex gap-1">
+              <Button
+                size="sm"
+                variant="ghost"
+                className="relative h-6 px-2 text-xs"
+                onClick={() => setRequestsOpen(true)}
+              >
+                <Bell className="h-3 w-3 mr-1" />
+                {t("dashboard:requests")}
+                {pendingCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white font-bold">
+                    {pendingCount}
+                  </span>
+                )}
+              </Button>
+              <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => setProfileOpen(true)}>
+                <UserCircle className="h-3 w-3 mr-1" />
+                {t("dashboard:profile")}
+              </Button>
+            </div>
             <span className="text-muted-foreground text-right">{profile.email}</span>
             <LanguageSwitcher />
             <span className="text-muted-foreground capitalize text-right">{(profile as any).role}</span>

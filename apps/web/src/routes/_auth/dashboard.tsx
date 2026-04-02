@@ -54,7 +54,8 @@ function DashboardPage() {
 
   function handleNewSession() {
     if (!newTitle.trim()) return;
-    createSession.mutate({ title: newTitle.trim(), language: i18n.language });
+    const lang = (["en","fr","es","zh","ar","hi"].includes(i18n.language) ? i18n.language : "en") as "en"|"fr"|"es"|"zh"|"ar"|"hi";
+    createSession.mutate({ title: newTitle.trim(), language: lang });
   }
 
   const isAdmin = (profile as any)?.role === "admin";

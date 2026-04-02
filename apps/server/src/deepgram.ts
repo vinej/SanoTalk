@@ -4,8 +4,9 @@ import type { Server } from "http";
 import { logger } from "./logger";
 import { auth } from "@sanotalk/trpc/auth";
 import { db } from "@sanotalk/db";
-import { talkSession, sessionParticipant, session as sessionTable } from "@sanotalk/db";
-import { eq, and, gt } from "drizzle-orm";
+import { talkSession, sessionParticipant } from "@sanotalk/db";
+import { eq, and } from "drizzle-orm";
+import { consumeTicket } from "@sanotalk/trpc/lib/ws-tickets";
 
 export function startDeepgramWebSocket(server: Server) {
   const wss = new WebSocketServer({ server, path: "/ws/transcribe" });
@@ -36,15 +37,12 @@ export function startDeepgramWebSocket(server: Server) {
     if (cookieSession?.user) {
       userId = cookieSession.user.id;
     } else {
-      // Extract token from Sec-WebSocket-Protocol: "token.<value>"
+      // Extract short-lived ticket from Sec-WebSocket-Protocol: "ticket.<uuid>"
       const protocols = (req.headers["sec-websocket-protocol"] ?? "").split(",").map((p) => p.trim());
-      const tokenEntry = protocols.find((p) => p.startsWith("token."));
-      const token = tokenEntry?.slice("token.".length);
-      if (token) {
-        const dbSession = await db.query.session.findFirst({
-          where: and(eq(sessionTable.token, token), gt(sessionTable.expiresAt, new Date())),
-        });
-        if (dbSession) userId = dbSession.userId;
+      const ticketEntry = protocols.find((p) => p.startsWith("ticket."));
+      const ticketId = ticketEntry?.slice("ticket.".length);
+      if (ticketId) {
+        userId = consumeTicket(ticketId) ?? undefined;
       }
     }
 
@@ -84,10 +82,16 @@ export function startDeepgramWebSocket(server: Server) {
     logger.info({ sessionId: sessionId ?? "general", userId }, "WebSocket authorized");
 
     // Map i18n language codes to Deepgram-compatible BCP-47 codes
+    const ALLOWED_LANGUAGES = new Set(["en", "fr", "es", "zh", "ar", "hi"]);
     const langMap: Record<string, string> = {
       zh: "zh-CN",
     };
     const rawLang = url.searchParams.get("language") ?? "en";
+    if (!ALLOWED_LANGUAGES.has(rawLang)) {
+      logger.warn({ rawLang }, "WebSocket rejected: unsupported language");
+      ws.close(1008, "Unsupported language");
+      return;
+    }
     const dgLanguage = langMap[rawLang] ?? rawLang;
 
     logger.info({ sessionId, language: dgLanguage }, "Transcription WS client connected");

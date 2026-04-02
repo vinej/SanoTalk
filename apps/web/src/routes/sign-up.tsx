@@ -13,7 +13,7 @@ export const Route: any = createFileRoute("/sign-up")({
   component: SignUpPage,
 });
 
-const ROLES = ["patient", "doctor", "pharmacist", "ia_agent"] as const;
+const ROLES = ["patient", "doctor", "pharmacist"] as const;
 type Role = (typeof ROLES)[number];
 
 function SignUpPage() {

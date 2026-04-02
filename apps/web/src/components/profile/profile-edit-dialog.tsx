@@ -12,7 +12,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from "../ui/dialog";
-import { Trash2, Pencil } from "lucide-react";
+import { Trash2, Pencil, X, Clock } from "lucide-react";
 
 type Props = {
   open: boolean;
@@ -46,21 +46,98 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
   const isProfessional = role === "doctor" || role === "pharmacist";
   const isAdmin = role === "admin";
 
-  const { data: doctors } = trpc.user.listByRole.useQuery(
-    { role: "doctor" },
-    { enabled: open && isPatient }
+  // ── Professional-link queries ──────────────────────────────────────────────
+  const { data: linkedUsers = [], refetch: refetchLinked } = trpc.user.listLinkedUsers.useQuery(
+    undefined, { enabled: open && (isPatient || isProfessional) }
   );
-  const { data: pharmacists } = trpc.user.listByRole.useQuery(
-    { role: "pharmacist" },
-    { enabled: open && isPatient }
+  const linkedDoctors      = linkedUsers.filter((u) => (u as any)?.role === "doctor");
+  const linkedPharmacists  = linkedUsers.filter((u) => (u as any)?.role === "pharmacist");
+  const linkedPatients     = linkedUsers.filter((u) => (u as any)?.role === "patient");
+
+  const { data: allDoctors = [] } = trpc.user.listByRole.useQuery(
+    { role: "doctor" }, { enabled: open && isPatient }
+  );
+  const { data: allPharmacists = [] } = trpc.user.listByRole.useQuery(
+    { role: "pharmacist" }, { enabled: open && isPatient }
+  );
+  const { data: allPatients = [] } = trpc.user.listByRole.useQuery(
+    { role: "patient" }, { enabled: open && isProfessional }
   );
 
-  const [linkedDoctorId, setLinkedDoctorId] = useState<string>("");
-  const [linkedPharmacistId, setLinkedPharmacistId] = useState<string>("");
+  // ── Sent pending requests ──────────────────────────────────────────────────
+  const { data: sentPending = [], refetch: refetchSentPending } = trpc.user.listSentPendingRequests.useQuery(
+    undefined, { enabled: open && (isPatient || isProfessional) }
+  );
+
+  const pendingLinkIds   = new Set(sentPending.filter((r) => r.type === "link").map((r) => r.toUserId));
+  const pendingFriendIds = new Set(sentPending.filter((r) => r.type === "friend").map((r) => r.toUserId));
+
+  const [selectedDoctorId, setSelectedDoctorId] = useState("");
+  const [selectedPharmacistId, setSelectedPharmacistId] = useState("");
+  const [selectedPatientId, setSelectedPatientId] = useState("");
+
+  const linkedIds = new Set(linkedUsers.map((u) => (u as any)?.id));
+
+  // Exclude already-linked AND pending
+  const availableDoctors     = allDoctors.filter((u) => !linkedIds.has(u.id) && !pendingLinkIds.has(u.id));
+  const availablePharmacists = allPharmacists.filter((u) => !linkedIds.has(u.id) && !pendingLinkIds.has(u.id));
+  const availablePatients    = allPatients.filter((u) => !linkedIds.has(u.id) && !pendingLinkIds.has(u.id));
+
+  // Pending link items per role
+  const pendingDoctorItems     = sentPending.filter((r) => r.type === "link" && (r as any).toUser?.role === "doctor");
+  const pendingPharmacistItems = sentPending.filter((r) => r.type === "link" && (r as any).toUser?.role === "pharmacist");
+  const pendingPatientItems    = sentPending.filter((r) => r.type === "link" && (r as any).toUser?.role === "patient");
+
+  const addLinkMutation = trpc.user.addUserLink.useMutation({
+    onSuccess: () => {
+      setSelectedDoctorId("");
+      setSelectedPharmacistId("");
+      setSelectedPatientId("");
+      void refetchLinked();
+      void refetchSentPending();
+    },
+  });
+  const removeLinkMutation = trpc.user.removeUserLink.useMutation({
+    onSuccess: () => void refetchLinked(),
+  });
+  const cancelRequestMutation = trpc.user.cancelRequest.useMutation({
+    onSuccess: () => void refetchSentPending(),
+  });
+
+  // ── Friends ────────────────────────────────────────────────────────────────
+  const { data: friends = [], refetch: refetchFriends } = trpc.user.listFriends.useQuery(
+    undefined, { enabled: open }
+  );
+  const { data: allUsers = [] } = trpc.user.listAll.useQuery(undefined, { enabled: open });
+
+  const [selectedFriendId, setSelectedFriendId] = useState("");
+
+  const friendIds = new Set(friends.map((f) => (f as any)?.id));
+  const availableFriends = allUsers.filter(
+    (u) => u.id !== profile?.id && !friendIds.has(u.id) && !pendingFriendIds.has(u.id) &&
+      (u.role === "patient" || u.role === "doctor" || u.role === "pharmacist")
+  );
+
+  // Pending friend items
+  const pendingFriendItems = sentPending.filter((r) => r.type === "friend");
+
+  const addFriendMutation = trpc.user.addFriend.useMutation({
+    onSuccess: () => {
+      setSelectedFriendId("");
+      void refetchFriends();
+      void refetchSentPending();
+    },
+  });
+  const removeFriendMutation = trpc.user.removeFriend.useMutation({
+    onSuccess: () => void refetchFriends(),
+  });
+
+  // ── Professional profile fields ────────────────────────────────────────────
   const [specialty, setSpecialty] = useState<string>("");
   const [licenseNumber, setLicenseNumber] = useState<string>("");
   const [saved, setSaved] = useState(false);
 
+  // ── Properties ────────────────────────────────────────────────────────────
   const [propKey, setPropKey] = useState("");
   const [propValue, setPropValue] = useState("");
   const propValueRef = useRef<HTMLInputElement>(null);
@@ -102,8 +179,6 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
 
   useEffect(() => {
     if (profile) {
-      setLinkedDoctorId((profile as any).linkedDoctorId ?? "");
-      setLinkedPharmacistId((profile as any).linkedPharmacistId ?? "");
       setSpecialty((profile as any).specialty ?? "");
       setLicenseNumber((profile as any).licenseNumber ?? "");
       setPropertiesLanguage((profile as any).propertiesLanguage ?? i18n.language);
@@ -123,12 +198,7 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
   });
 
   function handleSave() {
-    if (isPatient) {
-      updateMutation.mutate({
-        linkedDoctorId: linkedDoctorId || null,
-        linkedPharmacistId: linkedPharmacistId || null,
-      });
-    } else if (isProfessional) {
+    if (isProfessional) {
       updateMutation.mutate({
         specialty: specialty || null,
         licenseNumber: licenseNumber || null,
@@ -164,43 +234,45 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
             </p>
           )}
 
-          {/* Patient fields */}
+          {/* Patient — linked doctors */}
           {isPatient && (
             <>
-              <div className="space-y-1">
-                <Label>{t("doctor")}</Label>
-                <select
-                  value={linkedDoctorId}
-                  onChange={(e) => setLinkedDoctorId(e.target.value)}
-                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                >
-                  <option value="">{t("noDoctor")}</option>
-                  {doctors?.map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.name} {d.specialty ? `— ${d.specialty}` : ""}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="space-y-1">
-                <Label>{t("pharmacist")}</Label>
-                <select
-                  value={linkedPharmacistId}
-                  onChange={(e) => setLinkedPharmacistId(e.target.value)}
-                  className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                >
-                  <option value="">{t("noPharmacist")}</option>
-                  {pharmacists?.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <LinkedSection
+                label={t("linkedDoctors")}
+                emptyLabel={t("noLinkedDoctors")}
+                linked={linkedDoctors}
+                pending={pendingDoctorItems}
+                available={availableDoctors}
+                selectedId={selectedDoctorId}
+                onSelectChange={setSelectedDoctorId}
+                selectPlaceholder={t("selectDoctor")}
+                onAdd={() => addLinkMutation.mutate({ targetUserId: selectedDoctorId })}
+                onRemove={(id) => removeLinkMutation.mutate({ targetUserId: id })}
+                onCancel={(targetUserId) => cancelRequestMutation.mutate({ targetUserId, type: "link" })}
+                isPending={addLinkMutation.isPending || removeLinkMutation.isPending || cancelRequestMutation.isPending}
+                pendingLabel={t("pending")}
+                cancelLabel={t("cancelRequest")}
+              />
+              <LinkedSection
+                label={t("linkedPharmacists")}
+                emptyLabel={t("noLinkedPharmacists")}
+                linked={linkedPharmacists}
+                pending={pendingPharmacistItems}
+                available={availablePharmacists}
+                selectedId={selectedPharmacistId}
+                onSelectChange={setSelectedPharmacistId}
+                selectPlaceholder={t("selectPharmacist")}
+                onAdd={() => addLinkMutation.mutate({ targetUserId: selectedPharmacistId })}
+                onRemove={(id) => removeLinkMutation.mutate({ targetUserId: id })}
+                onCancel={(targetUserId) => cancelRequestMutation.mutate({ targetUserId, type: "link" })}
+                isPending={addLinkMutation.isPending || removeLinkMutation.isPending || cancelRequestMutation.isPending}
+                pendingLabel={t("pending")}
+                cancelLabel={t("cancelRequest")}
+              />
             </>
           )}
 
-          {/* Doctor / Pharmacist fields */}
+          {/* Professional — specialty, license, linked patients */}
           {isProfessional && (
             <>
               <div className="space-y-1">
@@ -219,7 +291,87 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
                   placeholder={t("licenseNumber")}
                 />
               </div>
+              <LinkedSection
+                label={t("linkedPatients")}
+                emptyLabel={t("noLinkedPatients")}
+                linked={linkedPatients}
+                pending={pendingPatientItems}
+                available={availablePatients}
+                selectedId={selectedPatientId}
+                onSelectChange={setSelectedPatientId}
+                selectPlaceholder={t("selectPatient")}
+                onAdd={() => addLinkMutation.mutate({ targetUserId: selectedPatientId })}
+                onRemove={(id) => removeLinkMutation.mutate({ targetUserId: id })}
+                onCancel={(targetUserId) => cancelRequestMutation.mutate({ targetUserId, type: "link" })}
+                isPending={addLinkMutation.isPending || removeLinkMutation.isPending || cancelRequestMutation.isPending}
+                pendingLabel={t("pending")}
+                cancelLabel={t("cancelRequest")}
+              />
             </>
+          )}
+
+          {/* Friends (all roles except admin) */}
+          {(isPatient || isProfessional) && (
+            <div className="space-y-2 pt-2 border-t">
+              <Label className="text-sm font-medium">{t("friends")}</Label>
+              {friends.length === 0 && pendingFriendItems.length === 0 ? (
+                <p className="text-xs text-muted-foreground italic">{t("noFriends")}</p>
+              ) : (
+                <ul className="space-y-1">
+                  {friends.map((f) => (
+                    <li key={(f as any)?.id} className="flex items-center justify-between text-sm bg-muted rounded px-2 py-1">
+                      <span>{(f as any)?.name ?? (f as any)?.id}</span>
+                      <span className="text-xs text-muted-foreground ml-2 capitalize">{(f as any)?.role}</span>
+                      <button
+                        onClick={() => removeFriendMutation.mutate({ friendId: (f as any).id })}
+                        className="text-muted-foreground hover:text-destructive ml-2"
+                        aria-label={t("removeFriend")}
+                        disabled={removeFriendMutation.isPending}
+                      >
+                        <X className="h-3.5 w-3.5" />
+                      </button>
+                    </li>
+                  ))}
+                  {pendingFriendItems.map((r) => {
+                    const toUser = (r as any).toUser;
+                    return (
+                      <li key={r.id} className="flex items-center justify-between text-sm bg-muted/50 rounded px-2 py-1 opacity-70">
+                        <Clock className="h-3 w-3 text-muted-foreground shrink-0 mr-1" />
+                        <span className="flex-1">{toUser?.name ?? r.toUserId}</span>
+                        <span className="text-xs text-muted-foreground ml-2 italic">{t("pending")}</span>
+                        <button
+                          onClick={() => cancelRequestMutation.mutate({ targetUserId: r.toUserId, type: "friend" })}
+                          className="text-muted-foreground hover:text-destructive ml-2 text-xs"
+                          disabled={cancelRequestMutation.isPending}
+                        >
+                          {t("cancelRequest")}
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+              <div className="flex gap-2">
+                <select
+                  value={selectedFriendId}
+                  onChange={(e) => setSelectedFriendId(e.target.value)}
+                  className="flex-1 h-8 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                >
+                  <option value="">{t("selectFriend")}</option>
+                  {availableFriends.map((u) => (
+                    <option key={u.id} value={u.id}>{u.name ?? u.id} ({u.role})</option>
+                  ))}
+                </select>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => addFriendMutation.mutate({ friendId: selectedFriendId })}
+                  disabled={!selectedFriendId || addFriendMutation.isPending}
+                >
+                  {t("addFriend")}
+                </Button>
+              </div>
+            </div>
           )}
 
           {/* Personal Context (key/value properties) */}
@@ -298,7 +450,7 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
               <p className="text-xs text-muted-foreground italic">{t("properties.empty")}</p>
             )}
 
-            {/* Predefined key suggestions — only show unused keys */}
+            {/* Predefined key suggestions */}
             {(() => {
               const usedKeys = new Set(properties?.map((p) => p.key) ?? []);
               const available = PREDEFINED_KEYS.filter((k) => !usedKeys.has(k));
@@ -361,11 +513,108 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
             {t("common:cancel")}
           </Button>
-          <Button onClick={handleSave} disabled={isPending || saved || (!isPatient && !isProfessional)}>
+          <Button onClick={handleSave} disabled={isPending || saved || !isProfessional}>
             {saved ? t("saved") : isPending ? t("saving") : t("common:save")}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+// ── Shared linked-users section ────────────────────────────────────────────
+
+function LinkedSection({
+  label,
+  emptyLabel,
+  linked,
+  pending,
+  available,
+  selectedId,
+  onSelectChange,
+  selectPlaceholder,
+  onAdd,
+  onRemove,
+  onCancel,
+  isPending,
+  pendingLabel,
+  cancelLabel,
+}: {
+  label: string;
+  emptyLabel: string;
+  linked: Array<any>;
+  pending: Array<any>;
+  available: Array<{ id: string; name?: string | null; specialty?: string | null }>;
+  selectedId: string;
+  onSelectChange: (id: string) => void;
+  selectPlaceholder: string;
+  onAdd: () => void;
+  onRemove: (id: string) => void;
+  onCancel: (targetUserId: string) => void;
+  isPending: boolean;
+  pendingLabel: string;
+  cancelLabel: string;
+}) {
+  return (
+    <div className="space-y-2 pt-2 border-t">
+      <Label className="text-sm font-medium">{label}</Label>
+      {linked.length === 0 && pending.length === 0 ? (
+        <p className="text-xs text-muted-foreground italic">{emptyLabel}</p>
+      ) : (
+        <ul className="space-y-1">
+          {linked.map((u) => (
+            <li key={u?.id} className="flex items-center justify-between text-sm bg-muted rounded px-2 py-1">
+              <span>{u?.name ?? u?.id}{u?.specialty ? ` — ${u.specialty}` : ""}</span>
+              <button
+                onClick={() => onRemove(u.id)}
+                className="text-muted-foreground hover:text-destructive ml-2"
+                disabled={isPending}
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </li>
+          ))}
+          {pending.map((r) => {
+            const toUser = (r as any).toUser;
+            return (
+              <li key={r.id} className="flex items-center justify-between text-sm bg-muted/50 rounded px-2 py-1 opacity-70">
+                <Clock className="h-3 w-3 text-muted-foreground shrink-0 mr-1" />
+                <span className="flex-1">{toUser?.name ?? r.toUserId}{toUser?.specialty ? ` — ${toUser.specialty}` : ""}</span>
+                <span className="text-xs text-muted-foreground ml-2 italic">{pendingLabel}</span>
+                <button
+                  onClick={() => onCancel(r.toUserId)}
+                  className="text-muted-foreground hover:text-destructive ml-2 text-xs"
+                  disabled={isPending}
+                >
+                  {cancelLabel}
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      <div className="flex gap-2">
+        <select
+          value={selectedId}
+          onChange={(e) => onSelectChange(e.target.value)}
+          className="flex-1 h-8 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+        >
+          <option value="">{selectPlaceholder}</option>
+          {available.map((u) => (
+            <option key={u.id} value={u.id}>
+              {u.name ?? u.id}{u.specialty ? ` — ${u.specialty}` : ""}
+            </option>
+          ))}
+        </select>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={onAdd}
+          disabled={!selectedId || isPending}
+        >
+          +
+        </Button>
+      </div>
+    </div>
   );
 }

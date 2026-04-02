@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
-import { agentRun, talkSession as talkSessionTable, chatMessage, transcript, user, transcriptSummary, userProperty, task, savedConversation } from "@sanotalk/db";
+import { agentRun, talkSession as talkSessionTable, chatMessage, transcript, user, transcriptSummary, userProperty, task, savedConversation, userLink } from "@sanotalk/db";
 import { resend } from "../lib/resend";
 import { eq, asc, desc, isNull, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
@@ -277,31 +277,37 @@ export const agentsRouter = createTRPCRouter({
   sendSummary: protectedProcedure
     .input(z.object({
       sessionId: z.string().uuid(),
-      recipientType: z.enum(["doctor", "pharmacist"]),
+      recipientUserId: z.string(),
     }))
     .mutation(async ({ ctx, input }) => {
       await assertSessionAccess(ctx.db, input.sessionId, ctx.user.id);
 
       const sender = await ctx.db.query.user.findFirst({
         where: eq(user.id, ctx.user.id),
-        with: { linkedDoctor: true, linkedPharmacist: true },
       });
 
       if (!sender || (sender as any).role !== "patient") {
         throw new TRPCError({ code: "FORBIDDEN", message: "Only patients can send summaries" });
       }
 
-      const recipient = input.recipientType === "doctor"
-        ? (sender as any).linkedDoctor
-        : (sender as any).linkedPharmacist;
-
-      if (!recipient) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "No linked provider of that type" });
+      // Verify the recipient is linked to this patient
+      const link = await ctx.db.query.userLink.findFirst({
+        where: and(eq(userLink.patientId, ctx.user.id), eq(userLink.professionalId, input.recipientUserId)),
+      });
+      if (!link) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Recipient is not linked to this patient" });
       }
 
-      const expectedRole = input.recipientType === "doctor" ? "doctor" : "pharmacist";
-      if ((recipient as any).role !== expectedRole) {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Linked provider does not have the required role" });
+      const recipient = await ctx.db.query.user.findFirst({
+        where: eq(user.id, input.recipientUserId),
+      });
+
+      if (!recipient) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Recipient not found" });
+      }
+
+      if ((recipient as any).role !== "doctor" && (recipient as any).role !== "pharmacist") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "Recipient must be a doctor or pharmacist" });
       }
 
       const summary = await ctx.db.query.transcriptSummary.findFirst({
