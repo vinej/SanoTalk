@@ -22,6 +22,7 @@ function SessionPage() {
   const { t } = useTranslation(["sessions", "common"]);
   const { data: session, isLoading } = trpc.sessions.byId.useQuery({ id: sessionId });
   const { data: friends = [] } = trpc.user.listFriends.useQuery();
+  const { data: aiAssistants = [] } = trpc.user.listAiAssistants.useQuery();
   const [pendingVoiceText, setPendingVoiceText] = useState<string | undefined>();
   const handleFinalTranscript = useCallback((text: string) => {
     setPendingVoiceText(text);
@@ -41,7 +42,8 @@ function SessionPage() {
 
   const participants: Array<{ userId: string }> = (session as any).participants ?? [];
   const friendIds = new Set(friends.map((f: any) => f?.id).filter(Boolean));
-  const hasFriendParticipant = participants.some((p) => friendIds.has(p.userId));
+  const aiAssistantIds = new Set(aiAssistants.map((a) => a.id));
+  const hasFriendParticipant = participants.some((p) => friendIds.has(p.userId) && !aiAssistantIds.has(p.userId));
   const showAiTabs = !hasFriendParticipant;
 
   const sessionWithDates = {

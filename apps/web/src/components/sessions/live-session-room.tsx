@@ -186,19 +186,22 @@ function ParticipantsPanel({
   onUpdate: () => void;
 }) {
   const { t } = useTranslation("sessions");
+  const { data: aiAssistants = [] } = trpc.user.listAiAssistants.useQuery();
 
   const participants: Array<{ id: string; userId: string; user?: { id: string; name: string | null } }> =
     (session as any).participants ?? [];
 
   const addedUserIds = new Set(participants.map((p) => p.userId));
+  const aiAssistantIds = new Set(aiAssistants.map((a) => a.id));
 
   const linkedIds = new Set(linkedUsers.map((u) => u?.id).filter(Boolean));
   const friendIds = new Set(friends.map((u) => u?.id).filter(Boolean));
 
   // For doctor/pharmacist: block mixing patients and friends as participants
+  // AI assistants are excluded from this restriction
   const isProfessional = hostRole === "doctor" || hostRole === "pharmacist";
   const hasPatientParticipant = isProfessional && participants.some((p) => linkedIds.has(p.userId));
-  const hasFriendParticipant  = isProfessional && participants.some((p) => friendIds.has(p.userId));
+  const hasFriendParticipant  = isProfessional && participants.some((p) => friendIds.has(p.userId) && !aiAssistantIds.has(p.userId));
 
   const candidateUsers = [...linkedUsers, ...friends].filter(
     (u, i, arr) => u && arr.findIndex((x) => x?.id === u.id) === i
@@ -212,6 +215,14 @@ function ParticipantsPanel({
     }
     return true;
   });
+
+  const availableAiAssistants = aiAssistants.filter((a) => !addedUserIds.has(a.id));
+
+  const AI_TYPE_LABELS: Record<string, string> = {
+    wellness: t("participants.aiType.wellness"),
+    health_specialist: t("participants.aiType.health_specialist"),
+    friend: t("participants.aiType.friend"),
+  };
 
   const addMutation = trpc.sessions.addParticipant.useMutation({
     onSuccess: () => {
@@ -238,6 +249,15 @@ function ParticipantsPanel({
           {availableUsers.map((u) => (
             <option key={u?.id} value={u?.id}>{u?.name ?? u?.id}</option>
           ))}
+          {availableAiAssistants.length > 0 && (
+            <optgroup label={t("participants.aiAssistants")}>
+              {availableAiAssistants.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name} — {AI_TYPE_LABELS[a.type] ?? a.type}
+                </option>
+              ))}
+            </optgroup>
+          )}
         </select>
         <Button
           size="sm"
@@ -254,18 +274,28 @@ function ParticipantsPanel({
         <p className="text-xs text-muted-foreground">{t("participants.empty")}</p>
       ) : (
         <ul className="space-y-1">
-          {participants.map((p) => (
-            <li key={p.id} className="flex items-center justify-between text-sm bg-muted rounded px-2 py-1">
-              <span>{p.user?.name ?? p.userId}</span>
-              <button
-                onClick={() => removeMutation.mutate({ sessionId, userId: p.userId })}
-                className="text-muted-foreground hover:text-destructive ml-2"
-                aria-label={t("participants.remove")}
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </li>
-          ))}
+          {participants.map((p) => {
+            const isAi = aiAssistantIds.has(p.userId);
+            return (
+              <li key={p.id} className="flex items-center justify-between text-sm bg-muted rounded px-2 py-1">
+                <span className="flex items-center gap-1.5">
+                  {p.user?.name ?? p.userId}
+                  {isAi && (
+                    <span className="text-[10px] font-medium bg-primary/15 text-primary rounded px-1 py-0.5 leading-none">
+                      {t("participants.aiBadge")}
+                    </span>
+                  )}
+                </span>
+                <button
+                  onClick={() => removeMutation.mutate({ sessionId, userId: p.userId })}
+                  className="text-muted-foreground hover:text-destructive ml-2"
+                  aria-label={t("participants.remove")}
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </li>
+            );
+          })}
         </ul>
       )}
     </div>

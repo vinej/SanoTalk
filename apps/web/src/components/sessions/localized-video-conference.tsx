@@ -24,7 +24,7 @@ import { ConnectionState } from "livekit-client";
 import { Track } from "livekit-client";
 import { useTranslation } from "react-i18next";
 
-type SessionParticipant = { userId: string; user?: { name: string | null } | null };
+type SessionParticipant = { userId: string; user?: { name: string | null; role?: string | null } | null };
 
 function AutoHideConnectionToast() {
   const state = useConnectionState();
@@ -100,6 +100,7 @@ function ParticipantsStatusPanel({ participants }: { participants: SessionPartic
     <div className="flex flex-wrap gap-1.5 px-2 py-1.5 bg-black/40 backdrop-blur-sm">
       {participants.map((p) => {
         const connected = connectedIds.has(p.userId);
+        const isAi = p.user?.role === "ia_agent";
         return (
           <span
             key={p.userId}
@@ -107,6 +108,11 @@ function ParticipantsStatusPanel({ participants }: { participants: SessionPartic
           >
             <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${connected ? "bg-green-400" : "bg-white/30"}`} />
             {p.user?.name ?? p.userId}
+            {isAi && (
+              <span className="text-[9px] font-medium bg-white/20 rounded px-1 py-px leading-none">
+                {t("participants.aiBadge")}
+              </span>
+            )}
             <span className="text-white/50">{connected ? t("participants.connected") : t("participants.notConnected")}</span>
           </span>
         );

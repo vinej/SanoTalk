@@ -32,7 +32,7 @@ export function TranscriptPanel({ sessionId }: Props) {
           <div key={entry.id} className="space-y-1">
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="text-xs">
-                {entry.speakerLabel ?? t("transcript.speaker")}
+                {entry.speaker?.name ?? entry.speakerLabel ?? t("transcript.speaker")}
               </Badge>
               {entry.confidence != null && (
                 <span

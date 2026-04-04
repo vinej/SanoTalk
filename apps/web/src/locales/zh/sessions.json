@@ -34,6 +34,13 @@
     "empty": "尚未添加参与者",
     "connected": "已连接",
     "notConnected": "未连接",
+    "aiAssistants": "AI 助手",
+    "aiBadge": "AI",
+    "aiType": {
+      "wellness": "健康伙伴",
+      "health_specialist": "健康专家",
+      "friend": "朋友"
+    },
     "unaddedTitle": "参与者未添加",
     "unaddedDesc": "已选择「{{name}}」，但尚未将其添加到会话中。是否在加入前先添加？",
     "addAndJoin": "添加并加入",

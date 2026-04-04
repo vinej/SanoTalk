@@ -27,6 +27,10 @@ interface ContextExtras {
     userProperties?: UserProperty[],
     propertiesLanguage?: string
   ) => Promise<string>;
+  joinAiParticipant?: (sessionId: string, aiUserId: string) => Promise<void>;
+  removeAiParticipant?: (sessionId: string, aiUserId: string) => Promise<void>;
+  removeAllAiParticipants?: (sessionId: string) => Promise<void>;
+  isAiAssistant?: (userId: string) => Promise<boolean>;
 }
 
 export async function createTRPCContext(opts: CreateHTTPContextOptions, extras: ContextExtras = {}) {
@@ -44,6 +48,10 @@ export async function createTRPCContext(opts: CreateHTTPContextOptions, extras: 
     callHealthChat: extras.callHealthChat ?? (async () => ""),
     callCompanionChat: extras.callCompanionChat ?? (async () => ""),
     callNewsChat: extras.callNewsChat ?? (async () => ""),
+    joinAiParticipant: extras.joinAiParticipant ?? (async () => {}),
+    removeAiParticipant: extras.removeAiParticipant ?? (async () => {}),
+    removeAllAiParticipants: extras.removeAllAiParticipants ?? (async () => {}),
+    isAiAssistant: extras.isAiAssistant ?? (async () => false),
   };
 }
 

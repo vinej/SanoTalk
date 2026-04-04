@@ -113,6 +113,13 @@
       "when": 1774900800000,
       "tag": "0015_connection_requests",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1774900900000,
+      "tag": "0016_ai_assistant_profiles",
+      "breakpoints": true
     }
   ]
 }

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
-import { user, userProperty, userLink, userFriend, connectionRequest } from "@sanotalk/db";
+import { user, userProperty, userLink, userFriend, connectionRequest, aiAssistantProfile } from "@sanotalk/db";
 import { eq, and, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
@@ -24,6 +24,22 @@ export const userRouter = createTRPCRouter({
     return ctx.db.query.user.findMany({
       columns: { id: true, name: true, role: true },
     });
+  }),
+
+  listAiAssistants: protectedProcedure.query(async ({ ctx }) => {
+    const profiles = await ctx.db.query.aiAssistantProfile.findMany({
+      where: eq(aiAssistantProfile.isActive, true),
+      with: { user: { columns: { id: true, name: true, image: true, role: true } } },
+    });
+    return profiles.map((p) => ({
+      id: p.user.id,
+      name: p.user.name,
+      image: p.user.image,
+      role: p.user.role,
+      type: p.type,
+      gender: p.gender,
+      personality: p.personality,
+    }));
   }),
 
   update: protectedProcedure

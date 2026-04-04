@@ -114,6 +114,21 @@ export const sessionsRouter = createTRPCRouter({
         .set({ status: "active", startedAt: new Date() })
         .where(eq(talkSession.id, input.id))
         .returning();
+
+      // Start voice pipelines for any AI participants already added
+      const withParticipants = await ctx.db.query.talkSession.findFirst({
+        where: eq(talkSession.id, input.id),
+        with: { participants: true },
+      });
+      if (withParticipants) {
+        for (const p of withParticipants.participants) {
+          const isAi = await ctx.isAiAssistant(p.userId);
+          if (isAi) {
+            void ctx.joinAiParticipant(input.id, p.userId);
+          }
+        }
+      }
+
       return updated;
     }),
 
@@ -125,6 +140,9 @@ export const sessionsRouter = createTRPCRouter({
       });
       if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
       if (session.hostId !== ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the host can end a session" });
+
+      // Disconnect all AI participants from the session
+      void ctx.removeAllAiParticipants(input.id);
 
       const [updated] = await ctx.db
         .update(talkSession)
@@ -163,6 +181,14 @@ export const sessionsRouter = createTRPCRouter({
         sessionId: input.sessionId,
         userId: input.userId,
       });
+
+      // If the participant is an AI assistant and session is active, start voice pipeline
+      if (session.status === "active") {
+        const isAi = await ctx.isAiAssistant(input.userId);
+        if (isAi) {
+          void ctx.joinAiParticipant(input.sessionId, input.userId);
+        }
+      }
     }),
 
   removeParticipant: protectedProcedure
@@ -173,6 +199,12 @@ export const sessionsRouter = createTRPCRouter({
       });
       if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
       if (session.hostId !== ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the host can remove participants" });
+
+      // If the participant is an AI assistant, stop its voice pipeline
+      const isAi = await ctx.isAiAssistant(input.userId);
+      if (isAi) {
+        void ctx.removeAiParticipant(input.sessionId, input.userId);
+      }
 
       await ctx.db
         .delete(sessionParticipant)

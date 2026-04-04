@@ -15,6 +15,7 @@ import { toNodeHandler } from "better-auth/node";
 import { logger } from "./logger";
 import { startDeepgramWebSocket } from "./deepgram";
 import { runPendingAgents, triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat } from "./mastra/index";
+import { joinAiParticipant, removeAiParticipant, removeAllAiParticipants, isAiAssistant } from "./ai-voice/index";
 import http from "http";
 
 const app = express();
@@ -103,7 +104,7 @@ app.use(
   "/api/trpc",
   createExpressMiddleware({
     router: appRouter,
-    createContext: (opts) => createTRPCContext(opts, { triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat }),
+    createContext: (opts) => createTRPCContext(opts, { triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat, joinAiParticipant, removeAiParticipant, removeAllAiParticipants, isAiAssistant }),
     onError({ path, error }) {
       logger.error({ path, error }, "tRPC error");
     },

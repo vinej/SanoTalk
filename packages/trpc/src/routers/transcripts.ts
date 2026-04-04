@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { transcript, transcriptSummary, talkSession } from "@sanotalk/db";
-import { eq, asc } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 /** Throws FORBIDDEN if the user is not the host or a participant of the session. */
@@ -28,7 +28,7 @@ export const transcriptsRouter = createTRPCRouter({
       await assertSessionAccess(ctx.db, input.sessionId, ctx.user.id);
       return ctx.db.query.transcript.findMany({
         where: eq(transcript.sessionId, input.sessionId),
-        orderBy: [asc(transcript.startMs)],
+        orderBy: [desc(transcript.createdAt)],
         with: { speaker: true },
       });
     }),
@@ -60,7 +60,12 @@ export const transcriptsRouter = createTRPCRouter({
         .insert(transcript)
         .values({
           sessionId: input.sessionId,
+          speakerId: input.speakerId ?? ctx.user.id,
+          speakerLabel: input.speakerLabel,
           content: input.content,
+          confidence: input.confidence,
+          startMs: input.startMs,
+          endMs: input.endMs,
         })
         .returning();
       return saved;

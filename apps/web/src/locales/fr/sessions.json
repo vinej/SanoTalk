@@ -34,6 +34,13 @@
     "empty": "Aucun participant ajouté pour l'instant",
     "connected": "Connecté",
     "notConnected": "Non connecté",
+    "aiAssistants": "Assistants IA",
+    "aiBadge": "IA",
+    "aiType": {
+      "wellness": "Compagnon bien-être",
+      "health_specialist": "Spécialiste santé",
+      "friend": "Ami"
+    },
     "unaddedTitle": "Participant non ajouté",
     "unaddedDesc": "«\u00a0{{name}}\u00a0» est sélectionné mais n'a pas encore été ajouté à la session. Souhaitez-vous l'ajouter avant de rejoindre\u00a0?",
     "addAndJoin": "Ajouter & Rejoindre",

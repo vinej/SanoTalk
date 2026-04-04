@@ -34,6 +34,13 @@
     "empty": "لم يُضَف أي مشارك بعد",
     "connected": "متصل",
     "notConnected": "غير متصل",
+    "aiAssistants": "مساعدو الذكاء الاصطناعي",
+    "aiBadge": "ذ.ا.",
+    "aiType": {
+      "wellness": "رفيق العافية",
+      "health_specialist": "أخصائي صحة",
+      "friend": "صديق"
+    },
     "unaddedTitle": "المشارك لم يُضَف",
     "unaddedDesc": "تم تحديد «{{name}}» لكنه لم يُضَف إلى الجلسة بعد. هل تريد إضافته قبل الانضمام؟",
     "addAndJoin": "إضافة والانضمام",
