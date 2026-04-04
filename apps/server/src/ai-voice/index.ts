@@ -17,7 +17,7 @@ function pipelineKey(sessionId: string, userId: string): string {
 async function loadAssistantConfig(userId: string): Promise<AiAssistantConfig | null> {
   const profile = await db.query.aiAssistantProfile.findFirst({
     where: eq(aiAssistantProfile.userId, userId),
-    with: { user: { columns: { id: true, name: true } } },
+    with: { user: { columns: { id: true, name: true, image: true } } },
   });
   if (!profile) return null;
 
@@ -28,6 +28,7 @@ async function loadAssistantConfig(userId: string): Promise<AiAssistantConfig | 
     gender: profile.gender as AiAssistantConfig["gender"],
     voiceId: profile.voiceId,
     systemPrompt: profile.systemPrompt,
+    image: profile.user.image,
   };
 }
 

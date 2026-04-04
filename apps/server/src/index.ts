@@ -111,6 +111,57 @@ app.use(
   })
 );
 
+// ─── Avatar proxy ─────────────────────────────────────────────────────────
+// Serves user avatars so the browser never needs direct access to MinIO.
+import { db, user as userTable } from "@sanotalk/db";
+import { eq } from "drizzle-orm";
+import * as Minio from "minio";
+
+let _avatarMinio: Minio.Client | null = null;
+function getAvatarMinio(): Minio.Client {
+  if (!_avatarMinio) {
+    _avatarMinio = new Minio.Client({
+      endPoint: process.env.MINIO_ENDPOINT!,
+      port: parseInt(process.env.MINIO_PORT ?? "9000"),
+      useSSL: process.env.MINIO_USE_SSL === "true",
+      accessKey: process.env.MINIO_ACCESS_KEY!,
+      secretKey: process.env.MINIO_SECRET_KEY!,
+    });
+  }
+  return _avatarMinio;
+}
+
+app.get("/api/avatar/:userId", apiLimiter, async (req, res) => {
+  try {
+    const userId = req.params.userId as string;
+    if (!userId) { res.status(400).end(); return; }
+
+    const record = await db.query.user.findFirst({
+      where: eq(userTable.id, userId),
+      columns: { image: true },
+    });
+    if (!record?.image) { res.status(404).end(); return; }
+
+    // External URLs (DiceBear, etc.) — redirect
+    if (record.image.startsWith("http://") || record.image.startsWith("https://")) {
+      res.redirect(record.image);
+      return;
+    }
+
+    // MinIO key — stream the object
+    const client = getAvatarMinio();
+    const bucket = process.env.MINIO_BUCKET ?? "sanotalk";
+    const stream = await client.getObject(bucket, record.image);
+    const ext = record.image.split(".").pop();
+    const mime = ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : "image/jpeg";
+    res.setHeader("Content-Type", mime);
+    res.setHeader("Cache-Control", "public, max-age=3600");
+    stream.pipe(res);
+  } catch {
+    res.status(404).end();
+  }
+});
+
 // ─── Health ────────────────────────────────────────────────────────────────
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });

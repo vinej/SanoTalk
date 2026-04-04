@@ -71,6 +71,17 @@ export const userRouter = createTRPCRouter({
       return updated;
     }),
 
+  updateImage: protectedProcedure
+    .input(z.object({ image: z.string().nullable() }))
+    .mutation(async ({ ctx, input }) => {
+      const [updated] = await ctx.db
+        .update(user)
+        .set({ image: input.image })
+        .where(eq(user.id, ctx.user.id))
+        .returning();
+      return updated;
+    }),
+
   // ── Professional links (patient ↔ doctor/pharmacist) ──────────────────────
 
   listLinkedUsers: protectedProcedure.query(async ({ ctx }) => {

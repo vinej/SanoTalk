@@ -38,7 +38,8 @@ export class LiveKitBot {
   private async generateToken(
     roomName: string,
     identity: string,
-    name: string
+    name: string,
+    metadata?: string
   ): Promise<string> {
     const apiKey = process.env.LIVEKIT_API_KEY;
     const apiSecret = process.env.LIVEKIT_API_SECRET;
@@ -47,6 +48,7 @@ export class LiveKitBot {
     const at = new AccessToken(apiKey, apiSecret, {
       identity,
       name,
+      ...(metadata ? { metadata } : {}),
       ttl: "4h",
     });
     at.addGrant({
@@ -63,11 +65,11 @@ export class LiveKitBot {
    * Connect to a LiveKit room, publish an audio track, and start
    * listening to other participants' audio.
    */
-  async connect(roomName: string, identity: string, name: string): Promise<void> {
+  async connect(roomName: string, identity: string, name: string, metadata?: string): Promise<void> {
     const serverUrl = process.env.LIVEKIT_URL;
     if (!serverUrl) throw new Error("LIVEKIT_URL not configured");
 
-    const token = await this.generateToken(roomName, identity, name);
+    const token = await this.generateToken(roomName, identity, name, metadata);
 
     // Create and publish the audio track before connecting
     this.track = LocalAudioTrack.createAudioTrack("ai-voice", this.audioSource);

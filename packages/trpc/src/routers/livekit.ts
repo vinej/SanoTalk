@@ -1,9 +1,18 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
-import { talkSession } from "@sanotalk/db";
+import { talkSession, user } from "@sanotalk/db";
 import { eq } from "drizzle-orm";
 import { AccessToken } from "livekit-server-sdk";
 import { TRPCError } from "@trpc/server";
+
+/** Resolve an image value to a URL suitable for embedding in participant metadata. */
+function resolveImageUrl(image: string | null | undefined, userId: string): string | null {
+  if (!image) return null;
+  // External URLs (DiceBear, etc.) — use directly
+  if (image.startsWith("http://") || image.startsWith("https://")) return image;
+  // MinIO key — use the server-side avatar proxy (same-origin, no CSP issues)
+  return `/api/avatar/${userId}`;
+}
 
 export const livekitRouter = createTRPCRouter({
   getToken: protectedProcedure
@@ -34,9 +43,18 @@ export const livekitRouter = createTRPCRouter({
         session.participants.some((p) => p.userId === ctx.user.id);
       if (!hasAccess) throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
 
+      // Fetch user's avatar for participant metadata
+      const userRecord = await ctx.db.query.user.findFirst({
+        where: eq(user.id, ctx.user.id),
+        columns: { image: true },
+      });
+      const avatarUrl = resolveImageUrl(userRecord?.image, ctx.user.id);
+      const metadata = JSON.stringify({ avatarUrl });
+
       const at = new AccessToken(apiKey, apiSecret, {
         identity: ctx.user.id,
         name: input.participantName ?? ctx.user.name,
+        metadata,
         ttl: "1h",
       });
 

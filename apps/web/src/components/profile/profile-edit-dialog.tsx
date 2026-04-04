@@ -12,7 +12,8 @@ import {
   DialogFooter,
   DialogDescription,
 } from "../ui/dialog";
-import { Trash2, Pencil, X, Clock } from "lucide-react";
+import { Trash2, Pencil, X, Clock, Camera, Loader2 } from "lucide-react";
+import { useAvatarUrl, getInitials } from "../../lib/avatar-url";
 
 type Props = {
   open: boolean;
@@ -132,6 +133,41 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
     onSuccess: () => void refetchFriends(),
   });
 
+  // ── Profile photo ──────────────────────────────────────────────────────────
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const avatarUrl = useAvatarUrl(profile?.id, profile?.image);
+
+  const uploadAvatarMutation = trpc.storage.uploadAvatar.useMutation({
+    onSuccess: () => void utils.user.profile.invalidate(),
+  });
+  const updateImageMutation = trpc.user.updateImage.useMutation({
+    onSuccess: () => void utils.user.profile.invalidate(),
+  });
+
+  async function handlePhotoUpload(file: File) {
+    const contentType = file.type as "image/jpeg" | "image/png" | "image/webp";
+    if (!["image/jpeg", "image/png", "image/webp"].includes(contentType)) return;
+    if (file.size > 5 * 1024 * 1024) return; // 5MB max
+
+    setUploading(true);
+    try {
+      const buffer = await file.arrayBuffer();
+      const base64 = btoa(
+        new Uint8Array(buffer).reduce((data, byte) => data + String.fromCharCode(byte), "")
+      );
+      await uploadAvatarMutation.mutateAsync({ base64, contentType });
+    } catch {
+      // upload failed silently
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function handleRemovePhoto() {
+    updateImageMutation.mutate({ image: null });
+  }
+
   // ── Professional profile fields ────────────────────────────────────────────
   const [specialty, setSpecialty] = useState<string>("");
   const [licenseNumber, setLicenseNumber] = useState<string>("");
@@ -217,6 +253,67 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
         </DialogHeader>
 
         <div className="space-y-4 py-2">
+          {/* Profile photo */}
+          {!isAdmin && (
+            <div className="flex items-center gap-4">
+              <div className="relative h-20 w-20 shrink-0">
+                {avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt={profile?.name ?? ""}
+                    className="h-20 w-20 rounded-full object-cover border"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                  />
+                ) : (
+                  <div className="h-20 w-20 rounded-full bg-muted flex items-center justify-center text-xl font-semibold text-muted-foreground border">
+                    {getInitials(profile?.name ?? "?")}
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col gap-1.5">
+                <Label className="text-sm">{t("photo.label")}</Label>
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="h-7 text-xs"
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={uploading}
+                  >
+                    {uploading ? (
+                      <><Loader2 className="h-3 w-3 mr-1 animate-spin" />{t("photo.uploading")}</>
+                    ) : (
+                      <><Camera className="h-3 w-3 mr-1" />{t("photo.upload")}</>
+                    )}
+                  </Button>
+                  {profile?.image && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 text-xs text-destructive"
+                      onClick={handleRemovePhoto}
+                      disabled={uploading}
+                    >
+                      {t("photo.remove")}
+                    </Button>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">{t("photo.maxSize")}</p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) void handlePhotoUpload(file);
+                    e.target.value = "";
+                  }}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Read-only fields */}
           <div className="space-y-1">
             <Label>{t("name")}</Label>

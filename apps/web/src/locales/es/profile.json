@@ -27,6 +27,13 @@
   "removeFriend": "Quitar",
   "pending": "Pendiente",
   "cancelRequest": "Cancelar",
+  "photo": {
+    "label": "Foto de perfil",
+    "upload": "Subir foto",
+    "remove": "Eliminar foto",
+    "uploading": "Subiendo…",
+    "maxSize": "Máx. 5 MB. JPG, PNG o WebP."
+  },
   "properties": {
     "title": "Contexto personal",
     "description": "Estos datos se comparten con los asistentes de IA para personalizar las respuestas.",

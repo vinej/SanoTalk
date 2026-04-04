@@ -103,7 +103,14 @@ export class AiVoicePipeline {
       logger.info({ from: speakerName, text }, "Chat message received by AI");
     };
 
-    await this.bot.connect(roomName, assistant.userId, assistant.name);
+    // Use the server-side avatar proxy for MinIO keys; external URLs (DiceBear) pass through
+    const avatarUrl = assistant.image
+      ? (assistant.image.startsWith("http://") || assistant.image.startsWith("https://")
+          ? assistant.image
+          : `/api/avatar/${assistant.userId}`)
+      : null;
+    const metadata = JSON.stringify({ avatarUrl });
+    await this.bot.connect(roomName, assistant.userId, assistant.name, metadata);
 
     // Set up Deepgram for server-side STT of room audio
     this.setupDeepgramSTT();

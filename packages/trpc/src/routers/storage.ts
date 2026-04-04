@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
-import { talkSession } from "@sanotalk/db";
+import { talkSession, user } from "@sanotalk/db";
 import { eq } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import * as Minio from "minio";
@@ -78,5 +78,32 @@ export const storageRouter = createTRPCRouter({
       const bucket = process.env.MINIO_BUCKET ?? "sanotalk";
       const url = await client.presignedGetObject(bucket, input.key, 3600);
       return { url };
+    }),
+
+  uploadAvatar: protectedProcedure
+    .input(
+      z.object({
+        base64: z.string().max(7_500_000), // ~5MB file after base64 encoding
+        contentType: z.enum(["image/jpeg", "image/png", "image/webp"]),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const client = getMinioClient();
+      const bucket = process.env.MINIO_BUCKET ?? "sanotalk";
+      const ext = input.contentType === "image/jpeg" ? "jpg" : input.contentType === "image/png" ? "png" : "webp";
+      const key = `avatars/${ctx.user.id}.${ext}`;
+
+      const buffer = Buffer.from(input.base64, "base64");
+      await client.putObject(bucket, key, buffer, buffer.length, {
+        "Content-Type": input.contentType,
+      });
+
+      // Update user image field
+      await ctx.db
+        .update(user)
+        .set({ image: key })
+        .where(eq(user.id, ctx.user.id));
+
+      return { key };
     }),
 });

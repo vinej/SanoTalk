@@ -27,6 +27,13 @@
   "removeFriend": "移除",
   "pending": "待处理",
   "cancelRequest": "取消",
+  "photo": {
+    "label": "个人头像",
+    "upload": "上传头像",
+    "remove": "删除头像",
+    "uploading": "上传中…",
+    "maxSize": "最大 5 MB。JPG、PNG 或 WebP。"
+  },
   "properties": {
     "title": "个人背景信息",
     "description": "这些信息将共享给AI助手，以便个性化回复。",

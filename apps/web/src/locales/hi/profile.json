@@ -27,6 +27,13 @@
   "removeFriend": "हटाएं",
   "pending": "लंबित",
   "cancelRequest": "रद्द करें",
+  "photo": {
+    "label": "प्रोफ़ाइल फ़ोटो",
+    "upload": "फ़ोटो अपलोड करें",
+    "remove": "फ़ोटो हटाएं",
+    "uploading": "अपलोड हो रहा है…",
+    "maxSize": "अधिकतम 5 MB। JPG, PNG या WebP।"
+  },
   "properties": {
     "title": "व्यक्तिगत संदर्भ",
     "description": "ये विवरण AI सहायकों के साथ साझा किए जाते हैं ताकि उत्तर व्यक्तिगत बनाए जा सकें।",

@@ -5,6 +5,7 @@ export interface AiAssistantConfig {
   gender: "male" | "female";
   voiceId: string;
   systemPrompt: string;
+  image?: string | null;
 }
 
 export interface TranscriptSegment {

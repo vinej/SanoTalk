@@ -27,6 +27,13 @@
   "removeFriend": "إزالة",
   "pending": "قيد الانتظار",
   "cancelRequest": "إلغاء",
+  "photo": {
+    "label": "صورة الملف الشخصي",
+    "upload": "رفع صورة",
+    "remove": "حذف الصورة",
+    "uploading": "جارٍ الرفع…",
+    "maxSize": "الحد الأقصى 5 ميغابايت. JPG أو PNG أو WebP."
+  },
   "properties": {
     "title": "السياق الشخصي",
     "description": "تُشارَك هذه المعلومات مع مساعدي الذكاء الاصطناعي لتخصيص الردود.",

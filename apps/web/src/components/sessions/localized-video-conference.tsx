@@ -23,6 +23,7 @@ import {
 import { ConnectionState } from "livekit-client";
 import { Track } from "livekit-client";
 import { useTranslation } from "react-i18next";
+import { AvatarParticipantTile } from "./participant-avatar-tile";
 
 type SessionParticipant = { userId: string; user?: { name: string | null; role?: string | null } | null };
 
@@ -139,13 +140,13 @@ function VideoConferenceInner({ participants }: { participants: SessionParticipa
       {focusedTracks.length > 0 ? (
         <FocusLayoutContainer>
           <CarouselLayout tracks={carouselTracks}>
-            <ParticipantTile />
+            <AvatarParticipantTile />
           </CarouselLayout>
           {focusedTracks[0] && <FocusLayout trackRef={focusedTracks[0]} />}
         </FocusLayoutContainer>
       ) : (
         <GridLayout tracks={tracks}>
-          <ParticipantTile />
+          <AvatarParticipantTile />
         </GridLayout>
       )}
       <LocalizedControlBar />

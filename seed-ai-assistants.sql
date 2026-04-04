@@ -7,13 +7,13 @@
 -- ============================================================
 
 -- ── AI Users ────────────────────────────────────────────────
-INSERT INTO sanotalk_user (id, name, email, email_verified, role, two_factor_enabled, created_at, updated_at) VALUES
-  ('ai-wellness-m', 'Marcus',  'marcus@sanotalk.internal',  true, 'ia_agent', false, NOW(), NOW()),
-  ('ai-wellness-f', 'Sophia',  'sophia@sanotalk.internal',  true, 'ia_agent', false, NOW(), NOW()),
-  ('ai-health-m',   'James',   'james@sanotalk.internal',   true, 'ia_agent', false, NOW(), NOW()),
-  ('ai-health-f',   'Elena',   'elena@sanotalk.internal',   true, 'ia_agent', false, NOW(), NOW()),
-  ('ai-friend-f',   'Lily',    'lily@sanotalk.internal',    true, 'ia_agent', false, NOW(), NOW()),
-  ('ai-friend-m',   'Ethan',   'ethan@sanotalk.internal',   true, 'ia_agent', false, NOW(), NOW());
+INSERT INTO sanotalk_user (id, name, email, email_verified, role, two_factor_enabled, image, created_at, updated_at) VALUES
+  ('ai-wellness-m', 'Marcus',  'marcus@sanotalk.internal',  true, 'ia_agent', false, 'https://api.dicebear.com/9.x/avataaars/svg?seed=Marcus&backgroundColor=b6e3f4', NOW(), NOW()),
+  ('ai-wellness-f', 'Sophia',  'sophia@sanotalk.internal',  true, 'ia_agent', false, 'https://api.dicebear.com/9.x/avataaars/svg?seed=Sophia&backgroundColor=ffd5dc', NOW(), NOW()),
+  ('ai-health-m',   'James',   'james@sanotalk.internal',   true, 'ia_agent', false, 'https://api.dicebear.com/9.x/avataaars/svg?seed=James&backgroundColor=c0aede',  NOW(), NOW()),
+  ('ai-health-f',   'Elena',   'elena@sanotalk.internal',   true, 'ia_agent', false, 'https://api.dicebear.com/9.x/avataaars/svg?seed=Elena&backgroundColor=d1f4d1',  NOW(), NOW()),
+  ('ai-friend-f',   'Lily',    'lily@sanotalk.internal',    true, 'ia_agent', false, 'https://api.dicebear.com/9.x/avataaars/svg?seed=Lily&backgroundColor=ffeaa7',   NOW(), NOW()),
+  ('ai-friend-m',   'Ethan',   'ethan@sanotalk.internal',   true, 'ia_agent', false, 'https://api.dicebear.com/9.x/avataaars/svg?seed=Ethan&backgroundColor=dfe6e9',  NOW(), NOW());
 
 -- ── AI Assistant Profiles ───────────────────────────────────
 INSERT INTO sanotalk_ai_assistant_profile (user_id, type, gender, voice_id, system_prompt, personality, is_active) VALUES

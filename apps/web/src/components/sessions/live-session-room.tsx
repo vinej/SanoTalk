@@ -153,7 +153,7 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
       token={token}
       serverUrl={serverUrl}
       connect={true}
-      video={true}
+      video={false}
       audio={true}
       data-lk-theme="huddle"
       style={{ height: "100%", width: "100%" }}

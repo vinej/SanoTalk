@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { trpc } from "../lib/trpc";
 import { Button } from "./ui/button";
 import { UserCircle, LogOut, Bell } from "lucide-react";
+import { useAvatarUrl } from "../lib/avatar-url";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "./language-switcher";
 import { signOut } from "../lib/auth-client";
@@ -21,6 +22,7 @@ export function AppHeader() {
   const navigate = useNavigate();
   const [profileOpen, setProfileOpen] = useState(false);
   const [requestsOpen, setRequestsOpen] = useState(false);
+  const avatarUrl = useAvatarUrl(profile?.id, profile?.image);
 
   async function handleLogout() {
     if (tracker) {
@@ -60,7 +62,11 @@ export function AppHeader() {
                 )}
               </Button>
               <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => setProfileOpen(true)}>
-                <UserCircle className="h-3 w-3 mr-1" />
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="" className="h-4 w-4 rounded-full object-cover mr-1" />
+                ) : (
+                  <UserCircle className="h-3 w-3 mr-1" />
+                )}
                 {t("dashboard:profile")}
               </Button>
             </div>
