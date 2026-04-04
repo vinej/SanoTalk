@@ -74,8 +74,9 @@ input::-webkit-textfield-decoration-container {
   object-fit: cover;
 }
 
-/* Hide the default SVG placeholder when our avatar is visible */
-.sanotalk-tile-wrapper:has(.sanotalk-avatar-overlay) .lk-participant-placeholder > svg {
+/* Hide the default placeholder and muted video when our avatar is visible */
+.sanotalk-tile-wrapper:has(.sanotalk-avatar-overlay) .lk-participant-placeholder > svg,
+.sanotalk-tile-wrapper:has(.sanotalk-avatar-overlay) video {
   display: none;
 }
 

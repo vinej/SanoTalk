@@ -10,8 +10,8 @@ function resolveImageUrl(image: string | null | undefined, userId: string): stri
   if (!image) return null;
   // External URLs (DiceBear, etc.) — use directly
   if (image.startsWith("http://") || image.startsWith("https://")) return image;
-  // MinIO key — use the server-side avatar proxy (same-origin, no CSP issues)
-  return `/api/avatar/${userId}`;
+  // MinIO key — use the server-side avatar proxy with cache buster
+  return `/api/avatar/${userId}?v=${encodeURIComponent(image)}`;
 }
 
 export const livekitRouter = createTRPCRouter({

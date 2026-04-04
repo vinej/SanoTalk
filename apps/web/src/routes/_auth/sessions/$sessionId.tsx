@@ -21,7 +21,6 @@ function SessionPage() {
   const { tab } = Route.useSearch();
   const { t } = useTranslation(["sessions", "common"]);
   const { data: session, isLoading } = trpc.sessions.byId.useQuery({ id: sessionId });
-  const { data: friends = [] } = trpc.user.listFriends.useQuery();
   const { data: aiAssistants = [] } = trpc.user.listAiAssistants.useQuery();
   const [pendingVoiceText, setPendingVoiceText] = useState<string | undefined>();
   const handleFinalTranscript = useCallback((text: string) => {
@@ -40,11 +39,17 @@ function SessionPage() {
 
   if (!session) return null
 
-  const participants: Array<{ userId: string }> = (session as any).participants ?? [];
-  const friendIds = new Set(friends.map((f: any) => f?.id).filter(Boolean));
+  const participants: Array<{ userId: string; user?: { role?: string | null } }> = (session as any).participants ?? [];
   const aiAssistantIds = new Set(aiAssistants.map((a) => a.id));
-  const hasFriendParticipant = participants.some((p) => friendIds.has(p.userId) && !aiAssistantIds.has(p.userId));
-  const showAiTabs = !hasFriendParticipant;
+  const hasAiParticipant = participants.some((p) => aiAssistantIds.has(p.userId));
+
+  // AI tabs (Summary + Chat) visible only when session is solo or all participants are doctors/pharmacists/AI
+  const nonAiParticipants = participants.filter((p) => !aiAssistantIds.has(p.userId));
+  const onlyProfessionals = nonAiParticipants.every(
+    (p) => p.user?.role === "doctor" || p.user?.role === "pharmacist"
+  );
+  const showAiTabs = nonAiParticipants.length === 0 || onlyProfessionals;
+  const showAiChat = showAiTabs && !hasAiParticipant;
 
   const sessionWithDates = {
       ...session,
@@ -74,7 +79,7 @@ function SessionPage() {
               <TabsList className="m-2 shrink-0">
                 <TabsTrigger value="transcript">{t("sessions:detail.transcript")}</TabsTrigger>
                 {showAiTabs && <TabsTrigger value="summary">{t("sessions:detail.aiSummary")}</TabsTrigger>}
-                {showAiTabs && <TabsTrigger value="chat">{t("sessions:detail.aiAssistant")}</TabsTrigger>}
+                {showAiChat && <TabsTrigger value="chat">{t("sessions:detail.aiAssistant")}</TabsTrigger>}
               </TabsList>
               <TabsContent
                 value="transcript"
@@ -90,7 +95,7 @@ function SessionPage() {
                   <SummaryPanel sessionId={sessionId} />
                 </TabsContent>
               )}
-              {showAiTabs && (
+              {showAiChat && (
                 <TabsContent
                   value="chat"
                   className="flex-1 min-h-0 overflow-hidden m-0 p-2"

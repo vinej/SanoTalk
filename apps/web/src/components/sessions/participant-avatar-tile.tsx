@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { ParticipantTile, useMaybeTrackRefContext } from "@livekit/components-react";
+import { ParticipantTile, useMaybeTrackRefContext, useIsMuted } from "@livekit/components-react";
 
 type AvatarParticipantTileProps = React.ComponentProps<typeof ParticipantTile>;
 
@@ -14,7 +14,8 @@ export function AvatarParticipantTile(props: AvatarParticipantTileProps) {
   const trackRef = props.trackRef ?? contextTrackRef;
 
   const participant = trackRef?.participant;
-  const isCameraOff = !trackRef?.publication;
+  const isMuted = useIsMuted(trackRef!);
+  const isCameraOff = !trackRef?.publication || isMuted;
 
   const avatarUrl = useMemo(() => {
     if (!participant?.metadata) return null;

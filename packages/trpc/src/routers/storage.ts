@@ -91,7 +91,7 @@ export const storageRouter = createTRPCRouter({
       const client = getMinioClient();
       const bucket = process.env.MINIO_BUCKET ?? "sanotalk";
       const ext = input.contentType === "image/jpeg" ? "jpg" : input.contentType === "image/png" ? "png" : "webp";
-      const key = `avatars/${ctx.user.id}.${ext}`;
+      const key = `avatars/${ctx.user.id}-${Date.now()}.${ext}`;
 
       const buffer = Buffer.from(input.base64, "base64");
       await client.putObject(bucket, key, buffer, buffer.length, {

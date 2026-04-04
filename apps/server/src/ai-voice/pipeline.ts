@@ -107,7 +107,7 @@ export class AiVoicePipeline {
     const avatarUrl = assistant.image
       ? (assistant.image.startsWith("http://") || assistant.image.startsWith("https://")
           ? assistant.image
-          : `/api/avatar/${assistant.userId}`)
+          : `/api/avatar/${assistant.userId}?v=${encodeURIComponent(assistant.image)}`)
       : null;
     const metadata = JSON.stringify({ avatarUrl });
     await this.bot.connect(roomName, assistant.userId, assistant.name, metadata);
