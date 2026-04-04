@@ -21,6 +21,7 @@ function SessionPage() {
   const { tab } = Route.useSearch();
   const { t } = useTranslation(["sessions", "common"]);
   const { data: session, isLoading } = trpc.sessions.byId.useQuery({ id: sessionId });
+  const { data: friends = [] } = trpc.user.listFriends.useQuery();
   const [pendingVoiceText, setPendingVoiceText] = useState<string | undefined>();
   const handleFinalTranscript = useCallback((text: string) => {
     setPendingVoiceText(text);
@@ -37,6 +38,11 @@ function SessionPage() {
   }
 
   if (!session) return null
+
+  const participants: Array<{ userId: string }> = (session as any).participants ?? [];
+  const friendIds = new Set(friends.map((f: any) => f?.id).filter(Boolean));
+  const hasFriendParticipant = participants.some((p) => friendIds.has(p.userId));
+  const showAiTabs = !hasFriendParticipant;
 
   const sessionWithDates = {
       ...session,
@@ -62,11 +68,11 @@ function SessionPage() {
 
           {/* Side panel */}
           <div className="flex flex-col h-full overflow-hidden">
-            <Tabs defaultValue={tab} className="flex flex-col h-full">
+            <Tabs defaultValue={!showAiTabs && tab !== "transcript" ? "transcript" : tab} className="flex flex-col h-full">
               <TabsList className="m-2 shrink-0">
                 <TabsTrigger value="transcript">{t("sessions:detail.transcript")}</TabsTrigger>
-                <TabsTrigger value="summary">{t("sessions:detail.aiSummary")}</TabsTrigger>
-                <TabsTrigger value="chat">{t("sessions:detail.aiAssistant")}</TabsTrigger>
+                {showAiTabs && <TabsTrigger value="summary">{t("sessions:detail.aiSummary")}</TabsTrigger>}
+                {showAiTabs && <TabsTrigger value="chat">{t("sessions:detail.aiAssistant")}</TabsTrigger>}
               </TabsList>
               <TabsContent
                 value="transcript"
@@ -74,18 +80,22 @@ function SessionPage() {
               >
                 <TranscriptPanel sessionId={sessionId} />
               </TabsContent>
-              <TabsContent
-                value="summary"
-                className="flex-1 min-h-0 overflow-hidden m-0 p-2"
-              >
-                <SummaryPanel sessionId={sessionId} />
-              </TabsContent>
-              <TabsContent
-                value="chat"
-                className="flex-1 min-h-0 overflow-hidden m-0 p-2"
-              >
-                <AiChatPanel sessionId={sessionId} {...(pendingVoiceText ? { pendingVoiceText } : {})} onVoiceTextConsumed={() => setPendingVoiceText(undefined)} />
-              </TabsContent>
+              {showAiTabs && (
+                <TabsContent
+                  value="summary"
+                  className="flex-1 min-h-0 overflow-hidden m-0 p-2"
+                >
+                  <SummaryPanel sessionId={sessionId} />
+                </TabsContent>
+              )}
+              {showAiTabs && (
+                <TabsContent
+                  value="chat"
+                  className="flex-1 min-h-0 overflow-hidden m-0 p-2"
+                >
+                  <AiChatPanel sessionId={sessionId} {...(pendingVoiceText ? { pendingVoiceText } : {})} onVoiceTextConsumed={() => setPendingVoiceText(undefined)} />
+                </TabsContent>
+              )}
             </Tabs>
           </div>
         </div>
