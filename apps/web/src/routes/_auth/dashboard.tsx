@@ -5,7 +5,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { SessionCard } from "../../components/sessions/session-card";
-import { Plus, Kanban, Bot, Heart, Newspaper } from "lucide-react";
+import { Plus, Kanban, Bot, Heart, Newspaper, Hospital } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -98,6 +98,12 @@ function DashboardPage() {
             <p className="text-muted-foreground mt-1">{t("dashboard:subtitle")}</p>
           </div>
           <div className="flex gap-2">
+            <Button asChild className="bg-red-600 hover:bg-red-700 text-white shadow-md shadow-red-200 dark:shadow-red-900/40 animate-pulse hover:animate-none">
+              <Link to="/health-help">
+                <Hospital className="mr-2 h-4 w-4" />
+                {t("dashboard:healthHelp")}
+              </Link>
+            </Button>
             <Button variant="outline" asChild>
               <Link to="/companion">
                 <Heart className="mr-2 h-4 w-4 text-rose-500" />
@@ -110,12 +116,14 @@ function DashboardPage() {
                 {t("dashboard:aiAssistant")}
               </Link>
             </Button>
+            {/* Future features, uncomment when ready}
             <Button variant="outline" asChild>
               <Link to="/news">
                 <Newspaper className="mr-2 h-4 w-4 text-amber-600" />
                 {t("dashboard:newsAgent")}
               </Link>
             </Button>
+            */}
             <Button variant="outline" asChild>
               <Link to="/kanban">
                 <Kanban className="mr-2 h-4 w-4" />

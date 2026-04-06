@@ -15,5 +15,6 @@
   "accept": "接受",
   "refuse": "拒绝",
   "linkRequest": "{{name}}（{{role}}）希望与您建立连接",
-  "friendRequest": "{{name}} 希望将您添加为好友"
+  "friendRequest": "{{name}} 希望将您添加为好友",
+  "healthHelp": "健康帮助"
 }

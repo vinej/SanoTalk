@@ -15,5 +15,6 @@
   "accept": "Aceptar",
   "refuse": "Rechazar",
   "linkRequest": "{{name}} ({{role}}) quiere conectarse contigo",
-  "friendRequest": "{{name}} quiere añadirte como amigo"
+  "friendRequest": "{{name}} quiere añadirte como amigo",
+  "healthHelp": "Ayuda de Salud"
 }

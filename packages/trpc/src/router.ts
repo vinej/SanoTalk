@@ -7,6 +7,7 @@ import { storageRouter } from "./routers/storage";
 import { tasksRouter } from "./routers/tasks";
 import { userRouter } from "./routers/user";
 import { wsRouter } from "./routers/ws";
+import { healthHelpRouter } from "./routers/healthHelp";
 
 export const appRouter = createTRPCRouter({
   sessions: sessionsRouter,
@@ -17,6 +18,7 @@ export const appRouter = createTRPCRouter({
   tasks: tasksRouter,
   user: userRouter,
   ws: wsRouter,
+  healthHelp: healthHelpRouter,
 });
 
 export type AppRouterSonoTalk = typeof appRouter;

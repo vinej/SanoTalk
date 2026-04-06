@@ -18,6 +18,7 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
 import { Route as AuthNewsRouteImport } from './routes/_auth/news'
 import { Route as AuthKanbanRouteImport } from './routes/_auth/kanban'
+import { Route as AuthHealthHelpRouteImport } from './routes/_auth/health-help'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
 import { Route as AuthCompanionRouteImport } from './routes/_auth/companion'
 import { Route as AuthAiAssistantRouteImport } from './routes/_auth/ai-assistant'
@@ -68,6 +69,11 @@ const AuthKanbanRoute = AuthKanbanRouteImport.update({
   path: '/kanban',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthHealthHelpRoute = AuthHealthHelpRouteImport.update({
+  id: '/health-help',
+  path: '/health-help',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthDashboardRoute = AuthDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -104,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/ai-assistant': typeof AuthAiAssistantRoute
   '/companion': typeof AuthCompanionRoute
   '/dashboard': typeof AuthDashboardRoute
+  '/health-help': typeof AuthHealthHelpRoute
   '/kanban': typeof AuthKanbanRoute
   '/news': typeof AuthNewsRoute
   '/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/ai-assistant': typeof AuthAiAssistantRoute
   '/companion': typeof AuthCompanionRoute
   '/dashboard': typeof AuthDashboardRoute
+  '/health-help': typeof AuthHealthHelpRoute
   '/kanban': typeof AuthKanbanRoute
   '/news': typeof AuthNewsRoute
   '/': typeof AuthIndexRoute
@@ -135,6 +143,7 @@ export interface FileRoutesById {
   '/_auth/ai-assistant': typeof AuthAiAssistantRoute
   '/_auth/companion': typeof AuthCompanionRoute
   '/_auth/dashboard': typeof AuthDashboardRoute
+  '/_auth/health-help': typeof AuthHealthHelpRoute
   '/_auth/kanban': typeof AuthKanbanRoute
   '/_auth/news': typeof AuthNewsRoute
   '/_auth/': typeof AuthIndexRoute
@@ -153,6 +162,7 @@ export interface FileRouteTypes {
     | '/ai-assistant'
     | '/companion'
     | '/dashboard'
+    | '/health-help'
     | '/kanban'
     | '/news'
     | '/sessions/$sessionId'
@@ -167,6 +177,7 @@ export interface FileRouteTypes {
     | '/ai-assistant'
     | '/companion'
     | '/dashboard'
+    | '/health-help'
     | '/kanban'
     | '/news'
     | '/'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '/_auth/ai-assistant'
     | '/_auth/companion'
     | '/_auth/dashboard'
+    | '/_auth/health-help'
     | '/_auth/kanban'
     | '/_auth/news'
     | '/_auth/'
@@ -264,6 +276,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthKanbanRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/health-help': {
+      id: '/_auth/health-help'
+      path: '/health-help'
+      fullPath: '/health-help'
+      preLoaderRoute: typeof AuthHealthHelpRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/dashboard': {
       id: '/_auth/dashboard'
       path: '/dashboard'
@@ -306,6 +325,7 @@ interface AuthRouteChildren {
   AuthAiAssistantRoute: typeof AuthAiAssistantRoute
   AuthCompanionRoute: typeof AuthCompanionRoute
   AuthDashboardRoute: typeof AuthDashboardRoute
+  AuthHealthHelpRoute: typeof AuthHealthHelpRoute
   AuthKanbanRoute: typeof AuthKanbanRoute
   AuthNewsRoute: typeof AuthNewsRoute
   AuthIndexRoute: typeof AuthIndexRoute
@@ -317,6 +337,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthAiAssistantRoute: AuthAiAssistantRoute,
   AuthCompanionRoute: AuthCompanionRoute,
   AuthDashboardRoute: AuthDashboardRoute,
+  AuthHealthHelpRoute: AuthHealthHelpRoute,
   AuthKanbanRoute: AuthKanbanRoute,
   AuthNewsRoute: AuthNewsRoute,
   AuthIndexRoute: AuthIndexRoute,

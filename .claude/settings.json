@@ -6,7 +6,8 @@
       "Bash(grep -r fs. /c/SanoTalk/SanoTalk/apps/server/src --include=*.ts)",
       "Bash(grep -rn VITE_ /c/SanoTalk/SanoTalk/apps/web/src/ --include=*.ts --include=*.tsx)",
       "Bash(grep -rn \"setUserID\\\\|tracker\\\\.\" /c/SanoTalk/SanoTalk/apps/web/src/ --include=*.ts --include=*.tsx)",
-      "Bash(grep -rn \"tracker\\\\.start\\\\|tracker\\\\.stop\" /c/SanoTalk/SanoTalk/apps/web/src/ --include=*.ts --include=*.tsx)"
+      "Bash(grep -rn \"tracker\\\\.start\\\\|tracker\\\\.stop\" /c/SanoTalk/SanoTalk/apps/web/src/ --include=*.ts --include=*.tsx)",
+      "Bash(node -e \"const d = require\\('./packages/trpc/src/data/quebec-hospitals.json'\\); d.forEach\\(h => console.log\\(h.msssName.toUpperCase\\(\\)\\)\\)\")"
     ]
   }
 }

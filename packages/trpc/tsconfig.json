@@ -9,6 +9,6 @@
       "@sanotalk/db/*": ["../../packages/db/src/*"]
     },
   },
-  "include": ["src"],
+  "include": ["src", "src/data/*.json"],
   "exclude": ["node_modules", "dist", "src/__tests__", "vitest.config.ts"]
 }
