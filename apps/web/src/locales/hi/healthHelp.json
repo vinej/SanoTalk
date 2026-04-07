@@ -1,6 +1,6 @@
 {
   "title": "स्वास्थ्य सहायता",
-  "subtitle": "क्यूबेक में निकटतम अस्पताल, CLSC और फार्मेसी खोजें",
+  "subtitle": "क्यूबेक में निकटतम अस्पताल, क्लिनिक, CLSC और फार्मेसी खोजें",
   "requestLocation": "निकटतम सुविधाएं खोजने के लिए स्थान पहुंच की अनुमति दें",
   "requestLocationButton": "मेरा स्थान साझा करें",
   "locationDenied": "स्थान पहुंच अस्वीकार कर दी गई। कृपया अपने ब्राउज़र सेटिंग्स में इसे सक्षम करें।",
@@ -23,7 +23,9 @@
   "lastUpdated": "अपडेट: {{time}}",
   "hospital": "अस्पताल",
   "clsc": "CLSC",
+  "clinic": "वॉक-इन क्लिनिक",
   "pharmacy": "फार्मेसी",
+  "checkAvailability": "RVSQ पर उपलब्धता जांचें",
   "yourLocation": "आपका स्थान",
   "refreshLocation": "रीफ्रेश",
   "dataSource": "डेटा: MSSS क्यूबेक",

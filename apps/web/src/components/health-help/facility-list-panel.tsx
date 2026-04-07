@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import { MapPin, Phone, Navigation, Clock, AlertTriangle, Star } from "lucide-react";
+import { MapPin, Phone, Navigation, Clock, AlertTriangle, Star, ExternalLink } from "lucide-react";
 
 export interface Facility {
   msssName: string;
@@ -88,9 +88,10 @@ export function FacilityListPanel({ facilities, selectedId, onSelect, favorites,
                     <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${
                       f.type === "hospital" ? "border-red-300 text-red-700 dark:border-red-800 dark:text-red-400" :
                       f.type === "pharmacy" ? "border-blue-300 text-blue-700 dark:border-blue-800 dark:text-blue-400" :
+                      f.type === "clinic" ? "border-orange-300 text-orange-700 dark:border-orange-800 dark:text-orange-400" :
                       "border-green-300 text-green-700 dark:border-green-800 dark:text-green-400"
                     }`}>
-                      {f.type === "hospital" ? t("hospital") : f.type === "pharmacy" ? t("pharmacy") : t("clsc")}
+                      {f.type === "hospital" ? t("hospital") : f.type === "pharmacy" ? t("pharmacy") : f.type === "clinic" ? t("clinic") : t("clsc")}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
                       {t("distance", { distance: f.distanceKm.toFixed(1) })}
@@ -136,6 +137,19 @@ export function FacilityListPanel({ facilities, selectedId, onSelect, favorites,
                     <div className="text-[10px] font-medium text-muted-foreground truncate">{t("patientsOver48h")}</div>
                     <div className="text-sm font-bold">{er.patientsOver48h}</div>
                   </div>
+                </div>
+              ) : f.type === "clinic" ? (
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
+                  <a
+                    href="https://rvsq.gouv.qc.ca/prendrerendezvous/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ExternalLink className="h-3 w-3" />
+                    {t("checkAvailability")}
+                  </a>
                 </div>
               ) : f.type !== "pharmacy" ? (
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">

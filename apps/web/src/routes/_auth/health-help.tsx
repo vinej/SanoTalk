@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { trpc } from "../../lib/trpc";
@@ -9,7 +9,7 @@ import { EmergencyNumbers } from "../../components/health-help/emergency-numbers
 import { Button } from "../../components/ui/button";
 import { MapPin, RefreshCw, Loader2, Bell } from "lucide-react";
 
-export type FacilityType = "hospital" | "clsc" | "pharmacy";
+export type FacilityType = "hospital" | "clsc" | "pharmacy" | "clinic";
 
 export const Route = createFileRoute("/_auth/health-help")({
   component: HealthHelpPage,
@@ -20,8 +20,30 @@ function HealthHelpPage() {
   const { lat, lng, error, loading: geoLoading, requestLocation } = useGeolocation();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [visibleTypes, setVisibleTypes] = useState<Set<FacilityType>>(
-    new Set(["hospital", "clsc", "pharmacy"])
+    new Set(["hospital", "clsc", "clinic", "pharmacy"])
   );
+
+  // Resizable split panel
+  const [leftPercent, setLeftPercent] = useState(50);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dragging = useRef(false);
+
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    e.preventDefault();
+    dragging.current = true;
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+  }, []);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!dragging.current || !containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const pct = ((e.clientX - rect.left) / rect.width) * 100;
+    setLeftPercent(Math.max(25, Math.min(75, pct)));
+  }, []);
+
+  const handlePointerUp = useCallback(() => {
+    dragging.current = false;
+  }, []);
 
   // Favorites
   const { data: favoriteNames = [] } = trpc.healthHelp.listFavorites.useQuery();
@@ -145,31 +167,39 @@ function HealthHelpPage() {
       {/* Emergency numbers */}
       <EmergencyNumbers />
 
-      {/* Split layout */}
-      <div className="flex-1 min-h-0">
-        <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-1 h-full gap-0">
-          {/* Left: Facility list */}
-          <div className="border-r h-full overflow-hidden min-w-0">
-            <FacilityListPanel
-              facilities={filteredFacilities}
-              selectedId={selectedId}
-              onSelect={setSelectedId}
-              favorites={favoritesSet}
-              onToggleFavorite={handleToggleFavorite}
-            />
-          </div>
+      {/* Split layout — stacked on mobile, resizable side-by-side on lg+ */}
+      <div className="flex-1 min-h-0 flex flex-col lg:flex-row" ref={containerRef}>
+        {/* Left: Facility list */}
+        <div className="h-1/2 lg:h-full overflow-hidden min-w-0" style={{ flexBasis: `${leftPercent}%`, flexShrink: 0 }}>
+          <FacilityListPanel
+            facilities={filteredFacilities}
+            selectedId={selectedId}
+            onSelect={setSelectedId}
+            favorites={favoritesSet}
+            onToggleFavorite={handleToggleFavorite}
+          />
+        </div>
 
-          {/* Right: Map */}
-          <div className="h-full min-h-[300px]">
-            <MapPanel
-              userLat={lat}
-              userLng={lng}
-              facilities={filteredFacilities}
-              selectedId={selectedId}
-              visibleTypes={visibleTypes}
-              onToggleType={toggleType}
-            />
-          </div>
+        {/* Drag handle */}
+        <div
+          className="hidden lg:flex items-center justify-center w-2 cursor-col-resize bg-border hover:bg-primary/20 active:bg-primary/30 transition-colors select-none shrink-0"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+        >
+          <div className="w-0.5 h-8 rounded-full bg-muted-foreground/40" />
+        </div>
+
+        {/* Right: Map */}
+        <div className="flex-1 min-h-[300px]">
+          <MapPanel
+            userLat={lat}
+            userLng={lng}
+            facilities={filteredFacilities}
+            selectedId={selectedId}
+            visibleTypes={visibleTypes}
+            onToggleType={toggleType}
+          />
         </div>
       </div>
     </div>

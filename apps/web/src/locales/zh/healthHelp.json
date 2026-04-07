@@ -1,6 +1,6 @@
 {
   "title": "健康帮助",
-  "subtitle": "查找魁北克最近的医院、CLSC和药房",
+  "subtitle": "查找魁北克最近的医院、诊所、CLSC和药房",
   "requestLocation": "允许位置访问以查找附近的医疗机构",
   "requestLocationButton": "分享我的位置",
   "locationDenied": "位置访问被拒绝。请在浏览器设置中启用。",
@@ -23,7 +23,9 @@
   "lastUpdated": "更新时间：{{time}}",
   "hospital": "医院",
   "clsc": "CLSC",
+  "clinic": "免预约诊所",
   "pharmacy": "药房",
+  "checkAvailability": "在RVSQ查看可用时间",
   "yourLocation": "您的位置",
   "refreshLocation": "刷新",
   "dataSource": "数据来源：MSSS魁北克",

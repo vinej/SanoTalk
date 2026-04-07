@@ -1,6 +1,6 @@
 {
   "title": "Health Help",
-  "subtitle": "Find the nearest hospitals, CLSCs and pharmacies in Quebec",
+  "subtitle": "Find the nearest hospitals, clinics, CLSCs and pharmacies in Quebec",
   "requestLocation": "Allow location access to find nearby facilities",
   "requestLocationButton": "Share My Location",
   "locationDenied": "Location access was denied. Please enable it in your browser settings.",
@@ -23,7 +23,9 @@
   "lastUpdated": "Updated: {{time}}",
   "hospital": "Hospital",
   "clsc": "CLSC",
+  "clinic": "Walk-In Clinic",
   "pharmacy": "Pharmacy",
+  "checkAvailability": "Check availability on RVSQ",
   "yourLocation": "Your Location",
   "refreshLocation": "Refresh",
   "dataSource": "Data: MSSS Quebec",

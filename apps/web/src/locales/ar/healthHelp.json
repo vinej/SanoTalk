@@ -1,6 +1,6 @@
 {
   "title": "مساعدة صحية",
-  "subtitle": "ابحث عن أقرب المستشفيات ومراكز CLSC والصيدليات في كيبيك",
+  "subtitle": "ابحث عن أقرب المستشفيات والعيادات ومراكز CLSC والصيدليات في كيبيك",
   "requestLocation": "اسمح بالوصول إلى موقعك للعثور على المرافق القريبة",
   "requestLocationButton": "مشاركة موقعي",
   "locationDenied": "تم رفض الوصول إلى الموقع. يرجى تفعيله في إعدادات المتصفح.",
@@ -23,7 +23,9 @@
   "lastUpdated": "آخر تحديث: {{time}}",
   "hospital": "مستشفى",
   "clsc": "CLSC",
+  "clinic": "عيادة بدون موعد",
   "pharmacy": "صيدلية",
+  "checkAvailability": "تحقق من التوفر على RVSQ",
   "yourLocation": "موقعك",
   "refreshLocation": "تحديث",
   "dataSource": "البيانات: MSSS كيبيك",

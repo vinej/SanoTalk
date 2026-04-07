@@ -52,16 +52,18 @@ function makeSvgIcon(color: string, glyph: string, size: [number, number] = [32,
 const hospitalIcon = makeSvgIcon("#dc2626", "H");              // red pin with H
 const clscIcon = makeSvgIcon("#16a34a", "C");                  // green pin with C
 const pharmacyIcon = makeSvgIcon("#2563eb", "P", [26, 33]);    // smaller blue pin with P
+const clinicIcon = makeSvgIcon("#ea580c", "W", [26, 33]);      // orange pin with W (walk-in)
 
 function iconForType(type: string): L.DivIcon {
   if (type === "hospital") return hospitalIcon;
   if (type === "pharmacy") return pharmacyIcon;
+  if (type === "clinic") return clinicIcon;
   return clscIcon;
 }
 
 // ── Map helpers ──────────────────────────────────────────────────────────────
 
-type FacilityType = "hospital" | "clsc" | "pharmacy";
+type FacilityType = "hospital" | "clsc" | "pharmacy" | "clinic";
 
 interface MapPanelProps {
   userLat: number;
@@ -110,6 +112,7 @@ function PanToSelected({ facilities, selectedId }: { facilities: Facility[]; sel
 const LEGEND_ITEMS: { type: FacilityType; color: string; glyph: string }[] = [
   { type: "hospital", color: "#dc2626", glyph: "H" },
   { type: "clsc", color: "#16a34a", glyph: "C" },
+  { type: "clinic", color: "#ea580c", glyph: "W" },
   { type: "pharmacy", color: "#2563eb", glyph: "P" },
 ];
 
@@ -146,7 +149,7 @@ export function MapPanel({ userLat, userLng, facilities, selectedId, visibleType
             <Popup>
               <div className="text-xs space-y-1">
                 <strong>{name}</strong>
-                <div className="opacity-70">{f.type === "hospital" ? t("hospital") : f.type === "pharmacy" ? t("pharmacy") : t("clsc")}</div>
+                <div className="opacity-70">{f.type === "hospital" ? t("hospital") : f.type === "pharmacy" ? t("pharmacy") : f.type === "clinic" ? t("clinic") : t("clsc")}</div>
                 <div>{f.address}</div>
                 <div>{t("distance", { distance: f.distanceKm.toFixed(1) })}</div>
                 {er && er.occupancyRate !== null && (
@@ -183,7 +186,7 @@ export function MapPanel({ userLat, userLng, facilities, selectedId, visibleType
               {glyph}
             </span>
             <span className="text-xs">
-              {type === "hospital" ? t("hospital") : type === "pharmacy" ? t("pharmacy") : t("clsc")}
+              {type === "hospital" ? t("hospital") : type === "pharmacy" ? t("pharmacy") : type === "clinic" ? t("clinic") : t("clsc")}
             </span>
           </label>
         ))}

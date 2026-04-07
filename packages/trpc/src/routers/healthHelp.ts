@@ -13,7 +13,7 @@ interface StaticEntry {
 
 interface FacilityRecord {
   name: string;
-  type: "hospital" | "clsc" | "pharmacy";
+  type: "hospital" | "clsc" | "pharmacy" | "clinic";
   address: string;
   region: string;
   lat: number;
@@ -140,9 +140,11 @@ function parseInstallationsCsv(text: string): FacilityRecord[] {
       .filter(Boolean)
       .join(", ");
 
+    const type: FacilityRecord["type"] = isHospital ? "hospital" : "clsc";
+
     facilities.push({
       name,
-      type: isHospital ? "hospital" : "clsc",
+      type,
       address,
       region: (cols[iRegion] ?? "").trim(),
       lat,
@@ -323,17 +325,13 @@ export async function fetchErData(): Promise<Map<string, ParsedErRow>> {
   return getLatestPerFacility(cachedErRows);
 }
 
-// ── Pharmacies (Overpass / OpenStreetMap) ─────────────────────────────────────
+// ── Pharmacies & Clinics (Overpass / OpenStreetMap) ──────────────────────────
+// Single combined query to avoid Overpass rate-limiting.
 
-const OVERPASS_URL = "https://overpass-api.de/api/interpreter";
-const PHARMACY_CACHE_TTL = 60 * 60 * 1000; // 1 hour
-const pharmacyCache = new Map<string, { data: FacilityRecord[]; at: number }>();
-const pharmacyPhones = new Map<string, string>(); // name+lat → phone
-
-function pharmacyCacheKey(lat: number, lng: number): string {
-  // Round to 2 decimals (~1km buckets) for cache reuse
-  return `${lat.toFixed(2)},${lng.toFixed(2)}`;
-}
+const POI_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+const poiCache = new Map<string, { pharmacies: FacilityRecord[]; clinics: FacilityRecord[]; at: number }>();
+const pharmacyPhones = new Map<string, string>();
+const clinicPhones = new Map<string, string>();
 
 interface OverpassElement {
   type: string;
@@ -343,7 +341,7 @@ interface OverpassElement {
   tags?: Record<string, string>;
 }
 
-function buildPharmacyAddress(tags: Record<string, string>): string {
+function buildPOIAddress(tags: Record<string, string>): string {
   const parts: string[] = [];
   const num = tags["addr:housenumber"];
   const street = tags["addr:street"];
@@ -356,83 +354,122 @@ function buildPharmacyAddress(tags: Record<string, string>): string {
   return parts.join(", ");
 }
 
-function parseOverpassPharmacies(
+function parseOverpassPOIs(
   elements: OverpassElement[],
   userLat: number,
   userLng: number
-): FacilityRecord[] {
-  const seen = new Set<string>();
+): { pharmacies: FacilityRecord[]; clinics: FacilityRecord[] } {
+  const seenPharm = new Set<string>();
+  const seenClinic = new Set<string>();
   const pharmacies: FacilityRecord[] = [];
+  const clinics: FacilityRecord[] = [];
+
   for (const el of elements) {
     const elLat = el.lat ?? el.center?.lat;
     const elLng = el.lon ?? el.center?.lon;
     if (!elLat || !elLng) continue;
 
-    // Deduplicate by rounded coordinates
-    const dedupKey = `${elLat.toFixed(4)},${elLng.toFixed(4)}`;
-    if (seen.has(dedupKey)) continue;
-    seen.add(dedupKey);
-
     const tags = el.tags ?? {};
-    const name = tags.name || tags.brand || "Pharmacy";
-    const address = buildPharmacyAddress(tags);
-    if (tags.phone) {
-      pharmacyPhones.set(`${name}|${elLat.toFixed(5)}`, tags.phone);
-    }
+    const isPharmacy =
+      tags.amenity === "pharmacy" ||
+      tags.shop === "chemist" ||
+      tags.healthcare === "pharmacy";
 
-    pharmacies.push({
-      name,
-      type: "pharmacy",
-      address,
-      region: "",
-      lat: elLat,
-      lng: elLng,
-    });
+    const dedupKey = `${elLat.toFixed(4)},${elLng.toFixed(4)}`;
+
+    if (isPharmacy) {
+      if (seenPharm.has(dedupKey)) continue;
+      seenPharm.add(dedupKey);
+      const name = tags.name || tags.brand || "Pharmacy";
+      const address = buildPOIAddress(tags);
+      if (tags.phone) pharmacyPhones.set(`${name}|${elLat.toFixed(5)}`, tags.phone);
+      pharmacies.push({ name, type: "pharmacy", address, region: "", lat: elLat, lng: elLng });
+    } else {
+      if (seenClinic.has(dedupKey)) continue;
+      seenClinic.add(dedupKey);
+      const name = tags.name || tags["name:fr"] || "Clinique";
+      const address = buildPOIAddress(tags);
+      if (tags.phone) clinicPhones.set(`${name}|${elLat.toFixed(5)}`, tags.phone);
+      clinics.push({ name, type: "clinic", address, region: "", lat: elLat, lng: elLng });
+    }
   }
 
-  pharmacies.sort(
-    (a, b) =>
-      haversineKm(userLat, userLng, a.lat, a.lng) -
-      haversineKm(userLat, userLng, b.lat, b.lng)
-  );
-  return pharmacies;
+  const dist = (f: FacilityRecord) => haversineKm(userLat, userLng, f.lat, f.lng);
+  pharmacies.sort((a, b) => dist(a) - dist(b));
+  clinics.sort((a, b) => dist(a) - dist(b));
+  return { pharmacies, clinics };
 }
 
-async function fetchNearbyPharmacies(
+const OVERPASS_ENDPOINTS = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.kumi.systems/api/interpreter",
+];
+
+async function queryOverpass(query: string): Promise<{ elements: OverpassElement[] }> {
+  for (const endpoint of OVERPASS_ENDPOINTS) {
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `data=${encodeURIComponent(query)}`,
+      });
+      if (res.status === 429) {
+        console.warn(`[healthHelp] Overpass 429 from ${endpoint}, trying next…`);
+        continue;
+      }
+      if (!res.ok) throw new Error(`Overpass HTTP ${res.status}`);
+      return (await res.json()) as { elements: OverpassElement[] };
+    } catch (err) {
+      console.warn(`[healthHelp] Overpass error from ${endpoint}:`, err);
+    }
+  }
+  throw new Error("All Overpass endpoints failed");
+}
+
+async function fetchNearbyPOIs(
   lat: number,
-  lng: number,
-  limit: number
-): Promise<FacilityRecord[]> {
-  const key = pharmacyCacheKey(lat, lng);
+  lng: number
+): Promise<{ pharmacies: FacilityRecord[]; clinics: FacilityRecord[] }> {
+  const key = `${lat.toFixed(2)},${lng.toFixed(2)}`;
   const now = Date.now();
-  const cached = pharmacyCache.get(key);
-  if (cached && now - cached.at < PHARMACY_CACHE_TTL) {
-    return cached.data.slice(0, limit);
+  const cached = poiCache.get(key);
+  if (cached && now - cached.at < POI_CACHE_TTL) {
+    return cached;
   }
 
   try {
-    // Search amenity=pharmacy + shop=chemist + healthcare=pharmacy within 50km
-    const query = `[out:json][timeout:20];(
-      node[amenity=pharmacy](around:50000,${lat},${lng});
-      way[amenity=pharmacy](around:50000,${lat},${lng});
-      node[shop=chemist](around:50000,${lat},${lng});
-      way[shop=chemist](around:50000,${lat},${lng});
-      node[healthcare=pharmacy](around:50000,${lat},${lng});
-      way[healthcare=pharmacy](around:50000,${lat},${lng});
+    // Fetch pharmacies first
+    const pharmQuery = `[out:json][timeout:20];(
+      node[amenity=pharmacy](around:25000,${lat},${lng});
+      way[amenity=pharmacy](around:25000,${lat},${lng});
+      node[shop=chemist](around:25000,${lat},${lng});
+      node[healthcare=pharmacy](around:25000,${lat},${lng});
     );out center 30;`;
-    const res = await fetch(OVERPASS_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: `data=${encodeURIComponent(query)}`,
-    });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = (await res.json()) as { elements: OverpassElement[] };
 
-    const pharmacies = parseOverpassPharmacies(json.elements, lat, lng);
-    pharmacyCache.set(key, { data: pharmacies, at: now });
-    return pharmacies.slice(0, limit);
-  } catch {
-    return cached?.data.slice(0, limit) ?? [];
+    const pharmData = await queryOverpass(pharmQuery);
+
+    // Then fetch clinics (sequential to avoid rate-limiting)
+    const clinicQuery = `[out:json][timeout:20];(
+      node[amenity=clinic](around:25000,${lat},${lng});
+      way[amenity=clinic](around:25000,${lat},${lng});
+      node[healthcare=clinic](around:25000,${lat},${lng});
+      way[healthcare=clinic](around:25000,${lat},${lng});
+      node[healthcare=doctor](around:25000,${lat},${lng});
+      way[healthcare=doctor](around:25000,${lat},${lng});
+    );out center 30;`;
+
+    const clinicData = await queryOverpass(clinicQuery);
+
+    const pharmacies = parseOverpassPOIs(pharmData.elements, lat, lng).pharmacies;
+    const clinics = parseOverpassPOIs(clinicData.elements, lat, lng).clinics;
+
+    const result = { pharmacies, clinics };
+    poiCache.set(key, { ...result, at: now });
+    console.log(`[healthHelp] Overpass OK: ${pharmacies.length} pharmacies, ${clinics.length} clinics`);
+    return result;
+  } catch (err) {
+    console.warn("[healthHelp] Overpass fetch failed:", err);
+    return cached ?? { pharmacies: [], clinics: [] };
   }
 }
 
@@ -450,16 +487,22 @@ export const healthHelpRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const { lat, lng, perType } = input;
 
-      // Fetch facilities, ER data, and pharmacies in parallel
-      const [allFacilities, erMap, pharmacies] = await Promise.all([
+      // Fetch CSV facilities, ER data, and Overpass POIs in parallel
+      const [allFacilities, erMap, pois] = await Promise.all([
         fetchFacilities(),
         fetchErData(),
-        fetchNearbyPharmacies(lat, lng, perType),
+        fetchNearbyPOIs(lat, lng),
       ]);
 
+      console.log("[healthHelp] nearestFacilities query:", {
+        lat, lng, perType,
+        csvFacilities: allFacilities.length,
+        pharmacies: pois.pharmacies.length,
+        clinics: pois.clinics.length,
+      });
+
       // Promote any facility that has ER data to "hospital"
-      // (many Centre multiservices have ERs but aren't flagged CHSGS)
-      const promoted = allFacilities.map((h) => {
+      const promoted = allFacilities.map((h: FacilityRecord) => {
         if (h.type === "hospital") return h;
         const key = h.name.toUpperCase().trim();
         if (erMap.has(key)) return { ...h, type: "hospital" as const };
@@ -467,25 +510,28 @@ export const healthHelpRouter = createTRPCRouter({
       });
 
       // Compute distances for hospitals/CLSCs
-      const withDistance = promoted.map((h) => ({
+      const withDistance = promoted.map((h: FacilityRecord) => ({
         ...h,
         distanceKm:
           Math.round(haversineKm(lat, lng, h.lat, h.lng) * 10) / 10,
       }));
-      withDistance.sort((a, b) => a.distanceKm - b.distanceKm);
+      withDistance.sort((a: { distanceKm: number }, b: { distanceKm: number }) => a.distanceKm - b.distanceKm);
 
       // Pick N nearest hospitals + N nearest CLSCs
-      const hospitals = withDistance.filter((h) => h.type === "hospital").slice(0, perType);
-      const clscs = withDistance.filter((h) => h.type === "clsc").slice(0, perType);
+      const hospitals = withDistance.filter((h: FacilityRecord) => h.type === "hospital").slice(0, perType);
+      const clscs = withDistance.filter((h: FacilityRecord) => h.type === "clsc").slice(0, perType);
 
-      // Pharmacies already sorted/limited by fetchNearbyPharmacies
-      const pharmacyResults = pharmacies.map((p) => ({
+      // Clinics & pharmacies from Overpass (already sorted by distance)
+      const clinicResults = pois.clinics.slice(0, perType).map((c) => ({
+        ...c,
+        distanceKm: Math.round(haversineKm(lat, lng, c.lat, c.lng) * 10) / 10,
+      }));
+      const pharmacyResults = pois.pharmacies.slice(0, perType).map((p) => ({
         ...p,
-        distanceKm:
-          Math.round(haversineKm(lat, lng, p.lat, p.lng) * 10) / 10,
+        distanceKm: Math.round(haversineKm(lat, lng, p.lat, p.lng) * 10) / 10,
       }));
 
-      const nearest = [...hospitals, ...clscs, ...pharmacyResults].sort(
+      const nearest = [...hospitals, ...clscs, ...clinicResults, ...pharmacyResults].sort(
         (a, b) => a.distanceKm - b.distanceKm
       );
 
@@ -500,7 +546,7 @@ export const healthHelpRouter = createTRPCRouter({
             : null;
 
         return {
-          msssName: h.type === "pharmacy" ? `${h.name}|${h.lat},${h.lng}` : h.name,
+          msssName: h.type === "pharmacy" || h.type === "clinic" ? `${h.name}|${h.lat},${h.lng}` : h.name,
           nameFr: h.name,
           nameEn: h.name,
           type: h.type,
@@ -508,7 +554,7 @@ export const healthHelpRouter = createTRPCRouter({
           lat: h.lat,
           lng: h.lng,
           region: h.region,
-          phone: phoneBook.get(key) ?? pharmacyPhones.get(`${h.name}|${h.lat.toFixed(5)}`) ?? "",
+          phone: phoneBook.get(key) ?? pharmacyPhones.get(`${h.name}|${h.lat.toFixed(5)}`) ?? clinicPhones.get(`${h.name}|${h.lat.toFixed(5)}`) ?? "",
           distanceKm: h.distanceKm,
           directionsUrl: `https://www.google.com/maps/dir/?api=1&origin=${lat},${lng}&destination=${h.lat},${h.lng}&travelmode=driving`,
           erStats: erRow
