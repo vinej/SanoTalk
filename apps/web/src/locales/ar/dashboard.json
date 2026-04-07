@@ -16,5 +16,8 @@
   "refuse": "رفض",
   "linkRequest": "{{name}} ({{role}}) يريد التواصل معك",
   "friendRequest": "{{name}} يريد إضافتك كصديق",
-  "healthHelp": "مساعدة صحية"
+  "healthHelp": "مساعدة صحية",
+  "installApp": "تثبيت SanoTalk",
+  "installAppDescription": "أضفه إلى شاشتك الرئيسية للوصول السريع، حتى بدون إنترنت",
+  "installButton": "تثبيت"
 }

@@ -5,7 +5,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { SessionCard } from "../../components/sessions/session-card";
-import { Plus, Kanban, Bot, Heart, Newspaper, Hospital } from "lucide-react";
+import { Plus, Kanban, Bot, Heart, Newspaper, Hospital, Download } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,7 @@ import {
 } from "../../components/ui/dialog";
 import { TalkSession } from "@sanotalk/db";
 import { useTranslation } from "react-i18next";
+import { usePwaInstall } from "../../hooks/use-pwa-install";
 
 export const Route = createFileRoute("/_auth/dashboard")({
   component: DashboardPage,
@@ -58,6 +59,7 @@ function DashboardPage() {
     createSession.mutate({ title: newTitle.trim(), language: lang });
   }
 
+  const { canInstall, install } = usePwaInstall();
   const isAdmin = (profile as any)?.role === "admin";
   const sessionsWithDates = sessions?.map(transformSessionDates) ?? [];
 
@@ -136,6 +138,20 @@ function DashboardPage() {
             </Button>
           </div>
         </div>
+
+        {canInstall && (
+          <div className="flex items-center justify-between rounded-lg border bg-muted/50 px-4 py-3">
+            <div className="text-sm">
+              <span className="font-medium">{t("dashboard:installApp")}</span>
+              {" — "}
+              <span className="text-muted-foreground">{t("dashboard:installAppDescription")}</span>
+            </div>
+            <Button size="sm" variant="outline" onClick={install}>
+              <Download className="mr-2 h-3.5 w-3.5" />
+              {t("dashboard:installButton")}
+            </Button>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

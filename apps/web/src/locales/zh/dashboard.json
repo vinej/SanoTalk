@@ -16,5 +16,8 @@
   "refuse": "拒绝",
   "linkRequest": "{{name}}（{{role}}）希望与您建立连接",
   "friendRequest": "{{name}} 希望将您添加为好友",
-  "healthHelp": "健康帮助"
+  "healthHelp": "健康帮助",
+  "installApp": "安装 SanoTalk",
+  "installAppDescription": "添加到主屏幕，即使离线也能快速访问",
+  "installButton": "安装"
 }
