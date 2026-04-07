@@ -1,20 +1,6 @@
-import { useState } from "react";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { trpc } from "../../lib/trpc";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
-import { SessionCard } from "../../components/sessions/session-card";
-import { Plus, Kanban, Bot, Heart, Newspaper, Hospital, Download, Activity } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-  DialogDescription,
-} from "../../components/ui/dialog";
-import { TalkSession } from "@sanotalk/db";
+import { Kanban, Bot, Heart, Hospital, Download, Activity, Video } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { usePwaInstall } from "../../hooks/use-pwa-install";
 
@@ -22,162 +8,55 @@ export const Route = createFileRoute("/_auth/dashboard")({
   component: DashboardPage,
 });
 
-function transformSessionDates(session: any): TalkSession {
-  return {
-    ...session,
-    scheduledAt: session.scheduledAt ? new Date(session.scheduledAt) : null,
-    startedAt: session.startedAt ? new Date(session.startedAt) : null,
-    endedAt: session.endedAt ? new Date(session.endedAt) : null,
-    createdAt: new Date(session.createdAt),
-    updatedAt: new Date(session.updatedAt),
-  };
-}
+const FEATURES = [
+  { to: "/sessions", icon: Video, color: "text-indigo-600", bg: "bg-indigo-50 dark:bg-indigo-950/30", border: "border-indigo-200 dark:border-indigo-800", key: "medicalConsultation" },
+  { to: "/health-help", icon: Hospital, color: "text-red-600", bg: "bg-red-50 dark:bg-red-950/30", border: "border-red-200 dark:border-red-800", key: "healthHelp" },
+  { to: "/vitals", icon: Activity, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-950/30", border: "border-emerald-200 dark:border-emerald-800", key: "vitals" },
+  { to: "/ai-assistant", icon: Bot, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-950/30", border: "border-blue-200 dark:border-blue-800", key: "aiAssistant" },
+  { to: "/companion", icon: Heart, color: "text-violet-600", bg: "bg-violet-50 dark:bg-violet-950/30", border: "border-violet-200 dark:border-violet-800", key: "companion" },
+  { to: "/kanban", icon: Kanban, color: "text-gray-700", bg: "bg-gray-50 dark:bg-gray-950/30", border: "border-gray-200 dark:border-gray-800", key: "kanban" },
+] as const;
 
 function DashboardPage() {
-  const { data: sessions, isLoading } = trpc.sessions.list.useQuery();
-  const { data: profile } = trpc.user.profile.useQuery();
-  const { t, i18n } = useTranslation(["dashboard", "common", "sessions"]);
-  const navigate = useNavigate();
-  const utils = trpc.useUtils();
-  const [newSessionOpen, setNewSessionOpen] = useState(false);
-  const [newTitle, setNewTitle] = useState("");
-
-  const createSession = trpc.sessions.create.useMutation({
-    onSuccess: (session) => {
-      if (session) {
-        void utils.sessions.list.invalidate();
-        setNewSessionOpen(false);
-        setNewTitle("");
-        navigate({ to: `/sessions/${session.id}` as any });
-      }
-    },
-  });
-
-  function handleNewSession() {
-    if (!newTitle.trim()) return;
-    const lang = (["en","fr","es","zh","ar","hi"].includes(i18n.language) ? i18n.language : "en") as "en"|"fr"|"es"|"zh"|"ar"|"hi";
-    createSession.mutate({ title: newTitle.trim(), language: lang });
-  }
-
+  const { t } = useTranslation(["dashboard", "common"]);
   const { canInstall, install } = usePwaInstall();
-  const isAdmin = (profile as any)?.role === "admin";
-  const sessionsWithDates = sessions?.map(transformSessionDates) ?? [];
 
   return (
-    <>
-      <Dialog open={newSessionOpen} onOpenChange={(v) => { setNewSessionOpen(v); if (!v) setNewTitle(""); }}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>{t("sessions:new.title")}</DialogTitle>
-            <DialogDescription>{t("sessions:new.subtitle")}</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-1 py-2">
-            <Label>{t("sessions:new.titleLabel")}</Label>
-            <Input
-              autoFocus
-              placeholder={t("sessions:new.titlePlaceholder")}
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter") handleNewSession(); }}
-              maxLength={120}
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setNewSessionOpen(false)}>
-              {t("common:cancel")}
-            </Button>
-            <Button onClick={handleNewSession} disabled={!newTitle.trim() || createSession.isPending}>
-              {createSession.isPending ? t("sessions:new.creating") : t("sessions:new.start")}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      <div className="px-6 py-6 space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">{t("dashboard:title")}</h1>
-            <p className="text-muted-foreground mt-1">{t("dashboard:subtitle")}</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Button asChild className="bg-white hover:bg-red-50 text-red-600 border border-red-300 shadow-md">
-              <Link to="/health-help">
-                <Hospital className="mr-2 h-4 w-4" />
-                {t("dashboard:healthHelp")}
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/vitals">
-                <Activity className="mr-2 h-4 w-4 text-emerald-600" />
-                {t("dashboard:vitals")}
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/companion">
-                <Heart className="mr-2 h-4 w-4 text-rose-500" />
-                {t("dashboard:companion")}
-              </Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/ai-assistant">
-                <Bot className="mr-2 h-4 w-4" />
-                {t("dashboard:aiAssistant")}
-              </Link>
-            </Button>
-            {/* Future features, uncomment when ready}
-            <Button variant="outline" asChild>
-              <Link to="/news">
-                <Newspaper className="mr-2 h-4 w-4 text-amber-600" />
-                {t("dashboard:newsAgent")}
-              </Link>
-            </Button>
-            */}
-            <Button variant="outline" asChild>
-              <Link to="/kanban">
-                <Kanban className="mr-2 h-4 w-4" />
-                {t("common:kanban")}
-              </Link>
-            </Button>
-            <Button onClick={() => setNewSessionOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              {t("dashboard:newSession")}
-            </Button>
-          </div>
-        </div>
-
-        {canInstall && (
-          <div className="flex items-center justify-between rounded-lg border bg-muted/50 px-4 py-3">
-            <div className="text-sm">
-              <span className="font-medium">{t("dashboard:installApp")}</span>
-              {" — "}
-              <span className="text-muted-foreground">{t("dashboard:installAppDescription")}</span>
-            </div>
-            <Button size="sm" variant="outline" onClick={install}>
-              <Download className="mr-2 h-3.5 w-3.5" />
-              {t("dashboard:installButton")}
-            </Button>
-          </div>
-        )}
-
-        {isLoading ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-40 rounded-xl bg-muted animate-pulse" />
-            ))}
-          </div>
-        ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {sessionsWithDates.map((session: TalkSession) => (
-              <SessionCard key={session.id} session={session} readOnly={isAdmin} />
-            ))}
-            {!sessions?.length && (
-              <div className="col-span-3 text-center py-16 text-muted-foreground">
-                {t("dashboard:noSessions")}
-              </div>
-            )}
-          </div>
-        )}
+    <div className="px-6 py-6 space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">{t("dashboard:title")}</h1>
+        <p className="text-muted-foreground mt-1">{t("dashboard:subtitle")}</p>
       </div>
-    </>
+
+      {canInstall && (
+        <div className="flex items-center justify-between rounded-lg border bg-muted/50 px-4 py-3">
+          <div className="text-sm">
+            <span className="font-medium">{t("dashboard:installApp")}</span>
+            {" — "}
+            <span className="text-muted-foreground">{t("dashboard:installAppDescription")}</span>
+          </div>
+          <Button size="sm" variant="outline" onClick={install}>
+            <Download className="mr-2 h-3.5 w-3.5" />
+            {t("dashboard:installButton")}
+          </Button>
+        </div>
+      )}
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {FEATURES.map((f) => (
+          <Link key={f.key} to={f.to as any} className="group">
+            <div className={`flex items-center gap-4 rounded-xl border-2 ${f.border} ${f.bg} p-5 transition-shadow hover:shadow-md`}>
+              <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-gray-900 shadow-sm`}>
+                <f.icon className={`h-6 w-6 ${f.color}`} />
+              </div>
+              <div className="min-w-0">
+                <p className="font-semibold group-hover:underline">{t(`dashboard:${f.key}`)}</p>
+                <p className="text-sm text-muted-foreground">{t(`dashboard:${f.key}Desc`)}</p>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    </div>
   );
 }

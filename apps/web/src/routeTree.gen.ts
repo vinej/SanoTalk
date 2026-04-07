@@ -23,6 +23,7 @@ import { Route as AuthHealthHelpRouteImport } from './routes/_auth/health-help'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
 import { Route as AuthCompanionRouteImport } from './routes/_auth/companion'
 import { Route as AuthAiAssistantRouteImport } from './routes/_auth/ai-assistant'
+import { Route as AuthSessionsIndexRouteImport } from './routes/_auth/sessions.index'
 import { Route as AuthSessionsNewRouteImport } from './routes/_auth/sessions/new'
 import { Route as AuthSessionsSessionIdRouteImport } from './routes/_auth/sessions/$sessionId'
 
@@ -95,6 +96,11 @@ const AuthAiAssistantRoute = AuthAiAssistantRouteImport.update({
   path: '/ai-assistant',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthSessionsIndexRoute = AuthSessionsIndexRouteImport.update({
+  id: '/sessions/',
+  path: '/sessions/',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthSessionsNewRoute = AuthSessionsNewRouteImport.update({
   id: '/sessions/new',
   path: '/sessions/new',
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/vitals': typeof AuthVitalsRoute
   '/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
   '/sessions/new': typeof AuthSessionsNewRoute
+  '/sessions/': typeof AuthSessionsIndexRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -139,6 +146,7 @@ export interface FileRoutesByTo {
   '/': typeof AuthIndexRoute
   '/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
   '/sessions/new': typeof AuthSessionsNewRoute
+  '/sessions': typeof AuthSessionsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -158,6 +166,7 @@ export interface FileRoutesById {
   '/_auth/': typeof AuthIndexRoute
   '/_auth/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
   '/_auth/sessions/new': typeof AuthSessionsNewRoute
+  '/_auth/sessions/': typeof AuthSessionsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -177,6 +186,7 @@ export interface FileRouteTypes {
     | '/vitals'
     | '/sessions/$sessionId'
     | '/sessions/new'
+    | '/sessions/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/'
     | '/sessions/$sessionId'
     | '/sessions/new'
+    | '/sessions'
   id:
     | '__root__'
     | '/_auth'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/_auth/'
     | '/_auth/sessions/$sessionId'
     | '/_auth/sessions/new'
+    | '/_auth/sessions/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -323,6 +335,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAiAssistantRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/sessions/': {
+      id: '/_auth/sessions/'
+      path: '/sessions'
+      fullPath: '/sessions/'
+      preLoaderRoute: typeof AuthSessionsIndexRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/sessions/new': {
       id: '/_auth/sessions/new'
       path: '/sessions/new'
@@ -351,6 +370,7 @@ interface AuthRouteChildren {
   AuthIndexRoute: typeof AuthIndexRoute
   AuthSessionsSessionIdRoute: typeof AuthSessionsSessionIdRoute
   AuthSessionsNewRoute: typeof AuthSessionsNewRoute
+  AuthSessionsIndexRoute: typeof AuthSessionsIndexRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
@@ -364,6 +384,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthIndexRoute: AuthIndexRoute,
   AuthSessionsSessionIdRoute: AuthSessionsSessionIdRoute,
   AuthSessionsNewRoute: AuthSessionsNewRoute,
+  AuthSessionsIndexRoute: AuthSessionsIndexRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)

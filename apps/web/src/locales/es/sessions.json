@@ -1,4 +1,7 @@
 {
+  "pageTitle": "Consultas médicas",
+  "pageSubtitle": "Gestiona tus sesiones de consulta",
+  "noSessions": "Aún no hay sesiones. ¡Crea tu primera!",
   "new": {
     "title": "Nueva sesión",
     "subtitle": "Dale un título a tu sesión para encontrarla fácilmente después.",
