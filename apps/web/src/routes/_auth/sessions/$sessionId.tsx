@@ -23,7 +23,6 @@ function SessionPage() {
   const { tab } = Route.useSearch();
   const { t } = useTranslation(["sessions", "common"]);
   const { data: session, isLoading } = trpc.sessions.byId.useQuery({ id: sessionId });
-  const { data: aiAssistants = [] } = trpc.user.listAiAssistants.useQuery();
   const { data: linkedUsers = [] } = trpc.user.listLinkedUsers.useQuery();
   const [pendingVoiceText, setPendingVoiceText] = useState<string | undefined>();
   const [selectedAgent, setSelectedAgent] = useState<AgentVariant | null>(null);
@@ -54,12 +53,11 @@ function SessionPage() {
 
   // Detect linked professional in session participants
   const participants: Array<{ userId: string; user?: { role?: string | null } }> = (session as any)?.participants ?? [];
-  const aiAssistantIds = new Set(aiAssistants.map((a) => a.id));
-  const nonAiParticipants = participants.filter((p) => !aiAssistantIds.has(p.userId));
-  const isSoloSession = nonAiParticipants.length === 0;
+  // Solo = no participants at all (friends or AI assistants count as non-solo)
+  const isSoloSession = participants.length === 0;
 
   let professionalAgentType: AgentVariant | null = null;
-  for (const p of nonAiParticipants) {
+  for (const p of participants) {
     const mapped = linkedProfessionalMap.get(p.userId);
     if (mapped) {
       professionalAgentType = mapped;

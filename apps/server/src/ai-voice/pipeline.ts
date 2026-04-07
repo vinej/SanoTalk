@@ -253,7 +253,7 @@ export class AiVoicePipeline {
       await this.storeTranscript(responseText);
 
       // Synthesize speech and publish to room
-      const { pcm } = await synthesize(responseText, this.options.assistant.voiceId);
+      const { pcm } = await synthesize(responseText, this.options.assistant.voiceId, this.options.language);
       logger.info(
         { assistant: this.options.assistant.name, pcmBytes: pcm.length, durationMs: Math.round((pcm.length / 2 / 24000) * 1000) },
         "TTS done, publishing audio to LiveKit"
@@ -294,7 +294,7 @@ export class AiVoicePipeline {
 
       if (text && this.running) {
         await this.storeTranscript(text);
-        const { pcm } = await synthesize(text, this.options.assistant.voiceId);
+        const { pcm } = await synthesize(text, this.options.assistant.voiceId, this.options.language);
         await this.bot.publishAudio(pcm);
         this.turnManager.markAiSpoke();
       }
