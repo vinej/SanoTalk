@@ -11,6 +11,8 @@ import enProfile from "../locales/en/profile.json";
 import enAuth from "../locales/en/auth.json";
 import enHealthHelp from "../locales/en/healthHelp.json";
 import enVitals from "../locales/en/vitals.json";
+import enMedications from "../locales/en/medications.json";
+import enSymptoms from "../locales/en/symptoms.json";
 
 // French
 import frCommon from "../locales/fr/common.json";
@@ -21,6 +23,8 @@ import frProfile from "../locales/fr/profile.json";
 import frAuth from "../locales/fr/auth.json";
 import frHealthHelp from "../locales/fr/healthHelp.json";
 import frVitals from "../locales/fr/vitals.json";
+import frMedications from "../locales/fr/medications.json";
+import frSymptoms from "../locales/fr/symptoms.json";
 
 // Spanish
 import esCommon from "../locales/es/common.json";
@@ -31,6 +35,8 @@ import esProfile from "../locales/es/profile.json";
 import esAuth from "../locales/es/auth.json";
 import esHealthHelp from "../locales/es/healthHelp.json";
 import esVitals from "../locales/es/vitals.json";
+import esMedications from "../locales/es/medications.json";
+import esSymptoms from "../locales/es/symptoms.json";
 
 // Chinese (Simplified)
 import zhCommon from "../locales/zh/common.json";
@@ -41,6 +47,8 @@ import zhProfile from "../locales/zh/profile.json";
 import zhAuth from "../locales/zh/auth.json";
 import zhHealthHelp from "../locales/zh/healthHelp.json";
 import zhVitals from "../locales/zh/vitals.json";
+import zhMedications from "../locales/zh/medications.json";
+import zhSymptoms from "../locales/zh/symptoms.json";
 
 // Arabic
 import arCommon from "../locales/ar/common.json";
@@ -51,6 +59,8 @@ import arProfile from "../locales/ar/profile.json";
 import arAuth from "../locales/ar/auth.json";
 import arHealthHelp from "../locales/ar/healthHelp.json";
 import arVitals from "../locales/ar/vitals.json";
+import arMedications from "../locales/ar/medications.json";
+import arSymptoms from "../locales/ar/symptoms.json";
 
 // Hindi
 import hiCommon from "../locales/hi/common.json";
@@ -61,6 +71,8 @@ import hiProfile from "../locales/hi/profile.json";
 import hiAuth from "../locales/hi/auth.json";
 import hiHealthHelp from "../locales/hi/healthHelp.json";
 import hiVitals from "../locales/hi/vitals.json";
+import hiMedications from "../locales/hi/medications.json";
+import hiSymptoms from "../locales/hi/symptoms.json";
 
 export const SUPPORTED_LANGUAGES = [
   { code: "en", label: "English", flag: "🇺🇸" },
@@ -84,12 +96,12 @@ i18n
   .use(initReactI18next)
   .init({
     resources: {
-      en: { common: enCommon, dashboard: enDashboard, kanban: enKanban, sessions: enSessions, profile: enProfile, auth: enAuth, healthHelp: enHealthHelp, vitals: enVitals },
-      fr: { common: frCommon, dashboard: frDashboard, kanban: frKanban, sessions: frSessions, profile: frProfile, auth: frAuth, healthHelp: frHealthHelp, vitals: frVitals },
-      es: { common: esCommon, dashboard: esDashboard, kanban: esKanban, sessions: esSessions, profile: esProfile, auth: esAuth, healthHelp: esHealthHelp, vitals: esVitals },
-      zh: { common: zhCommon, dashboard: zhDashboard, kanban: zhKanban, sessions: zhSessions, profile: zhProfile, auth: zhAuth, healthHelp: zhHealthHelp, vitals: zhVitals },
-      ar: { common: arCommon, dashboard: arDashboard, kanban: arKanban, sessions: arSessions, profile: arProfile, auth: arAuth, healthHelp: arHealthHelp, vitals: arVitals },
-      hi: { common: hiCommon, dashboard: hiDashboard, kanban: hiKanban, sessions: hiSessions, profile: hiProfile, auth: hiAuth, healthHelp: hiHealthHelp, vitals: hiVitals },
+      en: { common: enCommon, dashboard: enDashboard, kanban: enKanban, sessions: enSessions, profile: enProfile, auth: enAuth, healthHelp: enHealthHelp, vitals: enVitals, medications: enMedications, symptoms: enSymptoms },
+      fr: { common: frCommon, dashboard: frDashboard, kanban: frKanban, sessions: frSessions, profile: frProfile, auth: frAuth, healthHelp: frHealthHelp, vitals: frVitals, medications: frMedications, symptoms: frSymptoms },
+      es: { common: esCommon, dashboard: esDashboard, kanban: esKanban, sessions: esSessions, profile: esProfile, auth: esAuth, healthHelp: esHealthHelp, vitals: esVitals, medications: esMedications, symptoms: esSymptoms },
+      zh: { common: zhCommon, dashboard: zhDashboard, kanban: zhKanban, sessions: zhSessions, profile: zhProfile, auth: zhAuth, healthHelp: zhHealthHelp, vitals: zhVitals, medications: zhMedications, symptoms: zhSymptoms },
+      ar: { common: arCommon, dashboard: arDashboard, kanban: arKanban, sessions: arSessions, profile: arProfile, auth: arAuth, healthHelp: arHealthHelp, vitals: arVitals, medications: arMedications, symptoms: arSymptoms },
+      hi: { common: hiCommon, dashboard: hiDashboard, kanban: hiKanban, sessions: hiSessions, profile: hiProfile, auth: hiAuth, healthHelp: hiHealthHelp, vitals: hiVitals, medications: hiMedications, symptoms: hiSymptoms },
     },
     fallbackLng: "en",
     defaultNS: "common",

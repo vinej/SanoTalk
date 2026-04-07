@@ -1,15 +1,19 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
-import { agentRun, talkSession as talkSessionTable, chatMessage, transcript, user, transcriptSummary, userProperty, task, savedConversation, userLink, vitalSign } from "@sanotalk/db";
+import { agentRun, talkSession as talkSessionTable, chatMessage, transcript, user, transcriptSummary, userProperty, task, savedConversation, userLink, vitalSign, medication, symptomLog } from "@sanotalk/db";
 import { resend } from "../lib/resend";
-import { eq, asc, desc, isNull, and } from "drizzle-orm";
+import { eq, asc, desc, isNull, and, gte } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 type DB = Parameters<Parameters<typeof protectedProcedure.query>[0]>[0]["ctx"]["db"];
 
 /** Fetches all key/value properties + propertiesLanguage + recent vitals for a user to pass as AI context. */
 async function getUserContext(db: DB, userId: string) {
-  const [properties, userRow, recentVitals] = await Promise.all([
+  const sevenDaysAgo = new Date();
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+  const sevenDaysAgoStr = sevenDaysAgo.toISOString().split("T")[0]!;
+
+  const [properties, userRow, recentVitals, activeMedications, recentSymptoms] = await Promise.all([
     db
       .select({ key: userProperty.key, value: userProperty.value })
       .from(userProperty)
@@ -24,11 +28,25 @@ async function getUserContext(db: DB, userId: string) {
       .where(eq(vitalSign.userId, userId))
       .orderBy(desc(vitalSign.measuredAt))
       .limit(20),
+    db
+      .select()
+      .from(medication)
+      .where(and(eq(medication.userId, userId), eq(medication.isActive, true)))
+      .orderBy(desc(medication.startDate))
+      .limit(20),
+    db
+      .select()
+      .from(symptomLog)
+      .where(and(eq(symptomLog.userId, userId), gte(symptomLog.date, sevenDaysAgoStr)))
+      .orderBy(desc(symptomLog.date))
+      .limit(7),
   ]);
   return {
     properties,
     propertiesLanguage: userRow[0]?.propertiesLanguage ?? "en",
     recentVitals,
+    activeMedications,
+    recentSymptoms,
   };
 }
 
@@ -55,6 +73,50 @@ function buildVitalsContext(vitals: typeof vitalSign.$inferSelect[]): Array<{ ro
   return [
     { role: "user" as const, content: `My recent vital sign readings:\n${lines.join("\n")}` },
     { role: "assistant" as const, content: "Noted. I'll take your vital signs into account when assessing your health questions." },
+  ];
+}
+
+/** Builds a medications context message pair for AI agents. */
+function buildMedicationsContext(meds: typeof medication.$inferSelect[]): Array<{ role: "user" | "assistant"; content: string }> {
+  if (meds.length === 0) return [];
+
+  const lines = meds.map((m) => {
+    const since = new Date(m.startDate).toISOString().split("T")[0];
+    const parts = [`- ${m.name} ${m.dosage}, ${m.frequency}`];
+    if (m.route) parts[0] += ` (${m.route})`;
+    parts[0] += ` (since ${since})`;
+    if (m.reason) parts[0] += ` — ${m.reason}`;
+    return parts[0];
+  });
+
+  return [
+    { role: "user" as const, content: `My current medications:\n${lines.join("\n")}` },
+    { role: "assistant" as const, content: "Noted. I'll take your medications into account when assessing your health questions and flag any potential interactions." },
+  ];
+}
+
+/** Builds a symptoms context message pair for AI agents. */
+function buildSymptomsContext(logs: typeof symptomLog.$inferSelect[]): Array<{ role: "user" | "assistant"; content: string }> {
+  if (logs.length === 0) return [];
+
+  const lines = logs.map((l) => {
+    const parts: string[] = [];
+    if (l.painLevel != null) parts.push(`pain ${l.painLevel}/10`);
+    if (l.mood != null) parts.push(`mood ${l.mood}/10`);
+    if (l.energy != null) parts.push(`energy ${l.energy}/10`);
+    if (l.sleepHours != null) parts.push(`sleep ${l.sleepHours}h`);
+    if (l.sleepQuality != null) parts.push(`sleep quality ${l.sleepQuality}/10`);
+    if (l.stress != null) parts.push(`stress ${l.stress}/10`);
+    if (l.appetite != null) parts.push(`appetite ${l.appetite}/10`);
+    const symptoms = l.customSymptoms && l.customSymptoms.length > 0
+      ? `. Symptoms: ${l.customSymptoms.join(", ")}`
+      : "";
+    return `- ${l.date}: ${parts.join(", ")}${symptoms}`;
+  });
+
+  return [
+    { role: "user" as const, content: `My symptom journal (last 7 days):\n${lines.join("\n")}` },
+    { role: "assistant" as const, content: "Noted. I'll take your recent symptoms, mood, energy, and sleep patterns into account." },
   ];
 }
 
@@ -165,10 +227,12 @@ export const agentsRouter = createTRPCRouter({
         content: input.message,
       });
 
-      // Fetch user properties + language + vitals for AI context
-      const { properties: userProperties, propertiesLanguage, recentVitals } = await getUserContext(ctx.db, ctx.user.id);
+      // Fetch user properties + language + vitals + medications + symptoms for AI context
+      const { properties: userProperties, propertiesLanguage, recentVitals, activeMedications, recentSymptoms } = await getUserContext(ctx.db, ctx.user.id);
       const vitalsContext = buildVitalsContext(recentVitals);
-      const fullHistory = [...vitalsContext, ...history];
+      const medsContext = buildMedicationsContext(activeMedications);
+      const symptomsContext = buildSymptomsContext(recentSymptoms);
+      const fullHistory = [...vitalsContext, ...medsContext, ...symptomsContext, ...history];
 
       // Call AI agent
       const assistantText = await ctx.callHealthChat(fullHistory, input.message, sessionLanguage, userProperties, propertiesLanguage);
@@ -209,9 +273,11 @@ export const agentsRouter = createTRPCRouter({
 
       await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "health", role: "user", content: input.message });
 
-      const { properties: userProperties, propertiesLanguage, recentVitals } = await getUserContext(ctx.db, ctx.user.id);
+      const { properties: userProperties, propertiesLanguage, recentVitals, activeMedications, recentSymptoms } = await getUserContext(ctx.db, ctx.user.id);
       const vitalsContext = buildVitalsContext(recentVitals);
-      const fullHistory = [...vitalsContext, ...history];
+      const medsContext = buildMedicationsContext(activeMedications);
+      const symptomsContext = buildSymptomsContext(recentSymptoms);
+      const fullHistory = [...vitalsContext, ...medsContext, ...symptomsContext, ...history];
       const assistantText = await ctx.callHealthChat(fullHistory, input.message, input.language ?? "en", userProperties, propertiesLanguage);
 
       await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "health", role: "assistant", content: assistantText });
@@ -245,8 +311,10 @@ export const agentsRouter = createTRPCRouter({
 
       await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "companion", role: "user", content: input.message });
 
-      const { properties: userProperties, propertiesLanguage } = await getUserContext(ctx.db, ctx.user.id);
-      const assistantText = await ctx.callCompanionChat(history, input.message, input.language ?? "en", userProperties, propertiesLanguage);
+      const { properties: userProperties, propertiesLanguage, recentSymptoms } = await getUserContext(ctx.db, ctx.user.id);
+      const symptomsContext = buildSymptomsContext(recentSymptoms);
+      const fullHistory = [...symptomsContext, ...history];
+      const assistantText = await ctx.callCompanionChat(fullHistory, input.message, input.language ?? "en", userProperties, propertiesLanguage);
 
       await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "companion", role: "assistant", content: assistantText });
 

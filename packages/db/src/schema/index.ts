@@ -11,3 +11,5 @@ export * from "./saved-conversations";
 export * from "./user-links";
 export * from "./ai-assistants";
 export * from "./vital-signs";
+export * from "./medications";
+export * from "./symptom-logs";

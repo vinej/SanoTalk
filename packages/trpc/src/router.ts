@@ -9,6 +9,8 @@ import { userRouter } from "./routers/user";
 import { wsRouter } from "./routers/ws";
 import { healthHelpRouter } from "./routers/healthHelp";
 import { vitalsRouter } from "./routers/vitals";
+import { medicationsRouter } from "./routers/medications";
+import { symptomsRouter } from "./routers/symptoms";
 
 export const appRouter = createTRPCRouter({
   sessions: sessionsRouter,
@@ -21,6 +23,8 @@ export const appRouter = createTRPCRouter({
   ws: wsRouter,
   healthHelp: healthHelpRouter,
   vitals: vitalsRouter,
+  medications: medicationsRouter,
+  symptoms: symptomsRouter,
 });
 
 export type AppRouterSonoTalk = typeof appRouter;

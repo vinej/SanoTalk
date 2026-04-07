@@ -127,6 +127,20 @@
       "when": 1774901000000,
       "tag": "0017_vital_signs",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1774901100000,
+      "tag": "0018_medications",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1774901200000,
+      "tag": "0019_symptom_logs",
+      "breakpoints": true
     }
   ]
 }

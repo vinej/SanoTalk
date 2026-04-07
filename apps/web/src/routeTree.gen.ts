@@ -17,7 +17,9 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
 import { Route as AuthVitalsRouteImport } from './routes/_auth/vitals'
+import { Route as AuthSymptomsRouteImport } from './routes/_auth/symptoms'
 import { Route as AuthNewsRouteImport } from './routes/_auth/news'
+import { Route as AuthMedicationsRouteImport } from './routes/_auth/medications'
 import { Route as AuthKanbanRouteImport } from './routes/_auth/kanban'
 import { Route as AuthHealthHelpRouteImport } from './routes/_auth/health-help'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
@@ -66,9 +68,19 @@ const AuthVitalsRoute = AuthVitalsRouteImport.update({
   path: '/vitals',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthSymptomsRoute = AuthSymptomsRouteImport.update({
+  id: '/symptoms',
+  path: '/symptoms',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthNewsRoute = AuthNewsRouteImport.update({
   id: '/news',
   path: '/news',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthMedicationsRoute = AuthMedicationsRouteImport.update({
+  id: '/medications',
+  path: '/medications',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthKanbanRoute = AuthKanbanRouteImport.update({
@@ -124,7 +136,9 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthDashboardRoute
   '/health-help': typeof AuthHealthHelpRoute
   '/kanban': typeof AuthKanbanRoute
+  '/medications': typeof AuthMedicationsRoute
   '/news': typeof AuthNewsRoute
+  '/symptoms': typeof AuthSymptomsRoute
   '/vitals': typeof AuthVitalsRoute
   '/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
   '/sessions/new': typeof AuthSessionsNewRoute
@@ -141,7 +155,9 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthDashboardRoute
   '/health-help': typeof AuthHealthHelpRoute
   '/kanban': typeof AuthKanbanRoute
+  '/medications': typeof AuthMedicationsRoute
   '/news': typeof AuthNewsRoute
+  '/symptoms': typeof AuthSymptomsRoute
   '/vitals': typeof AuthVitalsRoute
   '/': typeof AuthIndexRoute
   '/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
@@ -161,7 +177,9 @@ export interface FileRoutesById {
   '/_auth/dashboard': typeof AuthDashboardRoute
   '/_auth/health-help': typeof AuthHealthHelpRoute
   '/_auth/kanban': typeof AuthKanbanRoute
+  '/_auth/medications': typeof AuthMedicationsRoute
   '/_auth/news': typeof AuthNewsRoute
+  '/_auth/symptoms': typeof AuthSymptomsRoute
   '/_auth/vitals': typeof AuthVitalsRoute
   '/_auth/': typeof AuthIndexRoute
   '/_auth/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
@@ -182,7 +200,9 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/health-help'
     | '/kanban'
+    | '/medications'
     | '/news'
+    | '/symptoms'
     | '/vitals'
     | '/sessions/$sessionId'
     | '/sessions/new'
@@ -199,7 +219,9 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/health-help'
     | '/kanban'
+    | '/medications'
     | '/news'
+    | '/symptoms'
     | '/vitals'
     | '/'
     | '/sessions/$sessionId'
@@ -218,7 +240,9 @@ export interface FileRouteTypes {
     | '/_auth/dashboard'
     | '/_auth/health-help'
     | '/_auth/kanban'
+    | '/_auth/medications'
     | '/_auth/news'
+    | '/_auth/symptoms'
     | '/_auth/vitals'
     | '/_auth/'
     | '/_auth/sessions/$sessionId'
@@ -293,11 +317,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthVitalsRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/symptoms': {
+      id: '/_auth/symptoms'
+      path: '/symptoms'
+      fullPath: '/symptoms'
+      preLoaderRoute: typeof AuthSymptomsRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/news': {
       id: '/_auth/news'
       path: '/news'
       fullPath: '/news'
       preLoaderRoute: typeof AuthNewsRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/medications': {
+      id: '/_auth/medications'
+      path: '/medications'
+      fullPath: '/medications'
+      preLoaderRoute: typeof AuthMedicationsRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/kanban': {
@@ -365,7 +403,9 @@ interface AuthRouteChildren {
   AuthDashboardRoute: typeof AuthDashboardRoute
   AuthHealthHelpRoute: typeof AuthHealthHelpRoute
   AuthKanbanRoute: typeof AuthKanbanRoute
+  AuthMedicationsRoute: typeof AuthMedicationsRoute
   AuthNewsRoute: typeof AuthNewsRoute
+  AuthSymptomsRoute: typeof AuthSymptomsRoute
   AuthVitalsRoute: typeof AuthVitalsRoute
   AuthIndexRoute: typeof AuthIndexRoute
   AuthSessionsSessionIdRoute: typeof AuthSessionsSessionIdRoute
@@ -379,7 +419,9 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthDashboardRoute: AuthDashboardRoute,
   AuthHealthHelpRoute: AuthHealthHelpRoute,
   AuthKanbanRoute: AuthKanbanRoute,
+  AuthMedicationsRoute: AuthMedicationsRoute,
   AuthNewsRoute: AuthNewsRoute,
+  AuthSymptomsRoute: AuthSymptomsRoute,
   AuthVitalsRoute: AuthVitalsRoute,
   AuthIndexRoute: AuthIndexRoute,
   AuthSessionsSessionIdRoute: AuthSessionsSessionIdRoute,
