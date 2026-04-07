@@ -17,6 +17,7 @@
   "linkRequest": "{{name}} ({{role}}) आपसे जुड़ना चाहते हैं",
   "friendRequest": "{{name}} आपको मित्र के रूप में जोड़ना चाहते हैं",
   "healthHelp": "स्वास्थ्य सहायता",
+  "vitals": "जीवन संकेत",
   "installApp": "SanoTalk इंस्टॉल करें",
   "installAppDescription": "त्वरित पहुंच के लिए होम स्क्रीन पर जोड़ें, ऑफ़लाइन भी",
   "installButton": "इंस्टॉल"

@@ -17,6 +17,7 @@
   "linkRequest": "{{name}} ({{role}}) quiere conectarse contigo",
   "friendRequest": "{{name}} quiere añadirte como amigo",
   "healthHelp": "Ayuda de Salud",
+  "vitals": "Signos vitales",
   "installApp": "Instalar SanoTalk",
   "installAppDescription": "Agrega a tu pantalla de inicio para acceso rápido, incluso sin conexión",
   "installButton": "Instalar"

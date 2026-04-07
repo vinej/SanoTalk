@@ -10,6 +10,7 @@ import enSessions from "../locales/en/sessions.json";
 import enProfile from "../locales/en/profile.json";
 import enAuth from "../locales/en/auth.json";
 import enHealthHelp from "../locales/en/healthHelp.json";
+import enVitals from "../locales/en/vitals.json";
 
 // French
 import frCommon from "../locales/fr/common.json";
@@ -19,6 +20,7 @@ import frSessions from "../locales/fr/sessions.json";
 import frProfile from "../locales/fr/profile.json";
 import frAuth from "../locales/fr/auth.json";
 import frHealthHelp from "../locales/fr/healthHelp.json";
+import frVitals from "../locales/fr/vitals.json";
 
 // Spanish
 import esCommon from "../locales/es/common.json";
@@ -28,6 +30,7 @@ import esSessions from "../locales/es/sessions.json";
 import esProfile from "../locales/es/profile.json";
 import esAuth from "../locales/es/auth.json";
 import esHealthHelp from "../locales/es/healthHelp.json";
+import esVitals from "../locales/es/vitals.json";
 
 // Chinese (Simplified)
 import zhCommon from "../locales/zh/common.json";
@@ -37,6 +40,7 @@ import zhSessions from "../locales/zh/sessions.json";
 import zhProfile from "../locales/zh/profile.json";
 import zhAuth from "../locales/zh/auth.json";
 import zhHealthHelp from "../locales/zh/healthHelp.json";
+import zhVitals from "../locales/zh/vitals.json";
 
 // Arabic
 import arCommon from "../locales/ar/common.json";
@@ -46,6 +50,7 @@ import arSessions from "../locales/ar/sessions.json";
 import arProfile from "../locales/ar/profile.json";
 import arAuth from "../locales/ar/auth.json";
 import arHealthHelp from "../locales/ar/healthHelp.json";
+import arVitals from "../locales/ar/vitals.json";
 
 // Hindi
 import hiCommon from "../locales/hi/common.json";
@@ -55,6 +60,7 @@ import hiSessions from "../locales/hi/sessions.json";
 import hiProfile from "../locales/hi/profile.json";
 import hiAuth from "../locales/hi/auth.json";
 import hiHealthHelp from "../locales/hi/healthHelp.json";
+import hiVitals from "../locales/hi/vitals.json";
 
 export const SUPPORTED_LANGUAGES = [
   { code: "en", label: "English", flag: "🇺🇸" },
@@ -78,12 +84,12 @@ i18n
   .use(initReactI18next)
   .init({
     resources: {
-      en: { common: enCommon, dashboard: enDashboard, kanban: enKanban, sessions: enSessions, profile: enProfile, auth: enAuth, healthHelp: enHealthHelp },
-      fr: { common: frCommon, dashboard: frDashboard, kanban: frKanban, sessions: frSessions, profile: frProfile, auth: frAuth, healthHelp: frHealthHelp },
-      es: { common: esCommon, dashboard: esDashboard, kanban: esKanban, sessions: esSessions, profile: esProfile, auth: esAuth, healthHelp: esHealthHelp },
-      zh: { common: zhCommon, dashboard: zhDashboard, kanban: zhKanban, sessions: zhSessions, profile: zhProfile, auth: zhAuth, healthHelp: zhHealthHelp },
-      ar: { common: arCommon, dashboard: arDashboard, kanban: arKanban, sessions: arSessions, profile: arProfile, auth: arAuth, healthHelp: arHealthHelp },
-      hi: { common: hiCommon, dashboard: hiDashboard, kanban: hiKanban, sessions: hiSessions, profile: hiProfile, auth: hiAuth, healthHelp: hiHealthHelp },
+      en: { common: enCommon, dashboard: enDashboard, kanban: enKanban, sessions: enSessions, profile: enProfile, auth: enAuth, healthHelp: enHealthHelp, vitals: enVitals },
+      fr: { common: frCommon, dashboard: frDashboard, kanban: frKanban, sessions: frSessions, profile: frProfile, auth: frAuth, healthHelp: frHealthHelp, vitals: frVitals },
+      es: { common: esCommon, dashboard: esDashboard, kanban: esKanban, sessions: esSessions, profile: esProfile, auth: esAuth, healthHelp: esHealthHelp, vitals: esVitals },
+      zh: { common: zhCommon, dashboard: zhDashboard, kanban: zhKanban, sessions: zhSessions, profile: zhProfile, auth: zhAuth, healthHelp: zhHealthHelp, vitals: zhVitals },
+      ar: { common: arCommon, dashboard: arDashboard, kanban: arKanban, sessions: arSessions, profile: arProfile, auth: arAuth, healthHelp: arHealthHelp, vitals: arVitals },
+      hi: { common: hiCommon, dashboard: hiDashboard, kanban: hiKanban, sessions: hiSessions, profile: hiProfile, auth: hiAuth, healthHelp: hiHealthHelp, vitals: hiVitals },
     },
     fallbackLng: "en",
     defaultNS: "common",

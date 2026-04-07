@@ -1,15 +1,15 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
-import { agentRun, talkSession as talkSessionTable, chatMessage, transcript, user, transcriptSummary, userProperty, task, savedConversation, userLink } from "@sanotalk/db";
+import { agentRun, talkSession as talkSessionTable, chatMessage, transcript, user, transcriptSummary, userProperty, task, savedConversation, userLink, vitalSign } from "@sanotalk/db";
 import { resend } from "../lib/resend";
 import { eq, asc, desc, isNull, and } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 type DB = Parameters<Parameters<typeof protectedProcedure.query>[0]>[0]["ctx"]["db"];
 
-/** Fetches all key/value properties + propertiesLanguage for a user to pass as AI context. */
+/** Fetches all key/value properties + propertiesLanguage + recent vitals for a user to pass as AI context. */
 async function getUserContext(db: DB, userId: string) {
-  const [properties, userRow] = await Promise.all([
+  const [properties, userRow, recentVitals] = await Promise.all([
     db
       .select({ key: userProperty.key, value: userProperty.value })
       .from(userProperty)
@@ -18,11 +18,44 @@ async function getUserContext(db: DB, userId: string) {
       .select({ propertiesLanguage: user.propertiesLanguage })
       .from(user)
       .where(eq(user.id, userId)),
+    db
+      .select()
+      .from(vitalSign)
+      .where(eq(vitalSign.userId, userId))
+      .orderBy(desc(vitalSign.measuredAt))
+      .limit(20),
   ]);
   return {
     properties,
     propertiesLanguage: userRow[0]?.propertiesLanguage ?? "en",
+    recentVitals,
   };
+}
+
+/** Builds a vitals context message pair for AI agents. */
+function buildVitalsContext(vitals: typeof vitalSign.$inferSelect[]): Array<{ role: "user" | "assistant"; content: string }> {
+  if (vitals.length === 0) return [];
+
+  // Group by type and pick latest per type
+  const latestByType = new Map<string, typeof vitalSign.$inferSelect>();
+  for (const v of vitals) {
+    if (!latestByType.has(v.type)) latestByType.set(v.type, v);
+  }
+
+  const lines = Array.from(latestByType.values()).map((v) => {
+    const value = v.type === "blood_pressure" && v.valueSecondary != null
+      ? `${v.valuePrimary}/${v.valueSecondary}`
+      : v.type === "temperature"
+        ? v.valuePrimary.toFixed(1)
+        : Math.round(v.valuePrimary).toString();
+    const date = new Date(v.measuredAt).toISOString().split("T")[0];
+    return `- ${v.type}: ${value} ${v.unit} (measured ${date})`;
+  });
+
+  return [
+    { role: "user" as const, content: `My recent vital sign readings:\n${lines.join("\n")}` },
+    { role: "assistant" as const, content: "Noted. I'll take your vital signs into account when assessing your health questions." },
+  ];
 }
 
 /** Throws FORBIDDEN if the user is not the host or a participant of the session. */
@@ -132,11 +165,13 @@ export const agentsRouter = createTRPCRouter({
         content: input.message,
       });
 
-      // Fetch user properties + language for AI context
-      const { properties: userProperties, propertiesLanguage } = await getUserContext(ctx.db, ctx.user.id);
+      // Fetch user properties + language + vitals for AI context
+      const { properties: userProperties, propertiesLanguage, recentVitals } = await getUserContext(ctx.db, ctx.user.id);
+      const vitalsContext = buildVitalsContext(recentVitals);
+      const fullHistory = [...vitalsContext, ...history];
 
       // Call AI agent
-      const assistantText = await ctx.callHealthChat(history, input.message, sessionLanguage, userProperties, propertiesLanguage);
+      const assistantText = await ctx.callHealthChat(fullHistory, input.message, sessionLanguage, userProperties, propertiesLanguage);
 
       // Persist assistant response
       await ctx.db.insert(chatMessage).values({
@@ -174,8 +209,10 @@ export const agentsRouter = createTRPCRouter({
 
       await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "health", role: "user", content: input.message });
 
-      const { properties: userProperties, propertiesLanguage } = await getUserContext(ctx.db, ctx.user.id);
-      const assistantText = await ctx.callHealthChat(history, input.message, input.language ?? "en", userProperties, propertiesLanguage);
+      const { properties: userProperties, propertiesLanguage, recentVitals } = await getUserContext(ctx.db, ctx.user.id);
+      const vitalsContext = buildVitalsContext(recentVitals);
+      const fullHistory = [...vitalsContext, ...history];
+      const assistantText = await ctx.callHealthChat(fullHistory, input.message, input.language ?? "en", userProperties, propertiesLanguage);
 
       await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "health", role: "assistant", content: assistantText });
 

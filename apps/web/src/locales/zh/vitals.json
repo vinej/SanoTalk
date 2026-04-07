@@ -1,0 +1,50 @@
+{
+  "title": "生命体征",
+  "subtitle": "跟踪和监测您的健康指标",
+  "share": "分享",
+  "logReading": "记录测量",
+  "logReadingDesc": "记录新的生命体征测量值",
+  "history": "近期历史",
+  "noHistory": "尚无测量记录",
+  "noData": "此期间无数据",
+  "date": "日期",
+  "vitalType": "类型",
+  "value": "数值",
+  "notes": "备注",
+  "notesPlaceholder": "可选备注（如：运动后、空腹...）",
+  "save": "保存",
+  "cancel": "取消",
+  "close": "关闭",
+  "shareTitle": "分享生命体征",
+  "shareDesc": "向关联的专业人员发送您的生命体征摘要",
+  "noLinkedProfessionals": "没有关联的专业人员。请在个人资料中关联医生或药剂师。",
+  "doctor": "医生",
+  "pharmacist": "药剂师",
+  "types": {
+    "blood_pressure": "血压",
+    "heart_rate": "心率",
+    "weight": "体重",
+    "blood_glucose": "血糖",
+    "temperature": "体温",
+    "oxygen_saturation": "血氧饱和度"
+  },
+  "labels": {
+    "systolic": "收缩压",
+    "diastolic": "舒张压"
+  },
+  "range": {
+    "7d": "7天",
+    "30d": "30天",
+    "90d": "90天",
+    "1y": "1年",
+    "all": "全部"
+  },
+  "alert": {
+    "warning": "警告",
+    "danger": "警报",
+    "highTitle": "{{type}}偏高警报",
+    "highDesc": "您的读数高于正常范围。如果感到不适，请咨询医疗专业人员。",
+    "lowTitle": "{{type}}偏低警报",
+    "lowDesc": "您的读数低于正常范围。如果感到不适，请咨询医疗专业人员。"
+  }
+}

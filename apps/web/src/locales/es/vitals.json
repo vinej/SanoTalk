@@ -1,0 +1,50 @@
+{
+  "title": "Signos vitales",
+  "subtitle": "Registre y monitoree sus indicadores de salud",
+  "share": "Compartir",
+  "logReading": "Nueva medición",
+  "logReadingDesc": "Registrar una nueva medición de signos vitales",
+  "history": "Historial reciente",
+  "noHistory": "No hay mediciones registradas",
+  "noData": "Sin datos para este período",
+  "date": "Fecha",
+  "vitalType": "Tipo",
+  "value": "Valor",
+  "notes": "Notas",
+  "notesPlaceholder": "Notas opcionales (ej: después del ejercicio, en ayunas...)",
+  "save": "Guardar",
+  "cancel": "Cancelar",
+  "close": "Cerrar",
+  "shareTitle": "Compartir signos vitales",
+  "shareDesc": "Enviar un resumen de sus signos vitales a un profesional vinculado",
+  "noLinkedProfessionals": "No hay profesionales vinculados. Vincule un médico o farmacéutico desde su perfil.",
+  "doctor": "Médico",
+  "pharmacist": "Farmacéutico",
+  "types": {
+    "blood_pressure": "Presión arterial",
+    "heart_rate": "Frecuencia cardíaca",
+    "weight": "Peso",
+    "blood_glucose": "Glucosa en sangre",
+    "temperature": "Temperatura",
+    "oxygen_saturation": "Saturación O₂"
+  },
+  "labels": {
+    "systolic": "Sistólica",
+    "diastolic": "Diastólica"
+  },
+  "range": {
+    "7d": "7D",
+    "30d": "30D",
+    "90d": "90D",
+    "1y": "1A",
+    "all": "Todo"
+  },
+  "alert": {
+    "warning": "Advertencia",
+    "danger": "Alerta",
+    "highTitle": "Alerta de {{type}} alta",
+    "highDesc": "Su lectura está por encima del rango normal. Si se siente mal, consulte a un profesional de la salud.",
+    "lowTitle": "Alerta de {{type}} baja",
+    "lowDesc": "Su lectura está por debajo del rango normal. Si se siente mal, consulte a un profesional de la salud."
+  }
+}

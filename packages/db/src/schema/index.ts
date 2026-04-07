@@ -10,3 +10,4 @@ export * from "./user-properties";
 export * from "./saved-conversations";
 export * from "./user-links";
 export * from "./ai-assistants";
+export * from "./vital-signs";

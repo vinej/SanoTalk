@@ -1,0 +1,50 @@
+{
+  "title": "Vital Signs",
+  "subtitle": "Track and monitor your health metrics",
+  "share": "Share",
+  "logReading": "Log Reading",
+  "logReadingDesc": "Record a new vital sign measurement",
+  "history": "Recent History",
+  "noHistory": "No readings recorded yet",
+  "noData": "No data for this period",
+  "date": "Date",
+  "vitalType": "Type",
+  "value": "Value",
+  "notes": "Notes",
+  "notesPlaceholder": "Optional notes (e.g., after exercise, fasting...)",
+  "save": "Save",
+  "cancel": "Cancel",
+  "close": "Close",
+  "shareTitle": "Share Vitals",
+  "shareDesc": "Send a summary of your vitals to a linked professional",
+  "noLinkedProfessionals": "No linked professionals. Link a doctor or pharmacist from your profile.",
+  "doctor": "Doctor",
+  "pharmacist": "Pharmacist",
+  "types": {
+    "blood_pressure": "Blood Pressure",
+    "heart_rate": "Heart Rate",
+    "weight": "Weight",
+    "blood_glucose": "Blood Glucose",
+    "temperature": "Temperature",
+    "oxygen_saturation": "O₂ Saturation"
+  },
+  "labels": {
+    "systolic": "Systolic",
+    "diastolic": "Diastolic"
+  },
+  "range": {
+    "7d": "7D",
+    "30d": "30D",
+    "90d": "90D",
+    "1y": "1Y",
+    "all": "All"
+  },
+  "alert": {
+    "warning": "Warning",
+    "danger": "Alert",
+    "highTitle": "High {{type}} Alert",
+    "highDesc": "Your reading is above the normal range. If you feel unwell, consult a healthcare professional.",
+    "lowTitle": "Low {{type}} Alert",
+    "lowDesc": "Your reading is below the normal range. If you feel unwell, consult a healthcare professional."
+  }
+}

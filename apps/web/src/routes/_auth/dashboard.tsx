@@ -5,7 +5,7 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { SessionCard } from "../../components/sessions/session-card";
-import { Plus, Kanban, Bot, Heart, Newspaper, Hospital, Download } from "lucide-react";
+import { Plus, Kanban, Bot, Heart, Newspaper, Hospital, Download, Activity } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -94,16 +94,22 @@ function DashboardPage() {
       </Dialog>
 
       <div className="px-6 py-6 space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">{t("dashboard:title")}</h1>
             <p className="text-muted-foreground mt-1">{t("dashboard:subtitle")}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button asChild className="bg-white hover:bg-red-50 text-red-600 border border-red-300 shadow-md">
               <Link to="/health-help">
                 <Hospital className="mr-2 h-4 w-4" />
                 {t("dashboard:healthHelp")}
+              </Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link to="/vitals">
+                <Activity className="mr-2 h-4 w-4 text-emerald-600" />
+                {t("dashboard:vitals")}
               </Link>
             </Button>
             <Button variant="outline" asChild>
