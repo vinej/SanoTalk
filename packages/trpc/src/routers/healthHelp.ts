@@ -11,7 +11,7 @@ interface StaticEntry {
 
 interface FacilityRecord {
   name: string;
-  type: "hospital" | "clsc";
+  type: "hospital" | "clsc" | "pharmacy";
   address: string;
   region: string;
   lat: number;
@@ -321,6 +321,119 @@ async function fetchErData(): Promise<Map<string, ParsedErRow>> {
   return getLatestPerFacility(cachedErRows);
 }
 
+// ── Pharmacies (Overpass / OpenStreetMap) ─────────────────────────────────────
+
+const OVERPASS_URL = "https://overpass-api.de/api/interpreter";
+const PHARMACY_CACHE_TTL = 60 * 60 * 1000; // 1 hour
+const pharmacyCache = new Map<string, { data: FacilityRecord[]; at: number }>();
+const pharmacyPhones = new Map<string, string>(); // name+lat → phone
+
+function pharmacyCacheKey(lat: number, lng: number): string {
+  // Round to 2 decimals (~1km buckets) for cache reuse
+  return `${lat.toFixed(2)},${lng.toFixed(2)}`;
+}
+
+interface OverpassElement {
+  type: string;
+  lat?: number;
+  lon?: number;
+  center?: { lat: number; lon: number };
+  tags?: Record<string, string>;
+}
+
+function buildPharmacyAddress(tags: Record<string, string>): string {
+  const parts: string[] = [];
+  const num = tags["addr:housenumber"];
+  const street = tags["addr:street"];
+  if (num && street) parts.push(`${num} ${street}`);
+  else if (street) parts.push(street);
+  const city = tags["addr:city"];
+  if (city) parts.push(`${city}, QC`);
+  const postal = tags["addr:postcode"];
+  if (postal) parts.push(formatPostalCode(postal));
+  return parts.join(", ");
+}
+
+function parseOverpassPharmacies(
+  elements: OverpassElement[],
+  userLat: number,
+  userLng: number
+): FacilityRecord[] {
+  const seen = new Set<string>();
+  const pharmacies: FacilityRecord[] = [];
+  for (const el of elements) {
+    const elLat = el.lat ?? el.center?.lat;
+    const elLng = el.lon ?? el.center?.lon;
+    if (!elLat || !elLng) continue;
+
+    // Deduplicate by rounded coordinates
+    const dedupKey = `${elLat.toFixed(4)},${elLng.toFixed(4)}`;
+    if (seen.has(dedupKey)) continue;
+    seen.add(dedupKey);
+
+    const tags = el.tags ?? {};
+    const name = tags.name || tags.brand || "Pharmacy";
+    const address = buildPharmacyAddress(tags);
+    if (tags.phone) {
+      pharmacyPhones.set(`${name}|${elLat.toFixed(5)}`, tags.phone);
+    }
+
+    pharmacies.push({
+      name,
+      type: "pharmacy",
+      address,
+      region: "",
+      lat: elLat,
+      lng: elLng,
+    });
+  }
+
+  pharmacies.sort(
+    (a, b) =>
+      haversineKm(userLat, userLng, a.lat, a.lng) -
+      haversineKm(userLat, userLng, b.lat, b.lng)
+  );
+  return pharmacies;
+}
+
+async function fetchNearbyPharmacies(
+  lat: number,
+  lng: number,
+  limit: number
+): Promise<FacilityRecord[]> {
+  const key = pharmacyCacheKey(lat, lng);
+  const now = Date.now();
+  const cached = pharmacyCache.get(key);
+  if (cached && now - cached.at < PHARMACY_CACHE_TTL) {
+    return cached.data.slice(0, limit);
+  }
+
+  try {
+    // Search amenity=pharmacy + shop=chemist + healthcare=pharmacy within 50km
+    const query = `[out:json][timeout:20];(
+      node[amenity=pharmacy](around:50000,${lat},${lng});
+      way[amenity=pharmacy](around:50000,${lat},${lng});
+      node[shop=chemist](around:50000,${lat},${lng});
+      way[shop=chemist](around:50000,${lat},${lng});
+      node[healthcare=pharmacy](around:50000,${lat},${lng});
+      way[healthcare=pharmacy](around:50000,${lat},${lng});
+    );out center 30;`;
+    const res = await fetch(OVERPASS_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: `data=${encodeURIComponent(query)}`,
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = (await res.json()) as { elements: OverpassElement[] };
+
+    const pharmacies = parseOverpassPharmacies(json.elements, lat, lng);
+    pharmacyCache.set(key, { data: pharmacies, at: now });
+    return pharmacies.slice(0, limit);
+  } catch {
+    return cached?.data.slice(0, limit) ?? [];
+  }
+}
+
 // ── Router ────────────────────────────────────────────────────────────────────
 
 export const healthHelpRouter = createTRPCRouter({
@@ -335,10 +448,11 @@ export const healthHelpRouter = createTRPCRouter({
     .query(async ({ input }) => {
       const { lat, lng, perType } = input;
 
-      // Fetch facilities + ER data in parallel
-      const [allFacilities, erMap] = await Promise.all([
+      // Fetch facilities, ER data, and pharmacies in parallel
+      const [allFacilities, erMap, pharmacies] = await Promise.all([
         fetchFacilities(),
         fetchErData(),
+        fetchNearbyPharmacies(lat, lng, perType),
       ]);
 
       // Promote any facility that has ER data to "hospital"
@@ -350,7 +464,7 @@ export const healthHelpRouter = createTRPCRouter({
         return h;
       });
 
-      // Compute distances
+      // Compute distances for hospitals/CLSCs
       const withDistance = promoted.map((h) => ({
         ...h,
         distanceKm:
@@ -361,7 +475,17 @@ export const healthHelpRouter = createTRPCRouter({
       // Pick N nearest hospitals + N nearest CLSCs
       const hospitals = withDistance.filter((h) => h.type === "hospital").slice(0, perType);
       const clscs = withDistance.filter((h) => h.type === "clsc").slice(0, perType);
-      const nearest = [...hospitals, ...clscs].sort((a, b) => a.distanceKm - b.distanceKm);
+
+      // Pharmacies already sorted/limited by fetchNearbyPharmacies
+      const pharmacyResults = pharmacies.map((p) => ({
+        ...p,
+        distanceKm:
+          Math.round(haversineKm(lat, lng, p.lat, p.lng) * 10) / 10,
+      }));
+
+      const nearest = [...hospitals, ...clscs, ...pharmacyResults].sort(
+        (a, b) => a.distanceKm - b.distanceKm
+      );
 
       return nearest.map((h) => {
         const key = h.name.toUpperCase().trim();
@@ -374,7 +498,7 @@ export const healthHelpRouter = createTRPCRouter({
             : null;
 
         return {
-          msssName: h.name,
+          msssName: h.type === "pharmacy" ? `${h.name}|${h.lat},${h.lng}` : h.name,
           nameFr: h.name,
           nameEn: h.name,
           type: h.type,
@@ -382,7 +506,7 @@ export const healthHelpRouter = createTRPCRouter({
           lat: h.lat,
           lng: h.lng,
           region: h.region,
-          phone: phoneBook.get(key) ?? "",
+          phone: phoneBook.get(key) ?? pharmacyPhones.get(`${h.name}|${h.lat.toFixed(5)}`) ?? "",
           distanceKm: h.distanceKm,
           directionsUrl: `https://www.google.com/maps/dir/?api=1&origin=${lat},${lng}&destination=${h.lat},${h.lng}&travelmode=driving`,
           erStats: erRow

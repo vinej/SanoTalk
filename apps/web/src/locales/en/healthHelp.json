@@ -23,6 +23,7 @@
   "lastUpdated": "Updated: {{time}}",
   "hospital": "Hospital",
   "clsc": "CLSC",
+  "pharmacy": "Pharmacy",
   "yourLocation": "Your Location",
   "refreshLocation": "Refresh",
   "dataSource": "Data: MSSS Quebec",

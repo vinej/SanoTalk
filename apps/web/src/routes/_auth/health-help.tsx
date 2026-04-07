@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { trpc } from "../../lib/trpc";
@@ -9,6 +9,8 @@ import { EmergencyNumbers } from "../../components/health-help/emergency-numbers
 import { Button } from "../../components/ui/button";
 import { MapPin, RefreshCw, Loader2 } from "lucide-react";
 
+export type FacilityType = "hospital" | "clsc" | "pharmacy";
+
 export const Route = createFileRoute("/_auth/health-help")({
   component: HealthHelpPage,
 });
@@ -17,11 +19,28 @@ function HealthHelpPage() {
   const { t } = useTranslation(["healthHelp", "common"]);
   const { lat, lng, error, loading: geoLoading, requestLocation } = useGeolocation();
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [visibleTypes, setVisibleTypes] = useState<Set<FacilityType>>(
+    new Set(["hospital", "clsc", "pharmacy"])
+  );
 
   const { data: facilities = [], isLoading } = trpc.healthHelp.nearestFacilities.useQuery(
     { lat: lat!, lng: lng!, perType: 5 },
     { enabled: lat !== null && lng !== null }
   );
+
+  const filteredFacilities = useMemo(
+    () => facilities.filter((f) => visibleTypes.has(f.type as FacilityType)),
+    [facilities, visibleTypes]
+  );
+
+  function toggleType(type: FacilityType) {
+    setVisibleTypes((prev) => {
+      const next = new Set(prev);
+      if (next.has(type)) next.delete(type);
+      else next.add(type);
+      return next;
+    });
+  }
 
   // No location yet — prompt
   if (lat === null || lng === null) {
@@ -98,7 +117,7 @@ function HealthHelpPage() {
           {/* Left: Facility list */}
           <div className="border-r h-full overflow-hidden">
             <FacilityListPanel
-              facilities={facilities}
+              facilities={filteredFacilities}
               selectedId={selectedId}
               onSelect={setSelectedId}
             />
@@ -109,8 +128,10 @@ function HealthHelpPage() {
             <MapPanel
               userLat={lat}
               userLng={lng}
-              facilities={facilities}
+              facilities={filteredFacilities}
               selectedId={selectedId}
+              visibleTypes={visibleTypes}
+              onToggleType={toggleType}
             />
           </div>
         </div>

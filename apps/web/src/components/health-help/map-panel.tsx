@@ -28,35 +28,46 @@ const userIcon = new L.DivIcon({
 
 // ── Facility markers by type ─────────────────────────────────────────────────
 
-function makeSvgIcon(color: string, glyph: string): L.DivIcon {
+function makeSvgIcon(color: string, glyph: string, size: [number, number] = [32, 40]): L.DivIcon {
+  const [w, h] = size;
+  const cx = w / 2;
+  const cy = w / 2; // text centered in the circle part
+  const fs = Math.round(w * 0.47);
   return new L.DivIcon({
     className: "",
-    html: `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="40" viewBox="0 0 32 40">
-      <path d="M16 0C7.16 0 0 7.16 0 16c0 12 16 24 16 24s16-12 16-24C32 7.16 24.84 0 16 0z"
+    html: `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">
+      <path d="M${cx} 0C${cx * 0.4475} 0 0 ${cx * 0.4475} 0 ${cx}c0 ${cx * 0.75} ${cx} ${h - cx} ${cx} ${h - cx}s${cx}-${(h - cx) * 0.5} ${cx}-${h - cx}C${w} ${cx * 0.4475} ${w - cx * 0.4475} 0 ${cx} 0z"
             fill="${color}" stroke="#fff" stroke-width="1.5"/>
-      <text x="16" y="18" text-anchor="middle" dominant-baseline="central"
-            font-size="15" fill="#fff">${glyph}</text>
+      <text x="${cx}" y="${cy + 2}" text-anchor="middle" dominant-baseline="central"
+            font-size="${fs}" fill="#fff">${glyph}</text>
     </svg>`,
-    iconSize: [32, 40],
-    iconAnchor: [16, 40],
-    popupAnchor: [0, -36],
+    iconSize: [w, h],
+    iconAnchor: [cx, h],
+    popupAnchor: [0, -h + 4],
   });
 }
 
-const hospitalIcon = makeSvgIcon("#dc2626", "H");  // red pin with H
-const clscIcon = makeSvgIcon("#16a34a", "C");       // green pin with C
+const hospitalIcon = makeSvgIcon("#dc2626", "H");              // red pin with H
+const clscIcon = makeSvgIcon("#16a34a", "C");                  // green pin with C
+const pharmacyIcon = makeSvgIcon("#2563eb", "P", [26, 33]);    // smaller blue pin with P
 
 function iconForType(type: string): L.DivIcon {
-  return type === "hospital" ? hospitalIcon : clscIcon;
+  if (type === "hospital") return hospitalIcon;
+  if (type === "pharmacy") return pharmacyIcon;
+  return clscIcon;
 }
 
 // ── Map helpers ──────────────────────────────────────────────────────────────
+
+type FacilityType = "hospital" | "clsc" | "pharmacy";
 
 interface MapPanelProps {
   userLat: number;
   userLng: number;
   facilities: Facility[];
   selectedId: string | null;
+  visibleTypes: Set<FacilityType>;
+  onToggleType: (type: FacilityType) => void;
 }
 
 function FitBounds({ userLat, userLng, facilities }: { userLat: number; userLng: number; facilities: Facility[] }) {
@@ -94,11 +105,18 @@ function PanToSelected({ facilities, selectedId }: { facilities: Facility[]; sel
 
 // ── Component ────────────────────────────────────────────────────────────────
 
-export function MapPanel({ userLat, userLng, facilities, selectedId }: MapPanelProps) {
+const LEGEND_ITEMS: { type: FacilityType; color: string; glyph: string }[] = [
+  { type: "hospital", color: "#dc2626", glyph: "H" },
+  { type: "clsc", color: "#16a34a", glyph: "C" },
+  { type: "pharmacy", color: "#2563eb", glyph: "P" },
+];
+
+export function MapPanel({ userLat, userLng, facilities, selectedId, visibleTypes, onToggleType }: MapPanelProps) {
   const { t, i18n } = useTranslation("healthHelp");
   const isFr = i18n.language === "fr";
 
   return (
+    <div className="relative w-full h-full">
     <MapContainer
       center={[userLat, userLng]}
       zoom={10}
@@ -126,7 +144,7 @@ export function MapPanel({ userLat, userLng, facilities, selectedId }: MapPanelP
             <Popup>
               <div className="text-xs space-y-1">
                 <strong>{name}</strong>
-                <div className="opacity-70">{f.type === "hospital" ? t("hospital") : t("clsc")}</div>
+                <div className="opacity-70">{f.type === "hospital" ? t("hospital") : f.type === "pharmacy" ? t("pharmacy") : t("clsc")}</div>
                 <div>{f.address}</div>
                 <div>{t("distance", { distance: f.distanceKm.toFixed(1) })}</div>
                 {er && er.occupancyRate !== null && (
@@ -141,5 +159,33 @@ export function MapPanel({ userLat, userLng, facilities, selectedId }: MapPanelP
         );
       })}
     </MapContainer>
+
+      {/* Legend – rendered after map so it paints on top */}
+      <div
+        className="absolute top-2 right-2 bg-white/95 dark:bg-zinc-900/95 rounded-lg shadow-md border px-2 py-1.5 flex gap-3"
+        style={{ zIndex: 9999 }}
+      >
+        {LEGEND_ITEMS.map(({ type, color, glyph }) => (
+          <label key={type} className="flex items-center gap-1.5 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={visibleTypes.has(type)}
+              onChange={() => onToggleType(type)}
+              className="accent-current h-3.5 w-3.5 rounded cursor-pointer"
+              style={{ accentColor: color }}
+            />
+            <span
+              className="inline-flex items-center justify-center rounded-full text-[10px] font-bold text-white"
+              style={{ background: color, width: 18, height: 18 }}
+            >
+              {glyph}
+            </span>
+            <span className="text-xs">
+              {type === "hospital" ? t("hospital") : type === "pharmacy" ? t("pharmacy") : t("clsc")}
+            </span>
+          </label>
+        ))}
+      </div>
+    </div>
   );
 }

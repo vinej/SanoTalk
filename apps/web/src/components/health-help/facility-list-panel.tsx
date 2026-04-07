@@ -73,8 +73,12 @@ export function FacilityListPanel({ facilities, selectedId, onSelect }: Facility
                     <h3 className="text-sm font-semibold truncate">{name}</h3>
                   </div>
                   <div className="flex items-center gap-1.5 mt-0.5">
-                    <Badge variant="outline" className="text-[10px] px-1.5 py-0">
-                      {f.type === "hospital" ? t("hospital") : t("clsc")}
+                    <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${
+                      f.type === "hospital" ? "border-red-300 text-red-700 dark:border-red-800 dark:text-red-400" :
+                      f.type === "pharmacy" ? "border-blue-300 text-blue-700 dark:border-blue-800 dark:text-blue-400" :
+                      "border-green-300 text-green-700 dark:border-green-800 dark:text-green-400"
+                    }`}>
+                      {f.type === "hospital" ? t("hospital") : f.type === "pharmacy" ? t("pharmacy") : t("clsc")}
                     </Badge>
                     <span className="text-xs text-muted-foreground">
                       {t("distance", { distance: f.distanceKm.toFixed(1) })}
@@ -121,12 +125,12 @@ export function FacilityListPanel({ facilities, selectedId, onSelect }: Facility
                     <div className="text-sm font-bold">{er.patientsOver48h}</div>
                   </div>
                 </div>
-              ) : (
+              ) : f.type !== "pharmacy" ? (
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
                   <AlertTriangle className="h-3 w-3" />
                   {t("erDataUnavailable")}
                 </div>
-              )}
+              ) : null}
 
               {/* Last updated */}
               {er?.lastUpdated && (

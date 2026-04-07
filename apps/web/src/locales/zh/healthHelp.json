@@ -23,6 +23,7 @@
   "lastUpdated": "更新时间：{{time}}",
   "hospital": "医院",
   "clsc": "CLSC",
+  "pharmacy": "\u836f\u623f",
   "yourLocation": "您的位置",
   "refreshLocation": "刷新",
   "dataSource": "数据来源：MSSS魁北克",

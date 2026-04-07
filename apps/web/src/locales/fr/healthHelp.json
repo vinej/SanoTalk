@@ -23,6 +23,7 @@
   "lastUpdated": "Mis à jour : {{time}}",
   "hospital": "Hôpital",
   "clsc": "CLSC",
+  "pharmacy": "Pharmacie",
   "yourLocation": "Votre position",
   "refreshLocation": "Actualiser",
   "dataSource": "Données : MSSS Québec",
