@@ -215,4 +215,17 @@ export const sessionsRouter = createTRPCRouter({
           )
         );
     }),
+
+  setAgentType: protectedProcedure
+    .input(z.object({
+      sessionId: z.string().uuid(),
+      agentType: z.enum(["health", "companion", "pharmacist"]),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      await assertSessionAccess(ctx.db, input.sessionId, ctx.user.id);
+      await ctx.db.update(talkSession)
+        .set({ agentType: input.agentType })
+        .where(eq(talkSession.id, input.sessionId));
+      return { ok: true };
+    }),
 });

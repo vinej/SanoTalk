@@ -7,7 +7,7 @@ import { Button } from "../../components/ui/button";
 import { useTranscriptSocket } from "../../hooks/use-transcript-socket";
 import { TalkSession } from "@sanotalk/db";
 import { useTranslation } from "react-i18next";
-import { X, UserPlus } from "lucide-react";
+import { X, UserPlus, Bot, Heart, FlaskConical } from "lucide-react";
 import { useSession } from "../../lib/auth-client";
 import {
   Dialog,
@@ -18,17 +18,28 @@ import {
   DialogFooter,
 } from "../../components/ui/dialog";
 
+type AgentVariant = "health" | "companion" | "pharmacist";
+
+const AGENT_OPTIONS: Array<{ variant: AgentVariant; icon: typeof Bot; color: string }> = [
+  { variant: "health", icon: Bot, color: "text-blue-600" },
+  { variant: "companion", icon: Heart, color: "text-violet-600" },
+  { variant: "pharmacist", icon: FlaskConical, color: "text-emerald-600" },
+];
+
 type Props = {
   session: TalkSession;
   onFinalTranscript?: (text: string) => void;
+  isSoloSession?: boolean;
+  onAgentSelected?: (agent: AgentVariant) => void;
 }
 
-export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
+export function LiveSessionRoom({ session, onFinalTranscript, isSoloSession, onAgentSelected }: Props) {
   const { t } = useTranslation("sessions");
   const [token, setToken] = useState<string | null>(null);
   const [serverUrl, setServerUrl] = useState<string | null>(null);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [showUnaddedDialog, setShowUnaddedDialog] = useState(false);
+  const [showAgentDialog, setShowAgentDialog] = useState(false);
   const utils = trpc.useUtils();
 
   const { data: profile } = trpc.user.profile.useQuery();
@@ -72,8 +83,22 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
       setShowUnaddedDialog(true);
       return;
     }
+    // Solo session: show AI agent selection dialog before joining
+    if (isSoloSession) {
+      setShowAgentDialog(true);
+      return;
+    }
     await performJoin();
-  }, [selectedUserId, performJoin]);
+  }, [selectedUserId, isSoloSession, performJoin]);
+
+  const setAgentTypeMutation = trpc.sessions.setAgentType.useMutation();
+
+  const handleAgentSelected = useCallback((agent: AgentVariant) => {
+    setShowAgentDialog(false);
+    onAgentSelected?.(agent);
+    setAgentTypeMutation.mutate({ sessionId: session.id, agentType: agent });
+    void performJoin();
+  }, [onAgentSelected, performJoin, setAgentTypeMutation, session.id]);
 
   const handleDisconnected = useCallback(() => {
     setToken(null);
@@ -111,6 +136,7 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
           </div>
         </div>
 
+        {/* Unadded participant dialog */}
         <Dialog open={showUnaddedDialog} onOpenChange={setShowUnaddedDialog}>
           <DialogContent>
             <DialogHeader>
@@ -140,6 +166,39 @@ export function LiveSessionRoom({ session, onFinalTranscript }: Props) {
                 onClick={() => addForJoinMutation.mutate({ sessionId: session.id, userId: selectedUserId })}
               >
                 {t("participants.addAndJoin")}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* AI Assistant selection dialog — shown when joining a solo session */}
+        <Dialog open={showAgentDialog} onOpenChange={() => {}}>
+          <DialogContent showCloseButton={false} onInteractOutside={(e) => e.preventDefault()} onEscapeKeyDown={(e) => e.preventDefault()}>
+            <DialogHeader>
+              <DialogTitle>{t("detail.selectAgent.title")}</DialogTitle>
+              <DialogDescription>{t("detail.selectAgent.desc")}</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-3 py-2">
+              {AGENT_OPTIONS.map(({ variant, icon: Icon, color }) => (
+                <Button
+                  key={variant}
+                  variant="outline"
+                  className="h-auto w-full py-3 px-3 justify-start gap-3 min-w-0"
+                  onClick={() => handleAgentSelected(variant)}
+                >
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-muted">
+                    <Icon className={`h-4 w-4 ${color}`} />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <p className="font-semibold text-sm truncate">{t(`detail.selectAgent.${variant}`)}</p>
+                    <p className="text-xs text-muted-foreground truncate">{t(`detail.selectAgent.${variant}Desc`)}</p>
+                  </div>
+                </Button>
+              ))}
+            </div>
+            <DialogFooter>
+              <Button variant="outline" size="sm" onClick={() => setShowAgentDialog(false)}>
+                {t("chat.clearDialog.cancel")}
               </Button>
             </DialogFooter>
           </DialogContent>

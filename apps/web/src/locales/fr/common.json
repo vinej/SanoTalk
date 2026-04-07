@@ -5,6 +5,11 @@
   "dashboard": "Tableau de bord",
   "kanban": "Kanban",
   "logout": "Déconnexion",
+  "logoutConfirm": {
+    "title": "Se déconnecter ?",
+    "desc": "Êtes-vous sûr de vouloir vous déconnecter de SanoTalk ?",
+    "cancel": "Annuler"
+  },
   "cancel": "Annuler",
   "save": "Enregistrer",
   "delete": "Supprimer",

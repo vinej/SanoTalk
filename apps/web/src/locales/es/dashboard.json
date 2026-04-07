@@ -21,6 +21,8 @@
   "aiAssistantDesc": "Hacer preguntas de salud y obtener orientación de triaje",
   "companion": "Compañero de Bienestar",
   "companionDesc": "Hablar sobre bienestar, sueño, estrés y estilo de vida",
+  "pharmacist": "Agente IA Farmacéutico",
+  "pharmacistDesc": "Interacciones de medicamentos, dosificación y gestión de medicamentos",
   "medications": "Medicamentos",
   "medicationsDesc": "Registre sus recetas y gestione sus medicamentos",
   "allergies": "Alergias y condiciones",

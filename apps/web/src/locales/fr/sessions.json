@@ -14,7 +14,19 @@
     "loading": "Chargement de la session…",
     "transcript": "Transcription",
     "aiSummary": "Résumé IA",
-    "aiAssistant": "Assistant IA Santé"
+    "aiAssistant": "Assistant IA Santé",
+    "aiCompanion": "Compagnon Bien-être",
+    "aiPharmacist": "Agent IA Pharmacien",
+    "selectAgent": {
+      "title": "Choisissez votre assistant IA",
+      "desc": "Sélectionnez l'assistant IA que vous souhaitez utiliser pendant cette session.",
+      "health": "Assistant IA Santé",
+      "healthDesc": "Poser des questions de santé et obtenir un triage",
+      "companion": "Compagnon Bien-être",
+      "companionDesc": "Discuter bien-être, sommeil, stress et style de vie",
+      "pharmacist": "Agent IA Pharmacien",
+      "pharmacistDesc": "Interactions médicamenteuses, posologie et gestion des médicaments"
+    }
   },
   "card": {
     "liveNow": "En direct",
@@ -86,7 +98,10 @@
     "sendDesc": "Choisissez à qui envoyer ce résumé IA.",
     "sending": "Envoi…",
     "sent": "Envoyé !",
-    "noRecipients": "Aucun médecin ou pharmacien lié. Modifiez votre profil pour en ajouter un."
+    "noRecipients": "Aucun médecin ou pharmacien lié. Modifiez votre profil pour en ajouter un.",
+    "autoSent": "Résumé envoyé automatiquement à votre {{role}}.",
+    "roleDoctor": "médecin",
+    "rolePharmacist": "pharmacien"
   },
   "chat": {
     "placeholder": "Posez une question de santé…",
@@ -130,6 +145,9 @@
     "titleNews": "Actualités",
     "emptyNews": "Posez-moi une question sur l'actualité aux États-Unis ou au Canada.",
     "placeholderNews": "Que se passe-t-il dans l'actualité…",
+    "titlePharmacist": "Agent IA Pharmacien",
+    "emptyPharmacist": "Posez-moi des questions sur vos médicaments, interactions ou posologie.",
+    "placeholderPharmacist": "Posez une question sur vos médicaments…",
     "urgency": {
       "emergency": "Appelez le 911 — Urgence",
       "emergencyDesc": "Vos symptômes peuvent mettre votre vie en danger. Appelez le 911 immédiatement ou rendez-vous aux urgences les plus proches.",

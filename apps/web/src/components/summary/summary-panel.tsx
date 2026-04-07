@@ -9,9 +9,10 @@ import { SendSummaryDialog } from "./send-summary-dialog";
 
 interface Props {
   sessionId: string;
+  agentType?: "health" | "companion" | "pharmacist" | undefined;
 }
 
-export function SummaryPanel({ sessionId }: Props) {
+export function SummaryPanel({ sessionId, agentType }: Props) {
   const { t } = useTranslation("sessions");
   const [isPolling, setIsPolling] = useState(false);
   const [sendOpen, setSendOpen] = useState(false);
@@ -54,7 +55,7 @@ export function SummaryPanel({ sessionId }: Props) {
             <Button
               size="sm"
               variant="outline"
-              onClick={() => generateMutation.mutate({ sessionId })}
+              onClick={() => generateMutation.mutate({ sessionId, agentType })}
               disabled={generateMutation.isPending || isPolling}
             >
               {generateMutation.isPending || isPolling ? (
@@ -117,6 +118,12 @@ export function SummaryPanel({ sessionId }: Props) {
                   ))}
                 </div>
               </section>
+            )}
+
+            {agentType && (
+              <p className="text-xs text-muted-foreground italic border-t pt-2">
+                {t("summary.autoSent", { role: agentType === "pharmacist" ? t("summary.rolePharmacist") : t("summary.roleDoctor") })}
+              </p>
             )}
           </div>
         ) : (

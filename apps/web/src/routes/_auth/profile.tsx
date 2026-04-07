@@ -43,9 +43,10 @@ function ProfilePage() {
   const { data: linkedUsers = [], refetch: refetchLinked } = trpc.user.listLinkedUsers.useQuery(
     undefined, { enabled: isPatient || isProfessional }
   );
-  const linkedDoctors      = linkedUsers.filter((u) => (u as any)?.role === "doctor");
-  const linkedPharmacists  = linkedUsers.filter((u) => (u as any)?.role === "pharmacist");
-  const linkedPatients     = linkedUsers.filter((u) => (u as any)?.role === "patient");
+  const linkedDoctors          = linkedUsers.filter((u) => (u as any)?.role === "doctor" && ((u as any)?.linkType ?? "doctor") === "doctor");
+  const linkedWellnessDoctors  = linkedUsers.filter((u) => (u as any)?.role === "doctor" && (u as any)?.linkType === "wellness");
+  const linkedPharmacists      = linkedUsers.filter((u) => (u as any)?.role === "pharmacist");
+  const linkedPatients         = linkedUsers.filter((u) => (u as any)?.role === "patient");
 
   const { data: allDoctors = [] } = trpc.user.listByRole.useQuery(
     { role: "doctor" }, { enabled: isPatient }
@@ -62,26 +63,39 @@ function ProfilePage() {
     undefined, { enabled: isPatient || isProfessional }
   );
 
-  const pendingLinkIds   = new Set(sentPending.filter((r) => r.type === "link").map((r) => r.toUserId));
   const pendingFriendIds = new Set(sentPending.filter((r) => r.type === "friend").map((r) => r.toUserId));
 
   const [selectedDoctorId, setSelectedDoctorId] = useState("");
+  const [selectedWellnessDoctorId, setSelectedWellnessDoctorId] = useState("");
   const [selectedPharmacistId, setSelectedPharmacistId] = useState("");
   const [selectedPatientId, setSelectedPatientId] = useState("");
 
-  const linkedIds = new Set(linkedUsers.map((u) => (u as any)?.id));
+  // IDs already linked as general doctors
+  const linkedGeneralDoctorIds   = new Set(linkedDoctors.map((u) => (u as any)?.id));
+  const linkedWellnessDoctorIds  = new Set(linkedWellnessDoctors.map((u) => (u as any)?.id));
+  const linkedPharmacistIds      = new Set(linkedPharmacists.map((u) => (u as any)?.id));
+  const linkedPatientIds         = new Set(linkedPatients.map((u) => (u as any)?.id));
 
-  const availableDoctors     = allDoctors.filter((u) => !linkedIds.has(u.id) && !pendingLinkIds.has(u.id));
-  const availablePharmacists = allPharmacists.filter((u) => !linkedIds.has(u.id) && !pendingLinkIds.has(u.id));
-  const availablePatients    = allPatients.filter((u) => !linkedIds.has(u.id) && !pendingLinkIds.has(u.id));
+  // Pending IDs per link type
+  const pendingGeneralDoctorIds  = new Set(sentPending.filter((r) => r.type === "link" && (r as any).toUser?.role === "doctor" && ((r as any).linkType ?? "doctor") === "doctor").map((r) => r.toUserId));
+  const pendingWellnessDoctorIds = new Set(sentPending.filter((r) => r.type === "link" && (r as any).toUser?.role === "doctor" && (r as any).linkType === "wellness").map((r) => r.toUserId));
+  const pendingPharmacistLinkIds = new Set(sentPending.filter((r) => r.type === "link" && (r as any).toUser?.role === "pharmacist").map((r) => r.toUserId));
+  const pendingPatientLinkIds    = new Set(sentPending.filter((r) => r.type === "link" && (r as any).toUser?.role === "patient").map((r) => r.toUserId));
 
-  const pendingDoctorItems     = sentPending.filter((r) => r.type === "link" && (r as any).toUser?.role === "doctor");
-  const pendingPharmacistItems = sentPending.filter((r) => r.type === "link" && (r as any).toUser?.role === "pharmacist");
-  const pendingPatientItems    = sentPending.filter((r) => r.type === "link" && (r as any).toUser?.role === "patient");
+  const availableDoctors          = allDoctors.filter((u) => !linkedGeneralDoctorIds.has(u.id) && !pendingGeneralDoctorIds.has(u.id));
+  const availableWellnessDoctors  = allDoctors.filter((u) => !linkedWellnessDoctorIds.has(u.id) && !pendingWellnessDoctorIds.has(u.id));
+  const availablePharmacists      = allPharmacists.filter((u) => !linkedPharmacistIds.has(u.id) && !pendingPharmacistLinkIds.has(u.id));
+  const availablePatients         = allPatients.filter((u) => !linkedPatientIds.has(u.id) && !pendingPatientLinkIds.has(u.id));
+
+  const pendingDoctorItems          = sentPending.filter((r) => r.type === "link" && (r as any).toUser?.role === "doctor" && ((r as any).linkType ?? "doctor") === "doctor");
+  const pendingWellnessDoctorItems  = sentPending.filter((r) => r.type === "link" && (r as any).toUser?.role === "doctor" && (r as any).linkType === "wellness");
+  const pendingPharmacistItems      = sentPending.filter((r) => r.type === "link" && (r as any).toUser?.role === "pharmacist");
+  const pendingPatientItems         = sentPending.filter((r) => r.type === "link" && (r as any).toUser?.role === "patient");
 
   const addLinkMutation = trpc.user.addUserLink.useMutation({
     onSuccess: () => {
       setSelectedDoctorId("");
+      setSelectedWellnessDoctorId("");
       setSelectedPharmacistId("");
       setSelectedPatientId("");
       void refetchLinked();
@@ -327,6 +341,22 @@ function ProfilePage() {
               onAdd={() => addLinkMutation.mutate({ targetUserId: selectedDoctorId })}
               onRemove={(id) => removeLinkMutation.mutate({ targetUserId: id })}
               onCancel={(targetUserId) => cancelRequestMutation.mutate({ targetUserId, type: "link" })}
+              isPending={addLinkMutation.isPending || removeLinkMutation.isPending || cancelRequestMutation.isPending}
+              pendingLabel={t("pending")}
+              cancelLabel={t("cancelRequest")}
+            />
+            <LinkedSection
+              label={t("linkedWellnessDoctors")}
+              emptyLabel={t("noLinkedWellnessDoctors")}
+              linked={linkedWellnessDoctors}
+              pending={pendingWellnessDoctorItems}
+              available={availableWellnessDoctors}
+              selectedId={selectedWellnessDoctorId}
+              onSelectChange={setSelectedWellnessDoctorId}
+              selectPlaceholder={t("selectWellnessDoctor")}
+              onAdd={() => addLinkMutation.mutate({ targetUserId: selectedWellnessDoctorId, linkType: "wellness" })}
+              onRemove={(id) => removeLinkMutation.mutate({ targetUserId: id, linkType: "wellness" })}
+              onCancel={(targetUserId) => cancelRequestMutation.mutate({ targetUserId, type: "link", linkType: "wellness" })}
               isPending={addLinkMutation.isPending || removeLinkMutation.isPending || cancelRequestMutation.isPending}
               pendingLabel={t("pending")}
               cancelLabel={t("cancelRequest")}

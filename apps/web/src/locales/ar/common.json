@@ -5,6 +5,11 @@
   "dashboard": "لوحة التحكم",
   "kanban": "كانبان",
   "logout": "تسجيل الخروج",
+  "logoutConfirm": {
+    "title": "تسجيل الخروج؟",
+    "desc": "هل أنت متأكد أنك تريد تسجيل الخروج من SanoTalk؟",
+    "cancel": "إلغاء"
+  },
   "cancel": "إلغاء",
   "save": "حفظ",
   "delete": "حذف",

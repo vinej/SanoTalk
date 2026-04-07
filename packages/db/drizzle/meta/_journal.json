@@ -155,6 +155,13 @@
       "when": 1774901400000,
       "tag": "0021_allergies",
       "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1774901500000,
+      "tag": "0022_agent_type_link_type",
+      "breakpoints": true
     }
   ]
 }

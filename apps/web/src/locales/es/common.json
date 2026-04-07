@@ -5,6 +5,11 @@
   "dashboard": "Panel",
   "kanban": "Kanban",
   "logout": "Cerrar sesión",
+  "logoutConfirm": {
+    "title": "Cerrar sesión?",
+    "desc": "Estas seguro de que deseas cerrar sesión en SanoTalk?",
+    "cancel": "Cancelar"
+  },
   "cancel": "Cancelar",
   "save": "Guardar",
   "delete": "Eliminar",

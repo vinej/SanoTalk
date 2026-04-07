@@ -21,6 +21,8 @@
   "aiAssistantDesc": "Ask health questions and get triage guidance",
   "companion": "Wellness Companion",
   "companionDesc": "Chat about wellness, sleep, stress and lifestyle",
+  "pharmacist": "Pharmacist AI Agent",
+  "pharmacistDesc": "Drug interactions, dosage guidance and medication management",
   "medications": "Medications",
   "medicationsDesc": "Track prescriptions and manage your medications",
   "allergies": "Allergies & Conditions",

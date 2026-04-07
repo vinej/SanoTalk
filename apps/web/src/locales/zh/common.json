@@ -5,6 +5,11 @@
   "dashboard": "控制台",
   "kanban": "看板",
   "logout": "退出登录",
+  "logoutConfirm": {
+    "title": "退出登录？",
+    "desc": "您确定要退出 SanoTalk 吗？",
+    "cancel": "取消"
+  },
   "cancel": "取消",
   "save": "保存",
   "delete": "删除",

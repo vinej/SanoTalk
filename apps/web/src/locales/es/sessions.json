@@ -14,7 +14,19 @@
     "loading": "Cargando sesión…",
     "transcript": "Transcripción",
     "aiSummary": "Resumen IA",
-    "aiAssistant": "Asistente IA de Salud"
+    "aiAssistant": "Asistente IA de Salud",
+    "aiCompanion": "Compañero de Bienestar",
+    "aiPharmacist": "Agente IA Farmacéutico",
+    "selectAgent": {
+      "title": "Elige tu asistente IA",
+      "desc": "Selecciona qué asistente IA deseas usar durante esta sesión.",
+      "health": "Asistente IA de Salud",
+      "healthDesc": "Hacer preguntas de salud y obtener orientación de triaje",
+      "companion": "Compañero de Bienestar",
+      "companionDesc": "Hablar sobre bienestar, sueño, estrés y estilo de vida",
+      "pharmacist": "Agente IA Farmacéutico",
+      "pharmacistDesc": "Interacciones de medicamentos, dosificación y gestión de medicamentos"
+    }
   },
   "card": {
     "liveNow": "En vivo",
@@ -86,7 +98,10 @@
     "sendDesc": "Elige a quién enviar este resumen IA.",
     "sending": "Enviando…",
     "sent": "¡Enviado!",
-    "noRecipients": "No hay médico ni farmacéutico vinculado. Edita tu perfil para añadir uno."
+    "noRecipients": "No hay médico ni farmacéutico vinculado. Edita tu perfil para añadir uno.",
+    "autoSent": "Resumen enviado automáticamente a su {{role}}.",
+    "roleDoctor": "médico",
+    "rolePharmacist": "farmacéutico"
   },
   "chat": {
     "placeholder": "Haz una pregunta de salud…",
@@ -130,6 +145,9 @@
     "titleNews": "Noticias",
     "emptyNews": "Pregúntame sobre las últimas noticias en EE.UU. o Canadá.",
     "placeholderNews": "¿Qué está pasando en las noticias…",
+    "titlePharmacist": "Agente IA Farmacéutico",
+    "emptyPharmacist": "Pregúntame sobre medicamentos, interacciones o dosificación.",
+    "placeholderPharmacist": "Pregunte sobre sus medicamentos…",
     "urgency": {
       "emergency": "Llame al 911 — Emergencia",
       "emergencyDesc": "Sus síntomas pueden poner en peligro su vida. Llame al 911 inmediatamente o vaya a la sala de emergencias más cercana.",

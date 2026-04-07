@@ -91,35 +91,41 @@ export const userRouter = createTRPCRouter({
         where: eq(userLink.patientId, ctx.user.id),
         with: { professional: { columns: { id: true, name: true, role: true, specialty: true, email: true } } },
       });
-      return rows.map((r) => r.professional);
+      return rows.map((r) => ({ ...r.professional, linkType: r.linkType }));
     }
     // doctor or pharmacist
     const rows = await ctx.db.query.userLink.findMany({
       where: eq(userLink.professionalId, ctx.user.id),
       with: { patient: { columns: { id: true, name: true, role: true, email: true } } },
     });
-    return rows.map((r) => r.patient);
+    return rows.map((r) => ({ ...r.patient, linkType: r.linkType }));
   }),
 
   addUserLink: protectedProcedure
-    .input(z.object({ targetUserId: z.string() }))
+    .input(z.object({
+      targetUserId: z.string(),
+      linkType: z.enum(["doctor", "wellness"]).optional().default("doctor"),
+    }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db
         .insert(connectionRequest)
-        .values({ fromUserId: ctx.user.id, toUserId: input.targetUserId, type: "link" })
+        .values({ fromUserId: ctx.user.id, toUserId: input.targetUserId, type: "link", linkType: input.linkType })
         .onConflictDoNothing();
       return { ok: true };
     }),
 
   removeUserLink: protectedProcedure
-    .input(z.object({ targetUserId: z.string() }))
+    .input(z.object({
+      targetUserId: z.string(),
+      linkType: z.enum(["doctor", "wellness"]).optional().default("doctor"),
+    }))
     .mutation(async ({ ctx, input }) => {
       const role = (ctx.user as any).role as string;
       const [patientId, professionalId] = role === "patient"
         ? [ctx.user.id, input.targetUserId]
         : [input.targetUserId, ctx.user.id];
       await ctx.db.delete(userLink).where(
-        and(eq(userLink.patientId, patientId), eq(userLink.professionalId, professionalId))
+        and(eq(userLink.patientId, patientId), eq(userLink.professionalId, professionalId), eq(userLink.linkType, input.linkType))
       );
       return { ok: true };
     }),
@@ -211,7 +217,7 @@ export const userRouter = createTRPCRouter({
           const [patientId, professionalId] = fromRole === "patient"
             ? [req.fromUserId, ctx.user.id]
             : [ctx.user.id, req.fromUserId];
-          await ctx.db.insert(userLink).values({ patientId, professionalId }).onConflictDoNothing();
+          await ctx.db.insert(userLink).values({ patientId, professionalId, linkType: req.linkType ?? "doctor" }).onConflictDoNothing();
         } else {
           // type === "friend" — mutual
           await ctx.db.insert(userFriend)
@@ -229,6 +235,7 @@ export const userRouter = createTRPCRouter({
     .input(z.object({
       targetUserId: z.string(),
       type: z.enum(["link", "friend"]),
+      linkType: z.enum(["doctor", "wellness"]).optional().default("doctor"),
     }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db.delete(connectionRequest).where(
@@ -236,6 +243,7 @@ export const userRouter = createTRPCRouter({
           eq(connectionRequest.fromUserId, ctx.user.id),
           eq(connectionRequest.toUserId, input.targetUserId),
           eq(connectionRequest.type, input.type),
+          eq(connectionRequest.linkType, input.linkType),
           eq(connectionRequest.status, "pending")
         )
       );

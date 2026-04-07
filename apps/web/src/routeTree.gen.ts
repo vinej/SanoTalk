@@ -19,6 +19,7 @@ import { Route as AuthIndexRouteImport } from './routes/_auth/index'
 import { Route as AuthVitalsRouteImport } from './routes/_auth/vitals'
 import { Route as AuthSymptomsRouteImport } from './routes/_auth/symptoms'
 import { Route as AuthProfileRouteImport } from './routes/_auth/profile'
+import { Route as AuthPharmacistRouteImport } from './routes/_auth/pharmacist'
 import { Route as AuthNewsRouteImport } from './routes/_auth/news'
 import { Route as AuthMedicationsRouteImport } from './routes/_auth/medications'
 import { Route as AuthKanbanRouteImport } from './routes/_auth/kanban'
@@ -79,6 +80,11 @@ const AuthSymptomsRoute = AuthSymptomsRouteImport.update({
 const AuthProfileRoute = AuthProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthPharmacistRoute = AuthPharmacistRouteImport.update({
+  id: '/pharmacist',
+  path: '/pharmacist',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthNewsRoute = AuthNewsRouteImport.update({
@@ -158,6 +164,7 @@ export interface FileRoutesByFullPath {
   '/kanban': typeof AuthKanbanRoute
   '/medications': typeof AuthMedicationsRoute
   '/news': typeof AuthNewsRoute
+  '/pharmacist': typeof AuthPharmacistRoute
   '/profile': typeof AuthProfileRoute
   '/symptoms': typeof AuthSymptomsRoute
   '/vitals': typeof AuthVitalsRoute
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/kanban': typeof AuthKanbanRoute
   '/medications': typeof AuthMedicationsRoute
   '/news': typeof AuthNewsRoute
+  '/pharmacist': typeof AuthPharmacistRoute
   '/profile': typeof AuthProfileRoute
   '/symptoms': typeof AuthSymptomsRoute
   '/vitals': typeof AuthVitalsRoute
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/_auth/kanban': typeof AuthKanbanRoute
   '/_auth/medications': typeof AuthMedicationsRoute
   '/_auth/news': typeof AuthNewsRoute
+  '/_auth/pharmacist': typeof AuthPharmacistRoute
   '/_auth/profile': typeof AuthProfileRoute
   '/_auth/symptoms': typeof AuthSymptomsRoute
   '/_auth/vitals': typeof AuthVitalsRoute
@@ -231,6 +240,7 @@ export interface FileRouteTypes {
     | '/kanban'
     | '/medications'
     | '/news'
+    | '/pharmacist'
     | '/profile'
     | '/symptoms'
     | '/vitals'
@@ -253,6 +263,7 @@ export interface FileRouteTypes {
     | '/kanban'
     | '/medications'
     | '/news'
+    | '/pharmacist'
     | '/profile'
     | '/symptoms'
     | '/vitals'
@@ -277,6 +288,7 @@ export interface FileRouteTypes {
     | '/_auth/kanban'
     | '/_auth/medications'
     | '/_auth/news'
+    | '/_auth/pharmacist'
     | '/_auth/profile'
     | '/_auth/symptoms'
     | '/_auth/vitals'
@@ -365,6 +377,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AuthProfileRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/pharmacist': {
+      id: '/_auth/pharmacist'
+      path: '/pharmacist'
+      fullPath: '/pharmacist'
+      preLoaderRoute: typeof AuthPharmacistRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/news': {
@@ -464,6 +483,7 @@ interface AuthRouteChildren {
   AuthKanbanRoute: typeof AuthKanbanRoute
   AuthMedicationsRoute: typeof AuthMedicationsRoute
   AuthNewsRoute: typeof AuthNewsRoute
+  AuthPharmacistRoute: typeof AuthPharmacistRoute
   AuthProfileRoute: typeof AuthProfileRoute
   AuthSymptomsRoute: typeof AuthSymptomsRoute
   AuthVitalsRoute: typeof AuthVitalsRoute
@@ -483,6 +503,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthKanbanRoute: AuthKanbanRoute,
   AuthMedicationsRoute: AuthMedicationsRoute,
   AuthNewsRoute: AuthNewsRoute,
+  AuthPharmacistRoute: AuthPharmacistRoute,
   AuthProfileRoute: AuthProfileRoute,
   AuthSymptomsRoute: AuthSymptomsRoute,
   AuthVitalsRoute: AuthVitalsRoute,

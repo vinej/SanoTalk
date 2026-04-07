@@ -21,6 +21,8 @@
   "aiAssistantDesc": "咨询健康问题并获取分诊建议",
   "companion": "健康伴侣",
   "companionDesc": "聊聊健康、睡眠、压力和生活方式",
+  "pharmacist": "药剂师 AI 助手",
+  "pharmacistDesc": "药物相互作用、剂量指导和药物管理",
   "medications": "药物管理",
   "medicationsDesc": "跟踪处方并管理您的药物",
   "allergies": "过敏与疾病",

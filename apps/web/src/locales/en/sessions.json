@@ -14,7 +14,19 @@
     "loading": "Loading session…",
     "transcript": "Transcript",
     "aiSummary": "AI Summary",
-    "aiAssistant": "Health AI Assistant"
+    "aiAssistant": "Health AI Assistant",
+    "aiCompanion": "Wellness Companion",
+    "aiPharmacist": "Pharmacist AI Agent",
+    "selectAgent": {
+      "title": "Choose your AI Assistant",
+      "desc": "Select which AI assistant you'd like to use during this session.",
+      "health": "Health AI Assistant",
+      "healthDesc": "Ask health questions and get triage guidance",
+      "companion": "Wellness Companion",
+      "companionDesc": "Chat about wellness, sleep, stress and lifestyle",
+      "pharmacist": "Pharmacist AI Agent",
+      "pharmacistDesc": "Drug interactions, dosage guidance and medication management"
+    }
   },
   "card": {
     "liveNow": "Live now",
@@ -86,7 +98,10 @@
     "sendDesc": "Choose who to send this AI summary to.",
     "sending": "Sending…",
     "sent": "Sent!",
-    "noRecipients": "No linked doctor or pharmacist. Edit your profile to add one."
+    "noRecipients": "No linked doctor or pharmacist. Edit your profile to add one.",
+    "autoSent": "Summary automatically sent to your {{role}}.",
+    "roleDoctor": "doctor",
+    "rolePharmacist": "pharmacist"
   },
   "chat": {
     "placeholder": "Ask a health question…",
@@ -130,6 +145,9 @@
     "titleNews": "News",
     "emptyNews": "Ask me about the latest news in the US or Canada.",
     "placeholderNews": "What's happening in the news…",
+    "titlePharmacist": "Pharmacist AI Agent",
+    "emptyPharmacist": "Ask me about medications, drug interactions, or dosage guidance.",
+    "placeholderPharmacist": "Ask about your medications…",
     "urgency": {
       "emergency": "Call 911 — Emergency",
       "emergencyDesc": "Your symptoms may be life-threatening. Call 911 immediately or go to the nearest emergency room.",

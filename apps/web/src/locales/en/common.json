@@ -5,6 +5,11 @@
   "dashboard": "Dashboard",
   "kanban": "Kanban",
   "logout": "Logout",
+  "logoutConfirm": {
+    "title": "Log out?",
+    "desc": "Are you sure you want to log out of SanoTalk?",
+    "cancel": "Cancel"
+  },
   "cancel": "Cancel",
   "save": "Save",
   "delete": "Delete",

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "../../components/ui/button";
-import { Kanban, Bot, Heart, Hospital, Download, Activity, Video, Pill, ClipboardList, UserCircle, ShieldAlert } from "lucide-react";
+import { Kanban, Bot, Heart, Hospital, Download, Activity, Video, Pill, ClipboardList, UserCircle, ShieldAlert, FlaskConical } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { usePwaInstall } from "../../hooks/use-pwa-install";
 import { trpc } from "../../lib/trpc";
@@ -20,6 +20,7 @@ const FEATURES = [
   { to: "/allergies", icon: ShieldAlert, color: "text-teal-600", bg: "bg-teal-50 dark:bg-teal-950/30", border: "border-teal-200 dark:border-teal-800", key: "allergies" },
   { to: "/ai-assistant", icon: Bot, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-950/30", border: "border-blue-200 dark:border-blue-800", key: "aiAssistant" },
   { to: "/companion", icon: Heart, color: "text-violet-600", bg: "bg-violet-50 dark:bg-violet-950/30", border: "border-violet-200 dark:border-violet-800", key: "companion" },
+  { to: "/pharmacist", icon: FlaskConical, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-950/30", border: "border-emerald-200 dark:border-emerald-800", key: "pharmacist" },
   { to: "/kanban", icon: Kanban, color: "text-gray-700", bg: "bg-gray-50 dark:bg-gray-950/30", border: "border-gray-200 dark:border-gray-800", key: "kanban" },
 ] as const;
 

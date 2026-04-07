@@ -186,14 +186,23 @@ async function assertSessionAccess(
 
 export const agentsRouter = createTRPCRouter({
   generateSummary: protectedProcedure
-    .input(z.object({ sessionId: z.string().uuid() }))
+    .input(z.object({
+      sessionId: z.string().uuid(),
+      agentType: z.enum(["health", "companion", "pharmacist"]).optional(),
+    }))
     .mutation(async ({ ctx, input }) => {
       await assertSessionAccess(ctx.db, input.sessionId, ctx.user.id);
+      const agentType = input.agentType ?? "health";
+      const agentName = agentType === "companion"
+        ? "companionSummaryAgent"
+        : agentType === "pharmacist"
+          ? "pharmacistSummaryAgent"
+          : "healthSummaryAgent";
       const [run] = await ctx.db
         .insert(agentRun)
         .values({
-          agentName: "summaryAgent",
-          input: { sessionId: input.sessionId },
+          agentName,
+          input: { sessionId: input.sessionId, agentType },
         })
         .returning();
       if (run) ctx.triggerAgentRun(run.id);
@@ -227,6 +236,7 @@ export const agentsRouter = createTRPCRouter({
     .input(z.object({
       sessionId: z.string().uuid(),
       message: z.string().min(1).max(2000),
+      agentType: z.enum(["health", "companion", "pharmacist"]).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       await assertSessionAccess(ctx.db, input.sessionId, ctx.user.id);
@@ -282,8 +292,13 @@ export const agentsRouter = createTRPCRouter({
       const allergyContext = buildAllergyContext(userAllergies, userConditions);
       const fullHistory = [...vitalsContext, ...medsContext, ...symptomsContext, ...allergyContext, ...history];
 
-      // Call AI agent
-      const assistantText = await ctx.callHealthChat(fullHistory, input.message, sessionLanguage, userProperties, propertiesLanguage);
+      // Call the selected AI agent
+      const callAgent = input.agentType === "companion"
+        ? ctx.callCompanionChat
+        : input.agentType === "pharmacist"
+          ? ctx.callPharmacistChat
+          : ctx.callHealthChat;
+      const assistantText = await callAgent(fullHistory, input.message, sessionLanguage, userProperties, propertiesLanguage);
 
       // Persist assistant response
       await ctx.db.insert(chatMessage).values({
@@ -360,10 +375,12 @@ export const agentsRouter = createTRPCRouter({
 
       await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "companion", role: "user", content: input.message });
 
-      const { properties: userProperties, propertiesLanguage, recentSymptoms, userAllergies, userConditions } = await getUserContext(ctx.db, ctx.user.id);
+      const { properties: userProperties, propertiesLanguage, recentVitals, activeMedications, recentSymptoms, userAllergies, userConditions } = await getUserContext(ctx.db, ctx.user.id);
+      const vitalsContext = buildVitalsContext(recentVitals);
+      const medsContext = buildMedicationsContext(activeMedications);
       const symptomsContext = buildSymptomsContext(recentSymptoms);
       const allergyContext = buildAllergyContext(userAllergies, userConditions);
-      const fullHistory = [...symptomsContext, ...allergyContext, ...history];
+      const fullHistory = [...vitalsContext, ...medsContext, ...symptomsContext, ...allergyContext, ...history];
       const assistantText = await ctx.callCompanionChat(fullHistory, input.message, input.language ?? "en", userProperties, propertiesLanguage);
 
       await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "companion", role: "assistant", content: assistantText });
@@ -425,6 +442,53 @@ export const agentsRouter = createTRPCRouter({
     .mutation(async ({ ctx }) => {
       await ctx.db.delete(chatMessage).where(
         and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "news"))
+      );
+      return { cleared: true };
+    }),
+
+  pharmacistChatHistory: protectedProcedure
+    .query(async ({ ctx }) => {
+      return ctx.db.query.chatMessage.findMany({
+        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "pharmacist")),
+        orderBy: [asc(chatMessage.createdAt)],
+      });
+    }),
+
+  sendPharmacistChatMessage: protectedProcedure
+    .input(z.object({
+      message: z.string().min(1).max(2000),
+      language: z.string().optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const pastMessages = await ctx.db.query.chatMessage.findMany({
+        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "pharmacist")),
+        orderBy: [asc(chatMessage.createdAt)],
+        limit: 20,
+      });
+
+      const history: Array<{ role: "user" | "assistant"; content: string }> = pastMessages.map(
+        (msg) => ({ role: msg.role as "user" | "assistant", content: msg.content })
+      );
+
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "pharmacist", role: "user", content: input.message });
+
+      const { properties: userProperties, propertiesLanguage, recentVitals, activeMedications, recentSymptoms, userAllergies, userConditions } = await getUserContext(ctx.db, ctx.user.id);
+      const vitalsContext = buildVitalsContext(recentVitals);
+      const medsContext = buildMedicationsContext(activeMedications);
+      const symptomsContext = buildSymptomsContext(recentSymptoms);
+      const allergyContext = buildAllergyContext(userAllergies, userConditions);
+      const fullHistory = [...vitalsContext, ...medsContext, ...symptomsContext, ...allergyContext, ...history];
+      const assistantText = await ctx.callPharmacistChat(fullHistory, input.message, input.language ?? "en", userProperties, propertiesLanguage);
+
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "pharmacist", role: "assistant", content: assistantText });
+
+      return { message: assistantText };
+    }),
+
+  clearPharmacistChat: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      await ctx.db.delete(chatMessage).where(
+        and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "pharmacist"))
       );
       return { cleared: true };
     }),
@@ -529,7 +593,7 @@ export const agentsRouter = createTRPCRouter({
     }),
 
   listSavedConversations: protectedProcedure
-    .input(z.object({ chatType: z.enum(["health", "companion", "news"]) }))
+    .input(z.object({ chatType: z.enum(["health", "companion", "news", "pharmacist"]) }))
     .query(async ({ ctx, input }) => {
       return ctx.db
         .select({
@@ -550,7 +614,7 @@ export const agentsRouter = createTRPCRouter({
 
   saveConversation: protectedProcedure
     .input(z.object({
-      chatType: z.enum(["health", "companion", "news"]),
+      chatType: z.enum(["health", "companion", "news", "pharmacist"]),
       title: z.string().min(1).max(120),
     }))
     .mutation(async ({ ctx, input }) => {
@@ -606,7 +670,7 @@ export const agentsRouter = createTRPCRouter({
         ),
       });
       if (!saved) throw new TRPCError({ code: "NOT_FOUND", message: "Saved conversation not found" });
-      const chatType = saved.chatType as "health" | "companion" | "news";
+      const chatType = saved.chatType as "health" | "companion" | "news" | "pharmacist";
       await ctx.db.delete(chatMessage).where(
         and(
           isNull(chatMessage.sessionId),

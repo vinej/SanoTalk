@@ -9,6 +9,14 @@ import { signOut } from "../lib/auth-client";
 import { tracker } from "../lib/tracker";
 import { SanoTalkLogoV2 } from "./logo-v2";
 import { ConnectionRequestsDialog } from "./profile/connection-requests-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "./ui/dialog";
 
 export function AppHeader() {
   const { data: profile } = trpc.user.profile.useQuery();
@@ -19,6 +27,7 @@ export function AppHeader() {
   const { t } = useTranslation(["dashboard", "common"]);
   const navigate = useNavigate();
   const [requestsOpen, setRequestsOpen] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
 
   async function handleLogout() {
     if (tracker) {
@@ -60,7 +69,7 @@ export function AppHeader() {
             <span className="text-muted-foreground text-right">{profile.email}</span>
             <div className="flex gap-1">
               <LanguageSwitcher />
-              <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={handleLogout}>
+              <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => setLogoutOpen(true)}>
                 <LogOut className="h-3 w-3 mr-1" />
                 {t("common:logout")}
               </Button>
@@ -68,6 +77,24 @@ export function AppHeader() {
           </div>
         )}
       </div>
+
+      <Dialog open={logoutOpen} onOpenChange={setLogoutOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("common:logoutConfirm.title")}</DialogTitle>
+            <DialogDescription>{t("common:logoutConfirm.desc")}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" size="sm" onClick={() => setLogoutOpen(false)}>
+              {t("common:logoutConfirm.cancel")}
+            </Button>
+            <Button variant="destructive" size="sm" onClick={handleLogout}>
+              <LogOut className="h-3 w-3 mr-1" />
+              {t("common:logout")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

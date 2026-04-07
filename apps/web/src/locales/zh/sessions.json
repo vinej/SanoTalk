@@ -14,7 +14,19 @@
     "loading": "加载会话中…",
     "transcript": "转录",
     "aiSummary": "AI 摘要",
-    "aiAssistant": "健康 AI 助手"
+    "aiAssistant": "健康 AI 助手",
+    "aiCompanion": "健康伴侣",
+    "aiPharmacist": "药剂师 AI 助手",
+    "selectAgent": {
+      "title": "选择您的 AI 助手",
+      "desc": "选择您想在此会话中使用的 AI 助手。",
+      "health": "健康 AI 助手",
+      "healthDesc": "咨询健康问题并获取分诊建议",
+      "companion": "健康伴侣",
+      "companionDesc": "聊聊健康、睡眠、压力和生活方式",
+      "pharmacist": "药剂师 AI 助手",
+      "pharmacistDesc": "药物相互作用、剂量指导和药物管理"
+    }
   },
   "card": {
     "liveNow": "直播中",
@@ -86,7 +98,10 @@
     "sendDesc": "选择将此 AI 摘要发送给谁。",
     "sending": "发送中…",
     "sent": "已发送！",
-    "noRecipients": "没有关联的医生或药剂师。请编辑个人资料以添加。"
+    "noRecipients": "没有关联的医生或药剂师。请编辑个人资料以添加。",
+    "autoSent": "摘要已自动发送给您的{{role}}。",
+    "roleDoctor": "医生",
+    "rolePharmacist": "药剂师"
   },
   "chat": {
     "placeholder": "提问健康相关问题…",
@@ -130,6 +145,9 @@
     "titleNews": "新闻",
     "emptyNews": "向我询问美国或加拿大的最新新闻。",
     "placeholderNews": "最近有什么新闻…",
+    "titlePharmacist": "药剂师 AI 助手",
+    "emptyPharmacist": "询问我关于药物、药物相互作用或剂量指导。",
+    "placeholderPharmacist": "询问您的药物…",
     "urgency": {
       "emergency": "拨打 911 — 紧急情况",
       "emergencyDesc": "您的症状可能危及生命。请立即拨打 911 或前往最近的急诊室。",

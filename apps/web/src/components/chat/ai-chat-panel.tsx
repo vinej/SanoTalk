@@ -84,7 +84,7 @@ function renderMessageContent(content: string, t: (key: string) => string) {
 
 interface Props {
   sessionId?: string;
-  variant?: "health" | "companion" | "news";
+  variant?: "health" | "companion" | "news" | "pharmacist";
   pendingVoiceText?: string;
   onVoiceTextConsumed?: () => void;
 }
@@ -97,7 +97,8 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
   const isSessionMode = !!sessionId;
   const isCompanion = !isSessionMode && variant === "companion";
   const isNews = !isSessionMode && variant === "news";
-  const chatTypeArg = isCompanion ? "companion" : isNews ? "news" : "health";
+  const isPharmacist = !isSessionMode && variant === "pharmacist";
+  const chatTypeArg = isCompanion ? "companion" : isNews ? "news" : isPharmacist ? "pharmacist" : "health";
   const titleStorageKey = userId
     ? `sanotalk_chat_loaded_title_${chatTypeArg}_${userId}`
     : null;
@@ -140,9 +141,13 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
     undefined,
     { enabled: isNews }
   );
+  const { data: pharmacistMessages = [], refetch: refetchPharmacist } = trpc.agents.pharmacistChatHistory.useQuery(
+    undefined,
+    { enabled: isPharmacist }
+  );
 
-  const messages = isSessionMode ? sessionMessages : isCompanion ? companionMessages : isNews ? newsMessages : healthMessages;
-  const refetch = isSessionMode ? refetchSession : isCompanion ? refetchCompanion : isNews ? refetchNews : refetchHealth;
+  const messages = isSessionMode ? sessionMessages : isCompanion ? companionMessages : isNews ? newsMessages : isPharmacist ? pharmacistMessages : healthMessages;
+  const refetch = isSessionMode ? refetchSession : isCompanion ? refetchCompanion : isNews ? refetchNews : isPharmacist ? refetchPharmacist : refetchHealth;
 
   // ── Saved conversations ────────────────────────────────────────────────────
   const { data: savedList = [], refetch: refetchSaved } = trpc.agents.listSavedConversations.useQuery(
@@ -179,9 +184,11 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
   const sendHealthMessage = trpc.agents.sendHealthChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
   const sendCompanionMessage = trpc.agents.sendCompanionChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
   const sendNewsMessage = trpc.agents.sendNewsChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
+  const sendPharmacistMessage = trpc.agents.sendPharmacistChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
   const clearHealth = trpc.agents.clearHealthChat.useMutation({ onSuccess: () => { void refetch(); } });
   const clearCompanion = trpc.agents.clearCompanionChat.useMutation({ onSuccess: () => { void refetch(); } });
   const clearNews = trpc.agents.clearNewsChat.useMutation({ onSuccess: () => { void refetch(); } });
+  const clearPharmacist = trpc.agents.clearPharmacistChat.useMutation({ onSuccess: () => { void refetch(); } });
 
   const isPending = isSessionMode
     ? sendSessionMessage.isPending
@@ -189,7 +196,9 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
       ? sendCompanionMessage.isPending
       : isNews
         ? sendNewsMessage.isPending
-        : sendHealthMessage.isPending;
+        : isPharmacist
+          ? sendPharmacistMessage.isPending
+          : sendHealthMessage.isPending;
 
   // ── Voice (non-session modes) ──────────────────────────────────────────────
   const { isRecording, micError } = useTranscriptSocket(undefined, {
@@ -200,6 +209,8 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
         sendCompanionMessage.mutate({ message: text, language: i18n.language });
       } else if (isNews) {
         sendNewsMessage.mutate({ message: text, language: i18n.language });
+      } else if (isPharmacist) {
+        sendPharmacistMessage.mutate({ message: text, language: i18n.language });
       } else {
         sendHealthMessage.mutate({ message: text, language: i18n.language });
       }
@@ -234,11 +245,14 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
     if (!trimmed || isPending) return;
     setInputValue("");
     if (isSessionMode) {
-      sendSessionMessage.mutate({ sessionId: sessionId!, message: trimmed });
+      const agentType = variant === "companion" ? "companion" as const : variant === "pharmacist" ? "pharmacist" as const : "health" as const;
+      sendSessionMessage.mutate({ sessionId: sessionId!, message: trimmed, agentType });
     } else if (isCompanion) {
       sendCompanionMessage.mutate({ message: trimmed, language: i18n.language });
     } else if (isNews) {
       sendNewsMessage.mutate({ message: trimmed, language: i18n.language });
+    } else if (isPharmacist) {
+      sendPharmacistMessage.mutate({ message: trimmed, language: i18n.language });
     } else {
       sendHealthMessage.mutate({ message: trimmed, language: i18n.language });
     }
@@ -246,7 +260,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
 
   function handleClearConfirmed() {
     stopTts();
-    (isCompanion ? clearCompanion : isNews ? clearNews : clearHealth).mutate(undefined, {
+    (isCompanion ? clearCompanion : isNews ? clearNews : isPharmacist ? clearPharmacist : clearHealth).mutate(undefined, {
       onSuccess: () => {
         setShowClearDialog(false);
         setShowSaveInput(false);
@@ -266,7 +280,8 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
   // Session mode: auto-send voice transcript from parent
   useEffect(() => {
     if (isSessionMode && voiceEnabled && pendingVoiceText && !isPending) {
-      sendSessionMessage.mutate({ sessionId: sessionId!, message: pendingVoiceText });
+      const agentType = variant === "companion" ? "companion" as const : variant === "pharmacist" ? "pharmacist" as const : "health" as const;
+      sendSessionMessage.mutate({ sessionId: sessionId!, message: pendingVoiceText, agentType });
       onVoiceTextConsumed?.();
     }
   }, [pendingVoiceText, voiceEnabled]);
@@ -284,10 +299,11 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
           "px-4 py-3 border-b font-semibold text-sm",
           isCompanion ? "bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300"
           : isNews ? "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300"
+          : isPharmacist ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300"
           : "bg-muted/50 text-foreground"
         )}>
           <div className="flex items-center gap-2 min-w-0">
-            <span className="shrink-0">{t(isCompanion ? "chat.titleCompanion" : isNews ? "chat.titleNews" : "chat.titleGeneral")}</span>
+            <span className="shrink-0">{t(isCompanion ? "chat.titleCompanion" : isNews ? "chat.titleNews" : isPharmacist ? "chat.titlePharmacist" : "chat.titleGeneral")}</span>
             {loadedConversationTitle && (
               <>
                 <span className="shrink-0 opacity-40">·</span>
@@ -301,7 +317,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
         <div className="p-3 space-y-3">
           {messages.length === 0 && !isPending && (
             <p className="text-sm text-muted-foreground text-center py-8">
-              {t(isCompanion ? "chat.emptyCompanion" : isNews ? "chat.emptyNews" : "chat.empty")}
+              {t(isCompanion ? "chat.emptyCompanion" : isNews ? "chat.emptyNews" : isPharmacist ? "chat.emptyPharmacist" : "chat.empty")}
             </p>
           )}
 
@@ -316,7 +332,9 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
                     ? "mr-auto bg-sky-50 dark:bg-sky-950/30 text-foreground"
                     : isNews
                       ? "mr-auto bg-amber-50 dark:bg-amber-950/30 text-foreground"
-                      : "mr-auto bg-muted text-foreground"
+                      : isPharmacist
+                        ? "mr-auto bg-emerald-50 dark:bg-emerald-950/30 text-foreground"
+                        : "mr-auto bg-muted text-foreground"
               )}
             >
               {msg.role === "assistant" ? renderMessageContent(msg.content, t) : msg.content}
@@ -410,7 +428,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
               size="sm"
               variant="ghost"
               onClick={() => { setSaveTitle(loadedConversationTitle ?? ""); setShowClearDialog(true); }}
-              disabled={messages.length === 0 || clearHealth.isPending || clearCompanion.isPending}
+              disabled={messages.length === 0 || clearHealth.isPending || clearCompanion.isPending || clearPharmacist.isPending}
               title={t("chat.clearConversation")}
               className="text-muted-foreground hover:text-destructive"
             >
@@ -468,7 +486,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
               handleSend();
             }
           }}
-          placeholder={t(isCompanion ? "chat.placeholderCompanion" : isNews ? "chat.placeholderNews" : "chat.placeholder")}
+          placeholder={t(isCompanion ? "chat.placeholderCompanion" : isNews ? "chat.placeholderNews" : isPharmacist ? "chat.placeholderPharmacist" : "chat.placeholder")}
           disabled={isPending}
           className="flex-1 text-sm"
         />
@@ -549,7 +567,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
             <Button
               variant="destructive"
               size="sm"
-              disabled={clearHealth.isPending || clearCompanion.isPending}
+              disabled={clearHealth.isPending || clearCompanion.isPending || clearPharmacist.isPending}
               onClick={handleClearConfirmed}
             >
               {t("chat.clearDialog.clearOnly")}
@@ -561,7 +579,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
             ) : (
               <Button
                 size="sm"
-                disabled={!saveTitle.trim() || saveConversationMutation.isPending || clearHealth.isPending || clearCompanion.isPending}
+                disabled={!saveTitle.trim() || saveConversationMutation.isPending || clearHealth.isPending || clearCompanion.isPending || clearPharmacist.isPending}
                 onClick={handleSaveAndClear}
               >
                 {saveConversationMutation.isPending

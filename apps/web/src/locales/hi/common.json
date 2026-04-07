@@ -5,6 +5,11 @@
   "dashboard": "डैशबोर्ड",
   "kanban": "कानबान",
   "logout": "लॉग आउट",
+  "logoutConfirm": {
+    "title": "लॉग आउट करें?",
+    "desc": "क्या आप वाकई SanoTalk से लॉग आउट करना चाहते हैं?",
+    "cancel": "रद्द करें"
+  },
   "cancel": "रद्द करें",
   "save": "सहेजें",
   "delete": "हटाएं",

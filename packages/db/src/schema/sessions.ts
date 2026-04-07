@@ -14,6 +14,7 @@ export const talkSession = createTable("talk_session", {
   id: uuid("id").primaryKey().defaultRandom(),
   title: text("title"),
   language: text("language").notNull().default("en"),
+  agentType: text("agent_type"),
   status: sessionStatusEnum("status").notNull().default("scheduled"),
   roomName: text("room_name").notNull().unique(),
   hostId: text("host_id")

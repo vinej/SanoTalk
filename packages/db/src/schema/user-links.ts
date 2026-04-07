@@ -8,9 +8,10 @@ export const userLink = createTable("user_link", {
   id:             uuid("id").primaryKey().defaultRandom(),
   patientId:      text("patient_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   professionalId: text("professional_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  linkType:       text("link_type").notNull().default("doctor"),
   createdAt:      timestamp("created_at").notNull().defaultNow(),
 }, (t) => ({
-  uniq: uniqueIndex("user_link_patient_professional_uniq").on(t.patientId, t.professionalId),
+  uniq: uniqueIndex("user_link_patient_professional_type_uniq").on(t.patientId, t.professionalId, t.linkType),
 }));
 
 export const userLinkRelations = relations(userLink, ({ one }) => ({
@@ -41,11 +42,12 @@ export const connectionRequest = createTable("connection_request", {
   fromUserId: text("from_user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   toUserId:   text("to_user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   type:       text("type", { enum: ["link", "friend"] }).notNull(),
+  linkType:   text("link_type").notNull().default("doctor"),
   status:     text("status", { enum: ["pending", "accepted", "refused"] }).notNull().default("pending"),
   createdAt:  timestamp("created_at").notNull().defaultNow(),
   updatedAt:  timestamp("updated_at").notNull().defaultNow(),
 }, (t) => ({
-  uniq: uniqueIndex("connection_request_from_to_type_uniq").on(t.fromUserId, t.toUserId, t.type),
+  uniq: uniqueIndex("connection_request_from_to_type_link_uniq").on(t.fromUserId, t.toUserId, t.type, t.linkType),
 }));
 
 export const connectionRequestRelations = relations(connectionRequest, ({ one }) => ({
