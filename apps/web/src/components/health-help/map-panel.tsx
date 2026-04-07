@@ -12,14 +12,16 @@ import shadowUrl from "leaflet/dist/images/marker-shadow.png";
 
 L.Icon.Default.mergeOptions({ iconUrl, iconRetinaUrl, shadowUrl });
 
-// ── User location: blue pulsing dot ──────────────────────────────────────────
+// ── User location: orange pulsing dot ────────────────────────────────────────
+
+const USER_COLOR = "#f97316"; // orange-500
 
 const userIcon = new L.DivIcon({
   className: "",
   html: `<div style="
     width:18px;height:18px;border-radius:50%;
-    background:#3b82f6;border:3px solid #fff;
-    box-shadow:0 0 0 2px #3b82f6,0 2px 6px rgba(0,0,0,.35);
+    background:${USER_COLOR};border:3px solid #fff;
+    box-shadow:0 0 0 2px ${USER_COLOR},0 2px 6px rgba(0,0,0,.35);
   "></div>`,
   iconSize: [18, 18],
   iconAnchor: [9, 9],
@@ -185,6 +187,14 @@ export function MapPanel({ userLat, userLng, facilities, selectedId, visibleType
             </span>
           </label>
         ))}
+        {/* User location – no checkbox */}
+        <div className="flex items-center gap-1.5 select-none border-l pl-3">
+          <span
+            className="inline-block rounded-full"
+            style={{ background: USER_COLOR, width: 12, height: 12, border: "2px solid #fff", boxShadow: `0 0 0 1.5px ${USER_COLOR}` }}
+          />
+          <span className="text-xs">{t("yourLocation")}</span>
+        </div>
       </div>
     </div>
   );

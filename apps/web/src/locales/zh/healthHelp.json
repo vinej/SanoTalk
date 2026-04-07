@@ -1,6 +1,6 @@
 {
   "title": "健康帮助",
-  "subtitle": "查找魁北克最近的医院和CLSC",
+  "subtitle": "查找魁北克最近的医院、CLSC和药房",
   "requestLocation": "允许位置访问以查找附近的医疗机构",
   "requestLocationButton": "分享我的位置",
   "locationDenied": "位置访问被拒绝。请在浏览器设置中启用。",

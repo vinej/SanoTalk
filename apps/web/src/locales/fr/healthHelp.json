@@ -1,6 +1,6 @@
 {
   "title": "Aide Santé",
-  "subtitle": "Trouvez les hôpitaux et CLSC les plus proches au Québec",
+  "subtitle": "Trouvez les hôpitaux, CLSC et pharmacies les plus proches au Québec",
   "requestLocation": "Autorisez l'accès à votre position pour trouver les établissements à proximité",
   "requestLocationButton": "Partager ma position",
   "locationDenied": "L'accès à la position a été refusé. Veuillez l'activer dans les paramètres de votre navigateur.",

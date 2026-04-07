@@ -98,7 +98,7 @@ function DashboardPage() {
             <p className="text-muted-foreground mt-1">{t("dashboard:subtitle")}</p>
           </div>
           <div className="flex gap-2">
-            <Button asChild className="bg-red-600 hover:bg-red-700 text-white shadow-md shadow-red-200 dark:shadow-red-900/40 animate-pulse hover:animate-none">
+            <Button asChild className="bg-white hover:bg-red-50 text-red-600 border border-red-300 shadow-md">
               <Link to="/health-help">
                 <Hospital className="mr-2 h-4 w-4" />
                 {t("dashboard:healthHelp")}

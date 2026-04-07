@@ -1,6 +1,6 @@
 {
   "title": "Ayuda de Salud",
-  "subtitle": "Encuentra los hospitales y CLSC más cercanos en Quebec",
+  "subtitle": "Encuentra los hospitales, CLSC y farmacias más cercanos en Quebec",
   "requestLocation": "Permite el acceso a tu ubicación para encontrar centros cercanos",
   "requestLocationButton": "Compartir mi ubicación",
   "locationDenied": "Se denegó el acceso a la ubicación. Actívalo en la configuración de tu navegador.",
