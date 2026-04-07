@@ -126,6 +126,17 @@
     "titleGeneral": "Asistente IA de Salud",
     "titleNews": "Noticias",
     "emptyNews": "Pregúntame sobre las últimas noticias en EE.UU. o Canadá.",
-    "placeholderNews": "¿Qué está pasando en las noticias…"
+    "placeholderNews": "¿Qué está pasando en las noticias…",
+    "urgency": {
+      "emergency": "Llame al 911 — Emergencia",
+      "emergencyDesc": "Sus síntomas pueden poner en peligro su vida. Llame al 911 inmediatamente o vaya a la sala de emergencias más cercana.",
+      "er_today": "Vaya a urgencias hoy",
+      "er_todayDesc": "Sus síntomas necesitan atención médica inmediata. Visite una sala de emergencias hoy.",
+      "see_doctor": "Consulte un médico en los próximos días",
+      "see_doctorDesc": "Sus síntomas deben ser evaluados por un profesional de la salud. Llame al 811 (Info-Santé) para una consulta de enfermería.",
+      "self_care": "Cuidado en casa",
+      "self_careDesc": "Sus síntomas probablemente son manejables en casa. Siga los consejos anteriores y consulte un médico si los síntomas empeoran.",
+      "findER": "Encontrar urgencias más cercanas"
+    }
   }
 }

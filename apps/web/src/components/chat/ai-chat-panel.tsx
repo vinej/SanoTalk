@@ -4,8 +4,9 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { trpc } from "../../lib/trpc";
-import { Loader2, Send, Mic, MicOff, Trash2, Bookmark, BookmarkCheck, BookmarkX, Volume2, VolumeX } from "lucide-react";
+import { Loader2, Send, Mic, MicOff, Trash2, Bookmark, BookmarkCheck, BookmarkX, Volume2, VolumeX, Phone, MapPin, Stethoscope, Heart } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Link } from "@tanstack/react-router";
 import { cn } from "../../lib/utils";
 import { useTranscriptSocket } from "../../hooks/use-transcript-socket";
 import { useTts } from "../../hooks/use-tts";
@@ -18,6 +19,68 @@ import {
   DialogFooter,
 } from "../ui/dialog";
 import { useSession } from "../../lib/auth-client";
+
+// ── Urgency triage badge ─────────────────────────────────────────────────────
+
+type UrgencyLevel = "emergency" | "er_today" | "see_doctor" | "self_care";
+
+const URGENCY_RE = /\[URGENCY:(emergency|er_today|see_doctor|self_care)\]/;
+
+const URGENCY_CONFIG: Record<UrgencyLevel, { bg: string; border: string; text: string; icon: typeof Phone }> = {
+  emergency:  { bg: "bg-red-50 dark:bg-red-950/40",    border: "border-red-300 dark:border-red-800",    text: "text-red-700 dark:text-red-300",    icon: Phone },
+  er_today:   { bg: "bg-orange-50 dark:bg-orange-950/40", border: "border-orange-300 dark:border-orange-800", text: "text-orange-700 dark:text-orange-300", icon: MapPin },
+  see_doctor: { bg: "bg-yellow-50 dark:bg-yellow-950/40", border: "border-yellow-300 dark:border-yellow-800", text: "text-yellow-700 dark:text-yellow-300", icon: Stethoscope },
+  self_care:  { bg: "bg-green-50 dark:bg-green-950/40",  border: "border-green-300 dark:border-green-800",  text: "text-green-700 dark:text-green-300",  icon: Heart },
+};
+
+function UrgencyBadge({ level, t }: { level: UrgencyLevel; t: (key: string) => string }) {
+  const cfg = URGENCY_CONFIG[level];
+  const Icon = cfg.icon;
+  return (
+    <div className={cn("rounded-lg border p-3 my-2", cfg.bg, cfg.border)}>
+      <div className={cn("flex items-center gap-2 font-semibold text-sm", cfg.text)}>
+        <Icon className="h-4 w-4 shrink-0" />
+        {t(`chat.urgency.${level}`)}
+      </div>
+      <p className={cn("text-xs mt-1", cfg.text, "opacity-80")}>
+        {t(`chat.urgency.${level}Desc`)}
+      </p>
+      {(level === "emergency" || level === "er_today") && (
+        <div className="flex gap-2 mt-2">
+          {level === "emergency" && (
+            <a href="tel:911" className="inline-flex items-center gap-1 text-xs font-medium text-red-700 dark:text-red-300 underline">
+              <Phone className="h-3 w-3" /> 911
+            </a>
+          )}
+          <Link to="/health-help" className="inline-flex items-center gap-1 text-xs font-medium underline" style={{ color: "inherit" }}>
+            <MapPin className="h-3 w-3" /> {t("chat.urgency.findER")}
+          </Link>
+        </div>
+      )}
+      {level === "see_doctor" && (
+        <a href="tel:811" className={cn("inline-flex items-center gap-1 text-xs font-medium mt-2 underline", cfg.text)}>
+          <Phone className="h-3 w-3" /> 811 — Info-Santé
+        </a>
+      )}
+    </div>
+  );
+}
+
+function renderMessageContent(content: string, t: (key: string) => string) {
+  const match = content.match(URGENCY_RE);
+  if (!match) return <>{content}</>;
+
+  const level = match[1] as UrgencyLevel;
+  const textWithoutTag = content.replace(URGENCY_RE, "").trim();
+  return (
+    <>
+      {textWithoutTag}
+      <UrgencyBadge level={level} t={t} />
+    </>
+  );
+}
+
+// ── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
   sessionId?: string;
@@ -256,7 +319,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
                       : "mr-auto bg-muted text-foreground"
               )}
             >
-              {msg.content}
+              {msg.role === "assistant" ? renderMessageContent(msg.content, t) : msg.content}
             </div>
           ))}
 

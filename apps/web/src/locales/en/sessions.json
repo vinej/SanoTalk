@@ -126,6 +126,17 @@
     "titleGeneral": "Health AI Assistant",
     "titleNews": "News",
     "emptyNews": "Ask me about the latest news in the US or Canada.",
-    "placeholderNews": "What's happening in the news…"
+    "placeholderNews": "What's happening in the news…",
+    "urgency": {
+      "emergency": "Call 911 — Emergency",
+      "emergencyDesc": "Your symptoms may be life-threatening. Call 911 immediately or go to the nearest emergency room.",
+      "er_today": "Go to ER today",
+      "er_todayDesc": "Your symptoms need prompt medical attention. Visit an emergency room today.",
+      "see_doctor": "See a doctor within days",
+      "see_doctorDesc": "Your symptoms should be evaluated by a healthcare professional. Call 811 (Info-Santé) for a nurse consultation.",
+      "self_care": "Self-care at home",
+      "self_careDesc": "Your symptoms are likely manageable at home. Follow the advice above and see a doctor if symptoms worsen.",
+      "findER": "Find nearest ER"
+    }
   }
 }

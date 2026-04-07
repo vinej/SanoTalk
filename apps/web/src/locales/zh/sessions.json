@@ -126,6 +126,17 @@
     "titleGeneral": "健康 AI 助手",
     "titleNews": "新闻",
     "emptyNews": "向我询问美国或加拿大的最新新闻。",
-    "placeholderNews": "最近有什么新闻…"
+    "placeholderNews": "最近有什么新闻…",
+    "urgency": {
+      "emergency": "拨打 911 — 紧急情况",
+      "emergencyDesc": "您的症状可能危及生命。请立即拨打 911 或前往最近的急诊室。",
+      "er_today": "今天去急诊室",
+      "er_todayDesc": "您的症状需要及时的医疗关注。请今天前往急诊室。",
+      "see_doctor": "几天内看医生",
+      "see_doctorDesc": "您的症状应由医疗专业人员评估。拨打 811（Info-Santé）进行护士咨询。",
+      "self_care": "居家自我护理",
+      "self_careDesc": "您的症状可能在家中处理。遵循以上建议，如果症状恶化请就医。",
+      "findER": "查找最近的急诊室"
+    }
   }
 }
