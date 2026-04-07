@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { trpc } from "../../lib/trpc";
@@ -7,6 +7,7 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Trash2, Pencil, X, Clock, Camera, Loader2 } from "lucide-react";
 import { useAvatarUrl, getInitials } from "../../lib/avatar-url";
+import { RamqSection } from "../../components/profile/ramq-section";
 
 export const Route = createFileRoute("/_auth/profile")({
   component: ProfilePage,
@@ -17,6 +18,7 @@ const PREDEFINED_KEYS = [
   "height", "weight", "bmi", "diet", "physical_activity", "smoking_status",
   "alcohol_consumption", "sleep_hours", "stress_level", "mood_baseline", "therapy_status",
   "city", "country", "region", "birth_date", "marital_status", "living_situation",
+  "ramq_number", "ramq_expiry",
 ];
 
 const SUPPORTED_LANGUAGES = [
@@ -183,6 +185,13 @@ function ProfilePage() {
   const tProps = i18n.getFixedT(propertiesLanguage, "profile");
 
   const { data: properties, refetch: refetchProperties } = trpc.user.listProperties.useQuery();
+
+  const showRamqSection = useMemo(() => {
+    if (!properties) return false;
+    if (properties.some((p) => p.key === "ramq_number" || p.key === "ramq_expiry")) return true;
+    const region = properties.find((p) => p.key === "region")?.value ?? "";
+    return /qu[eé]bec/i.test(region);
+  }, [properties]);
 
   const setPropertyMutation = trpc.user.setProperty.useMutation({
     onSuccess: () => {
@@ -489,6 +498,11 @@ function ProfilePage() {
               </Button>
             </div>
           </div>
+        )}
+
+        {/* RAMQ Health Insurance (Quebec patients) */}
+        {isPatient && showRamqSection && (
+          <RamqSection properties={properties ?? []} onPropertyChange={refetchProperties} />
         )}
 
         {/* Personal Context (key/value properties) */}

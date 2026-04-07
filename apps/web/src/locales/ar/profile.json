@@ -70,7 +70,9 @@
       "phone": "+966 50 000 0000",
       "birth_date": "1990-03-26",
       "marital_status": "أعزب",
-      "living_situation": "أعيش بمفردي"
+      "living_situation": "أعيش بمفردي",
+      "ramq_number": "VINJ 9001 0151",
+      "ramq_expiry": "2027-06"
     },
     "keys": {
       "blood_type": "فصيلة الدم",
@@ -94,7 +96,37 @@
       "phone": "الهاتف",
       "birth_date": "تاريخ الميلاد",
       "marital_status": "الحالة الاجتماعية",
-      "living_situation": "وضع المعيشة"
+      "living_situation": "وضع المعيشة",
+      "ramq_number": "رقم بطاقة RAMQ",
+      "ramq_expiry": "انتهاء بطاقة RAMQ"
     }
+  },
+  "ramq": {
+    "title": "تأمين RAMQ الصحي",
+    "description": "التأمين الصحي العام لكيبيك (Régie de l'assurance maladie du Québec)",
+    "cardNumber": "رقم البطاقة",
+    "cardExpiry": "تاريخ الانتهاء",
+    "noCardYet": "لم يتم حفظ معلومات بطاقة RAMQ بعد.",
+    "addCard": "إضافة بطاقة RAMQ",
+    "editCard": "تعديل",
+    "saveCard": "حفظ",
+    "cancelEdit": "إلغاء",
+    "removeCard": "حذف معلومات RAMQ",
+    "confirmRemove": "حذف",
+    "portalLink": "خدمات RAMQ عبر الإنترنت",
+    "portalDescription": "الوصول إلى حسابك في RAMQ، التحقق من الأهلية، طلب بطاقة بديلة.",
+    "coverageTitle": "ما تغطيه RAMQ",
+    "coverage_0": "زيارات الطبيب (طبيب عام وأخصائي)",
+    "coverage_1": "الإقامة في المستشفى والجراحة والخدمات التشخيصية",
+    "coverage_2": "التحاليل المخبرية والتصوير الطبي",
+    "coverage_3": "بعض خدمات طب الأسنان (أطفال أقل من 10 سنوات، جراحة الفم)",
+    "coverage_4": "فحوصات العيون (أطفال أقل من 18، كبار السن 65+)",
+    "coverage_5": "الطب النفسي وخدمات الصحة النفسية",
+    "coverage_6": "تأمين الأدوية (لمن ليس لديهم تغطية خاصة)",
+    "coverageNote": "قد تختلف التغطية. زوروا ramq.gouv.qc.ca للحصول على أحدث المعلومات.",
+    "expiryValid": "صالحة حتى {{date}}",
+    "expirySoon": "بطاقة RAMQ الخاصة بك تنتهي قريباً: {{date}}. فكر في تجديدها.",
+    "expiryExpired": "انتهت صلاحية بطاقة RAMQ الخاصة بك ({{date}}). جددها عبر بوابة RAMQ.",
+    "invalidNumber": "صيغة غير صالحة. المتوقع: ABCD 1234 5678"
   }
 }

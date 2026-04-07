@@ -70,7 +70,9 @@
       "phone": "+91 98765 43210",
       "birth_date": "1990-03-26",
       "marital_status": "अविवाहित",
-      "living_situation": "अकेले"
+      "living_situation": "अकेले",
+      "ramq_number": "VINJ 9001 0151",
+      "ramq_expiry": "2027-06"
     },
     "keys": {
       "blood_type": "रक्त समूह",
@@ -94,7 +96,37 @@
       "phone": "फ़ोन",
       "birth_date": "जन्म तिथि",
       "marital_status": "वैवाहिक स्थिति",
-      "living_situation": "रहने की स्थिति"
+      "living_situation": "रहने की स्थिति",
+      "ramq_number": "RAMQ कार्ड नंबर",
+      "ramq_expiry": "RAMQ कार्ड समाप्ति"
     }
+  },
+  "ramq": {
+    "title": "RAMQ स्वास्थ्य बीमा",
+    "description": "क्यूबेक सार्वजनिक स्वास्थ्य बीमा (Régie de l'assurance maladie du Québec)",
+    "cardNumber": "कार्ड नंबर",
+    "cardExpiry": "समाप्ति तिथि",
+    "noCardYet": "अभी तक कोई RAMQ कार्ड जानकारी सहेजी नहीं गई।",
+    "addCard": "RAMQ कार्ड जोड़ें",
+    "editCard": "संपादित करें",
+    "saveCard": "सहेजें",
+    "cancelEdit": "रद्द करें",
+    "removeCard": "RAMQ जानकारी हटाएं",
+    "confirmRemove": "हटाएं",
+    "portalLink": "RAMQ ऑनलाइन सेवाएं",
+    "portalDescription": "अपने RAMQ खाते तक पहुंचें, पात्रता जांचें, प्रतिस्थापन कार्ड ऑर्डर करें।",
+    "coverageTitle": "RAMQ क्या कवर करता है",
+    "coverage_0": "चिकित्सक परामर्श (सामान्य और विशेषज्ञ)",
+    "coverage_1": "अस्पताल में भर्ती, सर्जरी और नैदानिक सेवाएं",
+    "coverage_2": "प्रयोगशाला परीक्षण और चिकित्सा इमेजिंग",
+    "coverage_3": "कुछ दंत सेवाएं (10 वर्ष से कम बच्चे, मौखिक सर्जरी)",
+    "coverage_4": "नेत्र परीक्षा (18 से कम बच्चे, 65+ वरिष्ठ)",
+    "coverage_5": "मनोचिकित्सा और मानसिक स्वास्थ्य सेवाएं",
+    "coverage_6": "प्रिस्क्रिप्शन दवा बीमा (बिना निजी कवरेज वालों के लिए)",
+    "coverageNote": "कवरेज भिन्न हो सकता है। नवीनतम जानकारी के लिए ramq.gouv.qc.ca पर जाएं।",
+    "expiryValid": "{{date}} तक वैध",
+    "expirySoon": "आपका RAMQ कार्ड जल्द समाप्त हो रहा है: {{date}}। नवीनीकरण पर विचार करें।",
+    "expiryExpired": "आपका RAMQ कार्ड समाप्त हो गया है ({{date}})। RAMQ पोर्टल पर नवीनीकरण करें।",
+    "invalidNumber": "अमान्य प्रारूप। अपेक्षित: ABCD 1234 5678"
   }
 }

@@ -6,6 +6,7 @@ import { LogOut, Bell } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "./language-switcher";
 import { signOut } from "../lib/auth-client";
+import { queryClient } from "../lib/query-client";
 import { tracker } from "../lib/tracker";
 import { SanoTalkLogoV2 } from "./logo-v2";
 import { ConnectionRequestsDialog } from "./profile/connection-requests-dialog";
@@ -22,7 +23,7 @@ export function AppHeader() {
   const { data: profile } = trpc.user.profile.useQuery();
   const { data: pendingRequests = [] } = trpc.user.listPendingRequests.useQuery(
     undefined,
-    { refetchInterval: 30_000 }
+    { refetchInterval: 30_000, staleTime: 0 }
   );
   const { t } = useTranslation(["dashboard", "common"]);
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ export function AppHeader() {
       tracker.stop();
       console.log("[OpenReplay] tracker stopped");
     }
+    queryClient.clear();
     await signOut();
     navigate({ to: "/login" as any });
   }

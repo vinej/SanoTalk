@@ -70,7 +70,9 @@
       "phone": "+86 138 0000 0000",
       "birth_date": "1990-03-26",
       "marital_status": "未婚",
-      "living_situation": "独居"
+      "living_situation": "独居",
+      "ramq_number": "VINJ 9001 0151",
+      "ramq_expiry": "2027-06"
     },
     "keys": {
       "blood_type": "血型",
@@ -94,7 +96,37 @@
       "phone": "电话",
       "birth_date": "出生日期",
       "marital_status": "婚姻状况",
-      "living_situation": "居住情况"
+      "living_situation": "居住情况",
+      "ramq_number": "RAMQ 卡号",
+      "ramq_expiry": "RAMQ 卡到期日"
     }
+  },
+  "ramq": {
+    "title": "RAMQ 健康保险",
+    "description": "魁北克公共健康保险（魁北克医疗保险管理局）",
+    "cardNumber": "卡号",
+    "cardExpiry": "到期日期",
+    "noCardYet": "尚未保存 RAMQ 卡信息。",
+    "addCard": "添加 RAMQ 卡",
+    "editCard": "编辑",
+    "saveCard": "保存",
+    "cancelEdit": "取消",
+    "removeCard": "删除 RAMQ 信息",
+    "confirmRemove": "删除",
+    "portalLink": "RAMQ 在线服务",
+    "portalDescription": "访问您的 RAMQ 账户，检查资格，申请补办卡。",
+    "coverageTitle": "RAMQ 覆盖范围",
+    "coverage_0": "医生门诊（全科和专科）",
+    "coverage_1": "住院、手术和诊断服务",
+    "coverage_2": "化验和医学影像",
+    "coverage_3": "部分牙科服务（10岁以下儿童、口腔外科）",
+    "coverage_4": "视力检查（18岁以下儿童、65岁以上老人）",
+    "coverage_5": "精神科和心理健康服务",
+    "coverage_6": "处方药保险（无私人保险者）",
+    "coverageNote": "覆盖范围可能有所不同。请访问 ramq.gouv.qc.ca 获取最新信息。",
+    "expiryValid": "有效期至 {{date}}",
+    "expirySoon": "您的 RAMQ 卡即将到期：{{date}}。请考虑续期。",
+    "expiryExpired": "您的 RAMQ 卡已过期（{{date}}）。请在 RAMQ 门户网站续期。",
+    "invalidNumber": "格式无效。预期格式：ABCD 1234 5678"
   }
 }
