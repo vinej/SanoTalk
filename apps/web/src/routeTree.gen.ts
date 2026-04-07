@@ -18,12 +18,15 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
 import { Route as AuthVitalsRouteImport } from './routes/_auth/vitals'
 import { Route as AuthSymptomsRouteImport } from './routes/_auth/symptoms'
+import { Route as AuthProfileRouteImport } from './routes/_auth/profile'
 import { Route as AuthNewsRouteImport } from './routes/_auth/news'
 import { Route as AuthMedicationsRouteImport } from './routes/_auth/medications'
 import { Route as AuthKanbanRouteImport } from './routes/_auth/kanban'
 import { Route as AuthHealthHelpRouteImport } from './routes/_auth/health-help'
+import { Route as AuthErAlertsRouteImport } from './routes/_auth/er-alerts'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
 import { Route as AuthCompanionRouteImport } from './routes/_auth/companion'
+import { Route as AuthAllergiesRouteImport } from './routes/_auth/allergies'
 import { Route as AuthAiAssistantRouteImport } from './routes/_auth/ai-assistant'
 import { Route as AuthSessionsIndexRouteImport } from './routes/_auth/sessions.index'
 import { Route as AuthSessionsNewRouteImport } from './routes/_auth/sessions/new'
@@ -73,6 +76,11 @@ const AuthSymptomsRoute = AuthSymptomsRouteImport.update({
   path: '/symptoms',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthProfileRoute = AuthProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthNewsRoute = AuthNewsRouteImport.update({
   id: '/news',
   path: '/news',
@@ -93,6 +101,11 @@ const AuthHealthHelpRoute = AuthHealthHelpRouteImport.update({
   path: '/health-help',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthErAlertsRoute = AuthErAlertsRouteImport.update({
+  id: '/er-alerts',
+  path: '/er-alerts',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthDashboardRoute = AuthDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -101,6 +114,11 @@ const AuthDashboardRoute = AuthDashboardRouteImport.update({
 const AuthCompanionRoute = AuthCompanionRouteImport.update({
   id: '/companion',
   path: '/companion',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthAllergiesRoute = AuthAllergiesRouteImport.update({
+  id: '/allergies',
+  path: '/allergies',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthAiAssistantRoute = AuthAiAssistantRouteImport.update({
@@ -132,12 +150,15 @@ export interface FileRoutesByFullPath {
   '/two-factor': typeof TwoFactorRoute
   '/verify-email': typeof VerifyEmailRoute
   '/ai-assistant': typeof AuthAiAssistantRoute
+  '/allergies': typeof AuthAllergiesRoute
   '/companion': typeof AuthCompanionRoute
   '/dashboard': typeof AuthDashboardRoute
+  '/er-alerts': typeof AuthErAlertsRoute
   '/health-help': typeof AuthHealthHelpRoute
   '/kanban': typeof AuthKanbanRoute
   '/medications': typeof AuthMedicationsRoute
   '/news': typeof AuthNewsRoute
+  '/profile': typeof AuthProfileRoute
   '/symptoms': typeof AuthSymptomsRoute
   '/vitals': typeof AuthVitalsRoute
   '/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
@@ -151,12 +172,15 @@ export interface FileRoutesByTo {
   '/two-factor': typeof TwoFactorRoute
   '/verify-email': typeof VerifyEmailRoute
   '/ai-assistant': typeof AuthAiAssistantRoute
+  '/allergies': typeof AuthAllergiesRoute
   '/companion': typeof AuthCompanionRoute
   '/dashboard': typeof AuthDashboardRoute
+  '/er-alerts': typeof AuthErAlertsRoute
   '/health-help': typeof AuthHealthHelpRoute
   '/kanban': typeof AuthKanbanRoute
   '/medications': typeof AuthMedicationsRoute
   '/news': typeof AuthNewsRoute
+  '/profile': typeof AuthProfileRoute
   '/symptoms': typeof AuthSymptomsRoute
   '/vitals': typeof AuthVitalsRoute
   '/': typeof AuthIndexRoute
@@ -173,12 +197,15 @@ export interface FileRoutesById {
   '/two-factor': typeof TwoFactorRoute
   '/verify-email': typeof VerifyEmailRoute
   '/_auth/ai-assistant': typeof AuthAiAssistantRoute
+  '/_auth/allergies': typeof AuthAllergiesRoute
   '/_auth/companion': typeof AuthCompanionRoute
   '/_auth/dashboard': typeof AuthDashboardRoute
+  '/_auth/er-alerts': typeof AuthErAlertsRoute
   '/_auth/health-help': typeof AuthHealthHelpRoute
   '/_auth/kanban': typeof AuthKanbanRoute
   '/_auth/medications': typeof AuthMedicationsRoute
   '/_auth/news': typeof AuthNewsRoute
+  '/_auth/profile': typeof AuthProfileRoute
   '/_auth/symptoms': typeof AuthSymptomsRoute
   '/_auth/vitals': typeof AuthVitalsRoute
   '/_auth/': typeof AuthIndexRoute
@@ -196,12 +223,15 @@ export interface FileRouteTypes {
     | '/two-factor'
     | '/verify-email'
     | '/ai-assistant'
+    | '/allergies'
     | '/companion'
     | '/dashboard'
+    | '/er-alerts'
     | '/health-help'
     | '/kanban'
     | '/medications'
     | '/news'
+    | '/profile'
     | '/symptoms'
     | '/vitals'
     | '/sessions/$sessionId'
@@ -215,12 +245,15 @@ export interface FileRouteTypes {
     | '/two-factor'
     | '/verify-email'
     | '/ai-assistant'
+    | '/allergies'
     | '/companion'
     | '/dashboard'
+    | '/er-alerts'
     | '/health-help'
     | '/kanban'
     | '/medications'
     | '/news'
+    | '/profile'
     | '/symptoms'
     | '/vitals'
     | '/'
@@ -236,12 +269,15 @@ export interface FileRouteTypes {
     | '/two-factor'
     | '/verify-email'
     | '/_auth/ai-assistant'
+    | '/_auth/allergies'
     | '/_auth/companion'
     | '/_auth/dashboard'
+    | '/_auth/er-alerts'
     | '/_auth/health-help'
     | '/_auth/kanban'
     | '/_auth/medications'
     | '/_auth/news'
+    | '/_auth/profile'
     | '/_auth/symptoms'
     | '/_auth/vitals'
     | '/_auth/'
@@ -324,6 +360,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSymptomsRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/profile': {
+      id: '/_auth/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthProfileRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/news': {
       id: '/_auth/news'
       path: '/news'
@@ -352,6 +395,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthHealthHelpRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/er-alerts': {
+      id: '/_auth/er-alerts'
+      path: '/er-alerts'
+      fullPath: '/er-alerts'
+      preLoaderRoute: typeof AuthErAlertsRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/dashboard': {
       id: '/_auth/dashboard'
       path: '/dashboard'
@@ -364,6 +414,13 @@ declare module '@tanstack/react-router' {
       path: '/companion'
       fullPath: '/companion'
       preLoaderRoute: typeof AuthCompanionRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/allergies': {
+      id: '/_auth/allergies'
+      path: '/allergies'
+      fullPath: '/allergies'
+      preLoaderRoute: typeof AuthAllergiesRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/ai-assistant': {
@@ -399,12 +456,15 @@ declare module '@tanstack/react-router' {
 
 interface AuthRouteChildren {
   AuthAiAssistantRoute: typeof AuthAiAssistantRoute
+  AuthAllergiesRoute: typeof AuthAllergiesRoute
   AuthCompanionRoute: typeof AuthCompanionRoute
   AuthDashboardRoute: typeof AuthDashboardRoute
+  AuthErAlertsRoute: typeof AuthErAlertsRoute
   AuthHealthHelpRoute: typeof AuthHealthHelpRoute
   AuthKanbanRoute: typeof AuthKanbanRoute
   AuthMedicationsRoute: typeof AuthMedicationsRoute
   AuthNewsRoute: typeof AuthNewsRoute
+  AuthProfileRoute: typeof AuthProfileRoute
   AuthSymptomsRoute: typeof AuthSymptomsRoute
   AuthVitalsRoute: typeof AuthVitalsRoute
   AuthIndexRoute: typeof AuthIndexRoute
@@ -415,12 +475,15 @@ interface AuthRouteChildren {
 
 const AuthRouteChildren: AuthRouteChildren = {
   AuthAiAssistantRoute: AuthAiAssistantRoute,
+  AuthAllergiesRoute: AuthAllergiesRoute,
   AuthCompanionRoute: AuthCompanionRoute,
   AuthDashboardRoute: AuthDashboardRoute,
+  AuthErAlertsRoute: AuthErAlertsRoute,
   AuthHealthHelpRoute: AuthHealthHelpRoute,
   AuthKanbanRoute: AuthKanbanRoute,
   AuthMedicationsRoute: AuthMedicationsRoute,
   AuthNewsRoute: AuthNewsRoute,
+  AuthProfileRoute: AuthProfileRoute,
   AuthSymptomsRoute: AuthSymptomsRoute,
   AuthVitalsRoute: AuthVitalsRoute,
   AuthIndexRoute: AuthIndexRoute,

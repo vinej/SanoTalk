@@ -13,3 +13,5 @@ export * from "./ai-assistants";
 export * from "./vital-signs";
 export * from "./medications";
 export * from "./symptom-logs";
+export * from "./er-favorites";
+export * from "./allergies";

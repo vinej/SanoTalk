@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { trpc } from "../../lib/trpc";
 import { useGeolocation } from "../../hooks/use-geolocation";
@@ -7,7 +7,7 @@ import { FacilityListPanel } from "../../components/health-help/facility-list-pa
 import { MapPanel } from "../../components/health-help/map-panel";
 import { EmergencyNumbers } from "../../components/health-help/emergency-numbers";
 import { Button } from "../../components/ui/button";
-import { MapPin, RefreshCw, Loader2 } from "lucide-react";
+import { MapPin, RefreshCw, Loader2, Bell } from "lucide-react";
 
 export type FacilityType = "hospital" | "clsc" | "pharmacy";
 
@@ -23,14 +23,38 @@ function HealthHelpPage() {
     new Set(["hospital", "clsc", "pharmacy"])
   );
 
+  // Favorites
+  const { data: favoriteNames = [] } = trpc.healthHelp.listFavorites.useQuery();
+  const favoritesSet = useMemo(() => new Set(favoriteNames), [favoriteNames]);
+  const utils = trpc.useUtils();
+  const addFav = trpc.healthHelp.addFavorite.useMutation({ onSuccess: () => void utils.healthHelp.listFavorites.invalidate() });
+  const removeFav = trpc.healthHelp.removeFavorite.useMutation({ onSuccess: () => void utils.healthHelp.listFavorites.invalidate() });
+
+  function handleToggleFavorite(facilityName: string) {
+    if (favoritesSet.has(facilityName)) {
+      removeFav.mutate({ facilityName });
+    } else {
+      addFav.mutate({ facilityName });
+    }
+  }
+
   const { data: facilities = [], isLoading } = trpc.healthHelp.nearestFacilities.useQuery(
     { lat: lat!, lng: lng!, perType: 5 },
     { enabled: lat !== null && lng !== null }
   );
 
   const filteredFacilities = useMemo(
-    () => facilities.filter((f) => visibleTypes.has(f.type as FacilityType)),
-    [facilities, visibleTypes]
+    () => {
+      const filtered = facilities.filter((f) => visibleTypes.has(f.type as FacilityType));
+      // Sort favorites first, then by distance
+      return filtered.sort((a, b) => {
+        const aFav = favoritesSet.has(a.msssName) ? 0 : 1;
+        const bFav = favoritesSet.has(b.msssName) ? 0 : 1;
+        if (aFav !== bFav) return aFav - bFav;
+        return a.distanceKm - b.distanceKm;
+      });
+    },
+    [facilities, visibleTypes, favoritesSet]
   );
 
   function toggleType(type: FacilityType) {
@@ -102,10 +126,20 @@ function HealthHelpPage() {
           <h1 className="text-lg font-semibold">{t("title")}</h1>
           <p className="text-xs text-muted-foreground">{t("subtitle")}</p>
         </div>
-        <Button size="sm" variant="ghost" onClick={requestLocation} disabled={geoLoading}>
-          <RefreshCw className={`h-3.5 w-3.5 mr-1 ${geoLoading ? "animate-spin" : ""}`} />
-          {t("refreshLocation")}
-        </Button>
+        <div className="flex gap-2">
+          {favoritesSet.size > 0 && (
+            <Button size="sm" variant="outline" asChild>
+              <Link to="/er-alerts">
+                <Bell className="h-3.5 w-3.5 mr-1" />
+                {t("erAlerts")}
+              </Link>
+            </Button>
+          )}
+          <Button size="sm" variant="ghost" onClick={requestLocation} disabled={geoLoading}>
+            <RefreshCw className={`h-3.5 w-3.5 mr-1 ${geoLoading ? "animate-spin" : ""}`} />
+            {t("refreshLocation")}
+          </Button>
+        </div>
       </div>
 
       {/* Emergency numbers */}
@@ -115,11 +149,13 @@ function HealthHelpPage() {
       <div className="flex-1 min-h-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-1 h-full gap-0">
           {/* Left: Facility list */}
-          <div className="border-r h-full overflow-hidden">
+          <div className="border-r h-full overflow-hidden min-w-0">
             <FacilityListPanel
               facilities={filteredFacilities}
               selectedId={selectedId}
               onSelect={setSelectedId}
+              favorites={favoritesSet}
+              onToggleFavorite={handleToggleFavorite}
             />
           </div>
 

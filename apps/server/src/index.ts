@@ -113,6 +113,7 @@ app.use(
 
 // ─── Avatar proxy ─────────────────────────────────────────────────────────
 // Serves user avatars so the browser never needs direct access to MinIO.
+import { snapshotErData } from "@sanotalk/trpc/lib/er-snapshot";
 import { db, user as userTable } from "@sanotalk/db";
 import { eq } from "drizzle-orm";
 import * as Minio from "minio";
@@ -174,4 +175,6 @@ startDeepgramWebSocket(server);
 server.listen(PORT, () => {
   logger.info(`🚀 SanoTalk server running on http://localhost:${PORT}`);
   void runPendingAgents();
+  void snapshotErData(db);
+  setInterval(() => void snapshotErData(db), 30 * 60 * 1000);
 });

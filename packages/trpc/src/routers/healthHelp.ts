@@ -1,5 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
+import { erFavorite, erSnapshot } from "@sanotalk/db";
+import { eq, and, desc, gte, sql, avg } from "drizzle-orm";
 import hospitalsData from "../data/quebec-hospitals.json";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -18,7 +20,7 @@ interface FacilityRecord {
   lng: number;
 }
 
-interface ParsedErRow {
+export interface ParsedErRow {
   lastUpdated: string;
   facilityName: string;
   stretcherCount: number;
@@ -301,7 +303,7 @@ function getLatestPerFacility(rows: ParsedErRow[]): Map<string, ParsedErRow> {
   return map;
 }
 
-async function fetchErData(): Promise<Map<string, ParsedErRow>> {
+export async function fetchErData(): Promise<Map<string, ParsedErRow>> {
   const now = Date.now();
   if (cachedErRows && now - erCachedAt < ER_CACHE_TTL) {
     return getLatestPerFacility(cachedErRows);
@@ -524,5 +526,147 @@ export const healthHelpRouter = createTRPCRouter({
             : null,
         };
       });
+    }),
+
+  // ── Favorites ────────────────────────────────────────────────────────────
+
+  addFavorite: protectedProcedure
+    .input(z.object({ facilityName: z.string().min(1) }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db
+        .insert(erFavorite)
+        .values({ userId: ctx.user.id, facilityName: input.facilityName })
+        .onConflictDoNothing();
+      return { added: true };
+    }),
+
+  removeFavorite: protectedProcedure
+    .input(z.object({ facilityName: z.string().min(1) }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db
+        .delete(erFavorite)
+        .where(and(eq(erFavorite.userId, ctx.user.id), eq(erFavorite.facilityName, input.facilityName)));
+      return { removed: true };
+    }),
+
+  listFavorites: protectedProcedure
+    .query(async ({ ctx }) => {
+      const rows = await ctx.db
+        .select({ facilityName: erFavorite.facilityName })
+        .from(erFavorite)
+        .where(eq(erFavorite.userId, ctx.user.id));
+      return rows.map((r) => r.facilityName);
+    }),
+
+  // ── History & Analytics ──────────────────────────────────────────────────
+
+  facilityHistory: protectedProcedure
+    .input(z.object({
+      facilityName: z.string().min(1),
+      range: z.enum(["24h", "7d", "30d"]),
+    }))
+    .query(async ({ ctx, input }) => {
+      const now = new Date();
+      const from = new Date(now);
+      if (input.range === "24h") from.setHours(from.getHours() - 24);
+      else if (input.range === "7d") from.setDate(from.getDate() - 7);
+      else from.setDate(from.getDate() - 30);
+
+      return ctx.db
+        .select({
+          snapshotAt: erSnapshot.snapshotAt,
+          occupancyRate: erSnapshot.occupancyRate,
+          patientsWaiting: erSnapshot.patientsWaiting,
+          avgWaitHours: erSnapshot.avgWaitHours,
+        })
+        .from(erSnapshot)
+        .where(and(
+          eq(erSnapshot.facilityName, input.facilityName),
+          gte(erSnapshot.snapshotAt, from),
+        ))
+        .orderBy(erSnapshot.snapshotAt)
+        .limit(2000);
+    }),
+
+  compareFacilities: protectedProcedure
+    .input(z.object({
+      facilityNames: z.array(z.string().min(1)).min(1).max(5),
+    }))
+    .query(async ({ ctx, input }) => {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+      const results = await Promise.all(input.facilityNames.map(async (name) => {
+        // Latest snapshot
+        const [latest] = await ctx.db
+          .select()
+          .from(erSnapshot)
+          .where(eq(erSnapshot.facilityName, name))
+          .orderBy(desc(erSnapshot.snapshotAt))
+          .limit(1);
+
+        // 7-day averages
+        const [avgs] = await ctx.db
+          .select({
+            avgOccupancy: avg(erSnapshot.occupancyRate),
+            avgWait: avg(erSnapshot.avgWaitHours),
+            avgPatientsWaiting: avg(erSnapshot.patientsWaiting),
+          })
+          .from(erSnapshot)
+          .where(and(
+            eq(erSnapshot.facilityName, name),
+            gte(erSnapshot.snapshotAt, sevenDaysAgo),
+          ));
+
+        return {
+          facilityName: name,
+          current: latest ? {
+            occupancyRate: latest.occupancyRate,
+            patientsWaiting: latest.patientsWaiting,
+            avgWaitHours: latest.avgWaitHours,
+            stretcherCount: latest.stretcherCount,
+            stretchersOccupied: latest.stretchersOccupied,
+            snapshotAt: latest.snapshotAt,
+          } : null,
+          avg7d: {
+            occupancy: avgs?.avgOccupancy ? Math.round(Number(avgs.avgOccupancy)) : null,
+            waitHours: avgs?.avgWait ? Math.round(Number(avgs.avgWait) * 10) / 10 : null,
+            patientsWaiting: avgs?.avgPatientsWaiting ? Math.round(Number(avgs.avgPatientsWaiting)) : null,
+          },
+        };
+      }));
+
+      return results;
+    }),
+
+  bestTimeToVisit: protectedProcedure
+    .input(z.object({ facilityName: z.string().min(1) }))
+    .query(async ({ ctx, input }) => {
+      // Aggregate by day-of-week (0=Sun..6=Sat) and hour (0-23)
+      const rows = await ctx.db
+        .select({
+          dow: sql<number>`EXTRACT(DOW FROM ${erSnapshot.snapshotAt})::int`,
+          hour: sql<number>`EXTRACT(HOUR FROM ${erSnapshot.snapshotAt})::int`,
+          avgOccupancy: avg(erSnapshot.occupancyRate),
+        })
+        .from(erSnapshot)
+        .where(eq(erSnapshot.facilityName, input.facilityName))
+        .groupBy(
+          sql`EXTRACT(DOW FROM ${erSnapshot.snapshotAt})`,
+          sql`EXTRACT(HOUR FROM ${erSnapshot.snapshotAt})`,
+        );
+
+      // Build 7x24 grid (default null for missing data)
+      const grid: (number | null)[][] = Array.from({ length: 7 }, () =>
+        Array.from({ length: 24 }, () => null)
+      );
+
+      for (const row of rows) {
+        const d = Number(row.dow);
+        const h = Number(row.hour);
+        grid[d]![h] = row.avgOccupancy ? Math.round(Number(row.avgOccupancy)) : null;
+      }
+
+      return grid;
     }),
 });

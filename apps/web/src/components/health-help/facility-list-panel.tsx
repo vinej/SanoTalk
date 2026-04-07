@@ -1,8 +1,7 @@
 import { useTranslation } from "react-i18next";
-import { ScrollArea } from "../ui/scroll-area";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
-import { MapPin, Phone, Navigation, Clock, AlertTriangle } from "lucide-react";
+import { MapPin, Phone, Navigation, Clock, AlertTriangle, Star } from "lucide-react";
 
 export interface Facility {
   msssName: string;
@@ -33,6 +32,8 @@ interface FacilityListPanelProps {
   facilities: Facility[];
   selectedId: string | null;
   onSelect: (msssName: string) => void;
+  favorites?: Set<string>;
+  onToggleFavorite?: (facilityName: string) => void;
 }
 
 function occupancyColor(rate: number | null): string {
@@ -42,24 +43,25 @@ function occupancyColor(rate: number | null): string {
   return "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200";
 }
 
-export function FacilityListPanel({ facilities, selectedId, onSelect }: FacilityListPanelProps) {
+export function FacilityListPanel({ facilities, selectedId, onSelect, favorites, onToggleFavorite }: FacilityListPanelProps) {
   const { t, i18n } = useTranslation("healthHelp");
   const isFr = i18n.language === "fr";
 
   return (
-    <ScrollArea className="h-full">
+    <div className="h-full overflow-y-auto overflow-x-hidden">
       <div className="p-4 space-y-3">
         {facilities.map((f, idx) => {
           const name = isFr ? f.nameFr : f.nameEn;
           const isSelected = selectedId === f.msssName;
           const er = f.erStats;
+          const isFav = favorites?.has(f.msssName) ?? false;
 
           return (
             <button
               key={f.msssName}
               type="button"
               onClick={() => onSelect(f.msssName)}
-              className={`w-full text-left rounded-lg border p-3 transition-colors ${
+              className={`w-full min-w-0 text-left rounded-lg border p-3 transition-colors overflow-hidden ${
                 isSelected
                   ? "border-primary bg-primary/5 ring-1 ring-primary"
                   : "border-border hover:border-primary/50 hover:bg-muted/50"
@@ -71,6 +73,16 @@ export function FacilityListPanel({ facilities, selectedId, onSelect }: Facility
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-muted-foreground">{idx + 1}</span>
                     <h3 className="text-sm font-semibold truncate">{name}</h3>
+                    {onToggleFavorite && f.type === "hospital" && (
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); onToggleFavorite(f.msssName); }}
+                        className="shrink-0 p-0.5 hover:scale-110 transition-transform"
+                        title={isFav ? t("removeFavorite") : t("addFavorite")}
+                      >
+                        <Star className={`h-3.5 w-3.5 ${isFav ? "fill-amber-400 text-amber-400" : "text-muted-foreground"}`} />
+                      </button>
+                    )}
                   </div>
                   <div className="flex items-center gap-1.5 mt-0.5">
                     <Badge variant="outline" className={`text-[10px] px-1.5 py-0 ${
@@ -95,33 +107,33 @@ export function FacilityListPanel({ facilities, selectedId, onSelect }: Facility
 
               {/* ER Stats */}
               {er ? (
-                <div className="grid grid-cols-3 gap-1.5 mb-2">
-                  <div className={`rounded px-2 py-1 text-center ${occupancyColor(er.occupancyRate)}`}>
-                    <div className="text-[10px] font-medium">{t("occupancyRate")}</div>
+                <div className="grid grid-cols-2 gap-1.5 mb-2">
+                  <div className={`rounded px-2 py-1 text-center truncate ${occupancyColor(er.occupancyRate)}`}>
+                    <div className="text-[10px] font-medium truncate">{t("occupancyRate")}</div>
                     <div className="text-sm font-bold">{er.occupancyRate ?? "—"}%</div>
                   </div>
-                  <div className="rounded px-2 py-1 text-center bg-muted">
-                    <div className="text-[10px] font-medium text-muted-foreground">{t("patientsWaiting")}</div>
-                    <div className="text-sm font-bold">{er.patientsWaiting}</div>
-                  </div>
-                  <div className="rounded px-2 py-1 text-center bg-muted">
-                    <div className="text-[10px] font-medium text-muted-foreground">{t("avgWait")}</div>
+                  <div className="rounded px-2 py-1 text-center truncate bg-muted">
+                    <div className="text-[10px] font-medium text-muted-foreground truncate">{t("avgWait")}</div>
                     <div className="text-sm font-bold">
                       {er.avgAmbulatoryStayHours > 0
                         ? t("avgWaitValue", { hours: er.avgAmbulatoryStayHours.toFixed(1) })
                         : "—"}
                     </div>
                   </div>
-                  <div className="rounded px-2 py-1 text-center bg-muted">
-                    <div className="text-[10px] font-medium text-muted-foreground">{t("stretcherCount")}</div>
+                  <div className="rounded px-2 py-1 text-center truncate bg-muted">
+                    <div className="text-[10px] font-medium text-muted-foreground truncate">{t("patientsWaiting")}</div>
+                    <div className="text-sm font-bold">{er.patientsWaiting}</div>
+                  </div>
+                  <div className="rounded px-2 py-1 text-center truncate bg-muted">
+                    <div className="text-[10px] font-medium text-muted-foreground truncate">{t("stretcherCount")}</div>
                     <div className="text-sm font-bold">{er.stretchersOccupied}/{er.stretcherCount}</div>
                   </div>
-                  <div className="rounded px-2 py-1 text-center bg-muted">
-                    <div className="text-[10px] font-medium text-muted-foreground">{t("patientsOver24h")}</div>
+                  <div className="rounded px-2 py-1 text-center truncate bg-muted">
+                    <div className="text-[10px] font-medium text-muted-foreground truncate">{t("patientsOver24h")}</div>
                     <div className="text-sm font-bold">{er.patientsOver24h}</div>
                   </div>
-                  <div className="rounded px-2 py-1 text-center bg-muted">
-                    <div className="text-[10px] font-medium text-muted-foreground">{t("patientsOver48h")}</div>
+                  <div className="rounded px-2 py-1 text-center truncate bg-muted">
+                    <div className="text-[10px] font-medium text-muted-foreground truncate">{t("patientsOver48h")}</div>
                     <div className="text-sm font-bold">{er.patientsOver48h}</div>
                   </div>
                 </div>
@@ -141,7 +153,7 @@ export function FacilityListPanel({ facilities, selectedId, onSelect }: Facility
               )}
 
               {/* Actions */}
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <Button
                   size="sm"
                   variant="outline"
@@ -178,6 +190,6 @@ export function FacilityListPanel({ facilities, selectedId, onSelect }: Facility
           {t("dataSource")}
         </p>
       </div>
-    </ScrollArea>
+    </div>
   );
 }

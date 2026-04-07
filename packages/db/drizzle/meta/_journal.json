@@ -141,6 +141,20 @@
       "when": 1774901200000,
       "tag": "0019_symptom_logs",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1774901300000,
+      "tag": "0020_er_wait_times",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1774901400000,
+      "tag": "0021_allergies",
+      "breakpoints": true
     }
   ]
 }

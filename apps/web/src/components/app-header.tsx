@@ -2,14 +2,12 @@ import { useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { trpc } from "../lib/trpc";
 import { Button } from "./ui/button";
-import { UserCircle, LogOut, Bell } from "lucide-react";
-import { useAvatarUrl } from "../lib/avatar-url";
+import { LogOut, Bell } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "./language-switcher";
 import { signOut } from "../lib/auth-client";
 import { tracker } from "../lib/tracker";
 import { SanoTalkLogoV2 } from "./logo-v2";
-import { ProfileEditDialog } from "./profile/profile-edit-dialog";
 import { ConnectionRequestsDialog } from "./profile/connection-requests-dialog";
 
 export function AppHeader() {
@@ -20,9 +18,7 @@ export function AppHeader() {
   );
   const { t } = useTranslation(["dashboard", "common"]);
   const navigate = useNavigate();
-  const [profileOpen, setProfileOpen] = useState(false);
   const [requestsOpen, setRequestsOpen] = useState(false);
-  const avatarUrl = useAvatarUrl(profile?.id, profile?.image);
 
   async function handleLogout() {
     if (tracker) {
@@ -37,7 +33,6 @@ export function AppHeader() {
 
   return (
     <>
-      <ProfileEditDialog open={profileOpen} onOpenChange={setProfileOpen} />
       <ConnectionRequestsDialog open={requestsOpen} onOpenChange={setRequestsOpen} />
       <div className="flex items-center justify-between px-6 py-3 bg-white border-b shrink-0">
         <Link to="/dashboard">
@@ -61,22 +56,15 @@ export function AppHeader() {
                   </span>
                 )}
               </Button>
-              <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => setProfileOpen(true)}>
-                {avatarUrl ? (
-                  <img src={avatarUrl} alt="" className="h-4 w-4 rounded-full object-cover mr-1" />
-                ) : (
-                  <UserCircle className="h-3 w-3 mr-1" />
-                )}
-                {t("dashboard:profile")}
-              </Button>
             </div>
             <span className="text-muted-foreground text-right">{profile.email}</span>
-            <LanguageSwitcher />
-            <span className="text-muted-foreground capitalize text-right">{(profile as any).role}</span>
-            <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={handleLogout}>
-              <LogOut className="h-3 w-3 mr-1" />
-              {t("common:logout")}
-            </Button>
+            <div className="flex gap-1">
+              <LanguageSwitcher />
+              <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={handleLogout}>
+                <LogOut className="h-3 w-3 mr-1" />
+                {t("common:logout")}
+              </Button>
+            </div>
           </div>
         )}
       </div>
