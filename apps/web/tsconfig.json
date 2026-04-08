@@ -8,7 +8,6 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@sanotalk/trpc/*": ["../../packages/trpc/src/*"],
