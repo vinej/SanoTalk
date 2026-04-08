@@ -34,6 +34,7 @@ export const userRouter = createTRPCRouter({
       return ctx.db.query.user.findMany({
         where: and(eq(user.role, input.role), inArray(user.id, [...relatedIds])),
         columns: { id: true, name: true, specialty: true, role: true },
+        limit: 1000,
       });
     }),
 
@@ -50,6 +51,7 @@ export const userRouter = createTRPCRouter({
     return ctx.db.query.user.findMany({
       where: inArray(user.id, [...relatedIds]),
       columns: { id: true, name: true, role: true },
+      limit: 1000,
     });
   }),
 
@@ -103,7 +105,7 @@ export const userRouter = createTRPCRouter({
     }),
 
   updateImage: protectedProcedure
-    .input(z.object({ image: z.string().nullable() }))
+    .input(z.object({ image: z.string().max(300).nullable() }))
     .mutation(async ({ ctx, input }) => {
       // Only allow null (remove) or valid MinIO avatar keys
       if (input.image !== null && !/^avatars\/[\w-]+\.(jpg|png|webp)$/.test(input.image)) {
@@ -346,7 +348,7 @@ export const userRouter = createTRPCRouter({
 
   setProperty: protectedProcedure
     .input(z.object({
-      key: z.string().min(1).max(100),
+      key: z.string().min(1).max(100).regex(/^[a-z][a-z0-9_]*$/, "Invalid property key"),
       value: z.string().max(1000),
       language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).default("en"),
     }))

@@ -8,3 +8,7 @@ datasources:
     isDefault: true
     version: 1
     editable: false
+    jsonData:
+      httpHeaderName1: X-Scope-OrgID
+    secureJsonData:
+      httpHeaderValue1: sanotalk

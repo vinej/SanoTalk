@@ -188,7 +188,7 @@ export function FacilityListPanel({ facilities, selectedId, onSelect, favorites,
                     asChild
                     onClick={(e) => e.stopPropagation()}
                   >
-                    <a href={`tel:${f.phone}`}>
+                    <a href={`tel:${f.phone.replace(/[^\d+]/g, "")}`}>
                       <Phone className="h-3 w-3 mr-1" />
                       {t("call")}
                     </a>

@@ -16,6 +16,10 @@ if (!connectionString) {
 const client = postgres(connectionString, {
   prepare: false,
   ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: true } : false,
+  max: parseInt(process.env.DB_POOL_MAX ?? "20"),
+  idle_timeout: 30,
+  connect_timeout: 10,
+  max_lifetime: 60 * 30,
 });
 
 export const db = drizzle(client, { schema });

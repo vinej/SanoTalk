@@ -117,6 +117,12 @@ export const vitalsRouter = createTRPCRouter({
       to: z.string().datetime(),
     }))
     .query(async ({ ctx, input }) => {
+      const fromDate = new Date(input.from);
+      const toDate = new Date(input.to);
+      if (fromDate >= toDate) throw new TRPCError({ code: "BAD_REQUEST", message: "from must be before to" });
+      if (toDate.getTime() - fromDate.getTime() > 366 * 24 * 60 * 60 * 1000) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Date range exceeds maximum of 1 year" });
+      }
       const [result] = await ctx.db
         .select({
           avg: sql<number>`avg(${vitalSign.valuePrimary})`,
@@ -128,8 +134,8 @@ export const vitalsRouter = createTRPCRouter({
         .where(and(
           eq(vitalSign.userId, ctx.user.id),
           eq(vitalSign.type, input.type),
-          gte(vitalSign.measuredAt, new Date(input.from)),
-          lte(vitalSign.measuredAt, new Date(input.to)),
+          gte(vitalSign.measuredAt, fromDate),
+          lte(vitalSign.measuredAt, toDate),
         ));
 
       return result ?? { avg: 0, min: 0, max: 0, count: 0 };

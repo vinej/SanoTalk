@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { task, user } from "@sanotalk/db";
-import { eq, inArray } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { verifyAdminFromDb } from "../lib/verify-admin";
 import { getRelatedUserIds } from "../lib/related-users";
@@ -24,6 +24,7 @@ export const tasksRouter = createTRPCRouter({
       where: eq(task.assignedUserId, ctx.user.id),
       with: { assignedUser: { columns: { id: true, name: true, role: true } } },
       orderBy: (t, { desc }) => [desc(t.createdAt)],
+      limit: 500,
     });
   }),
 
@@ -82,11 +83,8 @@ export const tasksRouter = createTRPCRouter({
       }
       return ctx.db.transaction(async (tx) => {
         const { id, ...fields } = input;
-        const existing = await tx.query.task.findFirst({ where: eq(task.id, id) });
+        const existing = await tx.query.task.findFirst({ where: and(eq(task.id, id), eq(task.assignedUserId, ctx.user.id)) });
         if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "Task not found" });
-        if (existing.assignedUserId !== ctx.user.id) {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Only the assigned user can edit this task" });
-        }
         if (existing.taskType === "summary_review") {
           if (fields.assignedUserId !== undefined) {
             throw new TRPCError({ code: "FORBIDDEN", message: "Cannot reassign a summary review task" });
@@ -115,13 +113,10 @@ export const tasksRouter = createTRPCRouter({
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
       if (await verifyAdminFromDb(ctx.db, ctx.user.id)) throw new TRPCError({ code: "FORBIDDEN", message: "Admins cannot delete tasks" });
-      const existing = await ctx.db.query.task.findFirst({ where: eq(task.id, input.id) });
+      const existing = await ctx.db.query.task.findFirst({ where: and(eq(task.id, input.id), eq(task.assignedUserId, ctx.user.id)) });
       if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "Task not found" });
       if (existing.taskType === "summary_review") {
         throw new TRPCError({ code: "FORBIDDEN", message: "Cannot delete a summary review task" });
-      }
-      if (existing.assignedUserId !== ctx.user.id) {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Only the assigned user can delete this task" });
       }
       await ctx.db.delete(task).where(eq(task.id, input.id));
     }),
@@ -141,6 +136,7 @@ export const tasksRouter = createTRPCRouter({
       where: inArray(user.id, [...relatedIds]),
       columns: { id: true, name: true, role: true },
       orderBy: (u, { asc }) => [asc(u.name)],
+      limit: 1000,
     });
   }),
 });

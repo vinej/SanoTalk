@@ -8,6 +8,7 @@ import { pharmacistChatAgent } from "./agents/pharmacist-chat.js";
 import { db, agentRun, transcriptSummary, transcript, chatMessage, talkSession, userLink, user, task } from "@sanotalk/db";
 import { escapeHtml, sanitizeSubject } from "@sanotalk/trpc/lib/escape-html";
 import { eq, asc, and } from "drizzle-orm";
+import { z } from "zod";
 import { Resend } from "resend";
 import { logger } from "../logger.js";
 import { PinoLogger } from '@mastra/loggers'
@@ -140,14 +141,14 @@ export const mastra = new Mastra({
 });
 
 async function executeRun(run: typeof agentRun.$inferSelect) {
-  logger.info({ runId: run.id, agentName: run.agentName, input: run.input }, "executeRun started");
+  const input = run.input as { sessionId?: string; agentType?: string } | null;
+  logger.info({ runId: run.id, agentName: run.agentName, sessionId: input?.sessionId }, "executeRun started");
 
   await db.update(agentRun)
     .set({ status: "running", startedAt: new Date() })
     .where(eq(agentRun.id, run.id));
 
   try {
-    const input = run.input as { sessionId?: string; agentType?: string } | null;
     const sessionId = input?.sessionId;
     const agentType = input?.agentType ?? "health";
 
@@ -205,12 +206,18 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
       try {
         // Strip markdown code fences if present
         const rawText = result.text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim();
-        const parsed = JSON.parse(rawText) as {
-          summary: string;
-          keyPoints: string[];
-          actionItems: string[];
-          soapNote: { subjective: string; objective: string; assessment: string; plan: string };
-        };
+        const summarySchema = z.object({
+          summary: z.string().max(10000),
+          keyPoints: z.array(z.string().max(2000)).max(30),
+          actionItems: z.array(z.string().max(2000)).max(30),
+          soapNote: z.object({
+            subjective: z.string().max(10000),
+            objective: z.string().max(10000),
+            assessment: z.string().max(10000),
+            plan: z.string().max(10000),
+          }),
+        });
+        const parsed = summarySchema.parse(JSON.parse(rawText));
         await db.insert(transcriptSummary)
           .values({
             sessionId,
@@ -260,7 +267,7 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
   } catch (err) {
     logger.error({ err, runId: run.id }, "Agent run failed");
     await db.update(agentRun)
-      .set({ status: "error", errorMessage: err instanceof Error ? err.message : String(err), completedAt: new Date() })
+      .set({ status: "error", errorMessage: "An internal error occurred while processing this session.", completedAt: new Date() })
       .where(eq(agentRun.id, run.id));
   }
 }
@@ -298,6 +305,8 @@ function buildPropertyContext(userProperties?: UserProperty[], propertiesLanguag
   ];
 }
 
+const MAX_CHAT_RESPONSE_LENGTH = 15000;
+
 export async function callCompanionChat(
   history: Array<{ role: "user" | "assistant"; content: string }>,
   userMessage: string,
@@ -315,7 +324,7 @@ export async function callCompanionChat(
     { role: "user" as const, content: userMessage },
   ];
   const result = await companionChatAgent.generate(messages as any);
-  return result.text;
+  return result.text.slice(0, MAX_CHAT_RESPONSE_LENGTH);
 }
 
 export async function callNewsChat(
@@ -335,7 +344,7 @@ export async function callNewsChat(
     { role: "user" as const, content: userMessage },
   ];
   const result = await newsChatAgent.generate(messages as any);
-  return result.text;
+  return result.text.slice(0, MAX_CHAT_RESPONSE_LENGTH);
 }
 
 export async function callHealthChat(
@@ -355,7 +364,7 @@ export async function callHealthChat(
     { role: "user" as const, content: userMessage },
   ];
   const result = await healthChatAgent.generate(messages as any);
-  return result.text;
+  return result.text.slice(0, MAX_CHAT_RESPONSE_LENGTH);
 }
 
 export async function callPharmacistChat(
@@ -375,5 +384,5 @@ export async function callPharmacistChat(
     { role: "user" as const, content: userMessage },
   ];
   const result = await pharmacistChatAgent.generate(messages as any);
-  return result.text;
+  return result.text.slice(0, MAX_CHAT_RESPONSE_LENGTH);
 }

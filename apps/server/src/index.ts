@@ -19,7 +19,12 @@ import { joinAiParticipant, removeAiParticipant, removeAllAiParticipants, isAiAs
 import http from "http";
 
 // Fail fast if critical env vars are missing
-const REQUIRED_ENV = ["APP_URL", "MINIO_ENDPOINT", "MINIO_ACCESS_KEY", "MINIO_SECRET_KEY", "LIVEKIT_URL"] as const;
+const REQUIRED_ENV = [
+  "APP_URL", "DATABASE_URL", "BETTER_AUTH_URL",
+  "MINIO_ENDPOINT", "MINIO_ACCESS_KEY", "MINIO_SECRET_KEY",
+  "LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET",
+  "DEEPGRAM_API_KEY", "ENCRYPTION_KEY",
+] as const;
 const missingEnv = REQUIRED_ENV.filter((k) => !process.env[k]);
 if (missingEnv.length > 0) {
   throw new Error(`Missing required environment variables: ${missingEnv.join(", ")}`);
@@ -113,7 +118,7 @@ const otpLimiter = rateLimit({
 
 // ─── Permissions-Policy ───────────────────────────────────────────────────
 app.use((_req, res, next) => {
-  res.setHeader("Permissions-Policy", "camera=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=()");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(self), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=()");
   next();
 });
 
@@ -136,7 +141,7 @@ app.use("/api/trpc", (req, res, next) => {
   }
   next();
 });
-app.use("/api/trpc", apiLimiter);
+// Medical limiters first — these specific routes get the stricter limit only
 app.use("/api/trpc/agents.generateSummary", medicalLimiter);
 app.use("/api/trpc/agents.sendSummary", medicalLimiter);
 app.use("/api/trpc/agents.sendChatMessage", medicalLimiter);
@@ -147,6 +152,8 @@ app.use("/api/trpc/agents.sendPharmacistChatMessage", medicalLimiter);
 app.use("/api/trpc/vitals.shareWithProfessional", medicalLimiter);
 app.use("/api/trpc/medications.shareWithProfessional", medicalLimiter);
 app.use("/api/trpc/symptoms.shareWithProfessional", medicalLimiter);
+// General API limiter for all other tRPC routes
+app.use("/api/trpc", apiLimiter);
 app.use(
   "/api/trpc",
   createExpressMiddleware({
@@ -226,6 +233,8 @@ app.get("/api/avatar/:userId", apiLimiter, async (req, res) => {
     const ext = record.image.split(".").pop();
     const mime = ext === "png" ? "image/png" : ext === "webp" ? "image/webp" : "image/jpeg";
     res.setHeader("Content-Type", mime);
+    res.setHeader("Content-Disposition", "inline");
+    res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("Cache-Control", "public, max-age=3600");
     stream.pipe(res);
   } catch {
@@ -240,7 +249,7 @@ app.get("/health", (_req, res) => {
 
 // ─── HTTP + WebSocket server ───────────────────────────────────────────────
 const server = http.createServer(app);
-startDeepgramWebSocket(server);
+startDeepgramWebSocket(server, allowedOrigins);
 
 if (!process.env.NODE_ENV) {
   logger.warn("NODE_ENV is not set — security controls (rate limits, secure cookies) will use permissive defaults. Set NODE_ENV=production for production deployments.");

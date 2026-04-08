@@ -10,8 +10,20 @@ import { consumeTicket } from "@sanotalk/trpc/lib/ws-tickets";
 
 const MAX_WS_PER_USER = 2;
 
-export function startDeepgramWebSocket(server: Server) {
-  const wss = new WebSocketServer({ server, path: "/ws/transcribe" });
+export function startDeepgramWebSocket(server: Server, allowedOrigins?: string[]) {
+  const wss = new WebSocketServer({
+    server,
+    path: "/ws/transcribe",
+    maxPayload: 256 * 1024, // 256 KB — audio frames are typically under 64 KB
+    verifyClient: ({ req }, done) => {
+      const origin = req.headers.origin;
+      if (!origin || !allowedOrigins?.includes(origin)) {
+        done(false, 403, "Origin not allowed");
+        return;
+      }
+      done(true);
+    },
+  });
   if (!process.env.DEEPGRAM_API_KEY) throw new Error("DEEPGRAM_API_KEY is required");
   const deepgram = createClient(process.env.DEEPGRAM_API_KEY);
   const wsCountByUser = new Map<string, number>();
@@ -135,7 +147,8 @@ export function startDeepgramWebSocket(server: Server) {
     let audioChunkCount = 0;
 
     // Buffer audio that arrives before Deepgram is ready
-    ws.on("message", (data) => {
+    ws.on("message", (data, isBinary) => {
+      if (!isBinary) { ws.close(1003, "Only binary audio data accepted"); return; }
       const buf = data as Buffer<ArrayBufferLike>;
       audioChunkCount++;
       if (audioChunkCount <= 3 || audioChunkCount % 40 === 0) {

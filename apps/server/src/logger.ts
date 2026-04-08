@@ -13,8 +13,8 @@ function scrubPii(obj: unknown): unknown {
   if (obj && typeof obj === "object") {
     const out: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(obj)) {
-      // Redact known PII keys entirely
-      if (k === "email" || k === "password") {
+      // Redact known PII/secret keys entirely
+      if (["email", "password", "token", "accessToken", "refreshToken", "idToken", "otp", "secret", "backupCodes"].includes(k)) {
         out[k] = "[redacted]";
       } else {
         out[k] = scrubPii(v);
@@ -40,6 +40,7 @@ const transport =
               labels: { app: "sanotalk-server" },
               batching: true,
               interval: 5,
+              headers: { "X-Scope-OrgID": "sanotalk" },
             },
           },
         ],

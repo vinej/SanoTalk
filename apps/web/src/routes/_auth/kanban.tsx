@@ -617,7 +617,7 @@ function TaskCard({
                 <p style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "2px" }}>
                   {t("dialog.descriptionLabel")}
                 </p>
-                {/^https?:\/\//.test(task.description) ? (
+                {(() => { try { return /^https?:\/\//.test(task.description) && new URL(task.description).origin === window.location.origin; } catch { return false; } })() ? (
                   readOnly ? (
                     <p style={{ fontSize: "13px", color: "#94a3b8", fontWeight: 500, margin: 0 }}>
                       {t("viewSummary")}
