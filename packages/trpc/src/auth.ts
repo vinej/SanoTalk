@@ -3,6 +3,7 @@ import { twoFactor } from "better-auth/plugins";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db, user, session, account, verification, twoFactor as twoFactorTable } from "@sanotalk/db";
 import { resend } from "./lib/resend";
+import { escapeHtml } from "./lib/escape-html";
 
 // Structured log helper — avoids raw console.* which bypasses PII scrubbing.
 // Redacts emails inline since this package has no access to the server's pino instance.
@@ -133,7 +134,7 @@ export const auth = betterAuth({
         from,
         to: user.email,
         subject: "Verify your SanoTalk account",
-        html: `<p>Click the link below to verify your SanoTalk account:</p><p><a href="${verifyUrl}">Verify Email</a></p><p>If you did not register, ignore this email.</p>`,
+        html: `<p>Click the link below to verify your SanoTalk account:</p><p><a href="${escapeHtml(verifyUrl)}">Verify Email</a></p><p>If you did not register, ignore this email.</p>`,
       });
       if (error) {
         authLog.error(`Failed to send verification email: ${(error as any)?.message ?? error}`);
@@ -168,6 +169,8 @@ export const auth = betterAuth({
   trustedOrigins: [
     process.env.BETTER_AUTH_URL!,
     process.env.APP_URL!,
+    // Trust both www and non-www variants of the app URL
+    ...(process.env.APP_URL ? [process.env.APP_URL.replace("://", "://www.")] : []),
     ...(!isProduction && process.env.NGROK_URL ? [process.env.NGROK_URL] : []),
     ...(!isProduction ? ["http://localhost:5173", "http://localhost:3001"] : []),
   ],

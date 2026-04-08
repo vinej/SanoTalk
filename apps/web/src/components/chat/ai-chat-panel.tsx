@@ -203,16 +203,16 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
   // ── Voice (non-session modes) ──────────────────────────────────────────────
   const { isRecording, micError } = useTranscriptSocket(undefined, {
     enabled: !isSessionMode && voiceEnabled && !!sessionData?.session?.token,
-    language: i18n.language,
+    language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi",
     onFinalTranscript: (text) => {
       if (isCompanion) {
-        sendCompanionMessage.mutate({ message: text, language: i18n.language });
+        sendCompanionMessage.mutate({ message: text, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
       } else if (isNews) {
-        sendNewsMessage.mutate({ message: text, language: i18n.language });
+        sendNewsMessage.mutate({ message: text, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
       } else if (isPharmacist) {
-        sendPharmacistMessage.mutate({ message: text, language: i18n.language });
+        sendPharmacistMessage.mutate({ message: text, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
       } else {
-        sendHealthMessage.mutate({ message: text, language: i18n.language });
+        sendHealthMessage.mutate({ message: text, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
       }
     },
   });
@@ -248,13 +248,13 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
       const agentType = variant === "companion" ? "companion" as const : variant === "pharmacist" ? "pharmacist" as const : "health" as const;
       sendSessionMessage.mutate({ sessionId: sessionId!, message: trimmed, agentType });
     } else if (isCompanion) {
-      sendCompanionMessage.mutate({ message: trimmed, language: i18n.language });
+      sendCompanionMessage.mutate({ message: trimmed, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
     } else if (isNews) {
-      sendNewsMessage.mutate({ message: trimmed, language: i18n.language });
+      sendNewsMessage.mutate({ message: trimmed, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
     } else if (isPharmacist) {
-      sendPharmacistMessage.mutate({ message: trimmed, language: i18n.language });
+      sendPharmacistMessage.mutate({ message: trimmed, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
     } else {
-      sendHealthMessage.mutate({ message: trimmed, language: i18n.language });
+      sendHealthMessage.mutate({ message: trimmed, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
     }
   }
 

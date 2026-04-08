@@ -22,7 +22,7 @@ const testingEmail = process.env.TESTING_EMAIL;
 
 function sendEmail(params: Parameters<typeof _resend.emails.send>[0]) {
   if (isTesting && testingEmail) {
-    logger.info({ originalTo: params.to, testingEmail }, "[email] TESTING mode — redirecting");
+    logger.info({ testingEmail }, "[email] TESTING mode — redirecting");
     return _resend.emails.send({ ...params, to: testingEmail });
   }
   return _resend.emails.send(params);
@@ -43,39 +43,37 @@ async function autoSendSummaryToLinkedProfessional(params: {
   const { sessionId, patientId, agentType, sessionLanguage } = params;
 
   try {
-    const sender = await db.query.user.findFirst({ where: eq(user.id, patientId) });
+    const sender = await db.query.user.findFirst({ where: eq(user.id, patientId), columns: { id: true, name: true, role: true } });
     if (!sender || (sender as any).role !== "patient") {
       logger.info({ patientId }, "autoSend: host is not a patient, skipping");
       return;
     }
 
     // Find the right linked professional
-    let recipient: typeof user.$inferSelect | undefined;
+    const recipientCols = { id: user.id, name: user.name, email: user.email, role: user.role };
+    let recipient: { id: string; name: string; email: string; role: string } | undefined;
 
     if (agentType === "pharmacist") {
-      // Find linked pharmacist
       const links = await db
-        .select({ professional: user })
+        .select(recipientCols)
         .from(userLink)
         .innerJoin(user, eq(userLink.professionalId, user.id))
         .where(and(eq(userLink.patientId, patientId), eq(user.role, "pharmacist")));
-      recipient = links[0]?.professional;
+      recipient = links[0];
     } else if (agentType === "companion") {
-      // Find linked wellness doctor
       const links = await db
-        .select({ professional: user })
+        .select(recipientCols)
         .from(userLink)
         .innerJoin(user, eq(userLink.professionalId, user.id))
         .where(and(eq(userLink.patientId, patientId), eq(userLink.linkType, "wellness"), eq(user.role, "doctor")));
-      recipient = links[0]?.professional;
+      recipient = links[0];
     } else {
-      // Health AI or default → linked general doctor
       const links = await db
-        .select({ professional: user })
+        .select(recipientCols)
         .from(userLink)
         .innerJoin(user, eq(userLink.professionalId, user.id))
         .where(and(eq(userLink.patientId, patientId), eq(userLink.linkType, "doctor"), eq(user.role, "doctor")));
-      recipient = links[0]?.professional;
+      recipient = links[0];
     }
 
     if (!recipient) {

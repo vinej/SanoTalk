@@ -336,7 +336,7 @@ export const agentsRouter = createTRPCRouter({
   sendHealthChatMessage: protectedProcedure
     .input(z.object({
       message: z.string().min(1).max(2000),
-      language: z.string().optional(),
+      language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       const pastMessages = await ctx.db.query.chatMessage.findMany({
@@ -376,7 +376,7 @@ export const agentsRouter = createTRPCRouter({
   sendCompanionChatMessage: protectedProcedure
     .input(z.object({
       message: z.string().min(1).max(2000),
-      language: z.string().optional(),
+      language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       const pastMessages = await ctx.db.query.chatMessage.findMany({
@@ -432,7 +432,7 @@ export const agentsRouter = createTRPCRouter({
   sendNewsChatMessage: protectedProcedure
     .input(z.object({
       message: z.string().min(1).max(2000),
-      language: z.string().optional(),
+      language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       const pastMessages = await ctx.db.query.chatMessage.findMany({
@@ -475,7 +475,7 @@ export const agentsRouter = createTRPCRouter({
   sendPharmacistChatMessage: protectedProcedure
     .input(z.object({
       message: z.string().min(1).max(2000),
-      language: z.string().optional(),
+      language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       const pastMessages = await ctx.db.query.chatMessage.findMany({
@@ -514,13 +514,14 @@ export const agentsRouter = createTRPCRouter({
   sendSummary: protectedProcedure
     .input(z.object({
       sessionId: z.string().uuid(),
-      recipientUserId: z.string(),
+      recipientUserId: z.string().min(1).max(100),
     }))
     .mutation(async ({ ctx, input }) => {
       await assertSessionAccess(ctx.db, input.sessionId, ctx.user.id);
 
       const sender = await ctx.db.query.user.findFirst({
         where: eq(user.id, ctx.user.id),
+        columns: { id: true, name: true, role: true },
       });
 
       if (!sender || (sender as any).role !== "patient") {
@@ -537,6 +538,7 @@ export const agentsRouter = createTRPCRouter({
 
       const recipient = await ctx.db.query.user.findFirst({
         where: eq(user.id, input.recipientUserId),
+        columns: { id: true, name: true, email: true, role: true },
       });
 
       if (!recipient) {
@@ -627,7 +629,8 @@ export const agentsRouter = createTRPCRouter({
             eq(savedConversation.chatType, input.chatType)
           )
         )
-        .orderBy(desc(savedConversation.createdAt));
+        .orderBy(desc(savedConversation.createdAt))
+        .limit(200);
     }),
 
   saveConversation: protectedProcedure
@@ -689,24 +692,26 @@ export const agentsRouter = createTRPCRouter({
       });
       if (!saved) throw new TRPCError({ code: "NOT_FOUND", message: "Saved conversation not found" });
       const chatType = saved.chatType as "health" | "companion" | "news" | "pharmacist";
-      await ctx.db.delete(chatMessage).where(
-        and(
-          isNull(chatMessage.sessionId),
-          eq(chatMessage.userId, ctx.user.id),
-          eq(chatMessage.chatType, chatType)
-        )
-      );
       const msgs = saved.messages as Array<{ role: string; content: string }>;
-      if (msgs.length > 0) {
-        await ctx.db.insert(chatMessage).values(
-          msgs.map((m) => ({
-            userId: ctx.user.id,
-            chatType,
-            role: m.role,
-            content: m.content,
-          }))
+      await ctx.db.transaction(async (tx) => {
+        await tx.delete(chatMessage).where(
+          and(
+            isNull(chatMessage.sessionId),
+            eq(chatMessage.userId, ctx.user.id),
+            eq(chatMessage.chatType, chatType)
+          )
         );
-      }
+        if (msgs.length > 0) {
+          await tx.insert(chatMessage).values(
+            msgs.map((m) => ({
+              userId: ctx.user.id,
+              chatType,
+              role: m.role,
+              content: m.content,
+            }))
+          );
+        }
+      });
       return { loaded: true, chatType };
     }),
 

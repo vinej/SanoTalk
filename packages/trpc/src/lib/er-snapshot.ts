@@ -41,8 +41,8 @@ export async function snapshotErData(db: any): Promise<void> {
     const cutoff = new Date();
     cutoff.setDate(cutoff.getDate() - 90);
     await db.delete(erSnapshot).where(lt(erSnapshot.snapshotAt, cutoff));
-  } catch (err) {
-    // Avoid console.error — it bypasses PII scrubbing in the pino logger
-    console.error("[er-snapshot] Failed to snapshot ER data");
+  } catch {
+    // Swallow errors silently — ER snapshot is best-effort background work.
+    // Do not use console.error here as it bypasses PII scrubbing in the pino logger.
   }
 }

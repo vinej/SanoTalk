@@ -164,7 +164,7 @@ function ShareVitalsDialog({ open, onOpenChange, language }: { open: boolean; on
                 variant="outline"
                 className="w-full justify-start"
                 disabled={shareMutation.isPending}
-                onClick={() => shareMutation.mutate({ recipientUserId: prof.id, language })}
+                onClick={() => shareMutation.mutate({ recipientUserId: prof.id, language: language as "en" | "fr" | "es" | "zh" | "ar" | "hi" })}
               >
                 {shareMutation.isPending ? <Loader2 className="h-3.5 w-3.5 mr-2 animate-spin" /> : <Share2 className="h-3.5 w-3.5 mr-2" />}
                 {prof.name} — {prof.role === "doctor" ? t("doctor") : t("pharmacist")}

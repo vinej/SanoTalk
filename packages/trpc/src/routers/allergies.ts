@@ -52,7 +52,7 @@ export const allergiesRouter = createTRPCRouter({
             updatedAt: new Date(),
           },
         })
-        .returning();
+        .returning({ id: allergy.id, type: allergy.type, name: allergy.name, severity: allergy.severity, reaction: allergy.reaction, diagnosedDate: allergy.diagnosedDate, notes: allergy.notes, createdAt: allergy.createdAt, updatedAt: allergy.updatedAt });
       return row;
     }),
 
@@ -132,7 +132,7 @@ export const allergiesRouter = createTRPCRouter({
             updatedAt: new Date(),
           },
         })
-        .returning();
+        .returning({ id: chronicCondition.id, name: chronicCondition.name, status: chronicCondition.status, severity: chronicCondition.severity, diagnosedDate: chronicCondition.diagnosedDate, medications: chronicCondition.medications, notes: chronicCondition.notes, createdAt: chronicCondition.createdAt, updatedAt: chronicCondition.updatedAt });
       return row;
     }),
 

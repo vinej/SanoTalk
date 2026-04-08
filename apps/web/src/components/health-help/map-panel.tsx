@@ -121,7 +121,7 @@ export function MapPanel({ userLat, userLng, facilities, selectedId, visibleType
   const isFr = i18n.language === "fr";
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full isolate">
     <MapContainer
       center={[userLat, userLng]}
       zoom={10}

@@ -11,7 +11,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "@sanotalk/trpc";
 import { createTRPCContext } from "@sanotalk/trpc";
 import { auth } from "@sanotalk/trpc/auth";
-import { toNodeHandler } from "better-auth/node";
+import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
 import { logger } from "./logger";
 import { startDeepgramWebSocket } from "./deepgram";
 import { runPendingAgents, triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat, callPharmacistChat } from "./mastra/index";
@@ -55,8 +55,9 @@ app.use(helmet({
 
 // ─── CORS ─────────────────────────────────────────────────────────────────
 const allowedOrigins = [
-  process.env.BETTER_AUTH_URL,
   process.env.APP_URL,
+  // Trust both www and non-www variants
+  ...(process.env.APP_URL ? [process.env.APP_URL.replace("://", "://www.")] : []),
   ...(process.env.NODE_ENV !== "production" ? [process.env.NGROK_URL] : []),
 ].filter((o): o is string => typeof o === "string" && o.startsWith("http"));
 
@@ -100,6 +101,12 @@ const otpLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many verification attempts, please try again later." },
+});
+
+// ─── Permissions-Policy ───────────────────────────────────────────────────
+app.use((_req, res, next) => {
+  res.setHeader("Permissions-Policy", "camera=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=()");
+  next();
 });
 
 app.use(express.json({ limit: "10mb" }));
@@ -173,6 +180,9 @@ function isAllowedAvatarUrl(url: string): boolean {
 
 app.get("/api/avatar/:userId", apiLimiter, async (req, res) => {
   try {
+    const session = await auth.api.getSession({ headers: fromNodeHeaders(req.headers) });
+    if (!session) { res.status(401).end(); return; }
+
     const userId = req.params.userId as string;
     if (!userId) { res.status(400).end(); return; }
 
@@ -216,6 +226,10 @@ app.get("/health", (_req, res) => {
 // ─── HTTP + WebSocket server ───────────────────────────────────────────────
 const server = http.createServer(app);
 startDeepgramWebSocket(server);
+
+if (!process.env.NODE_ENV) {
+  logger.warn("NODE_ENV is not set — security controls (rate limits, secure cookies) will use permissive defaults. Set NODE_ENV=production for production deployments.");
+}
 
 server.listen(PORT, () => {
   logger.info(`🚀 SanoTalk server running on http://localhost:${PORT}`);

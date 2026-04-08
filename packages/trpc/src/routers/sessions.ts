@@ -82,7 +82,7 @@ export const sessionsRouter = createTRPCRouter({
           ...(input.title ? { title: input.title } : {}),
           scheduledAt: input.scheduledAt ? new Date(input.scheduledAt) : null,
         })
-        .returning();
+        .returning({ id: talkSession.id, roomName: talkSession.roomName, hostId: talkSession.hostId, title: talkSession.title, language: talkSession.language, status: talkSession.status, agentType: talkSession.agentType, scheduledAt: talkSession.scheduledAt, createdAt: talkSession.createdAt });
 
       return created;
     }),
@@ -100,7 +100,7 @@ export const sessionsRouter = createTRPCRouter({
         .update(talkSession)
         .set({ title: input.title, updatedAt: new Date() })
         .where(eq(talkSession.id, input.id))
-        .returning();
+        .returning({ id: talkSession.id, title: talkSession.title, updatedAt: talkSession.updatedAt });
       return updated;
     }),
 
@@ -117,7 +117,7 @@ export const sessionsRouter = createTRPCRouter({
         .update(talkSession)
         .set({ status: "active", startedAt: new Date() })
         .where(eq(talkSession.id, input.id))
-        .returning();
+        .returning({ id: talkSession.id, status: talkSession.status, startedAt: talkSession.startedAt });
 
       // Start voice pipelines for any AI participants already added
       const withParticipants = await ctx.db.query.talkSession.findFirst({
@@ -152,7 +152,7 @@ export const sessionsRouter = createTRPCRouter({
         .update(talkSession)
         .set({ status: "completed", endedAt: new Date() })
         .where(eq(talkSession.id, input.id))
-        .returning();
+        .returning({ id: talkSession.id, status: talkSession.status, endedAt: talkSession.endedAt });
       return updated;
     }),
 

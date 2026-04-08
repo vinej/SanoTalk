@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { task, user } from "@sanotalk/db";
-import { eq, or, isNull, inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { verifyAdminFromDb } from "../lib/verify-admin";
 import { getRelatedUserIds } from "../lib/related-users";
@@ -20,7 +20,7 @@ export const tasksRouter = createTRPCRouter({
       return tasks.map((t) => ({ ...t, remark: null as null }));
     }
     return ctx.db.query.task.findMany({
-      where: or(isNull(task.assignedUserId), eq(task.assignedUserId, ctx.user.id)),
+      where: eq(task.assignedUserId, ctx.user.id),
       with: { assignedUser: { columns: { id: true, name: true, role: true } } },
       orderBy: (t, { desc }) => [desc(t.createdAt)],
     });
@@ -55,7 +55,7 @@ export const tasksRouter = createTRPCRouter({
           taskType: input.taskType ?? "standard",
           remark: input.remark,
         })
-        .returning();
+        .returning({ id: task.id, title: task.title, status: task.status, taskType: task.taskType, assignedUserId: task.assignedUserId, createdAt: task.createdAt });
       return created;
     }),
 
@@ -83,11 +83,7 @@ export const tasksRouter = createTRPCRouter({
         const { id, ...fields } = input;
         const existing = await tx.query.task.findFirst({ where: eq(task.id, id) });
         if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "Task not found" });
-        const role = (ctx.user as any).role as string;
-        if (role === "patient" && existing.assignedUserId !== ctx.user.id) {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Patients can only edit tasks assigned to them" });
-        }
-        if (role !== "patient" && existing.assignedUserId !== null && existing.assignedUserId !== ctx.user.id) {
+        if (existing.assignedUserId !== ctx.user.id) {
           throw new TRPCError({ code: "FORBIDDEN", message: "Only the assigned user can edit this task" });
         }
         if (existing.taskType === "summary_review") {
@@ -102,14 +98,14 @@ export const tasksRouter = createTRPCRouter({
             .update(task)
             .set({ remark, status, updatedAt: new Date() })
             .where(eq(task.id, id))
-            .returning();
+            .returning({ id: task.id, title: task.title, status: task.status, taskType: task.taskType, assignedUserId: task.assignedUserId, createdAt: task.createdAt });
           return updated;
         }
         const [updated] = await tx
           .update(task)
           .set({ ...fields, updatedAt: new Date() })
           .where(eq(task.id, id))
-          .returning();
+          .returning({ id: task.id, title: task.title, status: task.status, taskType: task.taskType, assignedUserId: task.assignedUserId, createdAt: task.createdAt });
         return updated;
       });
     }),

@@ -32,7 +32,7 @@ export const medicationsRouter = createTRPCRouter({
         endDate: input.endDate ? new Date(input.endDate) : null,
         isActive: true,
         notes: input.notes ?? null,
-      }).returning();
+      }).returning({ id: medication.id, name: medication.name, dosage: medication.dosage, frequency: medication.frequency, route: medication.route, prescribedBy: medication.prescribedBy, reason: medication.reason, startDate: medication.startDate, endDate: medication.endDate, isActive: medication.isActive, notes: medication.notes, createdAt: medication.createdAt, updatedAt: medication.updatedAt });
       return row!;
     }),
 
@@ -76,7 +76,7 @@ export const medicationsRouter = createTRPCRouter({
         .update(medication)
         .set(values)
         .where(eq(medication.id, id))
-        .returning();
+        .returning({ id: medication.id, name: medication.name, dosage: medication.dosage, frequency: medication.frequency, route: medication.route, prescribedBy: medication.prescribedBy, reason: medication.reason, startDate: medication.startDate, endDate: medication.endDate, isActive: medication.isActive, notes: medication.notes, createdAt: medication.createdAt, updatedAt: medication.updatedAt });
       return updated!;
     }),
 
@@ -113,12 +113,13 @@ export const medicationsRouter = createTRPCRouter({
 
   shareWithProfessional: protectedProcedure
     .input(z.object({
-      recipientUserId: z.string(),
-      language: z.string().optional(),
+      recipientUserId: z.string().min(1).max(100),
+      language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       const sender = await ctx.db.query.user.findFirst({
         where: eq(user.id, ctx.user.id),
+        columns: { id: true, name: true, role: true },
       });
       if (!sender || (sender as any).role !== "patient") {
         throw new TRPCError({ code: "FORBIDDEN", message: "Only patients can share medications" });
@@ -133,6 +134,7 @@ export const medicationsRouter = createTRPCRouter({
 
       const recipient = await ctx.db.query.user.findFirst({
         where: eq(user.id, input.recipientUserId),
+        columns: { id: true, name: true, email: true, role: true },
       });
       if (!recipient) throw new TRPCError({ code: "NOT_FOUND" });
       if ((recipient as any).role !== "doctor" && (recipient as any).role !== "pharmacist") {

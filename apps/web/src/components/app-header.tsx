@@ -37,6 +37,10 @@ export function AppHeader() {
     }
     queryClient.clear();
     sessionStorage.clear();
+    // Clear service worker caches to remove any cached data
+    if ("caches" in window) {
+      caches.keys().then((names) => names.forEach((name) => caches.delete(name)));
+    }
     await signOut();
     navigate({ to: "/login" as any });
   }

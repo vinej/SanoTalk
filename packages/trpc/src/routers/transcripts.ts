@@ -66,7 +66,7 @@ export const transcriptsRouter = createTRPCRouter({
           startMs: input.startMs,
           endMs: input.endMs,
         })
-        .returning();
+        .returning({ id: transcript.id, sessionId: transcript.sessionId, content: transcript.content, createdAt: transcript.createdAt });
       return saved;
     }),
 });

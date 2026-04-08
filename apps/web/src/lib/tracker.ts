@@ -15,6 +15,7 @@ export const tracker = enabled && projectKey
       __DISABLE_SECURE_MODE: import.meta.env.DEV,
       obscureTextEmails: true,
       obscureInputNumbers: true,
+      obscureTextNumbers: true,
       defaultInputMode: 1, // mask all inputs by default
       network: {
         capturePayload: false,

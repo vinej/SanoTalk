@@ -135,13 +135,20 @@ export const userRouter = createTRPCRouter({
 
   addUserLink: protectedProcedure
     .input(z.object({
-      targetUserId: z.string(),
+      targetUserId: z.string().min(1).max(100),
       linkType: z.enum(["doctor", "wellness"]).optional().default("doctor"),
     }))
     .mutation(async ({ ctx, input }) => {
       const senderRole = (ctx.user as any).role as string;
       if (senderRole === "ia_agent" || senderRole === "admin") {
         throw new TRPCError({ code: "FORBIDDEN", message: "This role cannot create links" });
+      }
+      if (input.targetUserId === ctx.user.id) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot link to yourself" });
+      }
+      const targetExists = await ctx.db.select({ id: user.id }).from(user).where(eq(user.id, input.targetUserId)).limit(1);
+      if (targetExists.length === 0) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Could not create link" });
       }
       await ctx.db
         .insert(connectionRequest)

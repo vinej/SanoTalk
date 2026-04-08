@@ -56,7 +56,7 @@ export const symptomsRouter = createTRPCRouter({
             updatedAt: new Date(),
           },
         })
-        .returning();
+        .returning({ id: symptomLog.id, date: symptomLog.date, painLevel: symptomLog.painLevel, mood: symptomLog.mood, energy: symptomLog.energy, sleepQuality: symptomLog.sleepQuality, sleepHours: symptomLog.sleepHours, stress: symptomLog.stress, appetite: symptomLog.appetite, customSymptoms: symptomLog.customSymptoms, bodyLocation: symptomLog.bodyLocation, notes: symptomLog.notes, createdAt: symptomLog.createdAt, updatedAt: symptomLog.updatedAt });
       return row!;
     }),
 
@@ -95,12 +95,13 @@ export const symptomsRouter = createTRPCRouter({
 
   shareWithProfessional: protectedProcedure
     .input(z.object({
-      recipientUserId: z.string(),
-      language: z.string().optional(),
+      recipientUserId: z.string().min(1).max(100),
+      language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       const sender = await ctx.db.query.user.findFirst({
         where: eq(user.id, ctx.user.id),
+        columns: { id: true, name: true, role: true },
       });
       if (!sender || (sender as any).role !== "patient") {
         throw new TRPCError({ code: "FORBIDDEN", message: "Only patients can share symptoms" });
@@ -115,6 +116,7 @@ export const symptomsRouter = createTRPCRouter({
 
       const recipient = await ctx.db.query.user.findFirst({
         where: eq(user.id, input.recipientUserId),
+        columns: { id: true, name: true, email: true, role: true },
       });
       if (!recipient) throw new TRPCError({ code: "NOT_FOUND" });
       if ((recipient as any).role !== "doctor" && (recipient as any).role !== "pharmacist") {

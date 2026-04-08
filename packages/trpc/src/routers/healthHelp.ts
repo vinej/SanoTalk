@@ -429,8 +429,8 @@ async function queryOverpass(query: string): Promise<{ elements: OverpassElement
       }
       if (!res.ok) throw new Error(`Overpass HTTP ${res.status}`);
       return (await res.json()) as { elements: OverpassElement[] };
-    } catch {
-      console.warn(`[healthHelp] Overpass error from ${endpoint}`);
+    } catch (err) {
+      console.warn(`[healthHelp] Overpass error from ${endpoint}: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
   throw new Error("All Overpass endpoints failed");
@@ -447,25 +447,30 @@ async function fetchNearbyPOIs(
     return cached;
   }
 
+  // Round coordinates to 2 decimal places (~1.1km) before sending to external APIs
+  // to reduce location precision shared with third-party services
+  const roundedLat = parseFloat(lat.toFixed(2));
+  const roundedLng = parseFloat(lng.toFixed(2));
+
   try {
     // Fetch pharmacies first
     const pharmQuery = `[out:json][timeout:20];(
-      node[amenity=pharmacy](around:25000,${lat},${lng});
-      way[amenity=pharmacy](around:25000,${lat},${lng});
-      node[shop=chemist](around:25000,${lat},${lng});
-      node[healthcare=pharmacy](around:25000,${lat},${lng});
+      node[amenity=pharmacy](around:25000,${roundedLat},${roundedLng});
+      way[amenity=pharmacy](around:25000,${roundedLat},${roundedLng});
+      node[shop=chemist](around:25000,${roundedLat},${roundedLng});
+      node[healthcare=pharmacy](around:25000,${roundedLat},${roundedLng});
     );out center 30;`;
 
     const pharmData = await queryOverpass(pharmQuery);
 
     // Then fetch clinics (sequential to avoid rate-limiting)
     const clinicQuery = `[out:json][timeout:20];(
-      node[amenity=clinic](around:25000,${lat},${lng});
-      way[amenity=clinic](around:25000,${lat},${lng});
-      node[healthcare=clinic](around:25000,${lat},${lng});
-      way[healthcare=clinic](around:25000,${lat},${lng});
-      node[healthcare=doctor](around:25000,${lat},${lng});
-      way[healthcare=doctor](around:25000,${lat},${lng});
+      node[amenity=clinic](around:25000,${roundedLat},${roundedLng});
+      way[amenity=clinic](around:25000,${roundedLat},${roundedLng});
+      node[healthcare=clinic](around:25000,${roundedLat},${roundedLng});
+      way[healthcare=clinic](around:25000,${roundedLat},${roundedLng});
+      node[healthcare=doctor](around:25000,${roundedLat},${roundedLng});
+      way[healthcare=doctor](around:25000,${roundedLat},${roundedLng});
     );out center 30;`;
 
     const clinicData = await queryOverpass(clinicQuery);
@@ -477,8 +482,8 @@ async function fetchNearbyPOIs(
     poiCache.set(key, { ...result, at: now });
     // Overpass data fetched successfully
     return result;
-  } catch {
-    console.warn("[healthHelp] Overpass fetch failed");
+  } catch (err) {
+    console.warn(`[healthHelp] Overpass fetch failed: ${err instanceof Error ? err.message : String(err)}`);
     return cached ?? { pharmacies: [], clinics: [] };
   }
 }
