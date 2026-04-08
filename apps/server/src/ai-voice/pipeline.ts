@@ -242,8 +242,9 @@ export class AiVoicePipeline {
         "AI generating voice response"
       );
 
+      const MAX_VOICE_RESPONSE_LENGTH = 2000;
       const result = await this.agent.generate(messages as any);
-      const responseText = result.text;
+      const responseText = result.text?.slice(0, MAX_VOICE_RESPONSE_LENGTH);
 
       if (!responseText || !this.running) {
         this.speaking = false;

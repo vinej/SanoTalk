@@ -51,14 +51,6 @@ export const medicationsRouter = createTRPCRouter({
       notes: z.string().max(500).nullable().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const [existing] = await ctx.db
-        .select({ userId: medication.userId })
-        .from(medication)
-        .where(eq(medication.id, input.id));
-      if (!existing || existing.userId !== ctx.user.id) {
-        throw new TRPCError({ code: "NOT_FOUND" });
-      }
-
       const { id, ...fields } = input;
       const values: Record<string, unknown> = { updatedAt: new Date() };
       if (fields.name !== undefined) values.name = fields.name;
@@ -75,9 +67,10 @@ export const medicationsRouter = createTRPCRouter({
       const [updated] = await ctx.db
         .update(medication)
         .set(values)
-        .where(eq(medication.id, id))
+        .where(and(eq(medication.id, id), eq(medication.userId, ctx.user.id)))
         .returning({ id: medication.id, name: medication.name, dosage: medication.dosage, frequency: medication.frequency, route: medication.route, prescribedBy: medication.prescribedBy, reason: medication.reason, startDate: medication.startDate, endDate: medication.endDate, isActive: medication.isActive, notes: medication.notes, createdAt: medication.createdAt, updatedAt: medication.updatedAt });
-      return updated!;
+      if (!updated) throw new TRPCError({ code: "NOT_FOUND" });
+      return updated;
     }),
 
   list: protectedProcedure
@@ -100,14 +93,11 @@ export const medicationsRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const [row] = await ctx.db
-        .select({ userId: medication.userId })
-        .from(medication)
-        .where(eq(medication.id, input.id));
-      if (!row || row.userId !== ctx.user.id) {
-        throw new TRPCError({ code: "NOT_FOUND" });
-      }
-      await ctx.db.delete(medication).where(eq(medication.id, input.id));
+      const deleted = await ctx.db
+        .delete(medication)
+        .where(and(eq(medication.id, input.id), eq(medication.userId, ctx.user.id)))
+        .returning({ id: medication.id });
+      if (deleted.length === 0) throw new TRPCError({ code: "NOT_FOUND" });
       return { deleted: true };
     }),
 

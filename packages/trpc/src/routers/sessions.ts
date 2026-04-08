@@ -5,6 +5,7 @@ import { eq, desc, or, inArray, and } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { TRPCError } from "@trpc/server";
 import { verifyAdminFromDb } from "../lib/verify-admin";
+import { getRelatedUserIds } from "../lib/related-users";
 
 /** Returns the session (with participants+users) if the user is host or participant; throws otherwise. */
 async function assertSessionAccess(
@@ -184,6 +185,15 @@ export const sessionsRouter = createTRPCRouter({
       // Verify the target user actually exists (uniform error to prevent enumeration)
       const targetUser = await ctx.db.select({ id: user.id }).from(user).where(eq(user.id, input.userId)).limit(1);
       if (targetUser.length === 0) throw new TRPCError({ code: "BAD_REQUEST", message: "Could not add participant" });
+
+      // Only allow adding related users or AI assistants to prevent arbitrary user exposure
+      const isAi = await ctx.isAiAssistant(input.userId);
+      if (!isAi) {
+        const relatedIds = await getRelatedUserIds(ctx.db, ctx.user.id);
+        if (!relatedIds.has(input.userId)) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Can only add related users or AI assistants" });
+        }
+      }
 
       await ctx.db.insert(sessionParticipant).values({
         sessionId: input.sessionId,

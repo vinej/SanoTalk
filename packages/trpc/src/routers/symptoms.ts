@@ -62,8 +62,8 @@ export const symptomsRouter = createTRPCRouter({
 
   list: protectedProcedure
     .input(z.object({
-      from: z.string().optional(),
-      to: z.string().optional(),
+      from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+      to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
       limit: z.number().min(1).max(500).optional(),
     }).optional())
     .query(async ({ ctx, input }) => {
@@ -82,14 +82,11 @@ export const symptomsRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const [row] = await ctx.db
-        .select({ userId: symptomLog.userId })
-        .from(symptomLog)
-        .where(eq(symptomLog.id, input.id));
-      if (!row || row.userId !== ctx.user.id) {
-        throw new TRPCError({ code: "NOT_FOUND" });
-      }
-      await ctx.db.delete(symptomLog).where(eq(symptomLog.id, input.id));
+      const deleted = await ctx.db
+        .delete(symptomLog)
+        .where(and(eq(symptomLog.id, input.id), eq(symptomLog.userId, ctx.user.id)))
+        .returning({ id: symptomLog.id });
+      if (deleted.length === 0) throw new TRPCError({ code: "NOT_FOUND" });
       return { deleted: true };
     }),
 

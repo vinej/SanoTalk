@@ -154,6 +154,11 @@ app.use("/api/trpc/medications.shareWithProfessional", medicalLimiter);
 app.use("/api/trpc/symptoms.shareWithProfessional", medicalLimiter);
 // General API limiter for all other tRPC routes
 app.use("/api/trpc", apiLimiter);
+// Prevent caching of API responses (tRPC may return decrypted PHI)
+app.use("/api/trpc", (_req, res, next) => {
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
+  next();
+});
 app.use(
   "/api/trpc",
   createExpressMiddleware({

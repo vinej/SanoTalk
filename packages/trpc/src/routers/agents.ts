@@ -721,10 +721,13 @@ export const agentsRouter = createTRPCRouter({
         ),
       });
       if (!saved) throw new TRPCError({ code: "NOT_FOUND", message: "Saved conversation not found" });
-      const chatType = saved.chatType as "health" | "companion" | "news" | "pharmacist";
+      const chatType = z.enum(["health", "companion", "news", "pharmacist"]).parse(saved.chatType);
+      const savedMsgSchema = z.array(z.object({
+        role: z.enum(["user", "assistant"]),
+        content: z.string().max(10000),
+      })).max(1000);
       const rawMsgs = saved.messages as Array<{ role: string; content: string }>;
-      const _validRoles = new Set(["user", "assistant"]);
-      const msgs = rawMsgs.filter((m) => _validRoles.has(m.role));
+      const msgs = savedMsgSchema.parse(rawMsgs.filter((m) => m.role === "user" || m.role === "assistant"));
       await ctx.db.transaction(async (tx) => {
         await tx.delete(chatMessage).where(
           and(

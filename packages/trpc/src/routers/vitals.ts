@@ -144,16 +144,11 @@ export const vitalsRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const [row] = await ctx.db
-        .select({ userId: vitalSign.userId })
-        .from(vitalSign)
-        .where(eq(vitalSign.id, input.id));
-
-      if (!row || row.userId !== ctx.user.id) {
-        throw new TRPCError({ code: "NOT_FOUND" });
-      }
-
-      await ctx.db.delete(vitalSign).where(eq(vitalSign.id, input.id));
+      const deleted = await ctx.db
+        .delete(vitalSign)
+        .where(and(eq(vitalSign.id, input.id), eq(vitalSign.userId, ctx.user.id)))
+        .returning({ id: vitalSign.id });
+      if (deleted.length === 0) throw new TRPCError({ code: "NOT_FOUND" });
       return { deleted: true };
     }),
 

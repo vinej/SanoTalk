@@ -18,7 +18,12 @@ export const tasksRouter = createTRPCRouter({
         limit: 500,
       });
       // remark: null added for type-shape compatibility; value never comes from DB
-      return tasks.map((t) => ({ ...t, remark: null as null }));
+      // description redacted for summary_review tasks to avoid leaking session URLs
+      return tasks.map((t) => ({
+        ...t,
+        remark: null as null,
+        description: t.taskType === "summary_review" ? null : t.description,
+      }));
     }
     return ctx.db.query.task.findMany({
       where: eq(task.assignedUserId, ctx.user.id),
@@ -96,14 +101,14 @@ export const tasksRouter = createTRPCRouter({
           const [updated] = await tx
             .update(task)
             .set({ remark, status, updatedAt: new Date() })
-            .where(eq(task.id, id))
+            .where(and(eq(task.id, id), eq(task.assignedUserId, ctx.user.id)))
             .returning({ id: task.id, title: task.title, status: task.status, taskType: task.taskType, assignedUserId: task.assignedUserId, createdAt: task.createdAt });
           return updated;
         }
         const [updated] = await tx
           .update(task)
           .set({ ...fields, updatedAt: new Date() })
-          .where(eq(task.id, id))
+          .where(and(eq(task.id, id), eq(task.assignedUserId, ctx.user.id)))
           .returning({ id: task.id, title: task.title, status: task.status, taskType: task.taskType, assignedUserId: task.assignedUserId, createdAt: task.createdAt });
         return updated;
       });
@@ -118,7 +123,7 @@ export const tasksRouter = createTRPCRouter({
       if (existing.taskType === "summary_review") {
         throw new TRPCError({ code: "FORBIDDEN", message: "Cannot delete a summary review task" });
       }
-      await ctx.db.delete(task).where(eq(task.id, input.id));
+      await ctx.db.delete(task).where(and(eq(task.id, input.id), eq(task.assignedUserId, ctx.user.id)));
     }),
 
   listUsers: protectedProcedure.query(async ({ ctx }) => {

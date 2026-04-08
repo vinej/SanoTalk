@@ -54,5 +54,6 @@ export function buildSessionPrompt(
     `- REMINDER: Respond ONLY in ${langName}.`,
   ].join("\n");
 
-  return `${prefix}\n\n${assistant.systemPrompt}\n\n${context}`;
+  const safeSystemPrompt = assistant.systemPrompt.replace(/<\/?system_instructions>/gi, "");
+  return `${prefix}\n\n<system_instructions>\n${safeSystemPrompt}\n</system_instructions>\n\n${context}`;
 }

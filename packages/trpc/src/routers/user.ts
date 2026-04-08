@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
-import { user, userProperty, userLink, userFriend, connectionRequest, aiAssistantProfile } from "@sanotalk/db";
+import { user, userProperty, userLink, userFriend, connectionRequest, aiAssistantProfile, session } from "@sanotalk/db";
 import { eq, and, desc, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { verifyAdminFromDb } from "../lib/verify-admin";
@@ -166,7 +166,7 @@ export const userRouter = createTRPCRouter({
 
   removeUserLink: protectedProcedure
     .input(z.object({
-      targetUserId: z.string(),
+      targetUserId: z.string().min(1).max(100),
       linkType: z.enum(["doctor", "wellness"]).optional().default("doctor"),
     }))
     .mutation(async ({ ctx, input }) => {
@@ -216,7 +216,7 @@ export const userRouter = createTRPCRouter({
     }),
 
   removeFriend: protectedProcedure
-    .input(z.object({ friendId: z.string() }))
+    .input(z.object({ friendId: z.string().min(1).max(100) }))
     .mutation(async ({ ctx, input }) => {
       const exists = await ctx.db.query.userFriend.findFirst({
         where: and(eq(userFriend.userId, ctx.user.id), eq(userFriend.friendId, input.friendId)),
@@ -307,7 +307,7 @@ export const userRouter = createTRPCRouter({
 
   cancelRequest: protectedProcedure
     .input(z.object({
-      targetUserId: z.string(),
+      targetUserId: z.string().min(1).max(100),
       type: z.enum(["link", "friend"]),
       linkType: z.enum(["doctor", "wellness"]).optional().default("doctor"),
     }))
@@ -375,8 +375,9 @@ export const userRouter = createTRPCRouter({
           target: [userProperty.userId, userProperty.key],
           set: { value: valueToStore, updatedAt: new Date() },
         })
-        .returning({ id: userProperty.id, key: userProperty.key, value: userProperty.value });
-      return result;
+        .returning({ id: userProperty.id, key: userProperty.key });
+      // Return the original plaintext value — never expose the encrypted ciphertext
+      return { ...result, value: input.value };
     }),
 
   deleteProperty: protectedProcedure
@@ -400,6 +401,8 @@ export const userRouter = createTRPCRouter({
       const target = await ctx.db.query.user.findFirst({ where: eq(user.id, input.targetUserId), columns: { id: true, role: true } });
       if (!target) throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
       await ctx.db.update(user).set({ role: input.role }).where(eq(user.id, input.targetUserId));
+      // Invalidate all sessions for the target user so stale role claims are not used
+      await ctx.db.delete(session).where(eq(session.userId, input.targetUserId));
       return { ok: true, previousRole: target.role, newRole: input.role };
     }),
 });
