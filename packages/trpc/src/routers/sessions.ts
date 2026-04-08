@@ -51,6 +51,7 @@ export const sessionsRouter = createTRPCRouter({
       with: {
         participants: { with: { user: { columns: { id: true, name: true, image: true, role: true } } } },
       },
+      limit: 200,
     });
   }),
 

@@ -29,7 +29,7 @@ export const transcriptsRouter = createTRPCRouter({
       return ctx.db.query.transcript.findMany({
         where: eq(transcript.sessionId, input.sessionId),
         orderBy: [desc(transcript.createdAt)],
-        with: { speaker: true },
+        with: { speaker: { columns: { id: true, name: true, image: true, role: true } } },
       });
     }),
 

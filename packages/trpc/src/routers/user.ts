@@ -91,7 +91,10 @@ export const userRouter = createTRPCRouter({
         .update(user)
         .set(values)
         .where(eq(user.id, ctx.user.id))
-        .returning();
+        .returning({
+          id: user.id, name: user.name, role: user.role,
+          specialty: user.specialty, licenseNumber: user.licenseNumber,
+        });
 
       return updated;
     }),
@@ -107,7 +110,7 @@ export const userRouter = createTRPCRouter({
         .update(user)
         .set({ image: input.image })
         .where(eq(user.id, ctx.user.id))
-        .returning();
+        .returning({ id: user.id, image: user.image });
       return updated;
     }),
 
@@ -118,14 +121,14 @@ export const userRouter = createTRPCRouter({
     if (role === "patient") {
       const rows = await ctx.db.query.userLink.findMany({
         where: eq(userLink.patientId, ctx.user.id),
-        with: { professional: { columns: { id: true, name: true, role: true, specialty: true, email: true } } },
+        with: { professional: { columns: { id: true, name: true, role: true, specialty: true } } },
       });
       return rows.map((r) => ({ ...r.professional, linkType: r.linkType }));
     }
     // doctor or pharmacist
     const rows = await ctx.db.query.userLink.findMany({
       where: eq(userLink.professionalId, ctx.user.id),
-      with: { patient: { columns: { id: true, name: true, role: true, email: true } } },
+      with: { patient: { columns: { id: true, name: true, role: true } } },
     });
     return rows.map((r) => ({ ...r.patient, linkType: r.linkType }));
   }),
@@ -168,7 +171,7 @@ export const userRouter = createTRPCRouter({
   listFriends: protectedProcedure.query(async ({ ctx }) => {
     const rows = await ctx.db.query.userFriend.findMany({
       where: eq(userFriend.userId, ctx.user.id),
-      with: { friend: { columns: { id: true, name: true, role: true, email: true, specialty: true } } },
+      with: { friend: { columns: { id: true, name: true, role: true, specialty: true } } },
     });
     return rows.map((r) => r.friend);
   }),
@@ -213,6 +216,7 @@ export const userRouter = createTRPCRouter({
       ),
       with: { fromUser: { columns: { id: true, name: true, role: true, specialty: true } } },
       orderBy: [desc(connectionRequest.createdAt)],
+      limit: 200,
     });
     return rows;
   }),
@@ -224,6 +228,7 @@ export const userRouter = createTRPCRouter({
         eq(connectionRequest.status, "pending")
       ),
       with: { toUser: { columns: { id: true, name: true, role: true } } },
+      limit: 200,
     });
   }),
 
@@ -330,25 +335,15 @@ export const userRouter = createTRPCRouter({
 
       const valueToStore = ENCRYPTED_KEYS.has(input.key) ? encrypt(input.value) : input.value;
 
-      const existing = await ctx.db
-        .select({ id: userProperty.id })
-        .from(userProperty)
-        .where(and(eq(userProperty.userId, ctx.user.id), eq(userProperty.key, input.key)));
-
-      if (existing.length > 0) {
-        const [updated] = await ctx.db
-          .update(userProperty)
-          .set({ value: valueToStore })
-          .where(and(eq(userProperty.userId, ctx.user.id), eq(userProperty.key, input.key)))
-          .returning();
-        return updated;
-      } else {
-        const [inserted] = await ctx.db
-          .insert(userProperty)
-          .values({ userId: ctx.user.id, key: input.key, value: valueToStore })
-          .returning();
-        return inserted;
-      }
+      const [result] = await ctx.db
+        .insert(userProperty)
+        .values({ userId: ctx.user.id, key: input.key, value: valueToStore })
+        .onConflictDoUpdate({
+          target: [userProperty.userId, userProperty.key],
+          set: { value: valueToStore, updatedAt: new Date() },
+        })
+        .returning({ id: userProperty.id, key: userProperty.key, value: userProperty.value });
+      return result;
     }),
 
   deleteProperty: protectedProcedure

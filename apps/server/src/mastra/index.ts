@@ -6,7 +6,7 @@ import { companionChatAgent } from "./agents/companion-chat.js";
 import { newsChatAgent } from "./agents/news_chat.js";
 import { pharmacistChatAgent } from "./agents/pharmacist-chat.js";
 import { db, agentRun, transcriptSummary, transcript, chatMessage, talkSession, userLink, user, task } from "@sanotalk/db";
-import { escapeHtml } from "@sanotalk/trpc/lib/escape-html";
+import { escapeHtml, sanitizeSubject } from "@sanotalk/trpc/lib/escape-html";
 import { eq, asc, and } from "drizzle-orm";
 import { Resend } from "resend";
 import { logger } from "../logger.js";
@@ -100,7 +100,7 @@ async function autoSendSummaryToLinkedProfessional(params: {
     await sendEmail({
       from,
       to: recipient.email,
-      subject: `SanoTalk — Consultation summary available for ${escapeHtml(sender.name)}`,
+      subject: `SanoTalk — Consultation summary available for ${sanitizeSubject(sender.name)}`,
       html: `
         <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
           <h2 style="color:#1a1a1a">Consultation Summary Available</h2>
@@ -130,7 +130,7 @@ async function autoSendSummaryToLinkedProfessional(params: {
       taskType: "summary_review",
     });
 
-    logger.info({ sessionId, recipientEmail: recipient.email, agentType }, "autoSend: summary sent successfully");
+    logger.info({ sessionId, recipientId: recipient.id, agentType }, "autoSend: summary sent successfully");
   } catch (err) {
     logger.error({ err, sessionId, agentType }, "autoSend: failed to send summary");
   }

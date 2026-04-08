@@ -36,8 +36,10 @@ function withCustomAdapter(adapterFactory: typeof _baseAdapter): typeof _baseAda
       // the first sign-in — no manual setup step required.
       create: async (params: any) => {
         if (params.model === "user") {
-          params = { ...params, data: { ...params.data, twoFactorEnabled: true } };
-          authLog.info("user row — forcing twoFactorEnabled=true");
+          // Always force patient role and 2FA on sign-up — role escalation
+          // must go through a separate admin-only mutation, never sign-up.
+          params = { ...params, data: { ...params.data, twoFactorEnabled: true, role: "patient" } };
+          authLog.info("user row — forcing role=patient, twoFactorEnabled=true");
         }
         if (params.model === "account") {
           authLog.info(`account row for provider: ${params.data?.providerId}`);
@@ -85,6 +87,8 @@ export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
   database: withCustomAdapter(_baseAdapter),
   session: {
+    expiresIn: 60 * 60 * 8,      // 8-hour absolute session lifetime
+    updateAge: 60 * 15,           // refresh session every 15 min of activity
     cookieCache: { enabled: true, maxAge: 5 * 60 },
   },
   advanced: {
@@ -109,6 +113,8 @@ export const auth = betterAuth({
   },
   emailAndPassword: {
     enabled: true,
+    minPasswordLength: 12,
+    maxPasswordLength: 128,
     // Disabled while Resend delivery to Hotmail/Outlook is unreliable with the
     // shared onboarding@resend.dev sender. Re-enable once a verified sending
     // domain is configured (EMAIL_FROM=noreply@yourdomain.com).
@@ -162,7 +168,7 @@ export const auth = betterAuth({
   trustedOrigins: [
     process.env.BETTER_AUTH_URL!,
     process.env.APP_URL!,
-    ...(process.env.NODE_ENV !== "production" && process.env.NGROK_URL ? [process.env.NGROK_URL] : []),
-    ...(process.env.NODE_ENV !== "production" ? ["http://localhost:5173", "http://localhost:3001"] : []),
+    ...(!isProduction && process.env.NGROK_URL ? [process.env.NGROK_URL] : []),
+    ...(!isProduction ? ["http://localhost:5173", "http://localhost:3001"] : []),
   ],
 });

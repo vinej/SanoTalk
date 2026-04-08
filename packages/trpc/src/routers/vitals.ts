@@ -2,7 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { vitalSign, user, userLink, task } from "@sanotalk/db";
 import { resend } from "../lib/resend";
-import { escapeHtml } from "../lib/escape-html";
+import { escapeHtml, sanitizeSubject } from "../lib/escape-html";
 import { eq, and, desc, gte, lte, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
@@ -197,7 +197,7 @@ export const vitalsRouter = createTRPCRouter({
       await resend.emails.send({
         from,
         to: recipient.email,
-        subject: `SanoTalk — Vital signs shared by ${sender.name}`,
+        subject: `SanoTalk — Vital signs shared by ${sanitizeSubject(sender.name)}`,
         html: `
           <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
             <h2 style="color:#1a1a1a">Vital Signs Shared</h2>

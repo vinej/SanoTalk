@@ -37,7 +37,7 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https:"],
+      imgSrc: ["'self'", "data:", "https://api.dicebear.com", "https://avatars.dicebear.com", "https://www.gravatar.com"],
       fontSrc: ["'self'"],
       connectSrc: [
         "'self'",
@@ -180,7 +180,11 @@ app.get("/api/avatar/:userId", apiLimiter, async (req, res) => {
       where: eq(userTable.id, userId),
       columns: { image: true },
     });
-    if (!record?.image) { res.status(404).end(); return; }
+    if (!record?.image) {
+      // Redirect to a generic default avatar to prevent user enumeration
+      res.redirect("https://api.dicebear.com/9.x/initials/svg?seed=ST");
+      return;
+    }
 
     // External URLs — only redirect to allowlisted domains
     if (record.image.startsWith("http://") || record.image.startsWith("https://")) {

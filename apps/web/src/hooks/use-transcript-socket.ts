@@ -93,7 +93,7 @@ export function useTranscriptSocket(
               recorder.start(250);
             })
             .catch((err: Error) => {
-              console.error("[transcript] mic access denied:", err);
+              console.error("[transcript] mic access denied:", err.message);
               setMicError(err.message);
             });
         };

@@ -29,11 +29,11 @@ export const tasksRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
-        title: z.string().min(1),
-        description: z.string().optional(),
+        title: z.string().min(1).max(500),
+        description: z.string().max(5000).optional(),
         assignedUserId: z.string().optional(),
         taskType: z.enum(["standard", "summary_review"]).optional(),
-        remark: z.string().optional(),
+        remark: z.string().max(2000).optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -63,11 +63,11 @@ export const tasksRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string().uuid(),
-        title: z.string().min(1).optional(),
-        description: z.string().nullable().optional(),
+        title: z.string().min(1).max(500).optional(),
+        description: z.string().max(5000).nullable().optional(),
         status: z.enum(["not_assigned", "assigned", "completed"]).optional(),
         assignedUserId: z.string().nullable().optional(),
-        remark: z.string().nullable().optional(),
+        remark: z.string().max(2000).nullable().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {

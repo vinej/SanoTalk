@@ -12,7 +12,8 @@ const MAX_WS_PER_USER = 2;
 
 export function startDeepgramWebSocket(server: Server) {
   const wss = new WebSocketServer({ server, path: "/ws/transcribe" });
-  const deepgram = createClient(process.env.DEEPGRAM_API_KEY ?? "");
+  if (!process.env.DEEPGRAM_API_KEY) throw new Error("DEEPGRAM_API_KEY is required");
+  const deepgram = createClient(process.env.DEEPGRAM_API_KEY);
   const wsCountByUser = new Map<string, number>();
 
   wss.on("connection", async (ws: WebSocket, req) => {

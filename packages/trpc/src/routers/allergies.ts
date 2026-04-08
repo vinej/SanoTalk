@@ -16,7 +16,8 @@ export const allergiesRouter = createTRPCRouter({
       .select()
       .from(allergy)
       .where(eq(allergy.userId, ctx.user.id))
-      .orderBy(desc(allergy.createdAt));
+      .orderBy(desc(allergy.createdAt))
+      .limit(200);
   }),
 
   addAllergy: protectedProcedure
@@ -95,7 +96,8 @@ export const allergiesRouter = createTRPCRouter({
       .select()
       .from(chronicCondition)
       .where(eq(chronicCondition.userId, ctx.user.id))
-      .orderBy(desc(chronicCondition.createdAt));
+      .orderBy(desc(chronicCondition.createdAt))
+      .limit(200);
   }),
 
   addCondition: protectedProcedure

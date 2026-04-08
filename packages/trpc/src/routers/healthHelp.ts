@@ -424,13 +424,13 @@ async function queryOverpass(query: string): Promise<{ elements: OverpassElement
         body: `data=${encodeURIComponent(query)}`,
       });
       if (res.status === 429) {
-        console.warn(`[healthHelp] Overpass 429 from ${endpoint}, trying next…`);
+        // Overpass 429 — try next endpoint
         continue;
       }
       if (!res.ok) throw new Error(`Overpass HTTP ${res.status}`);
       return (await res.json()) as { elements: OverpassElement[] };
-    } catch (err) {
-      console.warn(`[healthHelp] Overpass error from ${endpoint}:`, err);
+    } catch {
+      console.warn(`[healthHelp] Overpass error from ${endpoint}`);
     }
   }
   throw new Error("All Overpass endpoints failed");
@@ -475,10 +475,10 @@ async function fetchNearbyPOIs(
 
     const result = { pharmacies, clinics };
     poiCache.set(key, { ...result, at: now });
-    console.log(`[healthHelp] Overpass OK: ${pharmacies.length} pharmacies, ${clinics.length} clinics`);
+    // Overpass data fetched successfully
     return result;
-  } catch (err) {
-    console.warn("[healthHelp] Overpass fetch failed:", err);
+  } catch {
+    console.warn("[healthHelp] Overpass fetch failed");
     return cached ?? { pharmacies: [], clinics: [] };
   }
 }
@@ -504,12 +504,7 @@ export const healthHelpRouter = createTRPCRouter({
         fetchNearbyPOIs(lat, lng),
       ]);
 
-      console.log("[healthHelp] nearestFacilities query:", {
-        perType,
-        csvFacilities: allFacilities.length,
-        pharmacies: pois.pharmacies.length,
-        clinics: pois.clinics.length,
-      });
+      // nearestFacilities query executed
 
       // Promote any facility that has ER data to "hospital"
       const promoted = allFacilities.map((h: FacilityRecord) => {

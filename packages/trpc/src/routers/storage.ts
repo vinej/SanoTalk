@@ -77,7 +77,10 @@ export const storageRouter = createTRPCRouter({
 
       const client = getMinioClient();
       const bucket = process.env.MINIO_BUCKET ?? "sanotalk";
-      const url = await client.presignedGetObject(bucket, input.key, 3600);
+      // Force downloads as attachments to prevent browser-rendered XSS via uploaded HTML
+      const url = await client.presignedGetObject(bucket, input.key, 3600, {
+        "response-content-disposition": "attachment",
+      });
       return { url };
     }),
 

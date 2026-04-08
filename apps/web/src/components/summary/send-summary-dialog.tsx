@@ -79,7 +79,7 @@ export function SendSummaryDialog({ sessionId, open, onOpenChange }: Props) {
                 {(u as any)?.specialty && (
                   <div className="text-muted-foreground text-xs">{(u as any).specialty}</div>
                 )}
-                <div className="text-muted-foreground text-xs">{(u as any)?.email}</div>
+                <div className="text-muted-foreground text-xs capitalize">{(u as any)?.role}</div>
               </button>
             ))
           ) : (

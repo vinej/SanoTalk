@@ -49,7 +49,7 @@ export class LiveKitBot {
       identity,
       name,
       ...(metadata ? { metadata } : {}),
-      ttl: "4h",
+      ttl: "1h",
     });
     at.addGrant({
       roomJoin: true,

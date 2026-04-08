@@ -2,7 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { agentRun, talkSession as talkSessionTable, chatMessage, transcript, user, transcriptSummary, userProperty, task, savedConversation, userLink, vitalSign, medication, symptomLog, allergy, chronicCondition } from "@sanotalk/db";
 import { resend } from "../lib/resend";
-import { escapeHtml } from "../lib/escape-html";
+import { escapeHtml, sanitizeSubject } from "../lib/escape-html";
 import { eq, asc, desc, isNull, and, gte } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
@@ -209,7 +209,7 @@ export const agentsRouter = createTRPCRouter({
           agentName,
           input: { sessionId: input.sessionId, agentType },
         })
-        .returning();
+        .returning({ id: agentRun.id, status: agentRun.status, agentName: agentRun.agentName, startedAt: agentRun.startedAt });
       if (run) ctx.triggerAgentRun(run.id);
       return run;
     }),
@@ -224,7 +224,15 @@ export const agentsRouter = createTRPCRouter({
       const sessionId = (run.input as { sessionId?: string } | null)?.sessionId;
       if (!sessionId) throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       await assertSessionAccess(ctx.db, sessionId, ctx.user.id);
-      return run;
+      // Return only status fields — the full output (SOAP notes etc.) is accessed via transcripts.summaryBySession
+      return {
+        id: run.id,
+        status: run.status,
+        agentName: run.agentName,
+        errorMessage: run.errorMessage,
+        startedAt: run.startedAt,
+        completedAt: run.completedAt,
+      };
     }),
 
   chatHistory: protectedProcedure
@@ -234,6 +242,7 @@ export const agentsRouter = createTRPCRouter({
       return ctx.db.query.chatMessage.findMany({
         where: eq(chatMessage.sessionId, input.sessionId),
         orderBy: [asc(chatMessage.createdAt)],
+        limit: 500,
       });
     }),
 
@@ -320,6 +329,7 @@ export const agentsRouter = createTRPCRouter({
       return ctx.db.query.chatMessage.findMany({
         where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "health")),
         orderBy: [asc(chatMessage.createdAt)],
+        limit: 500,
       });
     }),
 
@@ -359,6 +369,7 @@ export const agentsRouter = createTRPCRouter({
       return ctx.db.query.chatMessage.findMany({
         where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "companion")),
         orderBy: [asc(chatMessage.createdAt)],
+        limit: 500,
       });
     }),
 
@@ -414,6 +425,7 @@ export const agentsRouter = createTRPCRouter({
       return ctx.db.query.chatMessage.findMany({
         where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "news")),
         orderBy: [asc(chatMessage.createdAt)],
+        limit: 500,
       });
     }),
 
@@ -456,6 +468,7 @@ export const agentsRouter = createTRPCRouter({
       return ctx.db.query.chatMessage.findMany({
         where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "pharmacist")),
         orderBy: [asc(chatMessage.createdAt)],
+        limit: 500,
       });
     }),
 
@@ -564,7 +577,7 @@ export const agentsRouter = createTRPCRouter({
       await resend.emails.send({
         from,
         to: recipient.email,
-        subject: `SanoTalk — Consultation summary available for ${sender.name}`,
+        subject: `SanoTalk — Consultation summary available for ${sanitizeSubject(sender.name)}`,
         html: `
           <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
             <h2 style="color:#1a1a1a">Consultation Summary Available</h2>
@@ -649,7 +662,7 @@ export const agentsRouter = createTRPCRouter({
           .update(savedConversation)
           .set({ messages: snapshot, createdAt: new Date() })
           .where(eq(savedConversation.id, existing.id))
-          .returning();
+          .returning({ id: savedConversation.id, title: savedConversation.title, chatType: savedConversation.chatType, createdAt: savedConversation.createdAt });
         return updated;
       }
 
@@ -661,7 +674,7 @@ export const agentsRouter = createTRPCRouter({
           title: input.title,
           messages: snapshot,
         })
-        .returning();
+        .returning({ id: savedConversation.id, title: savedConversation.title, chatType: savedConversation.chatType, createdAt: savedConversation.createdAt });
       return saved;
     }),
 
