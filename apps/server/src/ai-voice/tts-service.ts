@@ -52,11 +52,16 @@ export async function synthesize(
   voiceId: string,
   language = "en"
 ): Promise<{ pcm: Buffer; sampleRate: number }> {
+  const MAX_TTS_LENGTH = 1500; // ~30 seconds of speech
+  const safeText = text.length > MAX_TTS_LENGTH
+    ? text.slice(0, MAX_TTS_LENGTH) + "…"
+    : text;
+
   const deepgram = createClient(process.env.DEEPGRAM_API_KEY ?? "");
   const resolvedVoice = resolveVoice(voiceId, language);
 
   const response = await deepgram.speak.request(
-    { text },
+    { text: safeText },
     {
       model: resolvedVoice,
       encoding: "linear16", // raw 16-bit PCM

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
-import { talkSession, sessionParticipant } from "@sanotalk/db";
+import { talkSession, sessionParticipant, user } from "@sanotalk/db";
 import { eq, desc, or, inArray, and } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { TRPCError } from "@trpc/server";
@@ -177,6 +177,10 @@ export const sessionsRouter = createTRPCRouter({
       const alreadyAdded = session.participants.some((p) => p.userId === input.userId);
       if (alreadyAdded) return;
 
+      // Verify the target user actually exists
+      const targetUser = await ctx.db.select({ id: user.id }).from(user).where(eq(user.id, input.userId)).limit(1);
+      if (targetUser.length === 0) throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+
       await ctx.db.insert(sessionParticipant).values({
         sessionId: input.sessionId,
         userId: input.userId,
@@ -222,7 +226,11 @@ export const sessionsRouter = createTRPCRouter({
       agentType: z.enum(["health", "companion", "pharmacist"]),
     }))
     .mutation(async ({ ctx, input }) => {
-      await assertSessionAccess(ctx.db, input.sessionId, ctx.user.id);
+      const session = await ctx.db.query.talkSession.findFirst({
+        where: eq(talkSession.id, input.sessionId),
+      });
+      if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
+      if (session.hostId !== ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the host can set the agent type" });
       await ctx.db.update(talkSession)
         .set({ agentType: input.agentType })
         .where(eq(talkSession.id, input.sessionId));

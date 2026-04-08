@@ -1,5 +1,10 @@
 import type { AiAssistantConfig } from "./types.js";
 
+/** Strip control characters and limit length to prevent prompt injection. */
+function sanitizeName(name: string): string {
+  return name.replace(/[\n\r\x00-\x1F\x7F]/g, "").slice(0, 50).trim() || "Unknown";
+}
+
 const LANG_NAMES: Record<string, string> = {
   fr: "French",
   es: "Spanish",
@@ -22,8 +27,10 @@ export function buildSessionPrompt(
   participantNames: string[]
 ): string {
   const langName = LANG_NAMES[language] ?? "English";
+  const safeName = sanitizeName(assistant.name);
+  const safeParticipants = participantNames.map(sanitizeName);
   const participantsStr =
-    participantNames.length > 0 ? participantNames.join(", ") : "none yet";
+    safeParticipants.length > 0 ? safeParticipants.join(", ") : "none yet";
 
   if (language === "en" || !LANG_NAMES[language]) {
     // English — no extra wrapping needed
@@ -31,7 +38,7 @@ export function buildSessionPrompt(
       assistant.systemPrompt,
       "",
       "LIVE SESSION CONTEXT:",
-      `- Your name: ${assistant.name}`,
+      `- Your name: ${safeName}`,
       `- Other participants: ${participantsStr}`,
     ].join("\n");
   }
@@ -42,7 +49,7 @@ export function buildSessionPrompt(
   const context = [
     "LIVE SESSION CONTEXT:",
     `- Session language: ${langName}`,
-    `- Your name: ${assistant.name}`,
+    `- Your name: ${safeName}`,
     `- Other participants: ${participantsStr}`,
     `- REMINDER: Respond ONLY in ${langName}.`,
   ].join("\n");

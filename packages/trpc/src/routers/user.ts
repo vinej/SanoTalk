@@ -275,6 +275,14 @@ export const userRouter = createTRPCRouter({
       language: z.string().min(2).max(10).default("en"),
     }))
     .mutation(async ({ ctx, input }) => {
+      // Server-side validation for sensitive fields
+      if (input.key === "ramq_number" && !/^[A-Z]{4}\s?\d{4}\s?\d{4}$/i.test(input.value)) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid RAMQ number format" });
+      }
+      if (input.key === "ramq_expiry" && !/^\d{4}-\d{2}$/.test(input.value)) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid RAMQ expiry format" });
+      }
+
       await ctx.db
         .update(user)
         .set({ propertiesLanguage: input.language })

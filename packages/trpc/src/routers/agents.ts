@@ -49,8 +49,12 @@ async function getUserContext(db: DB, userId: string) {
       .from(chronicCondition)
       .where(eq(chronicCondition.userId, userId)),
   ]);
+  // Filter out sensitive PII that AI agents should never see
+  const SENSITIVE_KEYS = new Set(["ramq_number", "ramq_expiry"]);
+  const safeProperties = properties.filter(p => !SENSITIVE_KEYS.has(p.key));
+
   return {
-    properties,
+    properties: safeProperties,
     propertiesLanguage: userRow[0]?.propertiesLanguage ?? "en",
     recentVitals,
     activeMedications,

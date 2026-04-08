@@ -36,6 +36,7 @@ export function AppHeader() {
       console.log("[OpenReplay] tracker stopped");
     }
     queryClient.clear();
+    sessionStorage.clear();
     await signOut();
     navigate({ to: "/login" as any });
   }

@@ -92,6 +92,16 @@ function formatPostalCode(raw: string): string {
   return raw;
 }
 
+/** Strip HTML/script injection characters from external facility names. */
+function sanitizeFacilityName(name: string): string {
+  return name.replace(/[<>"'&]/g, "").slice(0, 200).trim() || "Unknown";
+}
+
+/** Allow only phone-safe characters. */
+function sanitizePhone(phone: string): string {
+  return phone.replace(/[^0-9+\-().\s]/g, "").slice(0, 30);
+}
+
 // ── Installations CSV (Données Québec — all facilities) ──────────────────────
 
 const INSTALLATIONS_URL =
@@ -130,8 +140,8 @@ function parseInstallationsCsv(text: string): FacilityRecord[] {
     const lng = parseFloat(cols[iLng] ?? "");
     if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) continue;
 
-    const name = (cols[iName] ?? "").trim();
-    if (!name) continue;
+    const name = sanitizeFacilityName((cols[iName] ?? "").trim());
+    if (name === "Unknown") continue;
 
     const addr = (cols[iAddr] ?? "").trim();
     const mun = (cols[iMun] ?? "").trim();
@@ -380,16 +390,16 @@ function parseOverpassPOIs(
     if (isPharmacy) {
       if (seenPharm.has(dedupKey)) continue;
       seenPharm.add(dedupKey);
-      const name = tags.name || tags.brand || "Pharmacy";
+      const name = sanitizeFacilityName(tags.name || tags.brand || "Pharmacy");
       const address = buildPOIAddress(tags);
-      if (tags.phone) pharmacyPhones.set(`${name}|${elLat.toFixed(5)}`, tags.phone);
+      if (tags.phone) pharmacyPhones.set(`${name}|${elLat.toFixed(5)}`, sanitizePhone(tags.phone));
       pharmacies.push({ name, type: "pharmacy", address, region: "", lat: elLat, lng: elLng });
     } else {
       if (seenClinic.has(dedupKey)) continue;
       seenClinic.add(dedupKey);
-      const name = tags.name || tags["name:fr"] || "Clinique";
+      const name = sanitizeFacilityName(tags.name || tags["name:fr"] || "Clinique");
       const address = buildPOIAddress(tags);
-      if (tags.phone) clinicPhones.set(`${name}|${elLat.toFixed(5)}`, tags.phone);
+      if (tags.phone) clinicPhones.set(`${name}|${elLat.toFixed(5)}`, sanitizePhone(tags.phone));
       clinics.push({ name, type: "clinic", address, region: "", lat: elLat, lng: elLng });
     }
   }
