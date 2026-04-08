@@ -73,8 +73,8 @@ export const userRouter = createTRPCRouter({
   update: protectedProcedure
     .input(
       z.object({
-        specialty: z.string().nullable().optional(),
-        licenseNumber: z.string().nullable().optional(),
+        specialty: z.string().max(200).nullable().optional(),
+        licenseNumber: z.string().max(50).nullable().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -327,7 +327,8 @@ export const userRouter = createTRPCRouter({
       .select()
       .from(userProperty)
       .where(eq(userProperty.userId, ctx.user.id))
-      .orderBy(userProperty.createdAt);
+      .orderBy(userProperty.createdAt)
+      .limit(200);
     return rows.map((r) =>
       ENCRYPTED_KEYS.has(r.key) ? { ...r, value: decrypt(r.value) } : r
     );
@@ -347,7 +348,7 @@ export const userRouter = createTRPCRouter({
     .input(z.object({
       key: z.string().min(1).max(100),
       value: z.string().max(1000),
-      language: z.string().min(2).max(10).default("en"),
+      language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).default("en"),
     }))
     .mutation(async ({ ctx, input }) => {
       // Server-side validation for sensitive fields

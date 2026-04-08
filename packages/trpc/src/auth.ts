@@ -5,11 +5,12 @@ import { db, user, session, account, verification, twoFactor as twoFactorTable }
 import { resend } from "./lib/resend";
 import { escapeHtml } from "./lib/escape-html";
 
-// Structured log helper — avoids raw console.* which bypasses PII scrubbing.
+// Structured JSON log helper — writes to stdout/stderr in a format compatible
+// with pino so log aggregators (Loki, etc.) parse it consistently.
 // Redacts emails inline since this package has no access to the server's pino instance.
 const authLog = {
-  info: (msg: string) => console.info(`[auth] ${msg}`),
-  error: (msg: string) => console.error(`[auth] ${msg}`),
+  info: (msg: string) => process.stdout.write(JSON.stringify({ level: 30, time: Date.now(), msg: `[auth] ${msg}` }) + "\n"),
+  error: (msg: string) => process.stderr.write(JSON.stringify({ level: 50, time: Date.now(), msg: `[auth] ${msg}` }) + "\n"),
   redactEmail: (email: string) => email.slice(0, 3) + "***",
 };
 

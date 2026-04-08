@@ -106,7 +106,7 @@ async function autoSendSummaryToLinkedProfessional(params: {
           <hr style="border:none;border-top:1px solid #eee;margin:16px 0"/>
           <p style="color:#333">For security and privacy reasons, medical details are not included in this email.</p>
           <p>
-            <a href="${summaryUrl}" style="display:inline-block;padding:12px 24px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;font-weight:600">
+            <a href="${escapeHtml(summaryUrl)}" style="display:inline-block;padding:12px 24px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;font-weight:600">
               View Summary
             </a>
           </p>
@@ -165,6 +165,7 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
       const rows = await db.query.transcript.findMany({
         where: eq(transcript.sessionId, sessionId),
         orderBy: [asc(transcript.startMs)],
+        limit: 5000,
       });
       logger.info({ runId: run.id, rowCount: rows.length }, "Transcript rows found");
       transcriptContent = rows.map((r) => r.content).join("\n");
@@ -173,6 +174,7 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
       const chatRows = await db.query.chatMessage.findMany({
         where: eq(chatMessage.sessionId, sessionId),
         orderBy: [asc(chatMessage.createdAt)],
+        limit: 1000,
       });
       if (chatRows.length > 0) {
         const chatContent = chatRows

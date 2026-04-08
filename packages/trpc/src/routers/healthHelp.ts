@@ -609,7 +609,8 @@ export const healthHelpRouter = createTRPCRouter({
       const rows = await ctx.db
         .select({ facilityName: erFavorite.facilityName })
         .from(erFavorite)
-        .where(eq(erFavorite.userId, ctx.user.id));
+        .where(eq(erFavorite.userId, ctx.user.id))
+        .limit(200);
       return rows.map((r) => r.facilityName);
     }),
 

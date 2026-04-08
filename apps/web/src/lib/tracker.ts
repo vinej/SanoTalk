@@ -6,8 +6,6 @@ const ingestPoint = import.meta.env.VITE_OPENREPLAY_INGEST_POINT as string | und
 
 // Singleton — importable anywhere in the app.
 // tracker.start() is called in main.tsx; tracker.setUserID() is called in _auth.tsx.
-if (!enabled) console.log("[OpenReplay] disabled (VITE_OPENREPLAY_ENABLED != true)");
-
 export const tracker = enabled && projectKey
   ? new Tracker({
       projectKey,

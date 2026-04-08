@@ -207,7 +207,7 @@ export const vitalsRouter = createTRPCRouter({
             <hr style="border:none;border-top:1px solid #eee;margin:16px 0"/>
             <p style="color:#333">For security and privacy reasons, medical details are not included in this email.</p>
             <p>
-              <a href="${vitalsUrl}" style="display:inline-block;padding:12px 24px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;font-weight:600">
+              <a href="${escapeHtml(vitalsUrl)}" style="display:inline-block;padding:12px 24px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;font-weight:600">
                 View Vital Signs
               </a>
             </p>
