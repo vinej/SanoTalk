@@ -26,6 +26,7 @@ export const userRouter = createTRPCRouter({
         return ctx.db.query.user.findMany({
           where: eq(user.role, input.role),
           columns: { id: true, name: true, specialty: true, role: true },
+          limit: 1000,
         });
       }
       const relatedIds = await getRelatedUserIds(ctx.db, ctx.user.id);
@@ -41,6 +42,7 @@ export const userRouter = createTRPCRouter({
     if (isAdmin) {
       return ctx.db.query.user.findMany({
         columns: { id: true, name: true, role: true },
+        limit: 1000,
       });
     }
     const relatedIds = await getRelatedUserIds(ctx.db, ctx.user.id);
@@ -55,6 +57,7 @@ export const userRouter = createTRPCRouter({
     const profiles = await ctx.db.query.aiAssistantProfile.findMany({
       where: eq(aiAssistantProfile.isActive, true),
       with: { user: { columns: { id: true, name: true, image: true, role: true } } },
+      limit: 50,
     });
     return profiles.map((p) => ({
       id: p.user.id,
@@ -122,6 +125,7 @@ export const userRouter = createTRPCRouter({
       const rows = await ctx.db.query.userLink.findMany({
         where: eq(userLink.patientId, ctx.user.id),
         with: { professional: { columns: { id: true, name: true, role: true, specialty: true } } },
+        limit: 200,
       });
       return rows.map((r) => ({ ...r.professional, linkType: r.linkType }));
     }
@@ -129,6 +133,7 @@ export const userRouter = createTRPCRouter({
     const rows = await ctx.db.query.userLink.findMany({
       where: eq(userLink.professionalId, ctx.user.id),
       with: { patient: { columns: { id: true, name: true, role: true } } },
+      limit: 200,
     });
     return rows.map((r) => ({ ...r.patient, linkType: r.linkType }));
   }),
@@ -164,9 +169,16 @@ export const userRouter = createTRPCRouter({
     }))
     .mutation(async ({ ctx, input }) => {
       const role = (ctx.user as any).role as string;
+      if (role !== "patient" && role !== "doctor" && role !== "pharmacist") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "This role cannot manage links" });
+      }
       const [patientId, professionalId] = role === "patient"
         ? [ctx.user.id, input.targetUserId]
         : [input.targetUserId, ctx.user.id];
+      const exists = await ctx.db.query.userLink.findFirst({
+        where: and(eq(userLink.patientId, patientId), eq(userLink.professionalId, professionalId), eq(userLink.linkType, input.linkType)),
+      });
+      if (!exists) throw new TRPCError({ code: "NOT_FOUND", message: "Link not found" });
       await ctx.db.delete(userLink).where(
         and(eq(userLink.patientId, patientId), eq(userLink.professionalId, professionalId), eq(userLink.linkType, input.linkType))
       );
@@ -179,6 +191,7 @@ export const userRouter = createTRPCRouter({
     const rows = await ctx.db.query.userFriend.findMany({
       where: eq(userFriend.userId, ctx.user.id),
       with: { friend: { columns: { id: true, name: true, role: true, specialty: true } } },
+      limit: 200,
     });
     return rows.map((r) => r.friend);
   }),
@@ -203,6 +216,10 @@ export const userRouter = createTRPCRouter({
   removeFriend: protectedProcedure
     .input(z.object({ friendId: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      const exists = await ctx.db.query.userFriend.findFirst({
+        where: and(eq(userFriend.userId, ctx.user.id), eq(userFriend.friendId, input.friendId)),
+      });
+      if (!exists) throw new TRPCError({ code: "NOT_FOUND", message: "Friendship not found" });
       await ctx.db.delete(userFriend).where(
         and(eq(userFriend.userId, ctx.user.id), eq(userFriend.friendId, input.friendId))
       );

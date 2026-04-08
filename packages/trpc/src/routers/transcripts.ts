@@ -30,6 +30,7 @@ export const transcriptsRouter = createTRPCRouter({
         where: eq(transcript.sessionId, input.sessionId),
         orderBy: [desc(transcript.createdAt)],
         with: { speaker: { columns: { id: true, name: true, image: true, role: true } } },
+        limit: 5000,
       });
     }),
 

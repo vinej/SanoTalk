@@ -646,6 +646,7 @@ export const agentsRouter = createTRPCRouter({
           eq(chatMessage.chatType, input.chatType)
         ),
         orderBy: [asc(chatMessage.createdAt)],
+        limit: 1000,
       });
       if (liveMessages.length === 0) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "No messages to save" });

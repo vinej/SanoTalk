@@ -15,6 +15,7 @@ export const tasksRouter = createTRPCRouter({
         columns: { remark: false },
         with: { assignedUser: { columns: { id: true, name: true, role: true } } },
         orderBy: (t, { desc }) => [desc(t.createdAt)],
+        limit: 500,
       });
       // remark: null added for type-shape compatibility; value never comes from DB
       return tasks.map((t) => ({ ...t, remark: null as null }));
@@ -131,6 +132,7 @@ export const tasksRouter = createTRPCRouter({
       return ctx.db.query.user.findMany({
         columns: { id: true, name: true, role: true },
         orderBy: (u, { asc }) => [asc(u.name)],
+        limit: 1000,
       });
     }
     const relatedIds = await getRelatedUserIds(ctx.db, ctx.user.id);

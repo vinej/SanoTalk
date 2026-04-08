@@ -143,7 +143,7 @@ export function startDeepgramWebSocket(server: Server) {
       }
       if (dgConnection.getReadyState() === 1) {
         dgConnection.send(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer);
-      } else {
+      } else if (audioBuffer.length < 50) {
         audioBuffer.push(buf);
       }
     });
