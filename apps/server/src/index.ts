@@ -189,7 +189,8 @@ app.get("/api/avatar/:userId", apiLimiter, async (req, res) => {
       return;
     }
 
-    // MinIO key — stream the object
+    // MinIO key — validate format before fetching (prevent serving arbitrary objects)
+    if (!/^avatars\/[\w-]+\.(jpg|png|webp)$/.test(record.image)) { res.status(403).end(); return; }
     const client = getAvatarMinio();
     const bucket = process.env.MINIO_BUCKET ?? "sanotalk";
     const stream = await client.getObject(bucket, record.image);

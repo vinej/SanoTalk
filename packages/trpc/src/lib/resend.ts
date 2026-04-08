@@ -14,7 +14,7 @@ export const resend = {
   emails: {
     send: (params: Parameters<typeof _resend.emails.send>[0]) => {
       if (isTesting && testingEmail) {
-        console.info(`[email] TESTING mode — redirecting email to ${testingEmail} (original: ${params.to})`);
+        console.info(`[email] TESTING mode — redirecting to test mailbox`);
         return _resend.emails.send({ ...params, to: testingEmail });
       }
       return _resend.emails.send(params);

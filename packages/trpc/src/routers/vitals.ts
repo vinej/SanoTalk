@@ -49,7 +49,7 @@ export const vitalsRouter = createTRPCRouter({
       type: vitalTypeEnum,
       valuePrimary: z.number(),
       valueSecondary: z.number().nullable().optional(),
-      unit: z.string().min(1),
+      unit: z.string().min(1).max(50),
       notes: z.string().max(500).optional(),
       measuredAt: z.string().datetime().optional(),
     }))
@@ -226,6 +226,6 @@ export const vitalsRouter = createTRPCRouter({
         taskType: "summary_review",
       });
 
-      return { sent: true, to: recipient.email };
+      return { sent: true };
     }),
 });

@@ -168,6 +168,6 @@ export const symptomsRouter = createTRPCRouter({
         taskType: "summary_review",
       });
 
-      return { sent: true, to: recipient.email };
+      return { sent: true };
     }),
 });

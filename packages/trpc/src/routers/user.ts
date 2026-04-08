@@ -11,6 +11,10 @@ export const userRouter = createTRPCRouter({
   profile: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.query.user.findFirst({
       where: eq(user.id, ctx.user.id),
+      columns: {
+        id: true, name: true, email: true, image: true, role: true,
+        specialty: true, licenseNumber: true, propertiesLanguage: true, createdAt: true,
+      },
     });
   }),
 
@@ -132,6 +136,10 @@ export const userRouter = createTRPCRouter({
       linkType: z.enum(["doctor", "wellness"]).optional().default("doctor"),
     }))
     .mutation(async ({ ctx, input }) => {
+      const senderRole = (ctx.user as any).role as string;
+      if (senderRole === "ia_agent" || senderRole === "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "This role cannot create links" });
+      }
       await ctx.db
         .insert(connectionRequest)
         .values({ fromUserId: ctx.user.id, toUserId: input.targetUserId, type: "link", linkType: input.linkType })
@@ -166,8 +174,12 @@ export const userRouter = createTRPCRouter({
   }),
 
   addFriend: protectedProcedure
-    .input(z.object({ friendId: z.string() }))
+    .input(z.object({ friendId: z.string().min(1).max(100) }))
     .mutation(async ({ ctx, input }) => {
+      const senderRole = (ctx.user as any).role as string;
+      if (senderRole === "ia_agent" || senderRole === "admin") {
+        throw new TRPCError({ code: "FORBIDDEN", message: "This role cannot add friends" });
+      }
       if (input.friendId === ctx.user.id) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot add yourself as a friend" });
       }

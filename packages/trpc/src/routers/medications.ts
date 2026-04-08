@@ -11,8 +11,8 @@ export const medicationsRouter = createTRPCRouter({
     .input(z.object({
       name: z.string().min(1).max(200),
       dosage: z.string().min(1).max(100),
-      frequency: z.string().min(1),
-      route: z.string().optional(),
+      frequency: z.string().min(1).max(100),
+      route: z.string().max(100).optional(),
       prescribedBy: z.string().max(200).optional(),
       reason: z.string().max(300).optional(),
       startDate: z.string().datetime(),
@@ -41,8 +41,8 @@ export const medicationsRouter = createTRPCRouter({
       id: z.string().uuid(),
       name: z.string().min(1).max(200).optional(),
       dosage: z.string().min(1).max(100).optional(),
-      frequency: z.string().min(1).optional(),
-      route: z.string().nullable().optional(),
+      frequency: z.string().min(1).max(100).optional(),
+      route: z.string().max(100).nullable().optional(),
       prescribedBy: z.string().max(200).nullable().optional(),
       reason: z.string().max(300).nullable().optional(),
       startDate: z.string().datetime().optional(),
@@ -186,6 +186,6 @@ export const medicationsRouter = createTRPCRouter({
         taskType: "summary_review",
       });
 
-      return { sent: true, to: recipient.email };
+      return { sent: true };
     }),
 });

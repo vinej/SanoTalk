@@ -63,8 +63,9 @@ export const storageRouter = createTRPCRouter({
       const safeFilename = sanitizeFilename(input.filename);
       const key = `sessions/${input.sessionId}/${Date.now()}-${safeFilename}`;
 
+      // Set response headers so downloads are forced as attachments (prevents XSS via uploaded HTML)
       const presignedUrl = await client.presignedPutObject(bucket, key, 3600);
-      return { presignedUrl, key, bucket };
+      return { presignedUrl, key, bucket, contentType: input.contentType };
     }),
 
   getDownloadUrl: protectedProcedure

@@ -14,7 +14,7 @@ async function assertSessionAccess(
 ) {
   const session = await db.query.talkSession.findFirst({
     where: eq(talkSession.id, sessionId),
-    with: { participants: { with: { user: true } } },
+    with: { participants: { with: { user: { columns: { id: true, name: true, image: true, role: true } } } } },
   });
   if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
   const hasAccess =
@@ -32,7 +32,8 @@ export const sessionsRouter = createTRPCRouter({
       // (transcripts, chat, recordings are in separate tables and not included)
       return ctx.db.query.talkSession.findMany({
         orderBy: [desc(talkSession.createdAt)],
-        with: { participants: { with: { user: true } } },
+        with: { participants: { with: { user: { columns: { id: true, name: true, image: true, role: true } } } } },
+        limit: 200,
       });
     }
     // Single query using a subquery — user must be host OR a participant
@@ -48,7 +49,7 @@ export const sessionsRouter = createTRPCRouter({
       ),
       orderBy: [desc(talkSession.createdAt)],
       with: {
-        participants: { with: { user: true } },
+        participants: { with: { user: { columns: { id: true, name: true, image: true, role: true } } } },
       },
     });
   }),
@@ -68,6 +69,8 @@ export const sessionsRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const role = (ctx.user as any).role as string;
+      if (role === "ia_agent") throw new TRPCError({ code: "FORBIDDEN", message: "AI agents cannot create sessions" });
       const roomName = `sanotalk-${nanoid(10)}`;
       const [created] = await ctx.db
         .insert(talkSession)
@@ -165,7 +168,7 @@ export const sessionsRouter = createTRPCRouter({
     }),
 
   addParticipant: protectedProcedure
-    .input(z.object({ sessionId: z.string().uuid(), userId: z.string() }))
+    .input(z.object({ sessionId: z.string().uuid(), userId: z.string().min(1).max(100) }))
     .mutation(async ({ ctx, input }) => {
       const session = await ctx.db.query.talkSession.findFirst({
         where: eq(talkSession.id, input.sessionId),
@@ -177,9 +180,9 @@ export const sessionsRouter = createTRPCRouter({
       const alreadyAdded = session.participants.some((p) => p.userId === input.userId);
       if (alreadyAdded) return;
 
-      // Verify the target user actually exists
+      // Verify the target user actually exists (uniform error to prevent enumeration)
       const targetUser = await ctx.db.select({ id: user.id }).from(user).where(eq(user.id, input.userId)).limit(1);
-      if (targetUser.length === 0) throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      if (targetUser.length === 0) throw new TRPCError({ code: "BAD_REQUEST", message: "Could not add participant" });
 
       await ctx.db.insert(sessionParticipant).values({
         sessionId: input.sessionId,
@@ -196,7 +199,7 @@ export const sessionsRouter = createTRPCRouter({
     }),
 
   removeParticipant: protectedProcedure
-    .input(z.object({ sessionId: z.string().uuid(), userId: z.string() }))
+    .input(z.object({ sessionId: z.string().uuid(), userId: z.string().min(1).max(100) }))
     .mutation(async ({ ctx, input }) => {
       const session = await ctx.db.query.talkSession.findFirst({
         where: eq(talkSession.id, input.sessionId),

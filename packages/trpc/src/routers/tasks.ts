@@ -13,7 +13,7 @@ export const tasksRouter = createTRPCRouter({
       // remark column excluded from SQL SELECT — never fetched from DB
       const tasks = await ctx.db.query.task.findMany({
         columns: { remark: false },
-        with: { assignedUser: true },
+        with: { assignedUser: { columns: { id: true, name: true, role: true } } },
         orderBy: (t, { desc }) => [desc(t.createdAt)],
       });
       // remark: null added for type-shape compatibility; value never comes from DB
@@ -21,7 +21,7 @@ export const tasksRouter = createTRPCRouter({
     }
     return ctx.db.query.task.findMany({
       where: or(isNull(task.assignedUserId), eq(task.assignedUserId, ctx.user.id)),
-      with: { assignedUser: true },
+      with: { assignedUser: { columns: { id: true, name: true, role: true } } },
       orderBy: (t, { desc }) => [desc(t.createdAt)],
     });
   }),
@@ -73,45 +73,45 @@ export const tasksRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
       if (isAdmin) throw new TRPCError({ code: "FORBIDDEN", message: "Admins cannot modify tasks" });
-      const { id, ...fields } = input;
-      const existing = await ctx.db.query.task.findFirst({ where: eq(task.id, id) });
-      if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "Task not found" });
-      const role = (ctx.user as any).role as string;
-      // Patients may only update tasks explicitly assigned to them
-      if (role === "patient" && existing.assignedUserId !== ctx.user.id) {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Patients can only edit tasks assigned to them" });
-      }
-      // Non-patients may not edit tasks assigned to someone else
-      if (role !== "patient" && existing.assignedUserId !== null && existing.assignedUserId !== ctx.user.id) {
-        throw new TRPCError({ code: "FORBIDDEN", message: "Only the assigned user can edit this task" });
-      }
-      if (fields.assignedUserId && fields.assignedUserId !== ctx.user.id) {
+      if (input.assignedUserId && input.assignedUserId !== ctx.user.id) {
         const relatedIds = await getRelatedUserIds(ctx.db, ctx.user.id);
-        if (!relatedIds.has(fields.assignedUserId)) {
+        if (!relatedIds.has(input.assignedUserId)) {
           throw new TRPCError({ code: "FORBIDDEN", message: "Can only assign tasks to related users" });
         }
       }
-      if (existing?.taskType === "summary_review") {
-        if (fields.assignedUserId !== undefined) {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Cannot reassign a summary review task" });
+      return ctx.db.transaction(async (tx) => {
+        const { id, ...fields } = input;
+        const existing = await tx.query.task.findFirst({ where: eq(task.id, id) });
+        if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "Task not found" });
+        const role = (ctx.user as any).role as string;
+        if (role === "patient" && existing.assignedUserId !== ctx.user.id) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Patients can only edit tasks assigned to them" });
         }
-        if (fields.status === "not_assigned") {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Cannot unassign a summary review task" });
+        if (role !== "patient" && existing.assignedUserId !== null && existing.assignedUserId !== ctx.user.id) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Only the assigned user can edit this task" });
         }
-        const { remark, status } = fields;
-        const [updated] = await ctx.db
+        if (existing.taskType === "summary_review") {
+          if (fields.assignedUserId !== undefined) {
+            throw new TRPCError({ code: "FORBIDDEN", message: "Cannot reassign a summary review task" });
+          }
+          if (fields.status === "not_assigned") {
+            throw new TRPCError({ code: "FORBIDDEN", message: "Cannot unassign a summary review task" });
+          }
+          const { remark, status } = fields;
+          const [updated] = await tx
+            .update(task)
+            .set({ remark, status, updatedAt: new Date() })
+            .where(eq(task.id, id))
+            .returning();
+          return updated;
+        }
+        const [updated] = await tx
           .update(task)
-          .set({ remark, status, updatedAt: new Date() })
+          .set({ ...fields, updatedAt: new Date() })
           .where(eq(task.id, id))
           .returning();
         return updated;
-      }
-      const [updated] = await ctx.db
-        .update(task)
-        .set({ ...fields, updatedAt: new Date() })
-        .where(eq(task.id, id))
-        .returning();
-      return updated;
+      });
     }),
 
   delete: protectedProcedure

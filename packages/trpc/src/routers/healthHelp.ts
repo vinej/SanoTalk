@@ -505,7 +505,7 @@ export const healthHelpRouter = createTRPCRouter({
       ]);
 
       console.log("[healthHelp] nearestFacilities query:", {
-        lat, lng, perType,
+        perType,
         csvFacilities: allFacilities.length,
         pharmacies: pois.pharmacies.length,
         clinics: pois.clinics.length,
