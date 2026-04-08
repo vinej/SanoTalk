@@ -7,7 +7,7 @@ export const Route: any = createFileRoute("/_auth")({
   beforeLoad: async ({ location }) => {
     const session = await authClient.getSession();
     if (!session.data?.user) {
-      const intended = location.pathname + (location.searchStr ?? "");
+      const intended = location.pathname;
       if (intended && intended !== "/") {
         sessionStorage.setItem("postLoginRedirect", intended);
       }

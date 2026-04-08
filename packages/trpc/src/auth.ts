@@ -167,7 +167,6 @@ export const auth = betterAuth({
   ],
   socialProviders: {},
   trustedOrigins: [
-    process.env.BETTER_AUTH_URL!,
     process.env.APP_URL!,
     // Trust both www and non-www variants of the app URL
     ...(process.env.APP_URL ? [process.env.APP_URL.replace("://", "://www.")] : []),

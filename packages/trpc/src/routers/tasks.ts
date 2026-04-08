@@ -119,7 +119,7 @@ export const tasksRouter = createTRPCRouter({
       if (existing.taskType === "summary_review") {
         throw new TRPCError({ code: "FORBIDDEN", message: "Cannot delete a summary review task" });
       }
-      if (existing.assignedUserId !== null && existing.assignedUserId !== ctx.user.id) {
+      if (existing.assignedUserId !== ctx.user.id) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Only the assigned user can delete this task" });
       }
       await ctx.db.delete(task).where(eq(task.id, input.id));

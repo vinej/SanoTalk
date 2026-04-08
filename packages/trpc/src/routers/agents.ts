@@ -3,7 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { agentRun, talkSession as talkSessionTable, chatMessage, transcript, user, transcriptSummary, userProperty, task, savedConversation, userLink, vitalSign, medication, symptomLog, allergy, chronicCondition } from "@sanotalk/db";
 import { resend } from "../lib/resend";
 import { escapeHtml, sanitizeSubject } from "../lib/escape-html";
-import { eq, asc, desc, isNull, and, gte } from "drizzle-orm";
+import { eq, asc, desc, isNull, and, gte, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
 type DB = Parameters<Parameters<typeof protectedProcedure.query>[0]>[0]["ctx"]["db"];
@@ -667,6 +667,15 @@ export const agentsRouter = createTRPCRouter({
           .where(eq(savedConversation.id, existing.id))
           .returning({ id: savedConversation.id, title: savedConversation.title, chatType: savedConversation.chatType, createdAt: savedConversation.createdAt });
         return updated;
+      }
+
+      // Enforce per-user limit on saved conversations
+      const [countResult] = await ctx.db
+        .select({ count: sql<number>`count(*)` })
+        .from(savedConversation)
+        .where(and(eq(savedConversation.userId, ctx.user.id), eq(savedConversation.chatType, input.chatType)));
+      if ((countResult?.count ?? 0) >= 50) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Maximum saved conversations reached (50)" });
       }
 
       const [saved] = await ctx.db

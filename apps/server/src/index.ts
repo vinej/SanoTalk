@@ -26,6 +26,7 @@ const PORT = process.env.PORT ?? 3001;
 
 // ─── Security Headers ──────────────────────────────────────────────────────
 app.use(helmet({
+  referrerPolicy: { policy: "strict-origin-when-cross-origin" },
   crossOriginResourcePolicy: { policy: "same-origin" },
   strictTransportSecurity: {
     maxAge: 31536000,
@@ -180,9 +181,6 @@ function isAllowedAvatarUrl(url: string): boolean {
 
 app.get("/api/avatar/:userId", apiLimiter, async (req, res) => {
   try {
-    const session = await auth.api.getSession({ headers: fromNodeHeaders(req.headers) });
-    if (!session) { res.status(401).end(); return; }
-
     const userId = req.params.userId as string;
     if (!userId) { res.status(400).end(); return; }
 

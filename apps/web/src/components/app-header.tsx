@@ -33,7 +33,6 @@ export function AppHeader() {
   async function handleLogout() {
     if (tracker) {
       tracker.stop();
-      console.log("[OpenReplay] tracker stopped");
     }
     queryClient.clear();
     sessionStorage.clear();

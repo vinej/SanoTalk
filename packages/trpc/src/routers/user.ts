@@ -263,6 +263,12 @@ export const userRouter = createTRPCRouter({
       if (input.response === "accepted") {
         if (req.type === "link") {
           const fromRole = (req.fromUser as any).role as string;
+          const toRole = (ctx.user as any).role as string;
+          const roles = new Set([fromRole, toRole]);
+          // A link must be between exactly one patient and one professional
+          if (!roles.has("patient") || (!roles.has("doctor") && !roles.has("pharmacist"))) {
+            throw new TRPCError({ code: "BAD_REQUEST", message: "Link requires one patient and one doctor or pharmacist" });
+          }
           const [patientId, professionalId] = fromRole === "patient"
             ? [req.fromUserId, ctx.user.id]
             : [ctx.user.id, req.fromUserId];
@@ -360,5 +366,20 @@ export const userRouter = createTRPCRouter({
         .delete(userProperty)
         .where(and(eq(userProperty.id, input.id), eq(userProperty.userId, ctx.user.id)));
       return { deleted: true };
+    }),
+
+  setUserRole: protectedProcedure
+    .input(z.object({
+      targetUserId: z.string().min(1).max(100),
+      role: z.enum(["patient", "doctor", "pharmacist"]),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+      if (!isAdmin) throw new TRPCError({ code: "FORBIDDEN", message: "Only admins can change roles" });
+      if (input.targetUserId === ctx.user.id) throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot change your own role" });
+      const target = await ctx.db.query.user.findFirst({ where: eq(user.id, input.targetUserId), columns: { id: true, role: true } });
+      if (!target) throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      await ctx.db.update(user).set({ role: input.role }).where(eq(user.id, input.targetUserId));
+      return { ok: true, previousRole: target.role, newRole: input.role };
     }),
 });

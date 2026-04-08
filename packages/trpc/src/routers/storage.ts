@@ -63,7 +63,9 @@ export const storageRouter = createTRPCRouter({
       const safeFilename = sanitizeFilename(input.filename);
       const key = `sessions/${input.sessionId}/${Date.now()}-${safeFilename}`;
 
-      // Set response headers so downloads are forced as attachments (prevents XSS via uploaded HTML)
+      // Note: presignedPutObject doesn't enforce Content-Type server-side.
+      // Download endpoint mitigates XSS by forcing Content-Disposition: attachment.
+      // MinIO should not be directly accessible from the internet.
       const presignedUrl = await client.presignedPutObject(bucket, key, 3600);
       return { presignedUrl, key, bucket, contentType: input.contentType };
     }),
@@ -98,6 +100,18 @@ export const storageRouter = createTRPCRouter({
       const key = `avatars/${ctx.user.id}-${Date.now()}.${ext}`;
 
       const buffer = Buffer.from(input.base64, "base64");
+
+      // Validate magic bytes match declared content type
+      const magicBytes: Record<string, number[]> = {
+        "image/jpeg": [0xFF, 0xD8, 0xFF],
+        "image/png": [0x89, 0x50, 0x4E, 0x47],
+        "image/webp": [0x52, 0x49, 0x46, 0x46], // RIFF header
+      };
+      const expected = magicBytes[input.contentType];
+      if (!expected || buffer.length < expected.length || !expected.every((b, i) => buffer[i] === b)) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "File content does not match declared type" });
+      }
+
       await client.putObject(bucket, key, buffer, buffer.length, {
         "Content-Type": input.contentType,
       });

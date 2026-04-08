@@ -429,8 +429,8 @@ async function queryOverpass(query: string): Promise<{ elements: OverpassElement
       }
       if (!res.ok) throw new Error(`Overpass HTTP ${res.status}`);
       return (await res.json()) as { elements: OverpassElement[] };
-    } catch (err) {
-      console.warn(`[healthHelp] Overpass error from ${endpoint}: ${err instanceof Error ? err.message : String(err)}`);
+    } catch {
+      // Overpass endpoint failed — try next
     }
   }
   throw new Error("All Overpass endpoints failed");
@@ -482,8 +482,7 @@ async function fetchNearbyPOIs(
     poiCache.set(key, { ...result, at: now });
     // Overpass data fetched successfully
     return result;
-  } catch (err) {
-    console.warn(`[healthHelp] Overpass fetch failed: ${err instanceof Error ? err.message : String(err)}`);
+  } catch {
     return cached ?? { pharmacies: [], clinics: [] };
   }
 }

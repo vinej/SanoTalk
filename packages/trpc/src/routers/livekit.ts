@@ -18,7 +18,7 @@ export const livekitRouter = createTRPCRouter({
   getToken: protectedProcedure
     .input(
       z.object({
-        roomName: z.string(),
+        roomName: z.string().min(1).max(100).regex(/^sanotalk-[\w-]+$/),
         participantName: z.string().optional(),
         canPublish: z.boolean().default(true),
         canSubscribe: z.boolean().default(true),
