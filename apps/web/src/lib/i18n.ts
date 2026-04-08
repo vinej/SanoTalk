@@ -117,7 +117,7 @@ i18n
       lookupLocalStorage: "sanotalk-language",
     },
     interpolation: {
-      escapeValue: false,
+      escapeValue: true,
     },
   });
 

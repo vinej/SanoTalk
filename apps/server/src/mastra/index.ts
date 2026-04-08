@@ -198,6 +198,7 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
     logger.info({ runId: run.id, textLength: result.text.length }, "Agent responded");
 
     // Parse JSON from agent output and save to transcriptSummary
+    let parseFailed = false;
     if (sessionId) {
       try {
         // Strip markdown code fences if present
@@ -241,12 +242,18 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
           });
         }
       } catch (parseErr) {
+        parseFailed = true;
         logger.error({ runId: run.id, parseErr }, "Failed to parse agent JSON output");
       }
     }
 
     await db.update(agentRun)
-      .set({ status: "success", output: { text: result.text }, completedAt: new Date() })
+      .set({
+        status: parseFailed ? "error" : "success",
+        output: { text: result.text },
+        ...(parseFailed ? { errorMessage: "Failed to parse summary JSON from agent output" } : {}),
+        completedAt: new Date(),
+      })
       .where(eq(agentRun.id, run.id));
   } catch (err) {
     logger.error({ err, runId: run.id }, "Agent run failed");
@@ -274,12 +281,17 @@ export function triggerAgentRun(runId: string) {
 
 type UserProperty = { key: string; value: string };
 
+/** Strip control characters, newlines, and cap length to prevent prompt injection via user properties. */
+function sanitizePropertyValue(value: string): string {
+  return value.replace(/[\n\r\x00-\x1F\x7F]/g, " ").slice(0, 200).trim();
+}
+
 function buildPropertyContext(userProperties?: UserProperty[], propertiesLanguage = "en"): Array<{ role: "user" | "assistant"; content: string }> {
   if (!userProperties || userProperties.length === 0) return [];
   const today = new Date().toISOString().split("T")[0];
-  const lines = userProperties.map((p) => `- ${p.key}: ${p.value}`).join("\n");
+  const lines = userProperties.map((p) => `- ${sanitizePropertyValue(p.key)}: ${sanitizePropertyValue(p.value)}`).join("\n");
   return [
-    { role: "user" as const, content: `Today's date is ${today} (YYYY-MM-DD). Personal context about me (written in language "${propertiesLanguage}"):\n${lines}` },
+    { role: "user" as const, content: `Today's date is ${today} (YYYY-MM-DD). Personal context about me (written in language "${propertiesLanguage}"):\n<user_data>\n${lines}\n</user_data>` },
     { role: "assistant" as const, content: "Understood. I'll use this personal context and today's date throughout our conversation, regardless of the language it was written in." },
   ];
 }

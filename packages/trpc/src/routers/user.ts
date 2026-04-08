@@ -287,7 +287,7 @@ export const userRouter = createTRPCRouter({
   }),
 
   setPropertiesLanguage: protectedProcedure
-    .input(z.object({ language: z.string().min(2).max(10) }))
+    .input(z.object({ language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]) }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db
         .update(user)

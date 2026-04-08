@@ -4,6 +4,14 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db, user, session, account, verification, twoFactor as twoFactorTable } from "@sanotalk/db";
 import { resend } from "./lib/resend";
 
+// Structured log helper — avoids raw console.* which bypasses PII scrubbing.
+// Redacts emails inline since this package has no access to the server's pino instance.
+const authLog = {
+  info: (msg: string) => console.info(`[auth] ${msg}`),
+  error: (msg: string) => console.error(`[auth] ${msg}`),
+  redactEmail: (email: string) => email.slice(0, 3) + "***",
+};
+
 // Wrap the drizzle adapter to:
 //  1. Force twoFactorEnabled=true on user creation (plugin always writes false explicitly,
 //     ignoring the DB column default)
@@ -29,10 +37,10 @@ function withCustomAdapter(adapterFactory: typeof _baseAdapter): typeof _baseAda
       create: async (params: any) => {
         if (params.model === "user") {
           params = { ...params, data: { ...params.data, twoFactorEnabled: true } };
-          console.log("[auth:create] user row — forcing twoFactorEnabled=true");
+          authLog.info("user row — forcing twoFactorEnabled=true");
         }
         if (params.model === "account") {
-          console.log("[auth:create] account row for userId:", params.data?.userId, "provider:", params.data?.providerId);
+          authLog.info(`account row for provider: ${params.data?.providerId}`);
         }
         return origCreate(params);
       },
@@ -114,7 +122,7 @@ export const auth = betterAuth({
       const appUrl = process.env.APP_URL ?? "http://localhost:5173";
       const verifyUrl = `${appUrl}/verify-email?token=${token}`;
       const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
-      console.info(`[auth] Sending verification email to ${user.email.slice(0, 3)}*** from ${from}`);
+      authLog.info(`Sending verification email to ${authLog.redactEmail(user.email)} from ${from}`);
       const { error } = await resend.emails.send({
         from,
         to: user.email,
@@ -122,11 +130,11 @@ export const auth = betterAuth({
         html: `<p>Click the link below to verify your SanoTalk account:</p><p><a href="${verifyUrl}">Verify Email</a></p><p>If you did not register, ignore this email.</p>`,
       });
       if (error) {
-        console.error("[auth] Failed to send verification email:", error);
+        authLog.error(`Failed to send verification email: ${(error as any)?.message ?? error}`);
         // Do NOT throw — a failed verification email must not block sign-up.
         // The user can request a resend from the verify-email page.
       } else {
-        console.info(`[auth] Verification email sent to ${user.email.slice(0, 3)}***`);
+        authLog.info(`Verification email sent to ${authLog.redactEmail(user.email)}`);
       }
     },
   },
@@ -143,7 +151,7 @@ export const auth = betterAuth({
             html: `<p>Your one-time verification code is:</p><h2 style="letter-spacing:4px">${otp}</h2><p>This code expires in 3 minutes. Do not share it with anyone.</p>`,
           });
           if (error) {
-            console.error("[auth] Failed to send OTP:", error);
+            authLog.error(`Failed to send OTP: ${(error as any)?.message ?? error}`);
             throw new Error(`Failed to send OTP: ${error.message}`);
           }
         },

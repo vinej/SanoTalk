@@ -107,6 +107,7 @@ app.use(express.json({ limit: "10mb" }));
 // ─── Better Auth ───────────────────────────────────────────────────────────
 app.use("/api/auth/two-factor/verify-otp", otpLimiter);
 app.use("/api/auth/two-factor/verify-totp", otpLimiter);
+app.use("/api/auth/email-verification", otpLimiter);
 app.use("/api/auth", authLimiter, toNodeHandler(auth));
 
 // ─── tRPC ─────────────────────────────────────────────────────────────────
@@ -118,6 +119,9 @@ app.use("/api/trpc/agents.sendHealthChatMessage", medicalLimiter);
 app.use("/api/trpc/agents.sendCompanionChatMessage", medicalLimiter);
 app.use("/api/trpc/agents.sendNewsChatMessage", medicalLimiter);
 app.use("/api/trpc/agents.sendPharmacistChatMessage", medicalLimiter);
+app.use("/api/trpc/vitals.shareWithProfessional", medicalLimiter);
+app.use("/api/trpc/medications.shareWithProfessional", medicalLimiter);
+app.use("/api/trpc/symptoms.shareWithProfessional", medicalLimiter);
 app.use(
   "/api/trpc",
   createExpressMiddleware({
@@ -169,12 +173,6 @@ function isAllowedAvatarUrl(url: string): boolean {
 
 app.get("/api/avatar/:userId", apiLimiter, async (req, res) => {
   try {
-    // Require authentication
-    const session = await auth.api.getSession({
-      headers: new Headers(req.headers as Record<string, string>),
-    });
-    if (!session?.user) { res.status(401).end(); return; }
-
     const userId = req.params.userId as string;
     if (!userId) { res.status(400).end(); return; }
 

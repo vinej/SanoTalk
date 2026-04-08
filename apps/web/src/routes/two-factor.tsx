@@ -56,9 +56,11 @@ function TwoFactorPage() {
       setError(error.message ?? "Invalid code. Please try again.");
       setIsPending(false);
     } else {
-      const redirect = sessionStorage.getItem("postLoginRedirect") ?? "/dashboard";
+      const raw = sessionStorage.getItem("postLoginRedirect") ?? "/dashboard";
       sessionStorage.removeItem("postLoginRedirect");
-      const [path, qs] = redirect.split("?");
+      // Validate redirect is a relative path to prevent open redirect
+      const safe = raw.startsWith("/") && !raw.startsWith("//") ? raw : "/dashboard";
+      const [path, qs] = safe.split("?");
       const search = qs ? Object.fromEntries(new URLSearchParams(qs)) : undefined;
       navigate({ to: path as any, search: search as any });
     }

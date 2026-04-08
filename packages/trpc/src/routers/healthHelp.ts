@@ -587,7 +587,7 @@ export const healthHelpRouter = createTRPCRouter({
   // ── Favorites ────────────────────────────────────────────────────────────
 
   addFavorite: protectedProcedure
-    .input(z.object({ facilityName: z.string().min(1) }))
+    .input(z.object({ facilityName: z.string().min(1).max(200) }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db
         .insert(erFavorite)
@@ -597,7 +597,7 @@ export const healthHelpRouter = createTRPCRouter({
     }),
 
   removeFavorite: protectedProcedure
-    .input(z.object({ facilityName: z.string().min(1) }))
+    .input(z.object({ facilityName: z.string().min(1).max(200) }))
     .mutation(async ({ ctx, input }) => {
       await ctx.db
         .delete(erFavorite)
@@ -618,7 +618,7 @@ export const healthHelpRouter = createTRPCRouter({
 
   facilityHistory: protectedProcedure
     .input(z.object({
-      facilityName: z.string().min(1),
+      facilityName: z.string().min(1).max(200),
       range: z.enum(["24h", "7d", "30d"]),
     }))
     .query(async ({ ctx, input }) => {
@@ -696,7 +696,7 @@ export const healthHelpRouter = createTRPCRouter({
     }),
 
   bestTimeToVisit: protectedProcedure
-    .input(z.object({ facilityName: z.string().min(1) }))
+    .input(z.object({ facilityName: z.string().min(1).max(200) }))
     .query(async ({ ctx, input }) => {
       // Aggregate by day-of-week (0=Sun..6=Sat) and hour (0-23)
       const rows = await ctx.db

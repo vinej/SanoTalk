@@ -52,7 +52,7 @@ export const storageRouter = createTRPCRouter({
     .input(
       z.object({
         filename: z.string().max(200),
-        contentType: z.string().max(100),
+        contentType: z.enum(["image/jpeg", "image/png", "image/webp", "application/pdf", "audio/webm", "audio/ogg"]),
         sessionId: z.string().uuid(),
       })
     )

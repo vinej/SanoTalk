@@ -204,7 +204,7 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
     },
   });
 
-  function handlePropertiesLanguageChange(lang: string) {
+  function handlePropertiesLanguageChange(lang: "en" | "fr" | "es" | "zh" | "ar" | "hi") {
     setPropertiesLanguage(lang);
     setPropertiesLanguageMutation.mutate({ language: lang });
   }
@@ -483,7 +483,7 @@ export function ProfileEditDialog({ open, onOpenChange }: Props) {
                 <Label className="text-xs text-muted-foreground">{t("properties.languageLabel")}</Label>
                 <select
                   value={propertiesLanguage}
-                  onChange={(e) => handlePropertiesLanguageChange(e.target.value)}
+                  onChange={(e) => handlePropertiesLanguageChange(e.target.value as "en" | "fr" | "es" | "zh" | "ar" | "hi")}
                   disabled={!!properties && properties.length > 0}
                   className="h-8 rounded-md border border-input bg-transparent px-2 py-1 text-xs shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
                 >
