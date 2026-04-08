@@ -1,8 +1,10 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { user, userProperty, userLink, userFriend, connectionRequest, aiAssistantProfile } from "@sanotalk/db";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, and, desc, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
+import { verifyAdminFromDb } from "../lib/verify-admin";
+import { getRelatedUserIds } from "../lib/related-users";
 
 export const userRouter = createTRPCRouter({
   profile: protectedProcedure.query(async ({ ctx }) => {
@@ -14,14 +16,32 @@ export const userRouter = createTRPCRouter({
   listByRole: protectedProcedure
     .input(z.object({ role: z.enum(["doctor", "pharmacist", "patient"]) }))
     .query(async ({ ctx, input }) => {
+      const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+      if (isAdmin) {
+        return ctx.db.query.user.findMany({
+          where: eq(user.role, input.role),
+          columns: { id: true, name: true, specialty: true, role: true },
+        });
+      }
+      const relatedIds = await getRelatedUserIds(ctx.db, ctx.user.id);
+      if (relatedIds.size === 0) return [];
       return ctx.db.query.user.findMany({
-        where: eq(user.role, input.role),
+        where: and(eq(user.role, input.role), inArray(user.id, [...relatedIds])),
         columns: { id: true, name: true, specialty: true, role: true },
       });
     }),
 
   listAll: protectedProcedure.query(async ({ ctx }) => {
+    const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+    if (isAdmin) {
+      return ctx.db.query.user.findMany({
+        columns: { id: true, name: true, role: true },
+      });
+    }
+    const relatedIds = await getRelatedUserIds(ctx.db, ctx.user.id);
+    if (relatedIds.size === 0) return [];
     return ctx.db.query.user.findMany({
+      where: inArray(user.id, [...relatedIds]),
       columns: { id: true, name: true, role: true },
     });
   }),

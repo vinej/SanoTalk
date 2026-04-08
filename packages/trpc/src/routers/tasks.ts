@@ -1,9 +1,10 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
-import { task } from "@sanotalk/db";
-import { eq, or, isNull } from "drizzle-orm";
+import { task, user } from "@sanotalk/db";
+import { eq, or, isNull, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { verifyAdminFromDb } from "../lib/verify-admin";
+import { getRelatedUserIds } from "../lib/related-users";
 
 export const tasksRouter = createTRPCRouter({
   list: protectedProcedure.query(async ({ ctx }) => {
@@ -117,7 +118,17 @@ export const tasksRouter = createTRPCRouter({
     }),
 
   listUsers: protectedProcedure.query(async ({ ctx }) => {
+    const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+    if (isAdmin) {
+      return ctx.db.query.user.findMany({
+        columns: { id: true, name: true, role: true },
+        orderBy: (u, { asc }) => [asc(u.name)],
+      });
+    }
+    const relatedIds = await getRelatedUserIds(ctx.db, ctx.user.id);
+    if (relatedIds.size === 0) return [];
     return ctx.db.query.user.findMany({
+      where: inArray(user.id, [...relatedIds]),
       columns: { id: true, name: true, role: true },
       orderBy: (u, { asc }) => [asc(u.name)],
     });
