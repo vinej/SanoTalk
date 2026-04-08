@@ -18,6 +18,13 @@ import { runPendingAgents, triggerAgentRun, callHealthChat, callCompanionChat, c
 import { joinAiParticipant, removeAiParticipant, removeAllAiParticipants, isAiAssistant } from "./ai-voice/index";
 import http from "http";
 
+// Fail fast if critical env vars are missing
+const REQUIRED_ENV = ["APP_URL", "MINIO_ENDPOINT", "MINIO_ACCESS_KEY", "MINIO_SECRET_KEY", "LIVEKIT_URL"] as const;
+const missingEnv = REQUIRED_ENV.filter((k) => !process.env[k]);
+if (missingEnv.length > 0) {
+  throw new Error(`Missing required environment variables: ${missingEnv.join(", ")}`);
+}
+
 const app = express();
 // Trust only the first proxy hop (Cloudflare/nginx on the same host).
 // In production behind Cloudflare, set TRUSTED_PROXY=loopback or the proxy IP.
@@ -110,7 +117,7 @@ app.use((_req, res, next) => {
   next();
 });
 
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({ limit: "1mb" }));
 
 // ─── Better Auth ───────────────────────────────────────────────────────────
 app.use("/api/auth/two-factor/verify-otp", otpLimiter);
@@ -119,6 +126,16 @@ app.use("/api/auth/email-verification", otpLimiter);
 app.use("/api/auth", authLimiter, toNodeHandler(auth));
 
 // ─── tRPC ─────────────────────────────────────────────────────────────────
+// Cap batched tRPC requests to 10 procedures per HTTP call
+const MAX_TRPC_BATCH = 10;
+app.use("/api/trpc", (req, res, next) => {
+  const procedures = (req.path.split("/").pop() ?? "").split(",");
+  if (procedures.length > MAX_TRPC_BATCH) {
+    res.status(400).json({ error: `Batch too large (max ${MAX_TRPC_BATCH})` });
+    return;
+  }
+  next();
+});
 app.use("/api/trpc", apiLimiter);
 app.use("/api/trpc/agents.generateSummary", medicalLimiter);
 app.use("/api/trpc/agents.sendSummary", medicalLimiter);

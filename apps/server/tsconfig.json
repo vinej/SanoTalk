@@ -2,7 +2,6 @@
     "compilerOptions": {
     "rootDir": "src",
     "outDir": "dist",
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
       "@sanotalk/trpc/*": ["../../packages/trpc/src/*"],
