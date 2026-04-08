@@ -18,7 +18,7 @@ export default defineConfig({
     },
   },
   server: {
-    allowedHosts: true,
+    allowedHosts: ["localhost", "sanotalk.com", "www.sanotalk.com", "api.sanotalk.com"],
     port: 5173,
     host: true,
     proxy: {

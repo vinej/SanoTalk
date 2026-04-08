@@ -46,7 +46,6 @@ export const transcriptsRouter = createTRPCRouter({
     .input(
       z.object({
         sessionId: z.string().uuid(),
-        speakerId: z.string().optional(),
         speakerLabel: z.string().optional(),
         content: z.string().max(10000),
         confidence: z.number().optional(),
@@ -60,7 +59,7 @@ export const transcriptsRouter = createTRPCRouter({
         .insert(transcript)
         .values({
           sessionId: input.sessionId,
-          speakerId: input.speakerId ?? ctx.user.id,
+          speakerId: ctx.user.id,
           speakerLabel: input.speakerLabel,
           content: input.content,
           confidence: input.confidence,

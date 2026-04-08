@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { agentRun, talkSession as talkSessionTable, chatMessage, transcript, user, transcriptSummary, userProperty, task, savedConversation, userLink, vitalSign, medication, symptomLog, allergy, chronicCondition } from "@sanotalk/db";
 import { resend } from "../lib/resend";
+import { escapeHtml } from "../lib/escape-html";
 import { eq, asc, desc, isNull, and, gte } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
@@ -567,7 +568,7 @@ export const agentsRouter = createTRPCRouter({
         html: `
           <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
             <h2 style="color:#1a1a1a">Consultation Summary Available</h2>
-            <p style="color:#555">A new consultation summary from <strong>${sender.name}</strong> is ready to view.</p>
+            <p style="color:#555">A new consultation summary from <strong>${escapeHtml(sender.name)}</strong> is ready to view.</p>
             <hr style="border:none;border-top:1px solid #eee;margin:16px 0"/>
             <p style="color:#333">For security and privacy reasons, medical details are not included in this email.</p>
             <p>

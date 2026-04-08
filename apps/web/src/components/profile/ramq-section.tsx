@@ -14,6 +14,13 @@ type Props = {
 const RAMQ_NUMBER_REGEX = /^[A-Z]{4}\s?\d{4}\s?\d{4}$/i;
 const COVERAGE_COUNT = 7;
 
+/** Mask a RAMQ number for display: "VINJ 9001 0151" → "VINJ **** 0151" */
+function maskRamq(value: string): string {
+  const digits = value.replace(/\s/g, "");
+  if (digits.length < 8) return value;
+  return digits.slice(0, 4) + " **** " + digits.slice(-4);
+}
+
 function getExpiryStatus(expiryValue: string): "valid" | "soon" | "expired" | null {
   if (!expiryValue) return null;
   const [year, month] = expiryValue.split("-").map(Number);
@@ -141,7 +148,7 @@ export function RamqSection({ properties, onPropertyChange }: Props) {
           {ramqNumber && (
             <div>
               <span className="text-xs text-muted-foreground">{t("ramq.cardNumber")}</span>
-              <p className="text-sm font-mono font-medium">{ramqNumber.value}</p>
+              <p className="text-sm font-mono font-medium">{maskRamq(ramqNumber.value)}</p>
             </div>
           )}
           {ramqExpiry && (

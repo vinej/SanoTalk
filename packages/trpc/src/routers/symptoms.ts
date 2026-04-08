@@ -2,6 +2,7 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { symptomLog, user, userLink, task } from "@sanotalk/db";
 import { resend } from "../lib/resend";
+import { escapeHtml } from "../lib/escape-html";
 import { eq, and, desc, gte, lte } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 
@@ -142,7 +143,7 @@ export const symptomsRouter = createTRPCRouter({
         html: `
           <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
             <h2 style="color:#1a1a1a">Symptom Journal Shared</h2>
-            <p style="color:#555"><strong>${sender.name}</strong> has shared their symptom journal with you.</p>
+            <p style="color:#555"><strong>${escapeHtml(sender.name)}</strong> has shared their symptom journal with you.</p>
             <hr style="border:none;border-top:1px solid #eee;margin:16px 0"/>
             <p style="color:#333">For security and privacy reasons, medical details are not included in this email.</p>
             <p>

@@ -19,7 +19,9 @@ import { joinAiParticipant, removeAiParticipant, removeAllAiParticipants, isAiAs
 import http from "http";
 
 const app = express();
-app.set('trust proxy', 1);
+// Trust only the first proxy hop (Cloudflare/nginx on the same host).
+// In production behind Cloudflare, set TRUSTED_PROXY=loopback or the proxy IP.
+app.set('trust proxy', process.env.TRUSTED_PROXY ?? "loopback");
 const PORT = process.env.PORT ?? 3001;
 
 // ─── Security Headers ──────────────────────────────────────────────────────
@@ -91,22 +93,38 @@ const medicalLimiter = rateLimit({
   message: { error: "Too many requests, please try again later." },
 });
 
+// Strict limiter for OTP/2FA verification — 5 attempts per 5 minutes per IP
+const otpLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  max: process.env.NODE_ENV === "production" ? 5 : 500,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many verification attempts, please try again later." },
+});
+
 app.use(express.json({ limit: "10mb" }));
 
 // ─── Better Auth ───────────────────────────────────────────────────────────
+app.use("/api/auth/two-factor/verify-otp", otpLimiter);
+app.use("/api/auth/two-factor/verify-totp", otpLimiter);
 app.use("/api/auth", authLimiter, toNodeHandler(auth));
 
 // ─── tRPC ─────────────────────────────────────────────────────────────────
 app.use("/api/trpc", apiLimiter);
 app.use("/api/trpc/agents.generateSummary", medicalLimiter);
 app.use("/api/trpc/agents.sendSummary", medicalLimiter);
+app.use("/api/trpc/agents.sendChatMessage", medicalLimiter);
+app.use("/api/trpc/agents.sendHealthChatMessage", medicalLimiter);
+app.use("/api/trpc/agents.sendCompanionChatMessage", medicalLimiter);
+app.use("/api/trpc/agents.sendNewsChatMessage", medicalLimiter);
+app.use("/api/trpc/agents.sendPharmacistChatMessage", medicalLimiter);
 app.use(
   "/api/trpc",
   createExpressMiddleware({
     router: appRouter,
     createContext: (opts) => createTRPCContext(opts, { triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat, callPharmacistChat, joinAiParticipant, removeAiParticipant, removeAllAiParticipants, isAiAssistant }),
     onError({ path, error }) {
-      logger.error({ path, error }, "tRPC error");
+      logger.error({ path, code: error.code }, "tRPC error");
     },
   })
 );
@@ -132,8 +150,31 @@ function getAvatarMinio(): Minio.Client {
   return _avatarMinio;
 }
 
+// Allowed external avatar domains (DiceBear, Gravatar, etc.)
+const ALLOWED_AVATAR_HOSTS = new Set([
+  "api.dicebear.com",
+  "avatars.dicebear.com",
+  "www.gravatar.com",
+  "gravatar.com",
+]);
+
+function isAllowedAvatarUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:" && ALLOWED_AVATAR_HOSTS.has(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+
 app.get("/api/avatar/:userId", apiLimiter, async (req, res) => {
   try {
+    // Require authentication
+    const session = await auth.api.getSession({
+      headers: new Headers(req.headers as Record<string, string>),
+    });
+    if (!session?.user) { res.status(401).end(); return; }
+
     const userId = req.params.userId as string;
     if (!userId) { res.status(400).end(); return; }
 
@@ -143,8 +184,9 @@ app.get("/api/avatar/:userId", apiLimiter, async (req, res) => {
     });
     if (!record?.image) { res.status(404).end(); return; }
 
-    // External URLs (DiceBear, etc.) — redirect
+    // External URLs — only redirect to allowlisted domains
     if (record.image.startsWith("http://") || record.image.startsWith("https://")) {
+      if (!isAllowedAvatarUrl(record.image)) { res.status(403).end(); return; }
       res.redirect(record.image);
       return;
     }

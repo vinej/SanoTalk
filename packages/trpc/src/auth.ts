@@ -71,9 +71,24 @@ function withCustomAdapter(adapterFactory: typeof _baseAdapter): typeof _baseAda
   };
 }
 
+const isProduction = process.env.NODE_ENV === "production";
+
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
   database: withCustomAdapter(_baseAdapter),
+  session: {
+    cookieCache: { enabled: true, maxAge: 5 * 60 },
+  },
+  advanced: {
+    cookiePrefix: "sanotalk",
+    useSecureCookies: isProduction,
+    defaultCookieAttributes: {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: "lax" as const,
+      path: "/",
+    },
+  },
   user: {
     additionalFields: {
       role: {

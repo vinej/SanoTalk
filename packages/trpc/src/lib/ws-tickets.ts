@@ -1,5 +1,9 @@
 import { randomUUID } from "crypto";
 
+// NOTE: Tickets are stored in-memory. In a multi-instance deployment,
+// move this to Redis (or another shared store) so that a ticket issued
+// by one server instance can be consumed by another.
+
 interface Ticket {
   userId: string;
   expiresAt: number;

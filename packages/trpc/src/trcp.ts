@@ -6,12 +6,14 @@ import superjson from 'superjson';
 const t = initTRPC.context<TRPCContext>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
+    const isProd = process.env.NODE_ENV === "production";
     return {
       ...shape,
       data: {
         ...shape.data,
+        stack: isProd ? undefined : shape.data.stack,
         zodError:
-          process.env.NODE_ENV !== "production" && error.cause instanceof ZodError
+          !isProd && error.cause instanceof ZodError
             ? error.cause.flatten()
             : null,
       },

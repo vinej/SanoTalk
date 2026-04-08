@@ -8,9 +8,12 @@ import { talkSession, sessionParticipant } from "@sanotalk/db";
 import { eq, and } from "drizzle-orm";
 import { consumeTicket } from "@sanotalk/trpc/lib/ws-tickets";
 
+const MAX_WS_PER_USER = 2;
+
 export function startDeepgramWebSocket(server: Server) {
   const wss = new WebSocketServer({ server, path: "/ws/transcribe" });
   const deepgram = createClient(process.env.DEEPGRAM_API_KEY ?? "");
+  const wsCountByUser = new Map<string, number>();
 
   wss.on("connection", async (ws: WebSocket, req) => {
     const url = new URL(req.url ?? "", "http://localhost");
@@ -51,6 +54,15 @@ export function startDeepgramWebSocket(server: Server) {
       ws.close(1008, "Unauthorized");
       return;
     }
+
+    // Enforce per-user connection limit
+    const currentCount = wsCountByUser.get(userId) ?? 0;
+    if (currentCount >= MAX_WS_PER_USER) {
+      logger.warn({ userId, currentCount }, "WebSocket rejected: per-user limit reached");
+      ws.close(1008, "Too many connections");
+      return;
+    }
+    wsCountByUser.set(userId, currentCount + 1);
 
     // When a sessionId is provided, verify the user belongs to that session
     if (sessionId) {
@@ -187,6 +199,9 @@ export function startDeepgramWebSocket(server: Server) {
 
     ws.on("close", () => {
       dgConnection.requestClose();
+      const n = (wsCountByUser.get(userId!) ?? 1) - 1;
+      if (n <= 0) wsCountByUser.delete(userId!);
+      else wsCountByUser.set(userId!, n);
       logger.info("Transcription WS client disconnected");
     });
   });

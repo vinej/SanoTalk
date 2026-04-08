@@ -38,6 +38,12 @@ export const tasksRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       if (await verifyAdminFromDb(ctx.db, ctx.user.id)) throw new TRPCError({ code: "FORBIDDEN", message: "Admins cannot create tasks" });
+      if (input.assignedUserId && input.assignedUserId !== ctx.user.id) {
+        const relatedIds = await getRelatedUserIds(ctx.db, ctx.user.id);
+        if (!relatedIds.has(input.assignedUserId)) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Can only assign tasks to related users" });
+        }
+      }
       const status = input.assignedUserId ? "assigned" : "not_assigned";
       const [created] = await ctx.db
         .insert(task)
@@ -78,6 +84,12 @@ export const tasksRouter = createTRPCRouter({
       // Non-patients may not edit tasks assigned to someone else
       if (role !== "patient" && existing.assignedUserId !== null && existing.assignedUserId !== ctx.user.id) {
         throw new TRPCError({ code: "FORBIDDEN", message: "Only the assigned user can edit this task" });
+      }
+      if (fields.assignedUserId && fields.assignedUserId !== ctx.user.id) {
+        const relatedIds = await getRelatedUserIds(ctx.db, ctx.user.id);
+        if (!relatedIds.has(fields.assignedUserId)) {
+          throw new TRPCError({ code: "FORBIDDEN", message: "Can only assign tasks to related users" });
+        }
       }
       if (existing?.taskType === "summary_review") {
         if (fields.assignedUserId !== undefined) {

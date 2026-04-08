@@ -5,6 +5,7 @@ import { eq, and, desc, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { verifyAdminFromDb } from "../lib/verify-admin";
 import { getRelatedUserIds } from "../lib/related-users";
+import { encrypt, decrypt, ENCRYPTED_KEYS } from "../lib/crypto";
 
 export const userRouter = createTRPCRouter({
   profile: protectedProcedure.query(async ({ ctx }) => {
@@ -94,6 +95,10 @@ export const userRouter = createTRPCRouter({
   updateImage: protectedProcedure
     .input(z.object({ image: z.string().nullable() }))
     .mutation(async ({ ctx, input }) => {
+      // Only allow null (remove) or valid MinIO avatar keys
+      if (input.image !== null && !/^avatars\/[\w-]+\.(jpg|png|webp)$/.test(input.image)) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "Invalid image value" });
+      }
       const [updated] = await ctx.db
         .update(user)
         .set({ image: input.image })
@@ -271,11 +276,14 @@ export const userRouter = createTRPCRouter({
     }),
 
   listProperties: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db
+    const rows = await ctx.db
       .select()
       .from(userProperty)
       .where(eq(userProperty.userId, ctx.user.id))
       .orderBy(userProperty.createdAt);
+    return rows.map((r) =>
+      ENCRYPTED_KEYS.has(r.key) ? { ...r, value: decrypt(r.value) } : r
+    );
   }),
 
   setPropertiesLanguage: protectedProcedure
@@ -308,6 +316,8 @@ export const userRouter = createTRPCRouter({
         .set({ propertiesLanguage: input.language })
         .where(eq(user.id, ctx.user.id));
 
+      const valueToStore = ENCRYPTED_KEYS.has(input.key) ? encrypt(input.value) : input.value;
+
       const existing = await ctx.db
         .select({ id: userProperty.id })
         .from(userProperty)
@@ -316,14 +326,14 @@ export const userRouter = createTRPCRouter({
       if (existing.length > 0) {
         const [updated] = await ctx.db
           .update(userProperty)
-          .set({ value: input.value })
+          .set({ value: valueToStore })
           .where(and(eq(userProperty.userId, ctx.user.id), eq(userProperty.key, input.key)))
           .returning();
         return updated;
       } else {
         const [inserted] = await ctx.db
           .insert(userProperty)
-          .values({ userId: ctx.user.id, key: input.key, value: input.value })
+          .values({ userId: ctx.user.id, key: input.key, value: valueToStore })
           .returning();
         return inserted;
       }
