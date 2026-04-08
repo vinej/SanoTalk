@@ -132,13 +132,14 @@ export const medicationsRouter = createTRPCRouter({
       }
 
       const lang = input.language ?? "en";
+      const safeName = sender.name.replace(/[<>"'&\x00-\x1F]/g, "").slice(0, 100).trim() || "Unknown";
       const taskTitleByLang: Record<string, string> = {
-        en: `Review medications for patient ${sender.name}`,
-        fr: `Consulter les médicaments du patient ${sender.name}`,
-        es: `Revisar medicamentos del paciente ${sender.name}`,
-        zh: `查看患者 ${sender.name} 的药物`,
-        ar: `مراجعة أدوية المريض ${sender.name}`,
-        hi: `मरीज़ ${sender.name} की दवाइयाँ देखें`,
+        en: `Review medications for patient ${safeName}`,
+        fr: `Consulter les médicaments du patient ${safeName}`,
+        es: `Revisar medicamentos del paciente ${safeName}`,
+        zh: `查看患者 ${safeName} 的药物`,
+        ar: `مراجعة أدوية المريض ${safeName}`,
+        hi: `मरीज़ ${safeName} की दवाइयाँ देखें`,
       };
       const taskTitle = taskTitleByLang[lang] ?? taskTitleByLang["en"]!;
 

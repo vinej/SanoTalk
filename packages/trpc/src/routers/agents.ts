@@ -310,6 +310,7 @@ export const agentsRouter = createTRPCRouter({
       // Persist user message
       await ctx.db.insert(chatMessage).values({
         sessionId: input.sessionId,
+        userId: ctx.user.id,
         role: "user",
         content: input.message,
       });
@@ -582,13 +583,14 @@ export const agentsRouter = createTRPCRouter({
       });
       const sessionLanguage = session?.language ?? "en";
 
+      const safeName = sender.name.replace(/[<>"'&\x00-\x1F]/g, "").slice(0, 100).trim() || "Unknown";
       const taskTitleByLang: Record<string, string> = {
-        en: `Review summary for patient ${sender.name}`,
-        fr: `Réviser le résumé du patient ${sender.name}`,
-        es: `Revisar el resumen del paciente ${sender.name}`,
-        zh: `查看患者 ${sender.name} 的摘要`,
-        ar: `مراجعة ملخص المريض ${sender.name}`,
-        hi: `मरीज़ ${sender.name} का सारांश देखें`,
+        en: `Review summary for patient ${safeName}`,
+        fr: `Réviser le résumé du patient ${safeName}`,
+        es: `Revisar el resumen del paciente ${safeName}`,
+        zh: `查看患者 ${safeName} 的摘要`,
+        ar: `مراجعة ملخص المريض ${safeName}`,
+        hi: `मरीज़ ${safeName} का सारांश देखें`,
       };
       const taskTitle = taskTitleByLang[sessionLanguage] ?? taskTitleByLang["en"]!;
 
@@ -753,14 +755,11 @@ export const agentsRouter = createTRPCRouter({
   deleteSavedConversation: protectedProcedure
     .input(z.object({ savedId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const existing = await ctx.db.query.savedConversation.findFirst({
-        where: and(
-          eq(savedConversation.id, input.savedId),
-          eq(savedConversation.userId, ctx.user.id)
-        ),
-      });
-      if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "Saved conversation not found" });
-      await ctx.db.delete(savedConversation).where(eq(savedConversation.id, input.savedId));
+      const deleted = await ctx.db
+        .delete(savedConversation)
+        .where(and(eq(savedConversation.id, input.savedId), eq(savedConversation.userId, ctx.user.id)))
+        .returning({ id: savedConversation.id });
+      if (deleted.length === 0) throw new TRPCError({ code: "NOT_FOUND", message: "Saved conversation not found" });
       return { deleted: true };
     }),
 });

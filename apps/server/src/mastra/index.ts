@@ -306,6 +306,19 @@ function buildPropertyContext(userProperties?: UserProperty[], propertiesLanguag
 }
 
 const MAX_CHAT_RESPONSE_LENGTH = 15000;
+const MAX_HISTORY_MESSAGES = 50;
+const MAX_HISTORY_CHARS = 50000;
+
+/** Trim chat history to the most recent messages within size bounds. */
+function trimHistory(history: Array<{ role: "user" | "assistant"; content: string }>) {
+  let trimmed = history.slice(-MAX_HISTORY_MESSAGES);
+  let totalChars = trimmed.reduce((sum, m) => sum + m.content.length, 0);
+  while (totalChars > MAX_HISTORY_CHARS && trimmed.length > 1) {
+    totalChars -= trimmed[0]!.content.length;
+    trimmed = trimmed.slice(1);
+  }
+  return trimmed;
+}
 
 export async function callCompanionChat(
   history: Array<{ role: "user" | "assistant"; content: string }>,
@@ -320,7 +333,7 @@ export async function callCompanionChat(
     languageInstruction,
     languageAck,
     ...buildPropertyContext(userProperties, propertiesLanguage),
-    ...history,
+    ...trimHistory(history),
     { role: "user" as const, content: userMessage },
   ];
   const result = await companionChatAgent.generate(messages as any);
@@ -340,7 +353,7 @@ export async function callNewsChat(
     languageInstruction,
     languageAck,
     ...buildPropertyContext(userProperties, propertiesLanguage),
-    ...history,
+    ...trimHistory(history),
     { role: "user" as const, content: userMessage },
   ];
   const result = await newsChatAgent.generate(messages as any);
@@ -360,7 +373,7 @@ export async function callHealthChat(
     languageInstruction,
     languageAck,
     ...buildPropertyContext(userProperties, propertiesLanguage),
-    ...history,
+    ...trimHistory(history),
     { role: "user" as const, content: userMessage },
   ];
   const result = await healthChatAgent.generate(messages as any);
@@ -380,7 +393,7 @@ export async function callPharmacistChat(
     languageInstruction,
     languageAck,
     ...buildPropertyContext(userProperties, propertiesLanguage),
-    ...history,
+    ...trimHistory(history),
     { role: "user" as const, content: userMessage },
   ];
   const result = await pharmacistChatAgent.generate(messages as any);

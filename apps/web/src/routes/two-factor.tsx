@@ -58,8 +58,10 @@ function TwoFactorPage() {
     } else {
       const raw = sessionStorage.getItem("postLoginRedirect") ?? "/dashboard";
       sessionStorage.removeItem("postLoginRedirect");
-      // Validate redirect is a relative path to prevent open redirect
-      const safe = raw.startsWith("/") && !raw.startsWith("//") ? raw : "/dashboard";
+      // Validate redirect is a safe relative path to prevent open redirect
+      const SAFE_PATH_RE = /^\/[a-zA-Z0-9\-_/]*$/;
+      const rawPath = raw.split("?")[0] ?? "";
+      const safe = raw.startsWith("/") && !raw.startsWith("//") && SAFE_PATH_RE.test(rawPath) ? raw : "/dashboard";
       const [path, qs] = safe.split("?");
       const search = qs ? Object.fromEntries(new URLSearchParams(qs)) : undefined;
       navigate({ to: path as any, search: search as any });

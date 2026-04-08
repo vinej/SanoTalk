@@ -292,7 +292,7 @@ export class AiVoicePipeline {
       ];
 
       const result = await this.agent.generate(messages as any);
-      const text = result.text;
+      const text = result.text?.slice(0, 500); // Inactivity prompts should be very short
 
       if (text && this.running) {
         await this.storeTranscript(text);

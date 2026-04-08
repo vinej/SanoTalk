@@ -565,7 +565,7 @@ export const healthHelpRouter = createTRPCRouter({
           region: h.region,
           phone: phoneBook.get(key) ?? pharmacyPhones.get(`${h.name}|${h.lat.toFixed(5)}`) ?? clinicPhones.get(`${h.name}|${h.lat.toFixed(5)}`) ?? "",
           distanceKm: h.distanceKm,
-          directionsUrl: `https://www.google.com/maps/dir/?api=1&origin=${lat.toFixed(3)},${lng.toFixed(3)}&destination=${h.lat},${h.lng}&travelmode=driving`,
+          directionsUrl: `https://www.google.com/maps/dir/?api=1&origin=${lat.toFixed(2)},${lng.toFixed(2)}&destination=${h.lat},${h.lng}&travelmode=driving`,
           erStats: erRow
             ? {
                 occupancyRate,

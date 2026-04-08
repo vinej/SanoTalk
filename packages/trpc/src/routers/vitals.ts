@@ -183,13 +183,14 @@ export const vitalsRouter = createTRPCRouter({
       }
 
       const lang = input.language ?? "en";
+      const safeName = sender.name.replace(/[<>"'&\x00-\x1F]/g, "").slice(0, 100).trim() || "Unknown";
       const taskTitleByLang: Record<string, string> = {
-        en: `Review vital signs for patient ${sender.name}`,
-        fr: `Consulter les signes vitaux du patient ${sender.name}`,
-        es: `Revisar signos vitales del paciente ${sender.name}`,
-        zh: `查看患者 ${sender.name} 的生命体征`,
-        ar: `مراجعة العلامات الحيوية للمريض ${sender.name}`,
-        hi: `मरीज़ ${sender.name} के जीवन संकेत देखें`,
+        en: `Review vital signs for patient ${safeName}`,
+        fr: `Consulter les signes vitaux du patient ${safeName}`,
+        es: `Revisar signos vitales del paciente ${safeName}`,
+        zh: `查看患者 ${safeName} 的生命体征`,
+        ar: `مراجعة العلامات الحيوية للمريض ${safeName}`,
+        hi: `मरीज़ ${safeName} के जीवन संकेत देखें`,
       };
       const taskTitle = taskTitleByLang[lang] ?? taskTitleByLang["en"]!;
 

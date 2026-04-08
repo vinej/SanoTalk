@@ -121,13 +121,14 @@ export const symptomsRouter = createTRPCRouter({
       }
 
       const lang = input.language ?? "en";
+      const safeName = sender.name.replace(/[<>"'&\x00-\x1F]/g, "").slice(0, 100).trim() || "Unknown";
       const taskTitleByLang: Record<string, string> = {
-        en: `Review symptom journal for patient ${sender.name}`,
-        fr: `Consulter le journal des symptômes du patient ${sender.name}`,
-        es: `Revisar el diario de síntomas del paciente ${sender.name}`,
-        zh: `查看患者 ${sender.name} 的症状日记`,
-        ar: `مراجعة مذكرة أعراض المريض ${sender.name}`,
-        hi: `मरीज़ ${sender.name} की लक्षण डायरी देखें`,
+        en: `Review symptom journal for patient ${safeName}`,
+        fr: `Consulter le journal des symptômes du patient ${safeName}`,
+        es: `Revisar el diario de síntomas del paciente ${safeName}`,
+        zh: `查看患者 ${safeName} 的症状日记`,
+        ar: `مراجعة مذكرة أعراض المريض ${safeName}`,
+        hi: `मरीज़ ${safeName} की लक्षण डायरी देखें`,
       };
       const taskTitle = taskTitleByLang[lang] ?? taskTitleByLang["en"]!;
 

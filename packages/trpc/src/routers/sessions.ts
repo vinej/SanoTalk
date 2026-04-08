@@ -91,34 +91,24 @@ export const sessionsRouter = createTRPCRouter({
   rename: protectedProcedure
     .input(z.object({ id: z.string().uuid(), title: z.string().min(1).max(120) }))
     .mutation(async ({ ctx, input }) => {
-      const session = await ctx.db.query.talkSession.findFirst({
-        where: eq(talkSession.id, input.id),
-      });
-      if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
-      if (session.hostId !== ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the host can rename a session" });
-
       const [updated] = await ctx.db
         .update(talkSession)
         .set({ title: input.title, updatedAt: new Date() })
-        .where(eq(talkSession.id, input.id))
+        .where(and(eq(talkSession.id, input.id), eq(talkSession.hostId, ctx.user.id)))
         .returning({ id: talkSession.id, title: talkSession.title, updatedAt: talkSession.updatedAt });
+      if (!updated) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
       return updated;
     }),
 
   start: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const session = await ctx.db.query.talkSession.findFirst({
-        where: eq(talkSession.id, input.id),
-      });
-      if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
-      if (session.hostId !== ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the host can start a session" });
-
       const [updated] = await ctx.db
         .update(talkSession)
         .set({ status: "active", startedAt: new Date() })
-        .where(eq(talkSession.id, input.id))
+        .where(and(eq(talkSession.id, input.id), eq(talkSession.hostId, ctx.user.id)))
         .returning({ id: talkSession.id, status: talkSession.status, startedAt: talkSession.startedAt });
+      if (!updated) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
 
       // Start voice pipelines for any AI participants already added
       const withParticipants = await ctx.db.query.talkSession.findFirst({
@@ -140,33 +130,26 @@ export const sessionsRouter = createTRPCRouter({
   end: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const session = await ctx.db.query.talkSession.findFirst({
-        where: eq(talkSession.id, input.id),
-      });
-      if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
-      if (session.hostId !== ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the host can end a session" });
-
       // Disconnect all AI participants from the session
       void ctx.removeAllAiParticipants(input.id);
 
       const [updated] = await ctx.db
         .update(talkSession)
         .set({ status: "completed", endedAt: new Date() })
-        .where(eq(talkSession.id, input.id))
+        .where(and(eq(talkSession.id, input.id), eq(talkSession.hostId, ctx.user.id)))
         .returning({ id: talkSession.id, status: talkSession.status, endedAt: talkSession.endedAt });
+      if (!updated) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
       return updated;
     }),
 
   delete: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
-      const session = await ctx.db.query.talkSession.findFirst({
-        where: eq(talkSession.id, input.id),
-      });
-      if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
-      if (session.hostId !== ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the host can delete a session" });
-
-      await ctx.db.delete(talkSession).where(eq(talkSession.id, input.id));
+      const deleted = await ctx.db
+        .delete(talkSession)
+        .where(and(eq(talkSession.id, input.id), eq(talkSession.hostId, ctx.user.id)))
+        .returning({ id: talkSession.id });
+      if (deleted.length === 0) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
     }),
 
   addParticipant: protectedProcedure
@@ -212,11 +195,13 @@ export const sessionsRouter = createTRPCRouter({
   removeParticipant: protectedProcedure
     .input(z.object({ sessionId: z.string().uuid(), userId: z.string().min(1).max(100) }))
     .mutation(async ({ ctx, input }) => {
-      const session = await ctx.db.query.talkSession.findFirst({
-        where: eq(talkSession.id, input.sessionId),
-      });
-      if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
-      if (session.hostId !== ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the host can remove participants" });
+      // Verify host ownership atomically via an UPDATE touch (no-op set)
+      const [owned] = await ctx.db
+        .update(talkSession)
+        .set({ updatedAt: new Date() })
+        .where(and(eq(talkSession.id, input.sessionId), eq(talkSession.hostId, ctx.user.id)))
+        .returning({ id: talkSession.id });
+      if (!owned) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
 
       // If the participant is an AI assistant, stop its voice pipeline
       const isAi = await ctx.isAiAssistant(input.userId);
@@ -240,14 +225,11 @@ export const sessionsRouter = createTRPCRouter({
       agentType: z.enum(["health", "companion", "pharmacist"]),
     }))
     .mutation(async ({ ctx, input }) => {
-      const session = await ctx.db.query.talkSession.findFirst({
-        where: eq(talkSession.id, input.sessionId),
-      });
-      if (!session) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
-      if (session.hostId !== ctx.user.id) throw new TRPCError({ code: "FORBIDDEN", message: "Only the host can set the agent type" });
-      await ctx.db.update(talkSession)
+      const [updated] = await ctx.db.update(talkSession)
         .set({ agentType: input.agentType })
-        .where(eq(talkSession.id, input.sessionId));
+        .where(and(eq(talkSession.id, input.sessionId), eq(talkSession.hostId, ctx.user.id)))
+        .returning({ id: talkSession.id });
+      if (!updated) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
       return { ok: true };
     }),
 });
