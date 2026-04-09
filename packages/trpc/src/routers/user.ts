@@ -430,7 +430,8 @@ export const userRouter = createTRPCRouter({
       });
       if (!target) throw new TRPCError({ code: "NOT_FOUND" });
       if (target.approved) throw new TRPCError({ code: "BAD_REQUEST", message: "Already approved" });
-      await ctx.db.update(user).set({ approved: true }).where(eq(user.id, input.targetUserId));
+      const [updated] = await ctx.db.update(user).set({ approved: true }).where(and(eq(user.id, input.targetUserId), eq(user.approved, false))).returning({ id: user.id });
+      if (!updated) throw new TRPCError({ code: "CONFLICT", message: "User was modified concurrently" });
       const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
       const appUrl = process.env.APP_URL ?? "http://localhost:5173";
       await resend.emails.send({
@@ -463,6 +464,10 @@ export const userRouter = createTRPCRouter({
       });
       if (!target) throw new TRPCError({ code: "NOT_FOUND" });
       if (target.approved) throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot refuse an approved user" });
+      // Atomic delete with approved=false guard prevents race where another admin
+      // approves the user between our check and delete.
+      const [deleted] = await ctx.db.delete(user).where(and(eq(user.id, input.targetUserId), eq(user.approved, false))).returning({ id: user.id });
+      if (!deleted) throw new TRPCError({ code: "CONFLICT", message: "User was modified concurrently" });
       const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
       await resend.emails.send({
         from,
@@ -478,7 +483,6 @@ export const userRouter = createTRPCRouter({
           </div>
         `,
       });
-      await ctx.db.delete(user).where(eq(user.id, input.targetUserId));
       return { ok: true };
     }),
 });
