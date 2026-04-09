@@ -53,6 +53,7 @@ export function AppHeader() {
         <Link to="/dashboard">
           <SanoTalkLogoV2 size={64} showText={true} />
         </Link>
+        <span className="text-[10px] text-muted-foreground/60 font-mono">v{__APP_VERSION__}</span>
         {profile && (
           <div className="text-sm grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-0">
             <span className="font-medium text-right">{profile.name}</span>

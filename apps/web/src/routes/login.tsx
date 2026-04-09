@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { authClient } from "../lib/auth-client";
+import { authClient, signOut } from "../lib/auth-client";
 import { useTranslation } from "react-i18next";
 import { LanguageSwitcher } from "../components/language-switcher";
 import { Button } from "../components/ui/button";
@@ -31,10 +31,19 @@ function LoginPage() {
       const result = await authClient.signIn.email({ email, password });
       if ((result as any)?.error) {
         setError((result as any).error.message ?? "Sign-in failed");
-      } else if ((result?.data as any)?.twoFactorRedirect) {
-        navigate({ to: "/two-factor" as any });
       } else {
-        navigate({ to: "/dashboard" as any });
+        // Check if user is approved before proceeding
+        const sess = await authClient.getSession();
+        if (sess.data?.user && !(sess.data.user as any).approved) {
+          await signOut();
+          setError(t("login.pendingApproval"));
+          return;
+        }
+        if ((result?.data as any)?.twoFactorRedirect) {
+          navigate({ to: "/two-factor" as any });
+        } else {
+          navigate({ to: "/dashboard" as any });
+        }
       }
     } catch (err: any) {
       setError(err?.message ?? "Sign-in failed");

@@ -34,11 +34,16 @@
     "verifyMessage": "We sent a verification link to <strong>{{email}}</strong>. Please click the link in the email to activate your account before signing in.",
     "verifyGoToLogin": "Go to sign in"
   },
+  "pendingApproval": {
+    "title": "Registration pending",
+    "message": "Your email has been verified. An administrator will review your registration and send you an email when your account is activated.",
+    "backToLogin": "Back to sign in"
+  },
   "verifyEmail": {
     "verifying": "Verifying your email…",
     "verifyingDesc": "Please wait.",
     "success": "Email verified!",
-    "successDesc": "Your account is now active. You can sign in.",
+    "successDesc": "Your email has been verified. An administrator will review your registration and notify you by email when your account is activated.",
     "goToLogin": "Sign in",
     "failed": "Verification failed",
     "resendTitle": "Resend verification email",
@@ -55,6 +60,7 @@
     "password": "Password",
     "submit": "Sign in",
     "submitting": "Signing in…",
+    "pendingApproval": "Your account is pending administrator approval. You will receive an email when activated.",
     "noAccount": "Don't have an account?",
     "signUp": "Sign up",
     "forgotPassword": "Forgot password?"

@@ -22,6 +22,10 @@ export const Route: any = createFileRoute("/_auth")({
     if (!user.twoFactorEnabled) {
       throw redirect({ to: "/setup-2fa" });
     }
+    // If account not yet approved by admin, show pending page
+    if (!user.approved) {
+      throw redirect({ to: "/pending-approval" });
+    }
     return { user: session.data.user };
   },
   component: () => (

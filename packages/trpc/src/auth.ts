@@ -40,7 +40,7 @@ function withCustomAdapter(adapterFactory: typeof _baseAdapter): typeof _baseAda
         if (params.model === "user") {
           // Always force patient role and 2FA on sign-up — role escalation
           // must go through a separate admin-only mutation, never sign-up.
-          params = { ...params, data: { ...params.data, twoFactorEnabled: true, role: "patient" } };
+          params = { ...params, data: { ...params.data, twoFactorEnabled: true, role: "patient", approved: false } };
           authLog.info("user row — forcing role=patient, twoFactorEnabled=true");
         }
         if (params.model === "account") {
@@ -109,6 +109,12 @@ export const auth = betterAuth({
         type: "string",
         required: false,
         defaultValue: "patient",
+        input: false,
+      },
+      approved: {
+        type: "boolean",
+        required: false,
+        defaultValue: false,
         input: false,
       },
     },

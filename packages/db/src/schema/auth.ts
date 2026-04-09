@@ -26,6 +26,7 @@ export const user = createTable("user", {
   specialty: text("specialty"),
   licenseNumber: text("license_number"),
   twoFactorEnabled: boolean("two_factor_enabled").notNull().default(true),
+  approved: boolean("approved").notNull().default(false),
   propertiesLanguage: text("properties_language").notNull().default("en"),
 });
 

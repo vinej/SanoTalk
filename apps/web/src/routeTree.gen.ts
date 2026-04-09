@@ -13,6 +13,7 @@ import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as TwoFactorRouteImport } from './routes/two-factor'
 import { Route as SignUpRouteImport } from './routes/sign-up'
 import { Route as Setup2faRouteImport } from './routes/setup-2fa'
+import { Route as PendingApprovalRouteImport } from './routes/pending-approval'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
@@ -29,6 +30,7 @@ import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
 import { Route as AuthCompanionRouteImport } from './routes/_auth/companion'
 import { Route as AuthAllergiesRouteImport } from './routes/_auth/allergies'
 import { Route as AuthAiAssistantRouteImport } from './routes/_auth/ai-assistant'
+import { Route as AuthAdminApprovalsRouteImport } from './routes/_auth/admin-approvals'
 import { Route as AuthSessionsIndexRouteImport } from './routes/_auth/sessions.index'
 import { Route as AuthSessionsNewRouteImport } from './routes/_auth/sessions/new'
 import { Route as AuthSessionsSessionIdRouteImport } from './routes/_auth/sessions/$sessionId'
@@ -51,6 +53,11 @@ const SignUpRoute = SignUpRouteImport.update({
 const Setup2faRoute = Setup2faRouteImport.update({
   id: '/setup-2fa',
   path: '/setup-2fa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PendingApprovalRoute = PendingApprovalRouteImport.update({
+  id: '/pending-approval',
+  path: '/pending-approval',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -132,6 +139,11 @@ const AuthAiAssistantRoute = AuthAiAssistantRouteImport.update({
   path: '/ai-assistant',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthAdminApprovalsRoute = AuthAdminApprovalsRouteImport.update({
+  id: '/admin-approvals',
+  path: '/admin-approvals',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthSessionsIndexRoute = AuthSessionsIndexRouteImport.update({
   id: '/sessions/',
   path: '/sessions/',
@@ -151,10 +163,12 @@ const AuthSessionsSessionIdRoute = AuthSessionsSessionIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AuthIndexRoute
   '/login': typeof LoginRoute
+  '/pending-approval': typeof PendingApprovalRoute
   '/setup-2fa': typeof Setup2faRoute
   '/sign-up': typeof SignUpRoute
   '/two-factor': typeof TwoFactorRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/admin-approvals': typeof AuthAdminApprovalsRoute
   '/ai-assistant': typeof AuthAiAssistantRoute
   '/allergies': typeof AuthAllergiesRoute
   '/companion': typeof AuthCompanionRoute
@@ -174,10 +188,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/pending-approval': typeof PendingApprovalRoute
   '/setup-2fa': typeof Setup2faRoute
   '/sign-up': typeof SignUpRoute
   '/two-factor': typeof TwoFactorRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/admin-approvals': typeof AuthAdminApprovalsRoute
   '/ai-assistant': typeof AuthAiAssistantRoute
   '/allergies': typeof AuthAllergiesRoute
   '/companion': typeof AuthCompanionRoute
@@ -200,10 +216,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth': typeof AuthRouteWithChildren
   '/login': typeof LoginRoute
+  '/pending-approval': typeof PendingApprovalRoute
   '/setup-2fa': typeof Setup2faRoute
   '/sign-up': typeof SignUpRoute
   '/two-factor': typeof TwoFactorRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/_auth/admin-approvals': typeof AuthAdminApprovalsRoute
   '/_auth/ai-assistant': typeof AuthAiAssistantRoute
   '/_auth/allergies': typeof AuthAllergiesRoute
   '/_auth/companion': typeof AuthCompanionRoute
@@ -227,10 +245,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/pending-approval'
     | '/setup-2fa'
     | '/sign-up'
     | '/two-factor'
     | '/verify-email'
+    | '/admin-approvals'
     | '/ai-assistant'
     | '/allergies'
     | '/companion'
@@ -250,10 +270,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/pending-approval'
     | '/setup-2fa'
     | '/sign-up'
     | '/two-factor'
     | '/verify-email'
+    | '/admin-approvals'
     | '/ai-assistant'
     | '/allergies'
     | '/companion'
@@ -275,10 +297,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_auth'
     | '/login'
+    | '/pending-approval'
     | '/setup-2fa'
     | '/sign-up'
     | '/two-factor'
     | '/verify-email'
+    | '/_auth/admin-approvals'
     | '/_auth/ai-assistant'
     | '/_auth/allergies'
     | '/_auth/companion'
@@ -301,6 +325,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthRoute: typeof AuthRouteWithChildren
   LoginRoute: typeof LoginRoute
+  PendingApprovalRoute: typeof PendingApprovalRoute
   Setup2faRoute: typeof Setup2faRoute
   SignUpRoute: typeof SignUpRoute
   TwoFactorRoute: typeof TwoFactorRoute
@@ -335,6 +360,13 @@ declare module '@tanstack/react-router' {
       path: '/setup-2fa'
       fullPath: '/setup-2fa'
       preLoaderRoute: typeof Setup2faRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pending-approval': {
+      id: '/pending-approval'
+      path: '/pending-approval'
+      fullPath: '/pending-approval'
+      preLoaderRoute: typeof PendingApprovalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -449,6 +481,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAiAssistantRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/admin-approvals': {
+      id: '/_auth/admin-approvals'
+      path: '/admin-approvals'
+      fullPath: '/admin-approvals'
+      preLoaderRoute: typeof AuthAdminApprovalsRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/sessions/': {
       id: '/_auth/sessions/'
       path: '/sessions'
@@ -474,6 +513,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthRouteChildren {
+  AuthAdminApprovalsRoute: typeof AuthAdminApprovalsRoute
   AuthAiAssistantRoute: typeof AuthAiAssistantRoute
   AuthAllergiesRoute: typeof AuthAllergiesRoute
   AuthCompanionRoute: typeof AuthCompanionRoute
@@ -494,6 +534,7 @@ interface AuthRouteChildren {
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
+  AuthAdminApprovalsRoute: AuthAdminApprovalsRoute,
   AuthAiAssistantRoute: AuthAiAssistantRoute,
   AuthAllergiesRoute: AuthAllergiesRoute,
   AuthCompanionRoute: AuthCompanionRoute,
@@ -518,6 +559,7 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRouteWithChildren,
   LoginRoute: LoginRoute,
+  PendingApprovalRoute: PendingApprovalRoute,
   Setup2faRoute: Setup2faRoute,
   SignUpRoute: SignUpRoute,
   TwoFactorRoute: TwoFactorRoute,

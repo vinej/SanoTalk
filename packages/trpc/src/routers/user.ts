@@ -6,13 +6,15 @@ import { TRPCError } from "@trpc/server";
 import { verifyAdminFromDb } from "../lib/verify-admin";
 import { getRelatedUserIds } from "../lib/related-users";
 import { encrypt, decrypt, ENCRYPTED_KEYS } from "../lib/crypto";
+import { resend } from "../lib/resend";
+import { escapeHtml } from "../lib/escape-html";
 
 export const userRouter = createTRPCRouter({
   profile: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.query.user.findFirst({
       where: eq(user.id, ctx.user.id),
       columns: {
-        id: true, name: true, email: true, image: true, role: true,
+        id: true, name: true, email: true, image: true, role: true, approved: true,
         specialty: true, licenseNumber: true, propertiesLanguage: true, createdAt: true,
       },
     });
@@ -404,5 +406,79 @@ export const userRouter = createTRPCRouter({
       // Invalidate all sessions for the target user so stale role claims are not used
       await ctx.db.delete(session).where(eq(session.userId, input.targetUserId));
       return { ok: true, previousRole: target.role, newRole: input.role };
+    }),
+
+  listPendingApprovals: protectedProcedure.query(async ({ ctx }) => {
+    const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+    if (!isAdmin) throw new TRPCError({ code: "FORBIDDEN" });
+    return ctx.db.query.user.findMany({
+      where: eq(user.approved, false),
+      columns: { id: true, name: true, email: true, role: true, createdAt: true },
+      orderBy: [desc(user.createdAt)],
+      limit: 500,
+    });
+  }),
+
+  approveUser: protectedProcedure
+    .input(z.object({ targetUserId: z.string().min(1).max(100) }))
+    .mutation(async ({ ctx, input }) => {
+      const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+      if (!isAdmin) throw new TRPCError({ code: "FORBIDDEN" });
+      const target = await ctx.db.query.user.findFirst({
+        where: eq(user.id, input.targetUserId),
+        columns: { id: true, email: true, name: true, approved: true },
+      });
+      if (!target) throw new TRPCError({ code: "NOT_FOUND" });
+      if (target.approved) throw new TRPCError({ code: "BAD_REQUEST", message: "Already approved" });
+      await ctx.db.update(user).set({ approved: true }).where(eq(user.id, input.targetUserId));
+      const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
+      const appUrl = process.env.APP_URL ?? "http://localhost:5173";
+      await resend.emails.send({
+        from,
+        to: target.email,
+        subject: "Your SanoTalk account has been activated",
+        html: `
+          <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
+            <h2 style="color:#0f172a">Welcome to SanoTalk!</h2>
+            <p>Hello ${escapeHtml(target.name)},</p>
+            <p>Your registration has been approved by an administrator. You can now sign in and start using SanoTalk.</p>
+            <p style="text-align:center;margin:24px 0">
+              <a href="${escapeHtml(appUrl)}/login" style="background:#2563eb;color:#fff;padding:10px 24px;border-radius:6px;text-decoration:none;font-weight:600">Sign in to SanoTalk</a>
+            </p>
+            <p style="color:#999;font-size:11px">If you did not register for SanoTalk, please ignore this email.</p>
+          </div>
+        `,
+      });
+      return { ok: true };
+    }),
+
+  refuseUser: protectedProcedure
+    .input(z.object({ targetUserId: z.string().min(1).max(100) }))
+    .mutation(async ({ ctx, input }) => {
+      const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+      if (!isAdmin) throw new TRPCError({ code: "FORBIDDEN" });
+      const target = await ctx.db.query.user.findFirst({
+        where: eq(user.id, input.targetUserId),
+        columns: { id: true, email: true, name: true, approved: true },
+      });
+      if (!target) throw new TRPCError({ code: "NOT_FOUND" });
+      if (target.approved) throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot refuse an approved user" });
+      const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
+      await resend.emails.send({
+        from,
+        to: target.email,
+        subject: "Your SanoTalk registration",
+        html: `
+          <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
+            <h2 style="color:#0f172a">SanoTalk Registration</h2>
+            <p>Hello ${escapeHtml(target.name)},</p>
+            <p>We regret to inform you that your SanoTalk registration has been declined.</p>
+            <p>If you believe this is an error, please contact us.</p>
+            <p style="color:#999;font-size:11px">SanoTalk — AI-powered medical consultations.</p>
+          </div>
+        `,
+      });
+      await ctx.db.delete(user).where(eq(user.id, input.targetUserId));
+      return { ok: true };
     }),
 });

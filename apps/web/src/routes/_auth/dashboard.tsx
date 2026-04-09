@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "../../components/ui/button";
-import { Kanban, Bot, Heart, Hospital, Download, Activity, Video, Pill, ClipboardList, UserCircle, ShieldAlert, FlaskConical } from "lucide-react";
+import { Kanban, Bot, Heart, Hospital, Download, Activity, Video, Pill, ClipboardList, UserCircle, ShieldAlert, FlaskConical, ShieldCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { usePwaInstall } from "../../hooks/use-pwa-install";
 import { trpc } from "../../lib/trpc";
@@ -49,6 +49,20 @@ function DashboardPage() {
             {t("dashboard:installButton")}
           </Button>
         </div>
+      )}
+
+      {profile?.role === "admin" && (
+        <Link to="/admin-approvals" className="group">
+          <div className="flex items-center gap-4 rounded-xl border-2 border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 p-5 transition-shadow hover:shadow-md">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-gray-900 shadow-sm">
+              <ShieldCheck className="h-6 w-6 text-amber-600" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold group-hover:underline">{t(`dashboard:adminApprovals`)}</p>
+              <p className="text-sm text-muted-foreground">{t(`dashboard:adminApprovalsDesc`)}</p>
+            </div>
+          </div>
+        </Link>
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

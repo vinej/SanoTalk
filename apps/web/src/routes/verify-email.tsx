@@ -67,6 +67,9 @@ function VerifyEmailPage() {
             <MailCheck className="h-12 w-12 text-green-600 mx-auto" />
             <h1 className="text-2xl font-bold text-green-600">{t("verifyEmail.success")}</h1>
             <p className="text-muted-foreground">{t("verifyEmail.successDesc")}</p>
+            <Link to="/login" className="text-primary underline text-sm block mt-2">
+              {t("verifyEmail.backToLogin")}
+            </Link>
           </>
         )}
 

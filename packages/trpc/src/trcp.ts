@@ -29,6 +29,9 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
   if (!ctx.session || !ctx.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
+  if (!(ctx.user as any).approved) {
+    throw new TRPCError({ code: "FORBIDDEN", message: "Account pending approval" });
+  }
   return next({
     ctx: {
       ...ctx,

@@ -34,11 +34,16 @@
     "verifyMessage": "我们已向 <strong>{{email}}</strong> 发送了验证链接。请点击邮件中的链接以激活账户后再登录。",
     "verifyGoToLogin": "前往登录"
   },
+  "pendingApproval": {
+    "title": "注册待审核",
+    "message": "您的邮箱已验证。管理员将审核您的注册，并在账户激活后通过邮件通知您。",
+    "backToLogin": "返回登录"
+  },
   "verifyEmail": {
     "verifying": "正在验证您的邮箱…",
     "verifyingDesc": "请稍候。",
     "success": "邮箱已验证！",
-    "successDesc": "您的账户已激活，可以登录了。",
+    "successDesc": "您的邮箱已验证。管理员将审核您的注册，并在账户激活后通过邮件通知您。",
     "goToLogin": "登录",
     "failed": "验证失败",
     "resendTitle": "重新发送验证邮件",
@@ -55,6 +60,7 @@
     "password": "密码",
     "submit": "登录",
     "submitting": "登录中…",
+    "pendingApproval": "您的账户正在等待管理员审核。激活后将通过邮件通知您。",
     "noAccount": "没有账户？",
     "signUp": "注册",
     "forgotPassword": "忘记密码？"

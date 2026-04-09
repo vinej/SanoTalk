@@ -34,11 +34,16 @@
     "verifyMessage": "Nous avons envoyé un lien de vérification à <strong>{{email}}</strong>. Veuillez cliquer sur le lien dans l'e-mail pour activer votre compte avant de vous connecter.",
     "verifyGoToLogin": "Aller à la connexion"
   },
+  "pendingApproval": {
+    "title": "Inscription en attente",
+    "message": "Votre courriel a été vérifié. Un administrateur examinera votre inscription et vous enverra un courriel lorsque votre compte sera activé.",
+    "backToLogin": "Retour à la connexion"
+  },
   "verifyEmail": {
     "verifying": "Vérification de votre courriel…",
     "verifyingDesc": "Veuillez patienter.",
     "success": "Courriel vérifié !",
-    "successDesc": "Votre compte est maintenant actif. Vous pouvez vous connecter.",
+    "successDesc": "Votre courriel a été vérifié. Un administrateur examinera votre inscription et vous notifiera par courriel lorsque votre compte sera activé.",
     "goToLogin": "Se connecter",
     "failed": "Échec de la vérification",
     "resendTitle": "Renvoyer l'e-mail de vérification",
@@ -55,6 +60,7 @@
     "password": "Mot de passe",
     "submit": "Se connecter",
     "submitting": "Connexion en cours…",
+    "pendingApproval": "Votre compte est en attente d'approbation par un administrateur. Vous recevrez un courriel lorsqu'il sera activé.",
     "noAccount": "Vous n'avez pas de compte ?",
     "signUp": "S'inscrire",
     "forgotPassword": "Mot de passe oublié ?"
