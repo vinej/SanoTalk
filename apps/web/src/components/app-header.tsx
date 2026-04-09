@@ -58,7 +58,7 @@ export function AppHeader() {
           v{__APP_VERSION__}{aiInfo && <> powered by {aiInfo.model ?? aiInfo.provider}</>}
         </span>
         {profile && (
-          <div className="text-sm grid grid-cols-[auto_auto_auto] items-center gap-x-3 gap-y-0">
+          <div className="text-sm grid grid-cols-[auto_auto_auto] items-center gap-x-3 gap-y-0 shrink-0">
             <span className="font-medium text-right">{profile.name}</span>
             <span className="text-[10px] text-muted-foreground bg-muted rounded px-1.5 py-0.5 uppercase tracking-wide text-center">
               {t(`common:roles.${profile.role}`)}
