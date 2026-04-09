@@ -149,6 +149,7 @@ app.use("/api/trpc/agents.sendHealthChatMessage", medicalLimiter);
 app.use("/api/trpc/agents.sendCompanionChatMessage", medicalLimiter);
 app.use("/api/trpc/agents.sendNewsChatMessage", medicalLimiter);
 app.use("/api/trpc/agents.sendPharmacistChatMessage", medicalLimiter);
+app.use("/api/trpc/agents.sendTestChatMessage", medicalLimiter);
 app.use("/api/trpc/vitals.shareWithProfessional", medicalLimiter);
 app.use("/api/trpc/medications.shareWithProfessional", medicalLimiter);
 app.use("/api/trpc/symptoms.shareWithProfessional", medicalLimiter);

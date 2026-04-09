@@ -58,9 +58,12 @@ export function AppHeader() {
           v{__APP_VERSION__}{aiInfo && <> powered by {aiInfo.model ?? aiInfo.provider}</>}
         </span>
         {profile && (
-          <div className="text-sm grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-0">
+          <div className="text-sm grid grid-cols-[auto_auto_auto] items-center gap-x-3 gap-y-0">
             <span className="font-medium text-right">{profile.name}</span>
-            <div className="flex gap-1">
+            <span className="text-[10px] text-muted-foreground bg-muted rounded px-1.5 py-0.5 uppercase tracking-wide text-center">
+              {t(`common:roles.${profile.role}`)}
+            </span>
+            <div className="flex gap-1 justify-end">
               <Button
                 size="sm"
                 variant="ghost"
@@ -77,8 +80,10 @@ export function AppHeader() {
               </Button>
             </div>
             <span className="text-muted-foreground text-right">{profile.email}</span>
-            <div className="flex gap-1">
+            <div className="flex justify-center">
               <LanguageSwitcher />
+            </div>
+            <div className="flex gap-1 justify-end">
               <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => setLogoutOpen(true)}>
                 <LogOut className="h-3 w-3 mr-1" />
                 {t("common:logout")}

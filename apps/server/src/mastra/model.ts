@@ -1,5 +1,6 @@
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { createOpenAI } from "@ai-sdk/openai";
+import { logger } from "../logger.js";
 
 export const provider = process.env.AI_PROVIDER ?? "anthropic";
 
@@ -38,4 +39,4 @@ export const largeModel = createModel(largeModelId);
 /** For summary/SOAP agents — fast and cheap */
 export const smallModel = createModel(smallModelId);
 
-console.log(`[AI] provider=${provider} large=${largeModelId} small=${smallModelId}`);
+logger.info({ provider, largeModelId, smallModelId }, "AI configuration loaded");
