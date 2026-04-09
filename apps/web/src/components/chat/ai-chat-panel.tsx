@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { ScrollArea } from "../ui/scroll-area";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
 import { trpc } from "../../lib/trpc";
 import { Loader2, Send, Mic, MicOff, Trash2, Bookmark, BookmarkCheck, BookmarkX, Volume2, VolumeX, Phone, MapPin, Stethoscope, Heart } from "lucide-react";
@@ -437,7 +438,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
           {micError}
         </div>
       )}
-      <div className="border-t p-2 flex gap-2 shrink-0">
+      <div className="border-t p-2 flex gap-2 shrink-0 items-end">
         {!isSessionMode && (
           <>
             <Button
@@ -493,7 +494,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
         >
           {voiceEnabled ? <Mic className="h-3 w-3" /> : <MicOff className="h-3 w-3" />}
         </Button>
-        <Input
+        <Textarea
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={(e) => {
@@ -504,7 +505,8 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
           }}
           placeholder={t(isCompanion ? "chat.placeholderCompanion" : isNews ? "chat.placeholderNews" : isPharmacist ? "chat.placeholderPharmacist" : isTest ? "chat.placeholderTest" : "chat.placeholder")}
           disabled={isPending}
-          className="flex-1 text-sm"
+          rows={3}
+          className="flex-1 text-sm resize-none overflow-y-auto"
         />
         <Button size="sm" onClick={handleSend} disabled={isPending || !inputValue.trim()}>
           {isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
