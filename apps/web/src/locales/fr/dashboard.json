@@ -23,6 +23,8 @@
   "companionDesc": "Discuter bien-être, sommeil, stress et style de vie",
   "pharmacist": "Agent IA Pharmacien",
   "pharmacistDesc": "Interactions médicamenteuses, posologie et gestion des médicaments",
+  "news": "Agent IA Actualités",
+  "newsDesc": "Obtenez les dernières nouvelles des États-Unis et du Canada",
   "medications": "Médicaments",
   "medicationsDesc": "Suivez vos prescriptions et gérez vos médicaments",
   "allergies": "Allergies et conditions",
@@ -39,6 +41,8 @@
   "noApprovals": "Aucune inscription en attente",
   "approvedSuccess": "Utilisateur approuvé avec succès",
   "refusedSuccess": "Inscription refusée",
+  "testAi": "Test Agent IA",
+  "testAiDesc": "Tester le LLM directement sans prompt système (admin uniquement)",
   "installApp": "Installer SanoTalk",
   "installAppDescription": "Ajoutez à votre écran d'accueil pour un accès rapide, même hors ligne",
   "installButton": "Installer"

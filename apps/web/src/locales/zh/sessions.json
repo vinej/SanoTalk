@@ -148,6 +148,9 @@
     "titlePharmacist": "药剂师 AI 助手",
     "emptyPharmacist": "询问我关于药物、药物相互作用或剂量指导。",
     "placeholderPharmacist": "询问您的药物…",
+    "titleTest": "测试 AI 代理",
+    "emptyTest": "发送消息以直接测试 LLM。",
+    "placeholderTest": "输入消息…",
     "urgency": {
       "emergency": "拨打 911 — 紧急情况",
       "emergencyDesc": "您的症状可能危及生命。请立即拨打 911 或前往最近的急诊室。",

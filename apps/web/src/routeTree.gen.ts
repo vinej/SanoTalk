@@ -18,6 +18,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
 import { Route as AuthVitalsRouteImport } from './routes/_auth/vitals'
+import { Route as AuthTestAiRouteImport } from './routes/_auth/test-ai'
 import { Route as AuthSymptomsRouteImport } from './routes/_auth/symptoms'
 import { Route as AuthProfileRouteImport } from './routes/_auth/profile'
 import { Route as AuthPharmacistRouteImport } from './routes/_auth/pharmacist'
@@ -77,6 +78,11 @@ const AuthIndexRoute = AuthIndexRouteImport.update({
 const AuthVitalsRoute = AuthVitalsRouteImport.update({
   id: '/vitals',
   path: '/vitals',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthTestAiRoute = AuthTestAiRouteImport.update({
+  id: '/test-ai',
+  path: '/test-ai',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthSymptomsRoute = AuthSymptomsRouteImport.update({
@@ -181,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/pharmacist': typeof AuthPharmacistRoute
   '/profile': typeof AuthProfileRoute
   '/symptoms': typeof AuthSymptomsRoute
+  '/test-ai': typeof AuthTestAiRoute
   '/vitals': typeof AuthVitalsRoute
   '/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
   '/sessions/new': typeof AuthSessionsNewRoute
@@ -206,6 +213,7 @@ export interface FileRoutesByTo {
   '/pharmacist': typeof AuthPharmacistRoute
   '/profile': typeof AuthProfileRoute
   '/symptoms': typeof AuthSymptomsRoute
+  '/test-ai': typeof AuthTestAiRoute
   '/vitals': typeof AuthVitalsRoute
   '/': typeof AuthIndexRoute
   '/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
@@ -234,6 +242,7 @@ export interface FileRoutesById {
   '/_auth/pharmacist': typeof AuthPharmacistRoute
   '/_auth/profile': typeof AuthProfileRoute
   '/_auth/symptoms': typeof AuthSymptomsRoute
+  '/_auth/test-ai': typeof AuthTestAiRoute
   '/_auth/vitals': typeof AuthVitalsRoute
   '/_auth/': typeof AuthIndexRoute
   '/_auth/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
@@ -263,6 +272,7 @@ export interface FileRouteTypes {
     | '/pharmacist'
     | '/profile'
     | '/symptoms'
+    | '/test-ai'
     | '/vitals'
     | '/sessions/$sessionId'
     | '/sessions/new'
@@ -288,6 +298,7 @@ export interface FileRouteTypes {
     | '/pharmacist'
     | '/profile'
     | '/symptoms'
+    | '/test-ai'
     | '/vitals'
     | '/'
     | '/sessions/$sessionId'
@@ -315,6 +326,7 @@ export interface FileRouteTypes {
     | '/_auth/pharmacist'
     | '/_auth/profile'
     | '/_auth/symptoms'
+    | '/_auth/test-ai'
     | '/_auth/vitals'
     | '/_auth/'
     | '/_auth/sessions/$sessionId'
@@ -395,6 +407,13 @@ declare module '@tanstack/react-router' {
       path: '/vitals'
       fullPath: '/vitals'
       preLoaderRoute: typeof AuthVitalsRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/test-ai': {
+      id: '/_auth/test-ai'
+      path: '/test-ai'
+      fullPath: '/test-ai'
+      preLoaderRoute: typeof AuthTestAiRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/symptoms': {
@@ -526,6 +545,7 @@ interface AuthRouteChildren {
   AuthPharmacistRoute: typeof AuthPharmacistRoute
   AuthProfileRoute: typeof AuthProfileRoute
   AuthSymptomsRoute: typeof AuthSymptomsRoute
+  AuthTestAiRoute: typeof AuthTestAiRoute
   AuthVitalsRoute: typeof AuthVitalsRoute
   AuthIndexRoute: typeof AuthIndexRoute
   AuthSessionsSessionIdRoute: typeof AuthSessionsSessionIdRoute
@@ -547,6 +567,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthPharmacistRoute: AuthPharmacistRoute,
   AuthProfileRoute: AuthProfileRoute,
   AuthSymptomsRoute: AuthSymptomsRoute,
+  AuthTestAiRoute: AuthTestAiRoute,
   AuthVitalsRoute: AuthVitalsRoute,
   AuthIndexRoute: AuthIndexRoute,
   AuthSessionsSessionIdRoute: AuthSessionsSessionIdRoute,

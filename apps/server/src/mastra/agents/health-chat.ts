@@ -1,9 +1,8 @@
 import { Agent } from "@mastra/core/agent";
-import { createAnthropic } from "@ai-sdk/anthropic";
 import { largeModel } from "../model.js";
+import { createWebSearchTools } from "../web-search.js";
 
-const _anthropic = createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
-const webSearchTool = _anthropic.tools.webSearch_20250305({ maxUses: 5 });
+const searchTools = createWebSearchTools();
 
 export const healthChatAgent = new Agent({
   id: "healthChatAgent",
@@ -162,5 +161,5 @@ End every response with:
 > ⚠️ This is AI-generated health information and does not replace the advice of the clinician in this session.
 `,
   model: largeModel,
-  tools: { webSearch: webSearchTool as any },
+  tools: searchTools,
 });

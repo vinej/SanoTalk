@@ -148,6 +148,9 @@
     "titlePharmacist": "Pharmacist AI Agent",
     "emptyPharmacist": "Ask me about medications, drug interactions, or dosage guidance.",
     "placeholderPharmacist": "Ask about your medications…",
+    "titleTest": "Test AI Agent",
+    "emptyTest": "Send a message to test the LLM directly.",
+    "placeholderTest": "Type a message…",
     "urgency": {
       "emergency": "Call 911 — Emergency",
       "emergencyDesc": "Your symptoms may be life-threatening. Call 911 immediately or go to the nearest emergency room.",

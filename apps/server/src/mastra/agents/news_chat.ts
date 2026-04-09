@@ -1,9 +1,8 @@
 import { Agent } from "@mastra/core/agent";
-import { createAnthropic } from "@ai-sdk/anthropic";
 import { largeModel } from "../model.js";
+import { createWebSearchTools } from "../web-search.js";
 
-const _anthropic = createAnthropic({ apiKey: process.env.ANTHROPIC_API_KEY! });
-const webSearchTool = _anthropic.tools.webSearch_20250305({ maxUses: 5 });
+const searchTools = createWebSearchTools();
 
 export const newsChatAgent = new Agent({
   id: "newsChatAgent",
@@ -132,5 +131,5 @@ End deep dives with forward-looking context:
 `
   ,
    model: largeModel,
-  tools: { webSearch: webSearchTool as any },
+  tools: searchTools,
 });

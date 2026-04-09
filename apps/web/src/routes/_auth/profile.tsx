@@ -217,7 +217,7 @@ function ProfilePage() {
 
   function handleAddProperty() {
     if (!propKey.trim() || !propValue.trim()) return;
-    setPropertyMutation.mutate({ key: propKey.trim(), value: propValue.trim(), language: propertiesLanguage });
+    setPropertyMutation.mutate({ key: propKey.trim(), value: propValue.trim(), language: propertiesLanguage as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
   }
 
   useEffect(() => {

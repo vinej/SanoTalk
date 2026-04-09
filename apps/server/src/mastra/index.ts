@@ -5,6 +5,7 @@ import { healthChatAgent } from "./agents/health-chat.js";
 import { companionChatAgent } from "./agents/companion-chat.js";
 import { newsChatAgent } from "./agents/news_chat.js";
 import { pharmacistChatAgent } from "./agents/pharmacist-chat.js";
+import { testChatAgent } from "./agents/test-chat.js";
 import { db, agentRun, transcriptSummary, transcript, chatMessage, talkSession, userLink, user, task } from "@sanotalk/db";
 import { escapeHtml, sanitizeSubject } from "@sanotalk/trpc/lib/escape-html";
 import { eq, asc, and } from "drizzle-orm";
@@ -136,7 +137,7 @@ async function autoSendSummaryToLinkedProfessional(params: {
 }
 
 export const mastra = new Mastra({
-  agents: { summaryAgent, healthSummaryAgent, companionSummaryAgent, pharmacistSummaryAgent, soapNoteAgent, healthChatAgent, companionChatAgent, newsChatAgent, pharmacistChatAgent },
+  agents: { summaryAgent, healthSummaryAgent, companionSummaryAgent, pharmacistSummaryAgent, soapNoteAgent, healthChatAgent, companionChatAgent, newsChatAgent, pharmacistChatAgent, testChatAgent },
   logger: new PinoLogger({ name: 'Mastra', level: 'info' }),
 });
 
@@ -397,5 +398,22 @@ export async function callPharmacistChat(
     { role: "user" as const, content: userMessage },
   ];
   const result = await pharmacistChatAgent.generate(messages as any);
+  return result.text.slice(0, MAX_CHAT_RESPONSE_LENGTH);
+}
+
+export async function callTestChat(
+  history: Array<{ role: "user" | "assistant"; content: string }>,
+  userMessage: string,
+  language = "en",
+): Promise<string> {
+  const languageInstruction = { role: "user" as const, content: `Respond in language code "${language}". All your replies must be in that language.` };
+  const languageAck = { role: "assistant" as const, content: "Understood. I will respond in the requested language." };
+  const messages = [
+    languageInstruction,
+    languageAck,
+    ...trimHistory(history),
+    { role: "user" as const, content: userMessage },
+  ];
+  const result = await testChatAgent.generate(messages as any);
   return result.text.slice(0, MAX_CHAT_RESPONSE_LENGTH);
 }

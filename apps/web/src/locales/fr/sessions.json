@@ -148,6 +148,9 @@
     "titlePharmacist": "Agent IA Pharmacien",
     "emptyPharmacist": "Posez-moi des questions sur vos médicaments, interactions ou posologie.",
     "placeholderPharmacist": "Posez une question sur vos médicaments…",
+    "titleTest": "Test Agent IA",
+    "emptyTest": "Envoyez un message pour tester le LLM directement.",
+    "placeholderTest": "Tapez un message…",
     "urgency": {
       "emergency": "Appelez le 911 — Urgence",
       "emergencyDesc": "Vos symptômes peuvent mettre votre vie en danger. Appelez le 911 immédiatement ou rendez-vous aux urgences les plus proches.",

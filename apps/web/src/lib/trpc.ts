@@ -1,9 +1,9 @@
-import { createTRPCReact } from "@trpc/react-query";
+import { createTRPCReact, type CreateTRPCReact } from "@trpc/react-query";
 import { httpBatchLink, loggerLink } from "@trpc/client";
 import type { AppRouterSonoTalk } from "@sanotalk/trpc";
 import superjson from "superjson"
 
-export const trpc = createTRPCReact<AppRouterSonoTalk>();
+export const trpc: CreateTRPCReact<AppRouterSonoTalk, unknown> = createTRPCReact<AppRouterSonoTalk>();
 
 export const trpcClient = trpc.createClient({
   links: [

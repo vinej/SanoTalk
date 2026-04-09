@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "../../components/ui/button";
-import { Kanban, Bot, Heart, Hospital, Download, Activity, Video, Pill, ClipboardList, UserCircle, ShieldAlert, FlaskConical, ShieldCheck } from "lucide-react";
+import { Kanban, Bot, Heart, Hospital, Download, Activity, Video, Pill, ClipboardList, UserCircle, ShieldAlert, FlaskConical, ShieldCheck, FlaskRound, Newspaper } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { usePwaInstall } from "../../hooks/use-pwa-install";
 import { trpc } from "../../lib/trpc";
@@ -17,6 +17,7 @@ const FEATURES = [
   { to: "/ai-assistant", icon: Bot, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-950/30", border: "border-blue-200 dark:border-blue-800", key: "aiAssistant" },
   { to: "/companion", icon: Heart, color: "text-violet-600", bg: "bg-violet-50 dark:bg-violet-950/30", border: "border-violet-200 dark:border-violet-800", key: "companion" },
   { to: "/pharmacist", icon: FlaskConical, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-950/30", border: "border-emerald-200 dark:border-emerald-800", key: "pharmacist" },
+  { to: "/news", icon: Newspaper, color: "text-orange-600", bg: "bg-orange-50 dark:bg-orange-950/30", border: "border-orange-200 dark:border-orange-800", key: "news" },
   { to: "/vitals", icon: Activity, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-950/30", border: "border-emerald-200 dark:border-emerald-800", key: "vitals" },
   { to: "/medications", icon: Pill, color: "text-rose-600", bg: "bg-rose-50 dark:bg-rose-950/30", border: "border-rose-200 dark:border-rose-800", key: "medications" },
   { to: "/symptoms", icon: ClipboardList, color: "text-amber-600", bg: "bg-amber-50 dark:bg-amber-950/30", border: "border-amber-200 dark:border-amber-800", key: "symptoms" },
@@ -52,17 +53,30 @@ function DashboardPage() {
       )}
 
       {profile?.role === "admin" && (
-        <Link to="/admin-approvals" className="group">
-          <div className="flex items-center gap-4 rounded-xl border-2 border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 p-5 transition-shadow hover:shadow-md">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-gray-900 shadow-sm">
-              <ShieldCheck className="h-6 w-6 text-amber-600" />
+        <>
+          <Link to="/admin-approvals" className="group">
+            <div className="flex items-center gap-4 rounded-xl border-2 border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 p-5 transition-shadow hover:shadow-md">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-gray-900 shadow-sm">
+                <ShieldCheck className="h-6 w-6 text-amber-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="font-semibold group-hover:underline">{t(`dashboard:adminApprovals`)}</p>
+                <p className="text-sm text-muted-foreground">{t(`dashboard:adminApprovalsDesc`)}</p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="font-semibold group-hover:underline">{t(`dashboard:adminApprovals`)}</p>
-              <p className="text-sm text-muted-foreground">{t(`dashboard:adminApprovalsDesc`)}</p>
+          </Link>
+          <Link to="/test-ai" className="group">
+            <div className="flex items-center gap-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-950/30 p-5 transition-shadow hover:shadow-md">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-gray-900 shadow-sm">
+                <FlaskRound className="h-6 w-6 text-gray-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="font-semibold group-hover:underline">{t(`dashboard:testAi`)}</p>
+                <p className="text-sm text-muted-foreground">{t(`dashboard:testAiDesc`)}</p>
+              </div>
             </div>
-          </div>
-        </Link>
+          </Link>
+        </>
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

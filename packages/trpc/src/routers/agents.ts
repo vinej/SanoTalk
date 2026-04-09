@@ -5,6 +5,7 @@ import { resend } from "../lib/resend";
 import { escapeHtml, sanitizeSubject } from "../lib/escape-html";
 import { eq, asc, desc, isNull, and, gte, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
+import { verifyAdminFromDb } from "../lib/verify-admin";
 
 type DB = Parameters<Parameters<typeof protectedProcedure.query>[0]>[0]["ctx"]["db"];
 
@@ -532,6 +533,58 @@ export const agentsRouter = createTRPCRouter({
       return { cleared: true };
     }),
 
+  // ── Test AI Agent (admin only, no patient context) ──────────────────────────
+
+  testChatHistory: protectedProcedure
+    .query(async ({ ctx }) => {
+      const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+      if (!isAdmin) throw new TRPCError({ code: "FORBIDDEN" });
+      return ctx.db.query.chatMessage.findMany({
+        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "test")),
+        orderBy: [asc(chatMessage.createdAt)],
+        limit: 500,
+      });
+    }),
+
+  sendTestChatMessage: protectedProcedure
+    .input(z.object({
+      message: z.string().min(1).max(2000),
+      language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+      if (!isAdmin) throw new TRPCError({ code: "FORBIDDEN" });
+
+      const pastMessages = await ctx.db.query.chatMessage.findMany({
+        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "test")),
+        orderBy: [asc(chatMessage.createdAt)],
+        limit: 20,
+      });
+
+      const _allowedRoles = new Set(["user", "assistant"]);
+      const history: Array<{ role: "user" | "assistant"; content: string }> = pastMessages
+        .filter((msg) => _allowedRoles.has(msg.role))
+        .map((msg) => ({ role: msg.role as "user" | "assistant", content: msg.content }));
+
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "test", role: "user", content: input.message });
+
+      const assistantText = await ctx.callTestChat(history, input.message, input.language ?? "en");
+
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "test", role: "assistant", content: assistantText });
+
+      return { message: assistantText };
+    }),
+
+  clearTestChat: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+      if (!isAdmin) throw new TRPCError({ code: "FORBIDDEN" });
+      await ctx.db.delete(chatMessage).where(
+        and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "test"))
+      );
+      return { cleared: true };
+    }),
+
   sendSummary: protectedProcedure
     .input(z.object({
       sessionId: z.string().uuid(),
@@ -635,7 +688,7 @@ export const agentsRouter = createTRPCRouter({
     }),
 
   listSavedConversations: protectedProcedure
-    .input(z.object({ chatType: z.enum(["health", "companion", "news", "pharmacist"]) }))
+    .input(z.object({ chatType: z.enum(["health", "companion", "news", "pharmacist", "test"]) }))
     .query(async ({ ctx, input }) => {
       return ctx.db
         .select({
@@ -657,7 +710,7 @@ export const agentsRouter = createTRPCRouter({
 
   saveConversation: protectedProcedure
     .input(z.object({
-      chatType: z.enum(["health", "companion", "news", "pharmacist"]),
+      chatType: z.enum(["health", "companion", "news", "pharmacist", "test"]),
       title: z.string().min(1).max(120),
     }))
     .mutation(async ({ ctx, input }) => {
@@ -723,7 +776,7 @@ export const agentsRouter = createTRPCRouter({
         ),
       });
       if (!saved) throw new TRPCError({ code: "NOT_FOUND", message: "Saved conversation not found" });
-      const chatType = z.enum(["health", "companion", "news", "pharmacist"]).parse(saved.chatType);
+      const chatType = z.enum(["health", "companion", "news", "pharmacist", "test"]).parse(saved.chatType);
       const savedMsgSchema = z.array(z.object({
         role: z.enum(["user", "assistant"]),
         content: z.string().max(10000),
