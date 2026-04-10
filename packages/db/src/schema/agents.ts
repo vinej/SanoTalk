@@ -1,5 +1,5 @@
 import { text, timestamp, uuid, jsonb } from "drizzle-orm/pg-core";
-import { createTable } from "./auth";
+import { createTable, user } from "./auth";
 import { talkSession } from "./sessions";
 
 // Mastra agent execution logs
@@ -8,6 +8,7 @@ export const agentRun = createTable("agent_run", {
   sessionId: uuid("session_id").references(() => talkSession.id, {
     onDelete: "set null",
   }),
+  userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
   agentName: text("agent_name").notNull(),
   input: jsonb("input"),
   output: jsonb("output"),

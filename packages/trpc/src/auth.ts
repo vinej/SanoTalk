@@ -4,6 +4,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db, user, session, account, verification, twoFactor as twoFactorTable } from "@sanotalk/db";
 import { resend } from "./lib/resend";
 import { escapeHtml } from "./lib/escape-html";
+import { encrypt, decrypt } from "./lib/crypto";
 
 // Structured JSON log helper — writes to stdout/stderr in a format compatible
 // with pino so log aggregators (Loki, etc.) parse it consistently.
@@ -24,18 +25,55 @@ const _baseAdapter = drizzleAdapter(db, {
   schema: { user, session, account, verification, twoFactor: twoFactorTable },
 });
 
+// Fields that must be encrypted at rest in the Better Auth adapter layer
+const ENCRYPTED_ADAPTER_FIELDS: Record<string, string[]> = {
+  twoFactor: ["secret", "backupCodes"],
+  account: ["accessToken", "refreshToken", "idToken"],
+};
+
+function encryptAdapterFields(model: string, data: Record<string, any>): Record<string, any> {
+  const fields = ENCRYPTED_ADAPTER_FIELDS[model];
+  if (!fields) return data;
+  const copy = { ...data };
+  for (const field of fields) {
+    if (copy[field] && typeof copy[field] === "string" && !copy[field].startsWith("enc:v1:")) {
+      copy[field] = encrypt(copy[field]);
+    }
+  }
+  return copy;
+}
+
+function decryptAdapterFields(model: string, row: any): any {
+  if (!row) return row;
+  const fields = ENCRYPTED_ADAPTER_FIELDS[model];
+  if (!fields) return row;
+  const copy = { ...row };
+  for (const field of fields) {
+    if (copy[field] && typeof copy[field] === "string" && copy[field].startsWith("enc:v1:")) {
+      try {
+        copy[field] = decrypt(copy[field]);
+      } catch {
+        // If decryption fails, return as-is (could be pre-migration plaintext)
+      }
+    }
+  }
+  return copy;
+}
+
 function withCustomAdapter(adapterFactory: typeof _baseAdapter): typeof _baseAdapter {
   return (betterAuthOptions: any) => {
     const adapter = adapterFactory(betterAuthOptions);
     const origCreate  = adapter.create.bind(adapter);
     const origFindOne = adapter.findOne.bind(adapter);
     const origFindMany = adapter.findMany.bind(adapter);
+    const origUpdate = (adapter as any).update?.bind(adapter);
 
     return {
       ...adapter,
 
       // Force twoFactorEnabled=true for every new user so MFA is active from
       // the first sign-in — no manual setup step required.
+      // Encrypt sensitive fields in twoFactor and account models at rest.
       create: async (params: any) => {
         if (params.model === "user") {
           // Always force patient role and 2FA on sign-up — role escalation
@@ -46,17 +84,28 @@ function withCustomAdapter(adapterFactory: typeof _baseAdapter): typeof _baseAda
         if (params.model === "account") {
           authLog.info(`account row for provider: ${params.data?.providerId}`);
         }
-        return origCreate(params);
+        // Encrypt sensitive fields before writing to DB
+        if (ENCRYPTED_ADAPTER_FIELDS[params.model]) {
+          params = { ...params, data: encryptAdapterFields(params.model, params.data) };
+        }
+        const result = await origCreate(params);
+        return decryptAdapterFields(params.model, result);
       },
 
+      // Encrypt on update for twoFactor and account models
+      update: origUpdate ? async (params: any) => {
+        if (ENCRYPTED_ADAPTER_FIELDS[params.model] && params.update) {
+          params = { ...params, update: encryptAdapterFields(params.model, params.update) };
+        }
+        const result = await origUpdate(params);
+        return decryptAdapterFields(params.model, result);
+      } : undefined,
+
       // Manually resolve joins so Better Auth can find related records.
-      // Two relationship directions exist:
-      //   many-to-one: parent holds the FK  e.g. session.userId → user.id
-      //                → query joined model WHERE id = parent[joinModelId]
-      //   one-to-many: child holds the FK   e.g. account.userId → user.id
-      //                → query joined model WHERE userId = parent.id
+      // Decrypt sensitive fields after reading from DB.
       findOne: async (params: any) => {
-        const result = await origFindOne(params);
+        let result = await origFindOne(params);
+        result = decryptAdapterFields(params.model, result);
         if (!result || !params.join || Object.keys(params.join).length === 0) return result;
         const r = result as Record<string, unknown>;
         for (const joinModel of Object.keys(params.join)) {
@@ -74,10 +123,16 @@ function withCustomAdapter(adapterFactory: typeof _baseAdapter): typeof _baseAda
               model: joinModel,
               where: [{ field: "userId", value: r.id as string }],
             });
-            r[joinModel] = related ?? [];
+            r[joinModel] = (related ?? []).map((item: any) => decryptAdapterFields(joinModel, item));
           }
         }
         return result;
+      },
+
+      findMany: async (params: any) => {
+        const results = await origFindMany(params);
+        if (!Array.isArray(results) || !ENCRYPTED_ADAPTER_FIELDS[params.model]) return results;
+        return results.map((row: any) => decryptAdapterFields(params.model, row));
       },
     } as any;
   };
@@ -131,6 +186,7 @@ export const auth = betterAuth({
   emailVerification: {
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
+    expiresIn: 3600, // 1 hour — limits window for token leakage via email/browser history
     callbackURL: process.env.APP_URL ?? "http://localhost:5173",
     sendVerificationEmail: async ({ user, token }) => {
       const appUrl = process.env.APP_URL ?? "http://localhost:5173";
@@ -177,7 +233,7 @@ export const auth = betterAuth({
     process.env.APP_URL!,
     // Trust both www and non-www variants of the app URL
     ...(process.env.APP_URL ? [process.env.APP_URL.replace("://", "://www.")] : []),
-    ...(!isProduction && process.env.NGROK_URL ? [process.env.NGROK_URL] : []),
+    ...(!isProduction && process.env.NGROK_URL && /^https:\/\/[a-z0-9-]+\.ngrok(-free)?\.app$/.test(process.env.NGROK_URL) ? [process.env.NGROK_URL] : []),
     ...(!isProduction ? ["http://localhost:5173", "http://localhost:3001"] : []),
   ],
 });

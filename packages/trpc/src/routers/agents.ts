@@ -258,11 +258,12 @@ export const agentsRouter = createTRPCRouter({
       if (!sessionId) throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       await assertSessionAccess(ctx.db, sessionId, ctx.user.id);
       // Return only status fields — the full output (SOAP notes etc.) is accessed via transcripts.summaryBySession
+      // Sanitize error messages to avoid leaking internal details (stack traces, API keys)
       return {
         id: run.id,
         status: run.status,
         agentName: run.agentName,
-        errorMessage: run.errorMessage,
+        errorMessage: run.errorMessage ? "Processing failed" : null,
         startedAt: run.startedAt,
         completedAt: run.completedAt,
       };
@@ -761,6 +762,10 @@ export const agentsRouter = createTRPCRouter({
   listSavedConversations: protectedProcedure
     .input(z.object({ chatType: z.enum(["health", "companion", "news", "pharmacist", "drugInfo", "test"]) }))
     .query(async ({ ctx, input }) => {
+      if (input.chatType === "test") {
+        const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+        if (!isAdmin) throw new TRPCError({ code: "FORBIDDEN" });
+      }
       return ctx.db
         .select({
           id: savedConversation.id,
@@ -785,6 +790,10 @@ export const agentsRouter = createTRPCRouter({
       title: z.string().min(1).max(120),
     }))
     .mutation(async ({ ctx, input }) => {
+      if (input.chatType === "test") {
+        const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+        if (!isAdmin) throw new TRPCError({ code: "FORBIDDEN" });
+      }
       const liveMessages = await ctx.db.query.chatMessage.findMany({
         where: and(
           isNull(chatMessage.sessionId),

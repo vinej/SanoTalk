@@ -16,7 +16,7 @@ export const trpcClient = trpc.createClient({
       url: `${typeof window !== "undefined" ? window.location.origin : import.meta.env.VITE_API_URL}/api/trpc`,
       transformer : superjson,
       headers() {
-        return {};
+        return { "x-trpc-source": "sanotalk-web" };
       },
       fetch(url, options) {
         return fetch(url, { ...options as any, credentials: "include" });

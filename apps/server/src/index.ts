@@ -29,6 +29,9 @@ const missingEnv = REQUIRED_ENV.filter((k) => !process.env[k]);
 if (missingEnv.length > 0) {
   throw new Error(`Missing required environment variables: ${missingEnv.join(", ")}`);
 }
+if (process.env.NODE_ENV === "production" && process.env.MINIO_ACCESS_KEY === "minioadmin") {
+  throw new Error("Default MinIO credentials detected in production — change MINIO_ACCESS_KEY and MINIO_SECRET_KEY");
+}
 
 const app = express();
 // Trust only the first proxy hop (Cloudflare/nginx on the same host).
@@ -67,11 +70,22 @@ app.use(helmet({
 }));
 
 // ─── CORS ─────────────────────────────────────────────────────────────────
+// Only trust NGROK_URL if it matches a real ngrok domain pattern
+function isValidNgrokUrl(url: string | undefined): url is string {
+  if (!url) return false;
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === "https:" && /^[a-z0-9-]+\.ngrok(-free)?\.app$/.test(parsed.hostname);
+  } catch {
+    return false;
+  }
+}
+
 const allowedOrigins = [
   process.env.APP_URL,
   // Trust both www and non-www variants
   ...(process.env.APP_URL ? [process.env.APP_URL.replace("://", "://www.")] : []),
-  ...(process.env.NODE_ENV !== "production" ? [process.env.NGROK_URL] : []),
+  ...(process.env.NODE_ENV !== "production" && isValidNgrokUrl(process.env.NGROK_URL) ? [process.env.NGROK_URL] : []),
 ].filter((o): o is string => typeof o === "string" && o.startsWith("http"));
 
 app.use(
@@ -141,6 +155,14 @@ app.use("/api/trpc", (req, res, next) => {
   }
   next();
 });
+// Rate-limit public consent endpoint to prevent table pollution (no auth required)
+app.use("/api/trpc/privacy.recordConsent", rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: "Too many requests, please try again later." },
+}));
 // Medical limiters first — these specific routes get the stricter limit only
 app.use("/api/trpc/agents.generateSummary", medicalLimiter);
 app.use("/api/trpc/agents.sendSummary", medicalLimiter);
@@ -157,6 +179,14 @@ app.use("/api/trpc/medications.shareWithProfessional", medicalLimiter);
 app.use("/api/trpc/symptoms.shareWithProfessional", medicalLimiter);
 // General API limiter for all other tRPC routes
 app.use("/api/trpc", apiLimiter);
+// CSRF protection: require custom header on all tRPC requests (triggers CORS preflight on cross-origin)
+app.use("/api/trpc", (req, res, next) => {
+  if (req.method !== "OPTIONS" && req.headers["x-trpc-source"] !== "sanotalk-web") {
+    res.status(403).json({ error: "Missing required header" });
+    return;
+  }
+  next();
+});
 // Prevent caching of API responses (tRPC may return decrypted PHI)
 app.use("/api/trpc", (_req, res, next) => {
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
@@ -176,8 +206,9 @@ app.use(
 // ─── Avatar proxy ─────────────────────────────────────────────────────────
 // Serves user avatars so the browser never needs direct access to MinIO.
 import { snapshotErData } from "@sanotalk/trpc/lib/er-snapshot";
-import { db, user as userTable, chatMessage, transcript, agentRun } from "@sanotalk/db";
-import { eq, lte, and, sql } from "drizzle-orm";
+import { db, user as userTable, chatMessage, transcript, agentRun, dataRetentionPolicy, recording, talkSession } from "@sanotalk/db";
+import { eq, lte, and, sql, inArray } from "drizzle-orm";
+import { deleteMinioObjects } from "@sanotalk/trpc/lib/minio-cleanup";
 import * as Minio from "minio";
 
 let _avatarMinio: Minio.Client | null = null;
@@ -264,22 +295,42 @@ if (!process.env.NODE_ENV) {
 }
 
 // ─── Data Retention & Purge Jobs (Law 25) ────────────────────────────────
+// Default retention days (used when no row exists in the policy table)
+const DEFAULT_RETENTION: Record<string, number> = {
+  chat_message: 365,
+  transcript: 730,
+  agent_run: 90,
+};
+
+async function getRetentionDays(dataType: string): Promise<number> {
+  try {
+    const [row] = await db
+      .select({ retentionDays: dataRetentionPolicy.retentionDays })
+      .from(dataRetentionPolicy)
+      .where(eq(dataRetentionPolicy.dataType, dataType));
+    return row?.retentionDays ?? DEFAULT_RETENTION[dataType] ?? 365;
+  } catch {
+    return DEFAULT_RETENTION[dataType] ?? 365;
+  }
+}
+
 async function purgeExpiredData() {
   try {
     const now = new Date();
-    // Chat messages: 1 year
-    const chatCutoff = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+
+    const chatDays = await getRetentionDays("chat_message");
+    const chatCutoff = new Date(now.getTime() - chatDays * 24 * 60 * 60 * 1000);
     await db.delete(chatMessage).where(lte(chatMessage.createdAt, chatCutoff));
 
-    // Transcripts: 2 years
-    const transcriptCutoff = new Date(now.getTime() - 730 * 24 * 60 * 60 * 1000);
+    const transcriptDays = await getRetentionDays("transcript");
+    const transcriptCutoff = new Date(now.getTime() - transcriptDays * 24 * 60 * 60 * 1000);
     await db.delete(transcript).where(lte(transcript.createdAt, transcriptCutoff));
 
-    // Agent runs: 90 days
-    const agentCutoff = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+    const agentDays = await getRetentionDays("agent_run");
+    const agentCutoff = new Date(now.getTime() - agentDays * 24 * 60 * 60 * 1000);
     await db.delete(agentRun).where(lte(agentRun.startedAt, agentCutoff));
 
-    logger.info("Data retention purge completed");
+    logger.info({ chatDays, transcriptDays, agentDays }, "Data retention purge completed");
   } catch (err) {
     logger.error({ err }, "Data retention purge failed");
   }
@@ -294,6 +345,19 @@ async function purgeDeletedAccounts() {
       .where(lte((userTable as any).deletionScheduledFor, now));
 
     for (const u of users) {
+      // Collect MinIO recording objects before cascade delete removes the rows
+      const sessions = await db
+        .select({ id: talkSession.id })
+        .from(talkSession)
+        .where(eq(talkSession.hostId, u.id));
+      if (sessions.length > 0) {
+        const recs = await db
+          .select({ storageKey: recording.storageKey, storageBucket: recording.storageBucket })
+          .from(recording)
+          .where(inArray(recording.sessionId, sessions.map((s) => s.id)));
+        if (recs.length > 0) void deleteMinioObjects(recs);
+      }
+
       await db.delete(userTable).where(eq(userTable.id, u.id));
       logger.info({ userId: u.id }, "Account permanently deleted (Law 25)");
     }

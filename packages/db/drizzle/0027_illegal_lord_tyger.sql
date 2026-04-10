@@ -1,0 +1,15 @@
+ALTER TYPE "public"."sanotalk_consent_type" ADD VALUE 'ai_data_sharing';--> statement-breakpoint
+ALTER TABLE "sanotalk_agent_run" ADD COLUMN "user_id" text;--> statement-breakpoint
+ALTER TABLE "sanotalk_audit_log" ADD COLUMN "user_agent" text;--> statement-breakpoint
+ALTER TABLE "sanotalk_audit_log" ADD COLUMN "session_id" text;--> statement-breakpoint
+ALTER TABLE "sanotalk_agent_run" ADD CONSTRAINT "sanotalk_agent_run_user_id_sanotalk_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."sanotalk_user"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
+ALTER TABLE "sanotalk_chat_message" ADD CONSTRAINT "chat_message_owner_required" CHECK ("sanotalk_chat_message"."user_id" IS NOT NULL OR "sanotalk_chat_message"."session_id" IS NOT NULL);--> statement-breakpoint
+ALTER TABLE "sanotalk_vital_sign" ADD CONSTRAINT "vital_sign_value_primary_range" CHECK ("sanotalk_vital_sign"."value_primary" >= 0 AND "sanotalk_vital_sign"."value_primary" <= 1000);--> statement-breakpoint
+ALTER TABLE "sanotalk_vital_sign" ADD CONSTRAINT "vital_sign_value_secondary_range" CHECK ("sanotalk_vital_sign"."value_secondary" IS NULL OR ("sanotalk_vital_sign"."value_secondary" >= 0 AND "sanotalk_vital_sign"."value_secondary" <= 500));--> statement-breakpoint
+ALTER TABLE "sanotalk_symptom_log" ADD CONSTRAINT "symptom_log_pain_range" CHECK ("sanotalk_symptom_log"."pain_level" IS NULL OR ("sanotalk_symptom_log"."pain_level" >= 0 AND "sanotalk_symptom_log"."pain_level" <= 10));--> statement-breakpoint
+ALTER TABLE "sanotalk_symptom_log" ADD CONSTRAINT "symptom_log_mood_range" CHECK ("sanotalk_symptom_log"."mood" IS NULL OR ("sanotalk_symptom_log"."mood" >= 0 AND "sanotalk_symptom_log"."mood" <= 10));--> statement-breakpoint
+ALTER TABLE "sanotalk_symptom_log" ADD CONSTRAINT "symptom_log_energy_range" CHECK ("sanotalk_symptom_log"."energy" IS NULL OR ("sanotalk_symptom_log"."energy" >= 0 AND "sanotalk_symptom_log"."energy" <= 10));--> statement-breakpoint
+ALTER TABLE "sanotalk_symptom_log" ADD CONSTRAINT "symptom_log_sleep_quality_range" CHECK ("sanotalk_symptom_log"."sleep_quality" IS NULL OR ("sanotalk_symptom_log"."sleep_quality" >= 0 AND "sanotalk_symptom_log"."sleep_quality" <= 10));--> statement-breakpoint
+ALTER TABLE "sanotalk_symptom_log" ADD CONSTRAINT "symptom_log_sleep_hours_range" CHECK ("sanotalk_symptom_log"."sleep_hours" IS NULL OR ("sanotalk_symptom_log"."sleep_hours" >= 0 AND "sanotalk_symptom_log"."sleep_hours" <= 24));--> statement-breakpoint
+ALTER TABLE "sanotalk_symptom_log" ADD CONSTRAINT "symptom_log_stress_range" CHECK ("sanotalk_symptom_log"."stress" IS NULL OR ("sanotalk_symptom_log"."stress" >= 0 AND "sanotalk_symptom_log"."stress" <= 10));--> statement-breakpoint
+ALTER TABLE "sanotalk_symptom_log" ADD CONSTRAINT "symptom_log_appetite_range" CHECK ("sanotalk_symptom_log"."appetite" IS NULL OR ("sanotalk_symptom_log"."appetite" >= 0 AND "sanotalk_symptom_log"."appetite" <= 10));

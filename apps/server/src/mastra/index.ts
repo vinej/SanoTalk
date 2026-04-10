@@ -10,6 +10,7 @@ import { drugInfoChatAgent } from "./agents/drug-info-chat.js";
 import { runTestChatDocsMode, testDocsModeEnabled } from "./test-docs.js";
 import { db, agentRun, transcriptSummary, transcript, chatMessage, talkSession, userLink, user, task } from "@sanotalk/db";
 import { escapeHtml, sanitizeSubject } from "@sanotalk/trpc/lib/escape-html";
+import { encryptContent } from "@sanotalk/trpc/lib/crypto";
 import { eq, asc, and } from "drizzle-orm";
 import { z } from "zod";
 import { Resend } from "resend";
@@ -221,21 +222,28 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
           }),
         });
         const parsed = summarySchema.parse(JSON.parse(rawText));
+        const encSummary = encryptContent(parsed.summary) ?? parsed.summary;
+        const encSoap = {
+          subjective: encryptContent(parsed.soapNote.subjective) ?? parsed.soapNote.subjective,
+          objective: encryptContent(parsed.soapNote.objective) ?? parsed.soapNote.objective,
+          assessment: encryptContent(parsed.soapNote.assessment) ?? parsed.soapNote.assessment,
+          plan: encryptContent(parsed.soapNote.plan) ?? parsed.soapNote.plan,
+        };
         await db.insert(transcriptSummary)
           .values({
             sessionId,
-            summary: parsed.summary,
+            summary: encSummary,
             keyPoints: parsed.keyPoints,
             actionItems: parsed.actionItems,
-            soapNote: parsed.soapNote,
+            soapNote: encSoap,
           })
           .onConflictDoUpdate({
             target: transcriptSummary.sessionId,
             set: {
-              summary: parsed.summary,
+              summary: encSummary,
               keyPoints: parsed.keyPoints,
               actionItems: parsed.actionItems,
-              soapNote: parsed.soapNote,
+              soapNote: encSoap,
               updatedAt: new Date(),
             },
           });

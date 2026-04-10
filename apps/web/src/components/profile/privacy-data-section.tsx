@@ -40,31 +40,24 @@ export function PrivacyDataSection() {
   }
 
   // ── Data export ─────────────────────────────────────────────────────────────
-  const [exporting, setExporting] = useState(false);
   const [exportSuccess, setExportSuccess] = useState(false);
 
-  const exportQuery = trpc.privacy.exportMyData.useQuery(undefined, {
-    enabled: false, // manual trigger
+  const exportMutation = trpc.privacy.exportMyData.useMutation({
+    onSuccess: (data) => {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `sanotalk-data-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      setExportSuccess(true);
+    },
   });
 
-  async function handleExport() {
-    setExporting(true);
+  function handleExport() {
     setExportSuccess(false);
-    try {
-      const result = await exportQuery.refetch();
-      if (result.data) {
-        const blob = new Blob([JSON.stringify(result.data, null, 2)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `sanotalk-data-${new Date().toISOString().slice(0, 10)}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        setExportSuccess(true);
-      }
-    } finally {
-      setExporting(false);
-    }
+    exportMutation.mutate();
   }
 
   // ── Account deletion ────────────────────────────────────────────────────────
@@ -124,9 +117,9 @@ export function PrivacyDataSection() {
           size="sm"
           variant="outline"
           onClick={handleExport}
-          disabled={exporting}
+          disabled={exportMutation.isPending}
         >
-          {exporting ? (
+          {exportMutation.isPending ? (
             <>{t("export.downloading")}</>
           ) : exportSuccess ? (
             <><CheckCircle className="h-4 w-4 mr-1.5" />{t("export.success")}</>

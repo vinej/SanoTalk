@@ -21,10 +21,12 @@ import {
 import { eq, and, desc, lte } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { logAuditEvent } from "../lib/audit";
+import { verifyAdminFromDb } from "../lib/verify-admin";
+import { decrypt, ENCRYPTED_KEYS } from "../lib/crypto";
 
 const CURRENT_POLICY_VERSION = "2026-04-10";
 
-const consentTypeSchema = z.enum(["cookies", "analytics", "privacy_policy"]);
+const consentTypeSchema = z.enum(["cookies", "analytics", "privacy_policy", "ai_data_sharing"]);
 
 export const privacyRouter = createTRPCRouter({
   /** Record a consent decision (works for both anonymous and authenticated users) */
@@ -41,8 +43,8 @@ export const privacyRouter = createTRPCRouter({
         consentType: input.consentType,
         consented: input.consented,
         policyVersion: CURRENT_POLICY_VERSION,
-        ipAddress: null,
-        userAgent: null,
+        ipAddress: (ctx as any).ipAddress ?? null,
+        userAgent: (ctx as any).userAgent ?? null,
       }).returning({ id: consentRecord.id });
 
       return { id: row!.id };
@@ -52,7 +54,13 @@ export const privacyRouter = createTRPCRouter({
   getMyConsent: protectedProcedure
     .query(async ({ ctx }) => {
       const records = await ctx.db
-        .select()
+        .select({
+          consentType: consentRecord.consentType,
+          consented: consentRecord.consented,
+          policyVersion: consentRecord.policyVersion,
+          createdAt: consentRecord.createdAt,
+          withdrawnAt: consentRecord.withdrawnAt,
+        })
         .from(consentRecord)
         .where(eq(consentRecord.userId, ctx.user.id))
         .orderBy(desc(consentRecord.createdAt));
@@ -103,6 +111,13 @@ export const privacyRouter = createTRPCRouter({
         policyVersion: CURRENT_POLICY_VERSION,
       });
 
+      void logAuditEvent(ctx.db, {
+        userId: ctx.user.id,
+        action: "withdraw_consent",
+        resourceType: "consent",
+        resourceId: input.consentType,
+      });
+
       return { withdrawn: true };
     }),
 
@@ -125,10 +140,10 @@ export const privacyRouter = createTRPCRouter({
         .set({ aiDataSharingConsent: input.consented } as any)
         .where(eq(user.id, ctx.user.id));
 
-      // Record in consent history
+      // Record in consent history with correct type
       await ctx.db.insert(consentRecord).values({
         userId: ctx.user.id,
-        consentType: "privacy_policy",
+        consentType: "ai_data_sharing",
         consented: input.consented,
         policyVersion: CURRENT_POLICY_VERSION,
       });
@@ -147,7 +162,14 @@ export const privacyRouter = createTRPCRouter({
   consentHistory: protectedProcedure
     .query(async ({ ctx }) => {
       return ctx.db
-        .select()
+        .select({
+          id: consentRecord.id,
+          consentType: consentRecord.consentType,
+          consented: consentRecord.consented,
+          policyVersion: consentRecord.policyVersion,
+          createdAt: consentRecord.createdAt,
+          withdrawnAt: consentRecord.withdrawnAt,
+        })
         .from(consentRecord)
         .where(eq(consentRecord.userId, ctx.user.id))
         .orderBy(desc(consentRecord.createdAt))
@@ -156,7 +178,7 @@ export const privacyRouter = createTRPCRouter({
 
   /** Export all user data as JSON (data portability — Law 25) */
   exportMyData: protectedProcedure
-    .query(async ({ ctx }) => {
+    .mutation(async ({ ctx }) => {
       const userId = ctx.user.id;
 
       const [
@@ -194,6 +216,11 @@ export const privacyRouter = createTRPCRouter({
         ctx.db.select().from(consentRecord).where(eq(consentRecord.userId, userId)),
       ]);
 
+      // Decrypt encrypted properties so the user receives readable data (Law 25 portability)
+      const decryptedProperties = properties.map((r) =>
+        ENCRYPTED_KEYS.has(r.key) ? { ...r, value: decrypt(r.value) } : r
+      );
+
       void logAuditEvent(ctx.db, {
         userId, action: "export_data", resourceType: "user", resourceId: userId,
       });
@@ -201,7 +228,7 @@ export const privacyRouter = createTRPCRouter({
       return {
         exportedAt: new Date().toISOString(),
         profile: profile[0] ?? null,
-        properties,
+        properties: decryptedProperties,
         vitalSigns: vitals,
         medications: meds,
         symptomLogs: symptoms,
@@ -249,6 +276,10 @@ export const privacyRouter = createTRPCRouter({
         } as any)
         .where(eq(user.id, ctx.user.id));
 
+      void logAuditEvent(ctx.db, {
+        userId: ctx.user.id, action: "cancel_deletion", resourceType: "user", resourceId: ctx.user.id,
+      });
+
       return { cancelled: true };
     }),
 
@@ -256,13 +287,16 @@ export const privacyRouter = createTRPCRouter({
   getDeletionStatus: protectedProcedure
     .query(async ({ ctx }) => {
       const [result] = await ctx.db
-        .select()
+        .select({
+          deletionRequestedAt: (user as any).deletionRequestedAt,
+          deletionScheduledFor: (user as any).deletionScheduledFor,
+        })
         .from(user)
         .where(eq(user.id, ctx.user.id));
 
       return {
-        deletionRequestedAt: (result as any)?.deletionRequestedAt ?? null,
-        deletionScheduledFor: (result as any)?.deletionScheduledFor ?? null,
+        deletionRequestedAt: result?.deletionRequestedAt ?? null,
+        deletionScheduledFor: result?.deletionScheduledFor ?? null,
       };
     }),
 
@@ -271,9 +305,8 @@ export const privacyRouter = createTRPCRouter({
   /** List all breach records (admin only) */
   listBreaches: protectedProcedure
     .query(async ({ ctx }) => {
-      if ((ctx.user as any).role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN" });
-      }
+      const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+      if (!isAdmin) throw new TRPCError({ code: "FORBIDDEN" });
       return ctx.db
         .select()
         .from(breachRecord)
@@ -293,9 +326,8 @@ export const privacyRouter = createTRPCRouter({
       remediationSteps: z.string().max(5000).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      if ((ctx.user as any).role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN" });
-      }
+      const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+      if (!isAdmin) throw new TRPCError({ code: "FORBIDDEN" });
       const [row] = await ctx.db.insert(breachRecord).values({
         title: input.title,
         description: input.description,
@@ -319,9 +351,8 @@ export const privacyRouter = createTRPCRouter({
       usersNotifiedAt: z.string().datetime().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      if ((ctx.user as any).role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN" });
-      }
+      const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+      if (!isAdmin) throw new TRPCError({ code: "FORBIDDEN" });
       const updates: Record<string, unknown> = { updatedAt: new Date() };
       if (input.status) updates.status = input.status;
       if (input.remediationSteps !== undefined) updates.remediationSteps = input.remediationSteps;
@@ -343,9 +374,8 @@ export const privacyRouter = createTRPCRouter({
       limit: z.number().min(1).max(500).optional(),
     }).optional())
     .query(async ({ ctx, input }) => {
-      if ((ctx.user as any).role !== "admin") {
-        throw new TRPCError({ code: "FORBIDDEN" });
-      }
+      const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+      if (!isAdmin) throw new TRPCError({ code: "FORBIDDEN" });
       return ctx.db
         .select()
         .from(auditLog)

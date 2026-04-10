@@ -25,6 +25,24 @@ export function encrypt(plaintext: string): string {
   return `${PREFIX}${iv.toString("hex")}:${tag.toString("hex")}:${encrypted.toString("hex")}`;
 }
 
+/**
+ * Encrypt text content (chat messages, transcripts, SOAP notes) at rest.
+ * Returns the encrypted string. Null/undefined inputs pass through.
+ */
+export function encryptContent(text: string | null | undefined): string | null {
+  if (!text) return text as null;
+  return encrypt(text);
+}
+
+/**
+ * Decrypt text content. Handles pre-migration plaintext gracefully.
+ * Null/undefined inputs pass through.
+ */
+export function decryptContent(text: string | null | undefined): string | null {
+  if (!text) return text as null;
+  return decrypt(text);
+}
+
 /** Decrypt a value. Returns plaintext. Handles unencrypted values gracefully (migration). */
 export function decrypt(value: string): string {
   if (!value.startsWith(PREFIX)) return value; // already plaintext (pre-migration data)

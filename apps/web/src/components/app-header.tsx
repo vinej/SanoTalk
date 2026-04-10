@@ -42,6 +42,12 @@ export function AppHeader() {
     }
     queryClient.clear();
     sessionStorage.clear();
+    // Clear user-specific localStorage keys (chat titles, TTS state, AI notice)
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith("sanotalk_chat_") || key.startsWith("sanotalk-ai-notice")) {
+        localStorage.removeItem(key);
+      }
+    });
     // Clear service worker caches to remove any cached data
     if ("caches" in window) {
       caches.keys().then((names) => names.forEach((name) => caches.delete(name)));

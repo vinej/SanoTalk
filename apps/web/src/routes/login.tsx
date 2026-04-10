@@ -31,7 +31,8 @@ function LoginPage() {
     try {
       const result = await authClient.signIn.email({ email, password });
       if ((result as any)?.error) {
-        setError((result as any).error.message ?? "Sign-in failed");
+        // Generic message to prevent username enumeration
+        setError(t("login.invalidCredentials", "Invalid email or password"));
       } else {
         // Check if user is approved before proceeding
         const sess = await authClient.getSession();
@@ -46,8 +47,8 @@ function LoginPage() {
           navigate({ to: "/dashboard" as any });
         }
       }
-    } catch (err: any) {
-      setError(err?.message ?? "Sign-in failed");
+    } catch {
+      setError(t("login.invalidCredentials", "Invalid email or password"));
     } finally {
       setIsPending(false);
     }

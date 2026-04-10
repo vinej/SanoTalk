@@ -9,6 +9,8 @@ interface AuditEvent {
   resourceId?: string;
   metadata?: Record<string, unknown>;
   ipAddress?: string;
+  userAgent?: string;
+  sessionId?: string;
 }
 
 export async function logAuditEvent(db: PostgresJsDatabase<any>, event: AuditEvent) {
@@ -21,8 +23,16 @@ export async function logAuditEvent(db: PostgresJsDatabase<any>, event: AuditEve
       resourceId: event.resourceId ?? null,
       metadata: event.metadata ?? null,
       ipAddress: event.ipAddress ?? null,
+      userAgent: event.userAgent ?? null,
+      sessionId: event.sessionId ?? null,
     });
-  } catch {
-    // Audit logging should never break the main operation
+  } catch (err) {
+    // Audit logging should never break the main operation, but log the failure
+    // so observability tooling can alert on persistent audit write issues.
+    process.stderr.write(JSON.stringify({
+      level: 50,
+      time: Date.now(),
+      msg: `[audit] failed to log event: ${event.action} — ${err instanceof Error ? err.message : String(err)}`,
+    }) + "\n");
   }
 }

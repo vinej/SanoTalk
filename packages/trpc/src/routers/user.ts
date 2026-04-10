@@ -8,6 +8,7 @@ import { getRelatedUserIds } from "../lib/related-users";
 import { encrypt, decrypt, ENCRYPTED_KEYS } from "../lib/crypto";
 import { resend } from "../lib/resend";
 import { escapeHtml } from "../lib/escape-html";
+import { logAuditEvent } from "../lib/audit";
 
 export const userRouter = createTRPCRouter({
   profile: protectedProcedure.query(async ({ ctx }) => {
@@ -405,7 +406,42 @@ export const userRouter = createTRPCRouter({
       await ctx.db.update(user).set({ role: input.role }).where(eq(user.id, input.targetUserId));
       // Invalidate all sessions for the target user so stale role claims are not used
       await ctx.db.delete(session).where(eq(session.userId, input.targetUserId));
+
+      void logAuditEvent(ctx.db, {
+        userId: ctx.user.id,
+        action: "set_user_role",
+        targetUserId: input.targetUserId,
+        resourceType: "user",
+        resourceId: input.targetUserId,
+        metadata: { previousRole: target.role, newRole: input.role },
+      });
+
       return { ok: true, previousRole: target.role, newRole: input.role };
+    }),
+
+  /** Promote a user to admin role (admin only, audited) */
+  promoteToAdmin: protectedProcedure
+    .input(z.object({ targetUserId: z.string().min(1).max(100) }))
+    .mutation(async ({ ctx, input }) => {
+      const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
+      if (!isAdmin) throw new TRPCError({ code: "FORBIDDEN", message: "Only admins can promote to admin" });
+      if (input.targetUserId === ctx.user.id) throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot promote yourself" });
+      const target = await ctx.db.query.user.findFirst({ where: eq(user.id, input.targetUserId), columns: { id: true, role: true } });
+      if (!target) throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      if (target.role === "admin") throw new TRPCError({ code: "BAD_REQUEST", message: "User is already admin" });
+      await ctx.db.update(user).set({ role: "admin" }).where(eq(user.id, input.targetUserId));
+      await ctx.db.delete(session).where(eq(session.userId, input.targetUserId));
+
+      void logAuditEvent(ctx.db, {
+        userId: ctx.user.id,
+        action: "promote_to_admin",
+        targetUserId: input.targetUserId,
+        resourceType: "user",
+        resourceId: input.targetUserId,
+        metadata: { previousRole: target.role },
+      });
+
+      return { ok: true, previousRole: target.role };
     }),
 
   listPendingApprovals: protectedProcedure.query(async ({ ctx }) => {
@@ -450,6 +486,15 @@ export const userRouter = createTRPCRouter({
           </div>
         `,
       });
+
+      void logAuditEvent(ctx.db, {
+        userId: ctx.user.id,
+        action: "approve_user",
+        targetUserId: input.targetUserId,
+        resourceType: "user",
+        resourceId: input.targetUserId,
+      });
+
       return { ok: true };
     }),
 
@@ -468,6 +513,15 @@ export const userRouter = createTRPCRouter({
       // approves the user between our check and delete.
       const [deleted] = await ctx.db.delete(user).where(and(eq(user.id, input.targetUserId), eq(user.approved, false))).returning({ id: user.id });
       if (!deleted) throw new TRPCError({ code: "CONFLICT", message: "User was modified concurrently" });
+
+      void logAuditEvent(ctx.db, {
+        userId: ctx.user.id,
+        action: "refuse_user",
+        targetUserId: input.targetUserId,
+        resourceType: "user",
+        resourceId: input.targetUserId,
+      });
+
       const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";
       await resend.emails.send({
         from,

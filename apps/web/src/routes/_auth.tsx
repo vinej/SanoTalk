@@ -18,7 +18,10 @@ export const Route: any = createFileRoute("/_auth")({
     const user = session.data.user as any;
     if (tracker && hasAnalyticsConsent()) {
       void tracker.start().catch(() => {});
-      tracker.setUserID(user.id);
+      // Use a hashed ID to avoid sending the raw database user ID to OpenReplay
+      const hashBuffer = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(user.id));
+      const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+      tracker.setUserID(hashHex.slice(0, 16));
     }
     // If 2FA has never been set up, send to the setup page first
     if (!user.twoFactorEnabled) {

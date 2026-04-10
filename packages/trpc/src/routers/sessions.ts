@@ -1,11 +1,12 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
-import { talkSession, sessionParticipant, user } from "@sanotalk/db";
+import { talkSession, sessionParticipant, user, recording } from "@sanotalk/db";
 import { eq, desc, or, inArray, and } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { TRPCError } from "@trpc/server";
 import { verifyAdminFromDb } from "../lib/verify-admin";
 import { getRelatedUserIds } from "../lib/related-users";
+import { deleteMinioObjects } from "../lib/minio-cleanup";
 
 /** Returns the session (with participants+users) if the user is host or participant; throws otherwise. */
 async function assertSessionAccess(
@@ -145,11 +146,22 @@ export const sessionsRouter = createTRPCRouter({
   delete: protectedProcedure
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
+      // Fetch recording storage keys before cascade-deleting them from DB
+      const recordings = await ctx.db
+        .select({ storageKey: recording.storageKey, storageBucket: recording.storageBucket })
+        .from(recording)
+        .where(eq(recording.sessionId, input.id));
+
       const deleted = await ctx.db
         .delete(talkSession)
         .where(and(eq(talkSession.id, input.id), eq(talkSession.hostId, ctx.user.id)))
         .returning({ id: talkSession.id });
       if (deleted.length === 0) throw new TRPCError({ code: "NOT_FOUND", message: "Session not found" });
+
+      // Clean up MinIO objects in the background (best-effort)
+      if (recordings.length > 0) {
+        void deleteMinioObjects(recordings);
+      }
     }),
 
   addParticipant: protectedProcedure

@@ -1,5 +1,5 @@
-import { text, timestamp, uuid } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { text, timestamp, uuid, check } from "drizzle-orm/pg-core";
+import { relations, sql } from "drizzle-orm";
 import { createTable, user } from "./auth";
 import { talkSession } from "./sessions";
 
@@ -13,7 +13,9 @@ export const chatMessage = createTable("chat_message", {
   role: text("role").notNull(), // "user" | "assistant"
   content: text("content").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+}, (t) => ({
+  ownerRequired: check("chat_message_owner_required", sql`${t.userId} IS NOT NULL OR ${t.sessionId} IS NOT NULL`),
+}));
 
 export const chatMessageRelations = relations(chatMessage, ({ one }) => ({
   session: one(talkSession, {

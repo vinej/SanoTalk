@@ -11,6 +11,8 @@ import { Link } from "@tanstack/react-router";
 import { cn } from "../../lib/utils";
 import { useTranscriptSocket } from "../../hooks/use-transcript-socket";
 import { useTts } from "../../hooks/use-tts";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   Dialog,
   DialogContent,
@@ -69,14 +71,25 @@ function UrgencyBadge({ level, t }: { level: UrgencyLevel; t: (key: string) => s
 
 function renderMessageContent(content: string, t: (key: string) => string) {
   const match = content.match(URGENCY_RE);
-  if (!match) return <>{content}</>;
+  const level = match ? (match[1] as UrgencyLevel) : null;
+  const text = match ? content.replace(URGENCY_RE, "").trim() : content;
 
-  const level = match[1] as UrgencyLevel;
-  const textWithoutTag = content.replace(URGENCY_RE, "").trim();
   return (
     <>
-      {textWithoutTag}
-      <UrgencyBadge level={level} t={t} />
+      <Markdown
+        remarkPlugins={[remarkGfm]}
+        components={{
+          // Open links in new tab for safety
+          a: ({ children, href, ...props }) => (
+            <a href={href} target="_blank" rel="noopener noreferrer" className="underline text-primary" {...props}>{children}</a>
+          ),
+          // Prevent markdown images (security — no arbitrary URLs)
+          img: () => null,
+        }}
+      >
+        {text}
+      </Markdown>
+      {level && <UrgencyBadge level={level} t={t} />}
     </>
   );
 }
@@ -389,20 +402,18 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
             <div
               key={msg.id}
               className={cn(
-                "max-w-[85%] rounded-lg px-3 py-2 text-sm whitespace-pre-wrap",
+                "max-w-[85%] rounded-lg px-3 py-2 text-sm",
                 msg.role === "user"
-                  ? "ml-auto bg-primary text-primary-foreground"
-                  : isCompanion
-                    ? "mr-auto bg-sky-50 dark:bg-sky-950/30 text-foreground"
-                    : isNews
-                      ? "mr-auto bg-amber-50 dark:bg-amber-950/30 text-foreground"
-                      : isPharmacist
-                        ? "mr-auto bg-emerald-50 dark:bg-emerald-950/30 text-foreground"
-                        : isDrugInfo
-                          ? "mr-auto bg-purple-50 dark:bg-purple-950/30 text-foreground"
-                          : isTest
-                            ? "mr-auto bg-gray-100 dark:bg-gray-950/30 text-foreground"
-                            : "mr-auto bg-muted text-foreground"
+                  ? "ml-auto bg-primary text-primary-foreground whitespace-pre-wrap"
+                  : cn(
+                      "mr-auto chat-markdown",
+                      isCompanion ? "bg-sky-50 dark:bg-sky-950/30 text-foreground"
+                        : isNews ? "bg-amber-50 dark:bg-amber-950/30 text-foreground"
+                        : isPharmacist ? "bg-emerald-50 dark:bg-emerald-950/30 text-foreground"
+                        : isDrugInfo ? "bg-purple-50 dark:bg-purple-950/30 text-foreground"
+                        : isTest ? "bg-gray-100 dark:bg-gray-950/30 text-foreground"
+                        : "bg-muted text-foreground"
+                    )
               )}
             >
               {msg.role === "assistant" ? renderMessageContent(msg.content, t) : msg.content}

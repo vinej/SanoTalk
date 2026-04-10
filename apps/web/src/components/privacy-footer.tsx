@@ -2,24 +2,25 @@ import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { CookieSettingsDialog } from "./cookie-settings-dialog";
-import { getStoredConsent } from "./cookie-consent-banner";
-
-const CONSENT_KEY = "sanotalk-cookie-consent";
+import { storeConsent } from "./cookie-consent-banner";
+import { tracker } from "../lib/tracker";
 
 export function PrivacyFooter() {
   const { t } = useTranslation("privacy");
   const [showSettings, setShowSettings] = useState(false);
 
-  function handleSaveCookieSettings(analytics: boolean) {
-    const consent = {
+  async function handleSaveCookieSettings(analytics: boolean) {
+    await storeConsent({
       essential: true,
       analytics,
       decidedAt: new Date().toISOString(),
-    };
-    localStorage.setItem(CONSENT_KEY, JSON.stringify(consent));
+    });
     setShowSettings(false);
-    // Reload if analytics was disabled to stop the tracker
-    if (!analytics) window.location.reload();
+    // Stop the tracker immediately before reload to prevent data leakage
+    if (!analytics) {
+      if (tracker) tracker.stop();
+      window.location.reload();
+    }
   }
 
   return (

@@ -48,12 +48,12 @@ function SignUpPage() {
         role,
       });
       if (result?.error) {
-        setError(result.error.message ?? "Sign-up failed");
+        setError(t("signUp.failed", "Sign-up failed. Please try again."));
       } else {
         setSubmitted(true);
       }
-    } catch (err: any) {
-      setError(err?.message ?? "Sign-up failed");
+    } catch {
+      setError(t("signUp.failed", "Sign-up failed. Please try again."));
     } finally {
       setIsPending(false);
     }

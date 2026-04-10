@@ -7,6 +7,7 @@ export const consentTypeEnum = pgEnum("sanotalk_consent_type", [
   "cookies",
   "analytics",
   "privacy_policy",
+  "ai_data_sharing",
 ]);
 
 export const consentRecord = createTable("consent_record", {
@@ -77,6 +78,8 @@ export const auditLog = createTable("audit_log", {
   resourceId:     text("resource_id"),
   metadata:       jsonb("metadata"),
   ipAddress:      text("ip_address"),
+  userAgent:      text("user_agent"),
+  sessionId:      text("session_id"),
   createdAt:      timestamp("created_at").notNull().defaultNow(),
 }, (t) => ({
   userIdx: index("audit_log_user_idx").on(t.userId),
