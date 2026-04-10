@@ -112,6 +112,7 @@
     "emptyCompanion": "أنا هنا من أجلك. شارك ما يدور في ذهنك.",
     "placeholderCompanion": "كيف تشعر اليوم…",
     "clearConversation": "مسح المحادثة",
+    "downloadConversation": "تنزيل المحادثة بصيغة Markdown",
     "clearDialog": {
       "title": "مسح المحادثة؟",
       "desc": "هل تريد حفظ هذه المحادثة قبل مسحها؟",
@@ -148,6 +149,9 @@
     "titlePharmacist": "وكيل الذكاء الاصطناعي الصيدلي",
     "emptyPharmacist": "اسألني عن الأدوية أو التفاعلات الدوائية أو إرشادات الجرعات.",
     "placeholderPharmacist": "اسأل عن أدويتك…",
+    "titleDrugInfo": "معلومات الدواء",
+    "emptyDrugInfo": "أدخل اسم الدواء للحصول على الآثار الجانبية والتفاعلات ومعلومات الاستخدام.",
+    "placeholderDrugInfo": "البحث عن دواء…",
     "titleTest": "اختبار وكيل الذكاء الاصطناعي",
     "emptyTest": "أرسل رسالة لاختبار نموذج اللغة مباشرة.",
     "placeholderTest": "اكتب رسالة…",

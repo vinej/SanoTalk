@@ -5,7 +5,7 @@ import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Label } from "../ui/label";
 import { trpc } from "../../lib/trpc";
-import { Loader2, Send, Mic, MicOff, Trash2, Bookmark, BookmarkCheck, BookmarkX, Volume2, VolumeX, Phone, MapPin, Stethoscope, Heart } from "lucide-react";
+import { Loader2, Send, Mic, MicOff, Trash2, Bookmark, BookmarkCheck, BookmarkX, Volume2, VolumeX, Phone, MapPin, Stethoscope, Heart, Download } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Link } from "@tanstack/react-router";
 import { cn } from "../../lib/utils";
@@ -85,7 +85,7 @@ function renderMessageContent(content: string, t: (key: string) => string) {
 
 interface Props {
   sessionId?: string;
-  variant?: "health" | "companion" | "news" | "pharmacist" | "test";
+  variant?: "health" | "companion" | "news" | "pharmacist" | "drugInfo" | "test";
   pendingVoiceText?: string;
   onVoiceTextConsumed?: () => void;
 }
@@ -99,8 +99,9 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
   const isCompanion = !isSessionMode && variant === "companion";
   const isNews = !isSessionMode && variant === "news";
   const isPharmacist = !isSessionMode && variant === "pharmacist";
+  const isDrugInfo = !isSessionMode && variant === "drugInfo";
   const isTest = !isSessionMode && variant === "test";
-  const chatTypeArg = isCompanion ? "companion" : isNews ? "news" : isPharmacist ? "pharmacist" : isTest ? "test" : "health";
+  const chatTypeArg = isCompanion ? "companion" : isNews ? "news" : isPharmacist ? "pharmacist" : isDrugInfo ? "drugInfo" : isTest ? "test" : "health";
   const titleStorageKey = userId
     ? `sanotalk_chat_loaded_title_${chatTypeArg}_${userId}`
     : null;
@@ -133,7 +134,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
   );
   const { data: healthMessages = [], refetch: refetchHealth } = trpc.agents.healthChatHistory.useQuery(
     undefined,
-    { enabled: !isSessionMode && !isCompanion && !isNews }
+    { enabled: !isSessionMode && !isCompanion && !isNews && !isDrugInfo }
   );
   const { data: companionMessages = [], refetch: refetchCompanion } = trpc.agents.companionChatHistory.useQuery(
     undefined,
@@ -147,13 +148,17 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
     undefined,
     { enabled: isPharmacist }
   );
+  const { data: drugInfoMessages = [], refetch: refetchDrugInfo } = trpc.agents.drugInfoChatHistory.useQuery(
+    undefined,
+    { enabled: isDrugInfo }
+  );
   const { data: testMessages = [], refetch: refetchTest } = trpc.agents.testChatHistory.useQuery(
     undefined,
     { enabled: isTest }
   );
 
-  const messages = isSessionMode ? sessionMessages : isCompanion ? companionMessages : isNews ? newsMessages : isPharmacist ? pharmacistMessages : isTest ? testMessages : healthMessages;
-  const refetch = isSessionMode ? refetchSession : isCompanion ? refetchCompanion : isNews ? refetchNews : isPharmacist ? refetchPharmacist : isTest ? refetchTest : refetchHealth;
+  const messages = isSessionMode ? sessionMessages : isCompanion ? companionMessages : isNews ? newsMessages : isPharmacist ? pharmacistMessages : isDrugInfo ? drugInfoMessages : isTest ? testMessages : healthMessages;
+  const refetch = isSessionMode ? refetchSession : isCompanion ? refetchCompanion : isNews ? refetchNews : isPharmacist ? refetchPharmacist : isDrugInfo ? refetchDrugInfo : isTest ? refetchTest : refetchHealth;
 
   // ── Saved conversations ────────────────────────────────────────────────────
   const { data: savedList = [], refetch: refetchSaved } = trpc.agents.listSavedConversations.useQuery(
@@ -191,11 +196,13 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
   const sendCompanionMessage = trpc.agents.sendCompanionChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
   const sendNewsMessage = trpc.agents.sendNewsChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
   const sendPharmacistMessage = trpc.agents.sendPharmacistChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
+  const sendDrugInfoMessage = trpc.agents.sendDrugInfoChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
   const sendTestMessage = trpc.agents.sendTestChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
   const clearHealth = trpc.agents.clearHealthChat.useMutation({ onSuccess: () => { void refetch(); } });
   const clearCompanion = trpc.agents.clearCompanionChat.useMutation({ onSuccess: () => { void refetch(); } });
   const clearNews = trpc.agents.clearNewsChat.useMutation({ onSuccess: () => { void refetch(); } });
   const clearPharmacist = trpc.agents.clearPharmacistChat.useMutation({ onSuccess: () => { void refetch(); } });
+  const clearDrugInfo = trpc.agents.clearDrugInfoChat.useMutation({ onSuccess: () => { void refetch(); } });
   const clearTest = trpc.agents.clearTestChat.useMutation({ onSuccess: () => { void refetch(); } });
 
   const isPending = isSessionMode
@@ -206,9 +213,11 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
         ? sendNewsMessage.isPending
         : isPharmacist
           ? sendPharmacistMessage.isPending
-          : isTest
-            ? sendTestMessage.isPending
-            : sendHealthMessage.isPending;
+          : isDrugInfo
+            ? sendDrugInfoMessage.isPending
+            : isTest
+              ? sendTestMessage.isPending
+              : sendHealthMessage.isPending;
 
   // ── Voice (non-session modes) ──────────────────────────────────────────────
   const { isRecording, micError } = useTranscriptSocket(undefined, {
@@ -221,6 +230,8 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
         sendNewsMessage.mutate({ message: text, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
       } else if (isPharmacist) {
         sendPharmacistMessage.mutate({ message: text, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
+      } else if (isDrugInfo) {
+        sendDrugInfoMessage.mutate({ message: text, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
       } else if (isTest) {
         sendTestMessage.mutate({ message: text, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
       } else {
@@ -265,6 +276,8 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
       sendNewsMessage.mutate({ message: trimmed, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
     } else if (isPharmacist) {
       sendPharmacistMessage.mutate({ message: trimmed, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
+    } else if (isDrugInfo) {
+      sendDrugInfoMessage.mutate({ message: trimmed, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
     } else if (isTest) {
       sendTestMessage.mutate({ message: trimmed, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
     } else {
@@ -274,7 +287,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
 
   function handleClearConfirmed() {
     stopTts();
-    (isCompanion ? clearCompanion : isNews ? clearNews : isPharmacist ? clearPharmacist : isTest ? clearTest : clearHealth).mutate(undefined, {
+    (isCompanion ? clearCompanion : isNews ? clearNews : isPharmacist ? clearPharmacist : isDrugInfo ? clearDrugInfo : isTest ? clearTest : clearHealth).mutate(undefined, {
       onSuccess: () => {
         setShowClearDialog(false);
         setShowSaveInput(false);
@@ -289,6 +302,41 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
       { chatType: chatTypeArg, title: saveTitle.trim() },
       { onSuccess: () => { handleClearConfirmed(); } }
     );
+  }
+
+  function handleDownloadConversation() {
+    if (messages.length === 0) return;
+    const titleKey = isCompanion ? "chat.titleCompanion"
+      : isNews ? "chat.titleNews"
+      : isPharmacist ? "chat.titlePharmacist"
+      : isDrugInfo ? "chat.titleDrugInfo"
+      : isTest ? "chat.titleTest"
+      : "chat.titleGeneral";
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const stamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
+    const header =
+      `# ${t(titleKey)}\n` +
+      (loadedConversationTitle ? `## ${loadedConversationTitle}\n` : "") +
+      `\n_${now.toISOString()}_\n\n---\n\n`;
+    const body = messages
+      .map((m) => {
+        const label = m.role === "user" ? "User" : "Assistant";
+        // Strip the hidden [URGENCY:xxx] tag from exported text
+        const cleaned = m.content.replace(URGENCY_RE, "").trim();
+        return `### ${label}\n\n${cleaned}\n`;
+      })
+      .join("\n");
+    const md = header + body;
+    const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `sanotalk-${chatTypeArg}-${stamp}.md`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   }
 
   // Session mode: auto-send voice transcript from parent
@@ -314,11 +362,12 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
           isCompanion ? "bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300"
           : isNews ? "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300"
           : isPharmacist ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300"
+          : isDrugInfo ? "bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300"
           : isTest ? "bg-gray-50 dark:bg-gray-950/30 text-gray-700 dark:text-gray-300"
           : "bg-muted/50 text-foreground"
         )}>
           <div className="flex items-center gap-2 min-w-0">
-            <span className="shrink-0">{t(isCompanion ? "chat.titleCompanion" : isNews ? "chat.titleNews" : isPharmacist ? "chat.titlePharmacist" : isTest ? "chat.titleTest" : "chat.titleGeneral")}</span>
+            <span className="shrink-0">{t(isCompanion ? "chat.titleCompanion" : isNews ? "chat.titleNews" : isPharmacist ? "chat.titlePharmacist" : isDrugInfo ? "chat.titleDrugInfo" : isTest ? "chat.titleTest" : "chat.titleGeneral")}</span>
             {loadedConversationTitle && (
               <>
                 <span className="shrink-0 opacity-40">·</span>
@@ -332,7 +381,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
         <div className="p-3 space-y-3">
           {messages.length === 0 && !isPending && (
             <p className="text-sm text-muted-foreground text-center py-8">
-              {t(isCompanion ? "chat.emptyCompanion" : isNews ? "chat.emptyNews" : isPharmacist ? "chat.emptyPharmacist" : isTest ? "chat.emptyTest" : "chat.empty")}
+              {t(isCompanion ? "chat.emptyCompanion" : isNews ? "chat.emptyNews" : isPharmacist ? "chat.emptyPharmacist" : isDrugInfo ? "chat.emptyDrugInfo" : isTest ? "chat.emptyTest" : "chat.empty")}
             </p>
           )}
 
@@ -349,9 +398,11 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
                       ? "mr-auto bg-amber-50 dark:bg-amber-950/30 text-foreground"
                       : isPharmacist
                         ? "mr-auto bg-emerald-50 dark:bg-emerald-950/30 text-foreground"
-                        : isTest
-                          ? "mr-auto bg-gray-100 dark:bg-gray-950/30 text-foreground"
-                          : "mr-auto bg-muted text-foreground"
+                        : isDrugInfo
+                          ? "mr-auto bg-purple-50 dark:bg-purple-950/30 text-foreground"
+                          : isTest
+                            ? "mr-auto bg-gray-100 dark:bg-gray-950/30 text-foreground"
+                            : "mr-auto bg-muted text-foreground"
               )}
             >
               {msg.role === "assistant" ? renderMessageContent(msg.content, t) : msg.content}
@@ -445,7 +496,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
               size="sm"
               variant="ghost"
               onClick={() => { setSaveTitle(loadedConversationTitle ?? ""); setShowClearDialog(true); }}
-              disabled={messages.length === 0 || clearHealth.isPending || clearCompanion.isPending || clearPharmacist.isPending || clearTest.isPending}
+              disabled={messages.length === 0 || clearHealth.isPending || clearCompanion.isPending || clearPharmacist.isPending || clearDrugInfo.isPending || clearTest.isPending}
               title={t("chat.clearConversation")}
               className="text-muted-foreground hover:text-destructive"
             >
@@ -472,6 +523,17 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
                 {saveConversationMutation.isPending
                   ? <Loader2 className="h-3 w-3 animate-spin" />
                   : <BookmarkCheck className="h-3 w-3" />}
+              </Button>
+            )}
+            {messages.length > 0 && (
+              <Button
+                size="sm"
+                variant="ghost"
+                title={t("chat.downloadConversation")}
+                className="text-muted-foreground"
+                onClick={handleDownloadConversation}
+              >
+                <Download className="h-3 w-3" />
               </Button>
             )}
           </>
@@ -503,7 +565,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
               handleSend();
             }
           }}
-          placeholder={t(isCompanion ? "chat.placeholderCompanion" : isNews ? "chat.placeholderNews" : isPharmacist ? "chat.placeholderPharmacist" : isTest ? "chat.placeholderTest" : "chat.placeholder")}
+          placeholder={t(isCompanion ? "chat.placeholderCompanion" : isNews ? "chat.placeholderNews" : isPharmacist ? "chat.placeholderPharmacist" : isDrugInfo ? "chat.placeholderDrugInfo" : isTest ? "chat.placeholderTest" : "chat.placeholder")}
           disabled={isPending}
           rows={3}
           className="flex-1 text-sm resize-none overflow-y-auto"

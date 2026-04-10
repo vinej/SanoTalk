@@ -533,6 +533,57 @@ export const agentsRouter = createTRPCRouter({
       return { cleared: true };
     }),
 
+  // ── Drug Info AI Agent (with full patient context) ──────────────────────────
+
+  drugInfoChatHistory: protectedProcedure
+    .query(async ({ ctx }) => {
+      return ctx.db.query.chatMessage.findMany({
+        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "drugInfo")),
+        orderBy: [asc(chatMessage.createdAt)],
+        limit: 500,
+      });
+    }),
+
+  sendDrugInfoChatMessage: protectedProcedure
+    .input(z.object({
+      message: z.string().min(1).max(2000),
+      language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const pastMessages = await ctx.db.query.chatMessage.findMany({
+        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "drugInfo")),
+        orderBy: [asc(chatMessage.createdAt)],
+        limit: 20,
+      });
+
+      const _allowedRoles = new Set(["user", "assistant"]);
+      const history: Array<{ role: "user" | "assistant"; content: string }> = pastMessages
+        .filter((msg) => _allowedRoles.has(msg.role))
+        .map((msg) => ({ role: msg.role as "user" | "assistant", content: msg.content }));
+
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "drugInfo", role: "user", content: input.message });
+
+      const { properties: userProperties, propertiesLanguage, recentVitals, activeMedications, recentSymptoms, userAllergies, userConditions } = await getUserContext(ctx.db, ctx.user.id);
+      const vitalsContext = buildVitalsContext(recentVitals);
+      const medsContext = buildMedicationsContext(activeMedications);
+      const symptomsContext = buildSymptomsContext(recentSymptoms);
+      const allergyContext = buildAllergyContext(userAllergies, userConditions);
+      const fullHistory = [...vitalsContext, ...medsContext, ...symptomsContext, ...allergyContext, ...history];
+      const assistantText = await ctx.callDrugInfoChat(fullHistory, input.message, input.language ?? "en", userProperties, propertiesLanguage);
+
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "drugInfo", role: "assistant", content: assistantText });
+
+      return { message: assistantText };
+    }),
+
+  clearDrugInfoChat: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      await ctx.db.delete(chatMessage).where(
+        and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "drugInfo"))
+      );
+      return { cleared: true };
+    }),
+
   // ── Test AI Agent (admin only, no patient context) ──────────────────────────
 
   testChatHistory: protectedProcedure
@@ -688,7 +739,7 @@ export const agentsRouter = createTRPCRouter({
     }),
 
   listSavedConversations: protectedProcedure
-    .input(z.object({ chatType: z.enum(["health", "companion", "news", "pharmacist", "test"]) }))
+    .input(z.object({ chatType: z.enum(["health", "companion", "news", "pharmacist", "drugInfo", "test"]) }))
     .query(async ({ ctx, input }) => {
       return ctx.db
         .select({
@@ -710,7 +761,7 @@ export const agentsRouter = createTRPCRouter({
 
   saveConversation: protectedProcedure
     .input(z.object({
-      chatType: z.enum(["health", "companion", "news", "pharmacist", "test"]),
+      chatType: z.enum(["health", "companion", "news", "pharmacist", "drugInfo", "test"]),
       title: z.string().min(1).max(120),
     }))
     .mutation(async ({ ctx, input }) => {
@@ -776,7 +827,7 @@ export const agentsRouter = createTRPCRouter({
         ),
       });
       if (!saved) throw new TRPCError({ code: "NOT_FOUND", message: "Saved conversation not found" });
-      const chatType = z.enum(["health", "companion", "news", "pharmacist", "test"]).parse(saved.chatType);
+      const chatType = z.enum(["health", "companion", "news", "pharmacist", "drugInfo", "test"]).parse(saved.chatType);
       const savedMsgSchema = z.array(z.object({
         role: z.enum(["user", "assistant"]),
         content: z.string().max(10000),

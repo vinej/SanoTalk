@@ -112,6 +112,7 @@
     "emptyCompanion": "Je suis là pour vous. Partagez ce qui vous pèse.",
     "placeholderCompanion": "Comment vous sentez-vous aujourd'hui…",
     "clearConversation": "Effacer la conversation",
+    "downloadConversation": "Télécharger la conversation en Markdown",
     "clearDialog": {
       "title": "Effacer la conversation ?",
       "desc": "Souhaitez-vous sauvegarder cette conversation avant de l'effacer ?",
@@ -148,6 +149,9 @@
     "titlePharmacist": "Agent IA Pharmacien",
     "emptyPharmacist": "Posez-moi des questions sur vos médicaments, interactions ou posologie.",
     "placeholderPharmacist": "Posez une question sur vos médicaments…",
+    "titleDrugInfo": "Info Médicament",
+    "emptyDrugInfo": "Saisissez un nom de médicament pour obtenir les effets secondaires, interactions et informations d'utilisation.",
+    "placeholderDrugInfo": "Rechercher un médicament…",
     "titleTest": "Test Agent IA",
     "emptyTest": "Envoyez un message pour tester le LLM directement.",
     "placeholderTest": "Tapez un message…",

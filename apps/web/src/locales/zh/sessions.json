@@ -112,6 +112,7 @@
     "emptyCompanion": "我在这里陪伴您，请分享您的心情。",
     "placeholderCompanion": "您今天感觉怎么样…",
     "clearConversation": "清除对话",
+    "downloadConversation": "将对话下载为 Markdown",
     "clearDialog": {
       "title": "清除对话？",
       "desc": "清除前是否要保存此对话？",
@@ -148,6 +149,9 @@
     "titlePharmacist": "药剂师 AI 助手",
     "emptyPharmacist": "询问我关于药物、药物相互作用或剂量指导。",
     "placeholderPharmacist": "询问您的药物…",
+    "titleDrugInfo": "药物信息",
+    "emptyDrugInfo": "输入药品名称以获取副作用、相互作用和用药信息。",
+    "placeholderDrugInfo": "搜索药品…",
     "titleTest": "测试 AI 代理",
     "emptyTest": "发送消息以直接测试 LLM。",
     "placeholderTest": "输入消息…",

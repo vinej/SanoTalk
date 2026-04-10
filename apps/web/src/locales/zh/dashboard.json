@@ -23,6 +23,8 @@
   "companionDesc": "聊聊健康、睡眠、压力和生活方式",
   "pharmacist": "药剂师 AI 助手",
   "pharmacistDesc": "药物相互作用、剂量指导和药物管理",
+  "drugInfo": "药物信息",
+  "drugInfoDesc": "查询药物副作用、相互作用和用药信息",
   "news": "新闻 AI 助手",
   "newsDesc": "获取美国和加拿大的最新新闻",
   "medications": "药物管理",

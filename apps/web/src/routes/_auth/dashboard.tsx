@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Button } from "../../components/ui/button";
-import { Kanban, Bot, Heart, Hospital, Download, Activity, Video, Pill, ClipboardList, UserCircle, ShieldAlert, FlaskConical, ShieldCheck, FlaskRound, Newspaper } from "lucide-react";
+import { Kanban, Bot, Heart, Hospital, Download, Activity, Video, Pill, ClipboardList, UserCircle, ShieldAlert, FlaskConical, ShieldCheck, FlaskRound, Newspaper, Search } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { usePwaInstall } from "../../hooks/use-pwa-install";
 import { trpc } from "../../lib/trpc";
@@ -17,6 +17,7 @@ const FEATURES = [
   { to: "/ai-assistant", icon: Bot, color: "text-blue-600", bg: "bg-blue-50 dark:bg-blue-950/30", border: "border-blue-200 dark:border-blue-800", key: "aiAssistant" },
   { to: "/companion", icon: Heart, color: "text-violet-600", bg: "bg-violet-50 dark:bg-violet-950/30", border: "border-violet-200 dark:border-violet-800", key: "companion" },
   { to: "/pharmacist", icon: FlaskConical, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-950/30", border: "border-emerald-200 dark:border-emerald-800", key: "pharmacist" },
+  { to: "/drug-info", icon: Search, color: "text-purple-600", bg: "bg-purple-50 dark:bg-purple-950/30", border: "border-purple-200 dark:border-purple-800", key: "drugInfo" },
   { to: "/news", icon: Newspaper, color: "text-orange-600", bg: "bg-orange-50 dark:bg-orange-950/30", border: "border-orange-200 dark:border-orange-800", key: "news" },
   { to: "/vitals", icon: Activity, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-950/30", border: "border-emerald-200 dark:border-emerald-800", key: "vitals" },
   { to: "/medications", icon: Pill, color: "text-rose-600", bg: "bg-rose-50 dark:bg-rose-950/30", border: "border-rose-200 dark:border-rose-800", key: "medications" },

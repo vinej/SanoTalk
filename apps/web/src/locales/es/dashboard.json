@@ -23,6 +23,8 @@
   "companionDesc": "Hablar sobre bienestar, sueño, estrés y estilo de vida",
   "pharmacist": "Agente IA Farmacéutico",
   "pharmacistDesc": "Interacciones de medicamentos, dosificación y gestión de medicamentos",
+  "drugInfo": "Info Medicamentos",
+  "drugInfoDesc": "Buscar efectos secundarios, interacciones e información de medicamentos",
   "news": "Agente IA de Noticias",
   "newsDesc": "Obtén las últimas noticias de EE.UU. y Canadá",
   "medications": "Medicamentos",

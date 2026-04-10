@@ -23,6 +23,8 @@
   "companionDesc": "Discuter bien-être, sommeil, stress et style de vie",
   "pharmacist": "Agent IA Pharmacien",
   "pharmacistDesc": "Interactions médicamenteuses, posologie et gestion des médicaments",
+  "drugInfo": "Info Médicament",
+  "drugInfoDesc": "Rechercher les effets secondaires, interactions et informations sur les médicaments",
   "news": "Agent IA Actualités",
   "newsDesc": "Obtenez les dernières nouvelles des États-Unis et du Canada",
   "medications": "Médicaments",

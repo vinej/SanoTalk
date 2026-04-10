@@ -112,6 +112,7 @@
     "emptyCompanion": "मैं यहाँ आपके लिए हूँ। अपने मन की बात साझा करें।",
     "placeholderCompanion": "आज आप कैसा महसूस कर रहे हैं…",
     "clearConversation": "बातचीत साफ़ करें",
+    "downloadConversation": "बातचीत को Markdown के रूप में डाउनलोड करें",
     "clearDialog": {
       "title": "बातचीत साफ़ करें?",
       "desc": "क्या आप इसे साफ़ करने से पहले यह बातचीत सहेजना चाहते हैं?",
@@ -148,6 +149,9 @@
     "titlePharmacist": "फार्मासिस्ट AI एजेंट",
     "emptyPharmacist": "मुझसे दवाओं, दवा परस्पर क्रिया, या खुराक मार्गदर्शन के बारे में पूछें।",
     "placeholderPharmacist": "अपनी दवाओं के बारे में पूछें…",
+    "titleDrugInfo": "दवा जानकारी",
+    "emptyDrugInfo": "दुष्प्रभाव, इंटरैक्शन और उपयोग की जानकारी प्राप्त करने के लिए दवा का नाम दर्ज करें।",
+    "placeholderDrugInfo": "दवा खोजें…",
     "titleTest": "AI एजेंट परीक्षण",
     "emptyTest": "LLM का सीधे परीक्षण करने के लिए संदेश भेजें।",
     "placeholderTest": "संदेश लिखें…",

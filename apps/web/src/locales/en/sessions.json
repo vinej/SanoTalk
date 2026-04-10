@@ -112,6 +112,7 @@
     "emptyCompanion": "I'm here for you. Share what's on your mind.",
     "placeholderCompanion": "How are you feeling today…",
     "clearConversation": "Clear conversation",
+    "downloadConversation": "Download conversation as Markdown",
     "clearDialog": {
       "title": "Clear conversation?",
       "desc": "Would you like to save this conversation before clearing it?",
@@ -148,6 +149,9 @@
     "titlePharmacist": "Pharmacist AI Agent",
     "emptyPharmacist": "Ask me about medications, drug interactions, or dosage guidance.",
     "placeholderPharmacist": "Ask about your medications…",
+    "titleDrugInfo": "Drug Info",
+    "emptyDrugInfo": "Enter a medication name to get side effects, interactions, and usage information.",
+    "placeholderDrugInfo": "Search for a medication…",
     "titleTest": "Test AI Agent",
     "emptyTest": "Send a message to test the LLM directly.",
     "placeholderTest": "Type a message…",

@@ -23,6 +23,8 @@
   "companionDesc": "Chat about wellness, sleep, stress and lifestyle",
   "pharmacist": "Pharmacist AI Agent",
   "pharmacistDesc": "Drug interactions, dosage guidance and medication management",
+  "drugInfo": "Drug Info",
+  "drugInfoDesc": "Look up drug side effects, interactions, and usage information",
   "news": "News AI Agent",
   "newsDesc": "Get the latest news from the US and Canada",
   "medications": "Medications",

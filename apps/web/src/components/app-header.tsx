@@ -21,7 +21,12 @@ import {
 
 export function AppHeader() {
   const { data: profile } = trpc.user.profile.useQuery();
+  const isAdmin = profile?.role === "admin";
   const { data: aiInfo } = trpc.system.aiInfo.useQuery(undefined, { staleTime: Infinity });
+  const { data: testAgentInfo } = trpc.system.testAgentInfo.useQuery(undefined, {
+    staleTime: Infinity,
+    enabled: isAdmin,
+  });
   const { data: pendingRequests = [] } = trpc.user.listPendingRequests.useQuery(
     undefined,
     { refetchInterval: 30_000, staleTime: 0 }
@@ -54,9 +59,16 @@ export function AppHeader() {
         <Link to="/dashboard">
           <SanoTalkLogoV2 size={64} showText={true} />
         </Link>
-        <span className="text-[10px] text-muted-foreground/60 font-mono">
-          v{__APP_VERSION__}{aiInfo && <> powered by {aiInfo.model ?? aiInfo.provider}</>}
-        </span>
+        <div className="flex flex-col items-center text-[10px] text-muted-foreground/60 font-mono">
+          <span>
+            v{__APP_VERSION__}{aiInfo && <> powered by {aiInfo.model ?? aiInfo.provider}</>}
+          </span>
+          {testAgentInfo && (
+            <span>
+              Test Agent powered by {testAgentInfo.model ?? testAgentInfo.provider}
+            </span>
+          )}
+        </div>
         {profile && (
           <div className="text-sm grid grid-cols-[auto_auto_auto] items-center gap-x-3 gap-y-0 shrink-0">
             <span className="font-medium text-right">{profile.name}</span>

@@ -27,6 +27,7 @@ import { Route as AuthMedicationsRouteImport } from './routes/_auth/medications'
 import { Route as AuthKanbanRouteImport } from './routes/_auth/kanban'
 import { Route as AuthHealthHelpRouteImport } from './routes/_auth/health-help'
 import { Route as AuthErAlertsRouteImport } from './routes/_auth/er-alerts'
+import { Route as AuthDrugInfoRouteImport } from './routes/_auth/drug-info'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
 import { Route as AuthCompanionRouteImport } from './routes/_auth/companion'
 import { Route as AuthAllergiesRouteImport } from './routes/_auth/allergies'
@@ -125,6 +126,11 @@ const AuthErAlertsRoute = AuthErAlertsRouteImport.update({
   path: '/er-alerts',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthDrugInfoRoute = AuthDrugInfoRouteImport.update({
+  id: '/drug-info',
+  path: '/drug-info',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthDashboardRoute = AuthDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/allergies': typeof AuthAllergiesRoute
   '/companion': typeof AuthCompanionRoute
   '/dashboard': typeof AuthDashboardRoute
+  '/drug-info': typeof AuthDrugInfoRoute
   '/er-alerts': typeof AuthErAlertsRoute
   '/health-help': typeof AuthHealthHelpRoute
   '/kanban': typeof AuthKanbanRoute
@@ -205,6 +212,7 @@ export interface FileRoutesByTo {
   '/allergies': typeof AuthAllergiesRoute
   '/companion': typeof AuthCompanionRoute
   '/dashboard': typeof AuthDashboardRoute
+  '/drug-info': typeof AuthDrugInfoRoute
   '/er-alerts': typeof AuthErAlertsRoute
   '/health-help': typeof AuthHealthHelpRoute
   '/kanban': typeof AuthKanbanRoute
@@ -234,6 +242,7 @@ export interface FileRoutesById {
   '/_auth/allergies': typeof AuthAllergiesRoute
   '/_auth/companion': typeof AuthCompanionRoute
   '/_auth/dashboard': typeof AuthDashboardRoute
+  '/_auth/drug-info': typeof AuthDrugInfoRoute
   '/_auth/er-alerts': typeof AuthErAlertsRoute
   '/_auth/health-help': typeof AuthHealthHelpRoute
   '/_auth/kanban': typeof AuthKanbanRoute
@@ -264,6 +273,7 @@ export interface FileRouteTypes {
     | '/allergies'
     | '/companion'
     | '/dashboard'
+    | '/drug-info'
     | '/er-alerts'
     | '/health-help'
     | '/kanban'
@@ -290,6 +300,7 @@ export interface FileRouteTypes {
     | '/allergies'
     | '/companion'
     | '/dashboard'
+    | '/drug-info'
     | '/er-alerts'
     | '/health-help'
     | '/kanban'
@@ -318,6 +329,7 @@ export interface FileRouteTypes {
     | '/_auth/allergies'
     | '/_auth/companion'
     | '/_auth/dashboard'
+    | '/_auth/drug-info'
     | '/_auth/er-alerts'
     | '/_auth/health-help'
     | '/_auth/kanban'
@@ -472,6 +484,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthErAlertsRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/drug-info': {
+      id: '/_auth/drug-info'
+      path: '/drug-info'
+      fullPath: '/drug-info'
+      preLoaderRoute: typeof AuthDrugInfoRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/dashboard': {
       id: '/_auth/dashboard'
       path: '/dashboard'
@@ -537,6 +556,7 @@ interface AuthRouteChildren {
   AuthAllergiesRoute: typeof AuthAllergiesRoute
   AuthCompanionRoute: typeof AuthCompanionRoute
   AuthDashboardRoute: typeof AuthDashboardRoute
+  AuthDrugInfoRoute: typeof AuthDrugInfoRoute
   AuthErAlertsRoute: typeof AuthErAlertsRoute
   AuthHealthHelpRoute: typeof AuthHealthHelpRoute
   AuthKanbanRoute: typeof AuthKanbanRoute
@@ -559,6 +579,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthAllergiesRoute: AuthAllergiesRoute,
   AuthCompanionRoute: AuthCompanionRoute,
   AuthDashboardRoute: AuthDashboardRoute,
+  AuthDrugInfoRoute: AuthDrugInfoRoute,
   AuthErAlertsRoute: AuthErAlertsRoute,
   AuthHealthHelpRoute: AuthHealthHelpRoute,
   AuthKanbanRoute: AuthKanbanRoute,
