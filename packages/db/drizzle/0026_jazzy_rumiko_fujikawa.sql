@@ -1,0 +1,1 @@
+ALTER TABLE "sanotalk_user" ADD COLUMN "ai_data_sharing_consent" boolean DEFAULT false NOT NULL;

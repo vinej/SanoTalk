@@ -5,9 +5,10 @@ import { trpc } from "../../lib/trpc";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import { Trash2, Pencil, X, Clock, Camera, Loader2 } from "lucide-react";
+import { Trash2, Pencil, X, Clock, Camera, Loader2, Download, Shield, AlertTriangle } from "lucide-react";
 import { useAvatarUrl, getInitials } from "../../lib/avatar-url";
 import { RamqSection } from "../../components/profile/ramq-section";
+import { PrivacyDataSection } from "../../components/profile/privacy-data-section";
 
 export const Route = createFileRoute("/_auth/profile")({
   component: ProfilePage,
@@ -638,6 +639,9 @@ function ProfilePage() {
             </Button>
           </div>
         </div>
+
+        {/* Privacy & Data — Law 25 */}
+        <PrivacyDataSection />
       </div>
     </div>
   );

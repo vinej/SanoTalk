@@ -28,6 +28,11 @@ export const user = createTable("user", {
   twoFactorEnabled: boolean("two_factor_enabled").notNull().default(true),
   approved: boolean("approved").notNull().default(false),
   propertiesLanguage: text("properties_language").notNull().default("en"),
+  // Law 25 — consent to share health data with AI agents
+  aiDataSharingConsent: boolean("ai_data_sharing_consent").notNull().default(false),
+  // Law 25 — account deletion
+  deletionRequestedAt: timestamp("deletion_requested_at"),
+  deletionScheduledFor: timestamp("deletion_scheduled_for"),
 });
 
 export const session = createTable("session", {

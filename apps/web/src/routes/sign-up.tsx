@@ -18,6 +18,7 @@ type Role = (typeof ROLES)[number];
 
 function SignUpPage() {
   const { t } = useTranslation("common");
+  const { t: tp } = useTranslation("privacy");
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -29,6 +30,7 @@ function SignUpPage() {
   const [error, setError] = useState<string | null>(null);
   const [isPending, setIsPending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -183,11 +185,36 @@ function SignUpPage() {
                     </select>
                   </div>
 
+                  <label className="flex items-start gap-2 text-sm cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={acceptedPrivacy}
+                      onChange={(e) => setAcceptedPrivacy(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 rounded border-input accent-primary"
+                      required
+                    />
+                    <span className="text-muted-foreground">
+                      <Trans
+                        i18nKey="signUp.acceptPrivacy"
+                        ns="privacy"
+                        components={{
+                          link: (
+                            <Link
+                              to="/privacy-policy"
+                              target="_blank"
+                              className="text-primary underline-offset-4 hover:underline"
+                            />
+                          ),
+                        }}
+                      />
+                    </span>
+                  </label>
+
                   {error && (
                     <p className="text-sm text-destructive">{error}</p>
                   )}
 
-                  <Button type="submit" className="w-full" disabled={isPending}>
+                  <Button type="submit" className="w-full" disabled={isPending || !acceptedPrivacy}>
                     {isPending ? t("signUp.submitting") : t("signUp.submit")}
                   </Button>
                 </form>
@@ -201,6 +228,12 @@ function SignUpPage() {
               </>
             )}
           </div>
+
+          <p className="text-center text-xs text-muted-foreground mt-4">
+            <Link to="/privacy-policy" className="hover:underline underline-offset-4">
+              {tp("footer.privacyPolicy")}
+            </Link>
+          </p>
         </div>
       </div>
     </div>

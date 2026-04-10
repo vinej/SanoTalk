@@ -151,6 +151,7 @@ app.use("/api/trpc/agents.sendNewsChatMessage", medicalLimiter);
 app.use("/api/trpc/agents.sendPharmacistChatMessage", medicalLimiter);
 app.use("/api/trpc/agents.sendDrugInfoChatMessage", medicalLimiter);
 app.use("/api/trpc/agents.sendTestChatMessage", medicalLimiter);
+app.use("/api/trpc/privacy.exportMyData", medicalLimiter);
 app.use("/api/trpc/vitals.shareWithProfessional", medicalLimiter);
 app.use("/api/trpc/medications.shareWithProfessional", medicalLimiter);
 app.use("/api/trpc/symptoms.shareWithProfessional", medicalLimiter);
@@ -175,8 +176,8 @@ app.use(
 // ─── Avatar proxy ─────────────────────────────────────────────────────────
 // Serves user avatars so the browser never needs direct access to MinIO.
 import { snapshotErData } from "@sanotalk/trpc/lib/er-snapshot";
-import { db, user as userTable } from "@sanotalk/db";
-import { eq } from "drizzle-orm";
+import { db, user as userTable, chatMessage, transcript, agentRun } from "@sanotalk/db";
+import { eq, lte, and, sql } from "drizzle-orm";
 import * as Minio from "minio";
 
 let _avatarMinio: Minio.Client | null = null;
@@ -262,9 +263,56 @@ if (!process.env.NODE_ENV) {
   logger.warn("NODE_ENV is not set — security controls (rate limits, secure cookies) will use permissive defaults. Set NODE_ENV=production for production deployments.");
 }
 
+// ─── Data Retention & Purge Jobs (Law 25) ────────────────────────────────
+async function purgeExpiredData() {
+  try {
+    const now = new Date();
+    // Chat messages: 1 year
+    const chatCutoff = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+    await db.delete(chatMessage).where(lte(chatMessage.createdAt, chatCutoff));
+
+    // Transcripts: 2 years
+    const transcriptCutoff = new Date(now.getTime() - 730 * 24 * 60 * 60 * 1000);
+    await db.delete(transcript).where(lte(transcript.createdAt, transcriptCutoff));
+
+    // Agent runs: 90 days
+    const agentCutoff = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+    await db.delete(agentRun).where(lte(agentRun.startedAt, agentCutoff));
+
+    logger.info("Data retention purge completed");
+  } catch (err) {
+    logger.error({ err }, "Data retention purge failed");
+  }
+}
+
+async function purgeDeletedAccounts() {
+  try {
+    const now = new Date();
+    const users = await db
+      .select({ id: userTable.id })
+      .from(userTable)
+      .where(lte((userTable as any).deletionScheduledFor, now));
+
+    for (const u of users) {
+      await db.delete(userTable).where(eq(userTable.id, u.id));
+      logger.info({ userId: u.id }, "Account permanently deleted (Law 25)");
+    }
+  } catch (err) {
+    logger.error({ err }, "Account purge failed");
+  }
+}
+
 server.listen(PORT, () => {
   logger.info(`🚀 SanoTalk server running on http://localhost:${PORT}`);
   void runPendingAgents();
   void snapshotErData(db);
   setInterval(() => void snapshotErData(db), 30 * 60 * 1000);
+
+  // Run data retention purge + account deletion daily
+  void purgeExpiredData();
+  void purgeDeletedAccounts();
+  setInterval(() => {
+    void purgeExpiredData();
+    void purgeDeletedAccounts();
+  }, 24 * 60 * 60 * 1000);
 });

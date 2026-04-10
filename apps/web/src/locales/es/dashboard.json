@@ -45,6 +45,10 @@
   "refusedSuccess": "Registro rechazado",
   "testAi": "Test Agente IA",
   "testAiDesc": "Probar el LLM directamente sin prompt de sistema (solo admin)",
+  "adminPanel": "Administración",
+  "adminPanelDesc": "Gestionar usuarios, incidentes de privacidad y pruebas de IA",
+  "breachRegister": "Registro de incidentes",
+  "breachRegisterDesc": "Registrar y gestionar incidentes de privacidad (Ley 25)",
   "installApp": "Instalar SanoTalk",
   "installAppDescription": "Agrega a tu pantalla de inicio para acceso rápido, incluso sin conexión",
   "installButton": "Instalar"

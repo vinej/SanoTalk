@@ -176,6 +176,20 @@
       "when": 1774901700000,
       "tag": "0024_user_approved",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1775849113102,
+      "tag": "0025_nostalgic_bedlam",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1775849946152,
+      "tag": "0026_jazzy_rumiko_fujikawa",
+      "breakpoints": true
     }
   ]
 }

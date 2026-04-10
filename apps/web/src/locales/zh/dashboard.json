@@ -45,6 +45,10 @@
   "refusedSuccess": "注册已拒绝",
   "testAi": "测试 AI 代理",
   "testAiDesc": "直接测试 LLM，无系统提示（仅管理员）",
+  "adminPanel": "管理面板",
+  "adminPanelDesc": "管理用户、隐私事件和AI测试",
+  "breachRegister": "事件登记",
+  "breachRegisterDesc": "记录和管理隐私事件（第25号法律）",
   "installApp": "安装 SanoTalk",
   "installAppDescription": "添加到主屏幕，即使离线也能快速访问",
   "installButton": "安装"

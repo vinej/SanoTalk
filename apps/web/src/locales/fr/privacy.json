@@ -1,0 +1,122 @@
+{
+  "title": "Politique de confidentialité",
+  "lastUpdated": "Dernière mise à jour : 10 avril 2026",
+  "sections": {
+    "dataCollected": {
+      "title": "Renseignements personnels collectés",
+      "body": "SanoTalk recueille les renseignements personnels suivants :\n\n- **Identité** : nom, adresse courriel, rôle (patient, médecin, pharmacien)\n- **Données de santé** : signes vitaux, médicaments, symptômes, allergies, conditions chroniques, numéro RAMQ\n- **Communications** : messages avec les agents IA, transcriptions de consultations, enregistrements de sessions\n- **Données techniques** : adresse IP, type de navigateur, informations sur l’appareil, jetons de session\n- **Données d’utilisation** : utilisation des fonctionnalités, conversations sauvegardées, tableaux de tâches"
+    },
+    "purposes": {
+      "title": "Pourquoi nous recueillons vos données",
+      "body": "Nous recueillons et utilisons vos renseignements personnels aux fins suivantes :\n\n- Fournir les fonctionnalités de soutien en santé (agents IA, consultations, suivi de santé)\n- Authentifier votre identité et sécuriser votre compte (2FA, vérification par courriel)\n- Permettre la communication entre patients et professionnels de la santé\n- Générer des résumés et recommandations de santé assistés par IA\n- Améliorer nos services et l’expérience utilisateur\n- Respecter nos obligations légales et réglementaires"
+    },
+    "retention": {
+      "title": "Durée de conservation de vos données",
+      "body": "Nous conservons vos renseignements personnels aussi longtemps que votre compte est actif et conformément aux lois applicables :\n\n- **Dossiers de santé** (signes vitaux, médicaments, symptômes, allergies) : 5 ans\n- **Messages de clavardage et conversations sauvegardées** : 1 an\n- **Transcriptions de consultations** : 2 ans\n- **Journaux techniques** : 90 jours\n\nVous pouvez demander la suppression de vos données à tout moment dans les paramètres de votre profil."
+    },
+    "thirdPartyAccess": {
+      "title": "Accès par des tiers",
+      "body": "Vos données peuvent être traitées par les services tiers suivants :\n\n- **Anthropic** (fournisseur de modèle de langage IA) — les messages sont envoyés pour générer les réponses IA\n- **Deepgram** — transcription audio lors des consultations en direct\n- **LiveKit** — communication audio/vidéo en temps réel\n- **Resend** — courriels transactionnels (vérification, notifications)\n\nNous ne vendons pas vos renseignements personnels. Les données de santé ne sont jamais partagées avec des tiers à des fins publicitaires."
+    },
+    "userRights": {
+      "title": "Vos droits",
+      "body": "En vertu de la Loi 25 du Québec (Loi sur la protection des renseignements personnels dans le secteur privé), vous avez le droit de :\n\n- **Accéder** à vos renseignements personnels\n- **Rectifier** les informations inexactes\n- **Supprimer** vos renseignements personnels (droit à l’effacement)\n- **Portabilité des données** — recevoir vos données dans un format structuré et couramment utilisé (JSON)\n- **Retirer votre consentement** au traitement non essentiel de vos données à tout moment\n- **Être informé** des processus de décision automatisée"
+    },
+    "howToExerciseRights": {
+      "title": "Comment exercer vos droits",
+      "body": "Vous pouvez exercer vos droits directement dans SanoTalk :\n\n- **Télécharger vos données** : Profil > Vie privée et données > Télécharger mes données\n- **Supprimer votre compte** : Profil > Vie privée et données > Supprimer mon compte\n- **Gérer les préférences de cookies** : Cliquez sur « Gérer les cookies » dans le pied de page\n- **Nous contacter** : Écrivez à notre responsable de la vie privée à l’adresse ci-dessous pour toute autre demande\n\nNous répondrons à votre demande dans un délai de 30 jours."
+    },
+    "privacyOfficer": {
+      "title": "Responsable de la protection des renseignements personnels",
+      "body": "Notre responsable de la protection des renseignements personnels veille au respect de la législation en matière de vie privée. Pour toute question, préoccupation ou demande concernant vos renseignements personnels, veuillez communiquer avec :"
+    },
+    "aiTransparency": {
+      "title": "Utilisation de l’intelligence artificielle",
+      "body": "SanoTalk utilise l’intelligence artificielle (IA) dans plusieurs fonctionnalités :\n\n- **Assistant IA Santé** — répond aux questions de santé et fournit un triage\n- **Compagnon Bien-être** — accompagne les conversations sur le bien-être et le mode de vie\n- **Agent IA Pharmacien** — fournit des conseils sur les médicaments et la posologie\n- **Info Médicament** — recherche les effets secondaires et interactions via des bases de données externes\n- **Agent IA Actualités** — résume les nouvelles de santé\n- **Résumés de consultations** — résumés générés par IA des consultations médicales\n\nLe contenu généré par l’IA est à titre informatif seulement et ne constitue pas un avis médical, un diagnostic ou un traitement. Vous pouvez toujours demander une révision par un professionnel de la santé qualifié. Les réponses de l’IA peuvent contenir des erreurs — vérifiez toujours les informations médicales critiques auprès de votre professionnel de la santé.\n\n**Partage des données de santé avec les agents IA** : Par défaut, les agents IA n’ont **pas** accès à vos données de santé personnelles (profil de santé, signes vitaux, médicaments, symptômes, allergies, conditions chroniques). Pour recevoir des réponses IA personnalisées, vous devez activer explicitement le partage des données de santé dans vos paramètres **Profil > Vie privée et données**. Vous pouvez désactiver cette option à tout moment, et les agents IA fourniront alors uniquement des réponses génériques."
+    },
+    "cookies": {
+      "title": "Cookies et suivi",
+      "body": "SanoTalk utilise les types de cookies suivants :\n\n- **Cookies essentiels** : Nécessaires pour l’authentification et la sécurité (jetons de session). Ils ne peuvent pas être désactivés.\n- **Cookies analytiques** : Utilisés pour comprendre comment les utilisateurs interagissent avec notre application (OpenReplay). Ils sont optionnels et nécessitent votre consentement explicite.\n\nVous pouvez gérer vos préférences de cookies à tout moment via le lien « Gérer les cookies » dans le pied de page."
+    },
+    "changes": {
+      "title": "Modifications de cette politique",
+      "body": "Nous pouvons mettre à jour cette politique de confidentialité périodiquement. Nous vous informerons des changements importants par courriel ou par un avis dans l’application. La date de « Dernière mise à jour » en haut de cette page indique la dernière révision."
+    }
+  },
+  "privacyOfficerName": "Responsable de la vie privée",
+  "privacyOfficerEmail": "privacy@sanotalk.com",
+  "consent": {
+    "banner": {
+      "title": "Préférences de cookies",
+      "description": "Nous utilisons des cookies essentiels pour l’authentification et des cookies analytiques optionnels pour améliorer nos services. Vous pouvez accepter ou refuser les cookies non essentiels.",
+      "acceptAll": "Tout accepter",
+      "rejectAll": "Tout refuser",
+      "managePreferences": "Gérer les préférences"
+    },
+    "categories": {
+      "essential": "Essentiels",
+      "essentialDesc": "Nécessaires pour l’authentification et la sécurité. Ne peuvent pas être désactivés.",
+      "analytics": "Analytiques",
+      "analyticsDesc": "Nous aident à comprendre comment vous utilisez l’application pour améliorer nos services."
+    },
+    "settings": {
+      "title": "Paramètres des cookies",
+      "save": "Enregistrer les préférences"
+    },
+    "footer": {
+      "manageCookies": "Gérer les cookies"
+    }
+  },
+  "footer": {
+    "privacyPolicy": "Politique de confidentialité",
+    "manageCookies": "Gérer les cookies",
+    "privacyOfficer": "Responsable vie privée"
+  },
+  "ai": {
+    "transparencyNotice": "Cette fonctionnalité utilise l’intelligence artificielle. Les réponses sont générées par IA et sont à titre informatif seulement — elles ne constituent pas un avis médical.",
+    "dismiss": "Fermer"
+  },
+  "export": {
+    "title": "Télécharger mes données",
+    "description": "Téléchargez toutes vos données personnelles en format JSON.",
+    "button": "Télécharger mes données",
+    "downloading": "Préparation de vos données...",
+    "success": "Vos données ont été téléchargées."
+  },
+  "deletion": {
+    "title": "Supprimer mon compte",
+    "description": "Supprimez définitivement votre compte et toutes les données associées.",
+    "gracePeriod": "Vos données seront définitivement supprimées après un délai de grâce de 14 jours. Vous pouvez annuler pendant cette période.",
+    "requestButton": "Supprimer mon compte",
+    "confirmTitle": "Confirmer la suppression du compte",
+    "confirmMessage": "Êtes-vous sûr de vouloir supprimer votre compte ? Toutes vos données (dossiers de santé, conversations, signes vitaux, médicaments) seront définitivement supprimées après 14 jours. Cette action peut être annulée pendant le délai de grâce.",
+    "confirmButton": "Oui, supprimer mon compte",
+    "cancelButton": "Annuler la suppression",
+    "pendingMessage": "Votre compte est prévu pour suppression.",
+    "scheduledFor": "Suppression prévue pour : {{date}}",
+    "cancelled": "La suppression du compte a été annulée."
+  },
+  "consentHistory": {
+    "title": "Historique des consentements",
+    "empty": "Aucun enregistrement de consentement.",
+    "type": "Type",
+    "status": "Statut",
+    "date": "Date",
+    "consented": "Accepté",
+    "withdrawn": "Retiré",
+    "policyVersion": "Version de la politique"
+  },
+  "aiDataSharing": {
+    "title": "Partager les données de santé avec les agents IA",
+    "description": "Permettre aux agents IA (Assistant santé, Pharmacien, Compagnon, Info médicament) d’accéder à votre profil de santé, signes vitaux, médicaments, symptômes, allergies et conditions chroniques pour fournir des réponses personnalisées.",
+    "statusEnabled": "Vos données de santé sont partagées avec les agents IA pour des réponses personnalisées.",
+    "statusDisabled": "Les agents IA n’ont pas accès à vos données de santé. Les réponses seront génériques.",
+    "confirmTitle": "Activer le partage des données de santé avec l’IA ?",
+    "confirmMessage": "Cela permettra aux agents IA de SanoTalk d’accéder à votre profil de santé, signes vitaux, médicaments, symptômes, allergies et conditions chroniques. Ces données sont utilisées uniquement pour personnaliser les réponses IA et ne sont jamais partagées avec des tiers à des fins publicitaires. Vous pouvez désactiver cette option à tout moment.",
+    "confirm": "Oui, partager mes données de santé",
+    "cancel": "Annuler"
+  },
+  "signUp": {
+    "acceptPrivacy": "J’ai lu et j’accepte la <link>Politique de confidentialité</link>"
+  }
+}

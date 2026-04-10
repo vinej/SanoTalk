@@ -1,0 +1,122 @@
+{
+  "title": "隐私政策",
+  "lastUpdated": "最后更新：2026年4月10日",
+  "sections": {
+    "dataCollected": {
+      "title": "我们收集的个人信息",
+      "body": "SanoTalk 收集以下个人信息：\n\n- **身份信息**：姓名、电子邮件、角色\n- **健康数据**：生命体征、药物、症状、过敏、慢性病、RAMQ号码\n- **通信数据**：AI代理消息、咨询记录\n- **技术数据**：IP地址、浏览器类型、设备信息\n- **使用数据**：功能使用情况、保存的对话"
+    },
+    "purposes": {
+      "title": "我们为什么收集您的数据",
+      "body": "我们收集和使用您的个人信息用于提供健康支持功能、身份验证、患者与医疗专业人员之间的沟通、AI健康摘要生成以及遵守法律义务。"
+    },
+    "retention": {
+      "title": "数据保留时间",
+      "body": "健康记录：5年、聊天消息：1年、咨询记录：2年、技术日志：90天。您可以随时请求删除您的数据。"
+    },
+    "thirdPartyAccess": {
+      "title": "第三方访问",
+      "body": "您的数据可能由以下服务处理：Anthropic（AI）、Deepgram（转录）、LiveKit（通信）、Resend（邮件）。我们不会出售您的个人信息。"
+    },
+    "userRights": {
+      "title": "您的权利",
+      "body": "根据魁北克第25号法律，您有权访问、更正、删除和转移您的个人数据，撤回同意，并了解自动化决策。"
+    },
+    "howToExerciseRights": {
+      "title": "如何行使您的权利",
+      "body": "您可以通过个人资料页面或联系我们的隐私专员来行使您的权利。"
+    },
+    "privacyOfficer": {
+      "title": "隐私专员",
+      "body": "如有任何关于您个人数据的问题，请联系："
+    },
+    "aiTransparency": {
+      "title": "人工智能的使用",
+      "body": "SanoTalk 在多个功能中使用AI。AI生成的内容仅供参考，不构成医疗建议。\n\n**与AI代理共享健康数据**：默认情况下，AI代理**无法**访问您的个人健康数据（健康档案、生命体征、药物、症状、过敏和慢性病）。要获得个性化的AI回复，您必须在**个人资料 > 隐私与数据**设置中明确启用健康数据共享。您可以随时禁用此选项，届时AI代理将仅提供通用回复。"
+    },
+    "cookies": {
+      "title": "Cookie和跟踪",
+      "body": "我们使用必要的cookie（身份验证）和可选的分析cookie。您可以随时管理您的偏好。"
+    },
+    "changes": {
+      "title": "政策变更",
+      "body": "我们可能会定期更新此隐私政策。重大变更将通过邮件或应用内通知告知您。"
+    }
+  },
+  "privacyOfficerName": "隐私专员",
+  "privacyOfficerEmail": "privacy@sanotalk.com",
+  "consent": {
+    "banner": {
+      "title": "Cookie偏好设置",
+      "description": "我们使用必要的cookie和可选的分析cookie。您可以接受或拒绝非必要的cookie。",
+      "acceptAll": "全部接受",
+      "rejectAll": "全部拒绝",
+      "managePreferences": "管理偏好"
+    },
+    "categories": {
+      "essential": "必要",
+      "essentialDesc": "身份验证和安全所必需。无法禁用。",
+      "analytics": "分析",
+      "analyticsDesc": "帮助我们了解您如何使用应用程序。"
+    },
+    "settings": {
+      "title": "Cookie设置",
+      "save": "保存偏好"
+    },
+    "footer": {
+      "manageCookies": "管理Cookie"
+    }
+  },
+  "footer": {
+    "privacyPolicy": "隐私政策",
+    "manageCookies": "管理Cookie",
+    "privacyOfficer": "隐私专员"
+  },
+  "ai": {
+    "transparencyNotice": "此功能使用人工智能。响应由AI生成，仅供参考——不构成医疗建议。",
+    "dismiss": "关闭"
+  },
+  "export": {
+    "title": "下载我的数据",
+    "description": "以JSON格式下载所有个人数据。",
+    "button": "下载我的数据",
+    "downloading": "正在准备您的数据...",
+    "success": "您的数据已下载。"
+  },
+  "deletion": {
+    "title": "删除我的账户",
+    "description": "永久删除您的账户和所有相关数据。",
+    "gracePeriod": "您的数据将在14天宽限期后永久删除。",
+    "requestButton": "删除我的账户",
+    "confirmTitle": "确认删除账户",
+    "confirmMessage": "您确定要删除您的账户吗？所有数据将在14天后永久删除。",
+    "confirmButton": "是的，删除我的账户",
+    "cancelButton": "取消删除",
+    "pendingMessage": "您的账户已计划删除。",
+    "scheduledFor": "计划删除日期：{{date}}",
+    "cancelled": "账户删除已取消。"
+  },
+  "consentHistory": {
+    "title": "同意历史",
+    "empty": "没有同意记录。",
+    "type": "类型",
+    "status": "状态",
+    "date": "日期",
+    "consented": "已接受",
+    "withdrawn": "已撤回",
+    "policyVersion": "政策版本"
+  },
+  "aiDataSharing": {
+    "title": "与AI代理共享健康数据",
+    "description": "允许AI代理访问您的健康档案、生命体征、药物、症状、过敏和慢性病，以提供个性化回复。",
+    "statusEnabled": "您的健康数据已与AI代理共享。",
+    "statusDisabled": "AI代理无法访问您的健康数据。回复将是通用的。",
+    "confirmTitle": "启用AI健康数据共享？",
+    "confirmMessage": "这将允许SanoTalk AI代理访问您的健康档案、生命体征、药物、症状、过敏和慢性病。您可以随时禁用此选项。",
+    "confirm": "是的，共享我的健康数据",
+    "cancel": "取消"
+  },
+  "signUp": {
+    "acceptPrivacy": "我已阅读并接受<link>隐私政策</link>"
+  }
+}

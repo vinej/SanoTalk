@@ -6,6 +6,7 @@ import {
 //import { TanStackRouterDevtools } from "@tanstack/router-devtools";
 import type { QueryClient } from "@tanstack/react-query";
 import { Toaster as Sooner  } from "../components/ui/sonner";
+import { CookieConsentBanner } from "../components/cookie-consent-banner";
 
 export interface RouterContext {
   queryClient: QueryClient;
@@ -25,6 +26,7 @@ function RootComponent() {
       )}
       <Outlet />
       <Sooner />
+      <CookieConsentBanner />
     </>
   );
 }

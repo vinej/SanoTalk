@@ -54,30 +54,17 @@ function DashboardPage() {
       )}
 
       {profile?.role === "admin" && (
-        <>
-          <Link to="/admin-approvals" className="group">
-            <div className="flex items-center gap-4 rounded-xl border-2 border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 p-5 transition-shadow hover:shadow-md">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-gray-900 shadow-sm">
-                <ShieldCheck className="h-6 w-6 text-amber-600" />
-              </div>
-              <div className="min-w-0">
-                <p className="font-semibold group-hover:underline">{t(`dashboard:adminApprovals`)}</p>
-                <p className="text-sm text-muted-foreground">{t(`dashboard:adminApprovalsDesc`)}</p>
-              </div>
+        <Link to="/admin-panel" className="group">
+          <div className="flex items-center gap-4 rounded-xl border-2 border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30 p-5 transition-shadow hover:shadow-md">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-gray-900 shadow-sm">
+              <ShieldCheck className="h-6 w-6 text-amber-600" />
             </div>
-          </Link>
-          <Link to="/test-ai" className="group">
-            <div className="flex items-center gap-4 rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-950/30 p-5 transition-shadow hover:shadow-md">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-gray-900 shadow-sm">
-                <FlaskRound className="h-6 w-6 text-gray-600" />
-              </div>
-              <div className="min-w-0">
-                <p className="font-semibold group-hover:underline">{t(`dashboard:testAi`)}</p>
-                <p className="text-sm text-muted-foreground">{t(`dashboard:testAiDesc`)}</p>
-              </div>
+            <div className="min-w-0">
+              <p className="font-semibold group-hover:underline">{t(`dashboard:adminPanel`)}</p>
+              <p className="text-sm text-muted-foreground">{t(`dashboard:adminPanelDesc`)}</p>
             </div>
-          </Link>
-        </>
+          </div>
+        </Link>
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

@@ -1,0 +1,122 @@
+{
+  "title": "Privacy Policy",
+  "lastUpdated": "Last updated: April 10, 2026",
+  "sections": {
+    "dataCollected": {
+      "title": "Personal Information We Collect",
+      "body": "SanoTalk collects the following personal information:\n\n- **Identity**: name, email address, role (patient, doctor, pharmacist)\n- **Health data**: vital signs, medications, symptoms, allergies, chronic conditions, RAMQ number\n- **Communications**: chat messages with AI agents, consultation transcripts, session recordings\n- **Technical data**: IP address, browser type, device information, session tokens\n- **Usage data**: feature usage, saved conversations, task boards"
+    },
+    "purposes": {
+      "title": "Why We Collect Your Data",
+      "body": "We collect and use your personal information for the following purposes:\n\n- Providing healthcare support features (AI agents, consultations, health tracking)\n- Authenticating your identity and securing your account (2FA, email verification)\n- Enabling communication between patients and healthcare professionals\n- Generating AI-powered health summaries and recommendations\n- Improving our services and user experience\n- Complying with legal and regulatory obligations"
+    },
+    "retention": {
+      "title": "How Long We Keep Your Data",
+      "body": "We retain your personal information for as long as your account is active and as required by applicable law:\n\n- **Health records** (vitals, medications, symptoms, allergies): 5 years\n- **Chat messages and saved conversations**: 1 year\n- **Consultation transcripts**: 2 years\n- **Technical logs**: 90 days\n\nYou may request deletion of your data at any time through your profile settings."
+    },
+    "thirdPartyAccess": {
+      "title": "Third-Party Access",
+      "body": "Your data may be processed by the following third-party services:\n\n- **Anthropic** (AI language model provider) — chat messages are sent to generate AI responses\n- **Deepgram** — audio transcription during live consultations\n- **LiveKit** — real-time audio/video communication\n- **Resend** — transactional emails (verification, notifications)\n\nWe do not sell your personal information. Health data is never shared with third parties for advertising purposes."
+    },
+    "userRights": {
+      "title": "Your Rights",
+      "body": "Under Quebec's Law 25 (Act respecting the protection of personal information in the private sector), you have the right to:\n\n- **Access** your personal information\n- **Rectify** inaccurate information\n- **Delete** your personal information (right to erasure)\n- **Data portability** — receive your data in a structured, commonly used format (JSON)\n- **Withdraw consent** to non-essential data processing at any time\n- **Be informed** about automated decision-making processes"
+    },
+    "howToExerciseRights": {
+      "title": "How to Exercise Your Rights",
+      "body": "You can exercise your rights directly within SanoTalk:\n\n- **Download your data**: Go to Profile > Privacy & Data > Download My Data\n- **Delete your account**: Go to Profile > Privacy & Data > Delete My Account\n- **Manage cookie preferences**: Click \"Manage Cookies\" in the footer\n- **Contact us**: Email our Privacy Officer at the address below for any other request\n\nWe will respond to your request within 30 days."
+    },
+    "privacyOfficer": {
+      "title": "Privacy Officer",
+      "body": "Our Privacy Officer is responsible for ensuring compliance with privacy legislation. For any questions, concerns, or requests regarding your personal information, please contact:"
+    },
+    "aiTransparency": {
+      "title": "Use of Artificial Intelligence",
+      "body": "SanoTalk uses artificial intelligence (AI) in several features:\n\n- **Health AI Assistant** — answers health questions and provides triage guidance\n- **Wellness Companion** — supports conversations about wellness and lifestyle\n- **Pharmacist AI Agent** — provides medication and dosage guidance\n- **Drug Info** — looks up drug side effects and interactions via external databases\n- **News AI Agent** — summarizes health news\n- **Consultation summaries** — AI-generated summaries of medical consultations\n\nAI-generated content is for informational purposes only and does not constitute medical advice, diagnosis, or treatment. You can always request a review by a qualified healthcare professional. AI responses may contain errors — always verify critical medical information with your healthcare provider.\n\n**Health data sharing with AI agents**: By default, AI agents do **not** have access to your personal health data (health profile, vital signs, medications, symptoms, allergies, chronic conditions). To receive personalized AI responses, you must explicitly enable health data sharing in your **Profile > Privacy & Data** settings. You can disable this option at any time, and AI agents will then provide only generic responses."
+    },
+    "cookies": {
+      "title": "Cookies and Tracking",
+      "body": "SanoTalk uses the following types of cookies:\n\n- **Essential cookies**: Required for authentication and security (session tokens). These cannot be disabled.\n- **Analytics cookies**: Used to understand how users interact with our application (OpenReplay session replay). These are optional and require your explicit consent.\n\nYou can manage your cookie preferences at any time using the \"Manage Cookies\" link in the footer."
+    },
+    "changes": {
+      "title": "Changes to This Policy",
+      "body": "We may update this privacy policy from time to time. We will notify you of significant changes by email or through a notice in the application. The \"Last updated\" date at the top of this page indicates when this policy was last revised."
+    }
+  },
+  "privacyOfficerName": "Privacy Officer",
+  "privacyOfficerEmail": "privacy@sanotalk.com",
+  "consent": {
+    "banner": {
+      "title": "Cookie Preferences",
+      "description": "We use essential cookies for authentication and optional analytics cookies to improve our services. You can accept or reject non-essential cookies.",
+      "acceptAll": "Accept All",
+      "rejectAll": "Reject All",
+      "managePreferences": "Manage Preferences"
+    },
+    "categories": {
+      "essential": "Essential",
+      "essentialDesc": "Required for authentication and security. Cannot be disabled.",
+      "analytics": "Analytics",
+      "analyticsDesc": "Help us understand how you use the application to improve our services."
+    },
+    "settings": {
+      "title": "Cookie Settings",
+      "save": "Save Preferences"
+    },
+    "footer": {
+      "manageCookies": "Manage Cookies"
+    }
+  },
+  "footer": {
+    "privacyPolicy": "Privacy Policy",
+    "manageCookies": "Manage Cookies",
+    "privacyOfficer": "Privacy Officer"
+  },
+  "ai": {
+    "transparencyNotice": "This feature uses artificial intelligence. Responses are generated by AI and are for informational purposes only — they do not constitute medical advice.",
+    "dismiss": "Dismiss"
+  },
+  "export": {
+    "title": "Download My Data",
+    "description": "Download all your personal data in JSON format.",
+    "button": "Download My Data",
+    "downloading": "Preparing your data...",
+    "success": "Your data has been downloaded."
+  },
+  "deletion": {
+    "title": "Delete My Account",
+    "description": "Permanently delete your account and all associated data.",
+    "gracePeriod": "Your data will be permanently deleted after a 14-day grace period. You can cancel during this period.",
+    "requestButton": "Delete My Account",
+    "confirmTitle": "Confirm Account Deletion",
+    "confirmMessage": "Are you sure you want to delete your account? All your data (health records, conversations, vitals, medications) will be permanently deleted after 14 days. This action can be cancelled during the grace period.",
+    "confirmButton": "Yes, Delete My Account",
+    "cancelButton": "Cancel Deletion",
+    "pendingMessage": "Your account is scheduled for deletion.",
+    "scheduledFor": "Deletion scheduled for: {{date}}",
+    "cancelled": "Account deletion has been cancelled."
+  },
+  "consentHistory": {
+    "title": "Consent History",
+    "empty": "No consent records.",
+    "type": "Type",
+    "status": "Status",
+    "date": "Date",
+    "consented": "Accepted",
+    "withdrawn": "Withdrawn",
+    "policyVersion": "Policy version"
+  },
+  "aiDataSharing": {
+    "title": "Share health data with AI agents",
+    "description": "Allow AI agents (Health Assistant, Pharmacist, Companion, Drug Info) to access your health profile, vital signs, medications, symptoms, allergies and chronic conditions to provide personalized responses.",
+    "statusEnabled": "Your health data is shared with AI agents for personalized responses.",
+    "statusDisabled": "AI agents do not have access to your health data. Responses will be generic.",
+    "confirmTitle": "Enable AI health data sharing?",
+    "confirmMessage": "This will allow SanoTalk AI agents to access your health profile, vital signs, medications, symptoms, allergies and chronic conditions. This data is used only to personalize AI responses and is never shared with third parties for advertising. You can disable this at any time.",
+    "confirm": "Yes, share my health data",
+    "cancel": "Cancel"
+  },
+  "signUp": {
+    "acceptPrivacy": "I have read and accept the <link>Privacy Policy</link>"
+  }
+}

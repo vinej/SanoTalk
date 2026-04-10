@@ -16,6 +16,7 @@ export const Route: any = createFileRoute("/login")({
 function LoginPage() {
   const navigate = useNavigate();
   const { t } = useTranslation("common");
+  const { t: tp } = useTranslation("privacy");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -124,6 +125,12 @@ function LoginPage() {
               </Link>
             </p>
           </div>
+
+          <p className="text-center text-xs text-muted-foreground mt-4">
+            <Link to="/privacy-policy" className="hover:underline underline-offset-4">
+              {tp("footer.privacyPolicy")}
+            </Link>
+          </p>
         </div>
       </div>
     </div>

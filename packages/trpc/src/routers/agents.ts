@@ -25,15 +25,35 @@ async function getUserContext(db: DB, userId: string) {
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
   const sevenDaysAgoStr = sevenDaysAgo.toISOString().split("T")[0]!;
 
-  const [properties, userRow, recentVitals, activeMedications, recentSymptoms, userAllergies, userConditions] = await Promise.all([
+  // Check AI data sharing consent first
+  const [userRow] = await db
+    .select({
+      propertiesLanguage: user.propertiesLanguage,
+      aiDataSharingConsent: (user as any).aiDataSharingConsent,
+    })
+    .from(user)
+    .where(eq(user.id, userId));
+
+  const hasConsent = (userRow as any)?.aiDataSharingConsent === true;
+
+  // If user hasn't consented to AI data sharing, return only language preference
+  if (!hasConsent) {
+    return {
+      properties: [] as { key: string; value: string }[],
+      propertiesLanguage: userRow?.propertiesLanguage ?? "en",
+      recentVitals: [] as (typeof vitalSign.$inferSelect)[],
+      activeMedications: [] as (typeof medication.$inferSelect)[],
+      recentSymptoms: [] as (typeof symptomLog.$inferSelect)[],
+      userAllergies: [] as (typeof allergy.$inferSelect)[],
+      userConditions: [] as (typeof chronicCondition.$inferSelect)[],
+    };
+  }
+
+  const [properties, recentVitals, activeMedications, recentSymptoms, userAllergies, userConditions] = await Promise.all([
     db
       .select({ key: userProperty.key, value: userProperty.value })
       .from(userProperty)
       .where(eq(userProperty.userId, userId)),
-    db
-      .select({ propertiesLanguage: user.propertiesLanguage })
-      .from(user)
-      .where(eq(user.id, userId)),
     db
       .select()
       .from(vitalSign)
@@ -69,7 +89,7 @@ async function getUserContext(db: DB, userId: string) {
 
   return {
     properties: safeProperties,
-    propertiesLanguage: userRow[0]?.propertiesLanguage ?? "en",
+    propertiesLanguage: userRow?.propertiesLanguage ?? "en",
     recentVitals,
     activeMedications,
     recentSymptoms,

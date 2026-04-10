@@ -7,6 +7,7 @@ import { FacilityListPanel } from "../../components/health-help/facility-list-pa
 import { MapPanel } from "../../components/health-help/map-panel";
 import { EmergencyNumbers } from "../../components/health-help/emergency-numbers";
 import { Button } from "../../components/ui/button";
+import { AiTransparencyNotice } from "../../components/ai-transparency-notice";
 import { MapPin, RefreshCw, Loader2, Bell } from "lucide-react";
 
 export type FacilityType = "hospital" | "clsc" | "pharmacy" | "clinic";
@@ -162,6 +163,11 @@ function HealthHelpPage() {
             {t("refreshLocation")}
           </Button>
         </div>
+      </div>
+
+      {/* AI transparency notice */}
+      <div className="px-4 pt-2">
+        <AiTransparencyNotice />
       </div>
 
       {/* Emergency numbers */}

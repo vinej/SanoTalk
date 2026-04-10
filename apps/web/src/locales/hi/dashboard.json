@@ -45,6 +45,10 @@
   "refusedSuccess": "पंजीकरण अस्वीकृत",
   "testAi": "AI एजेंट परीक्षण",
   "testAiDesc": "बिना किसी सिस्टम प्रॉम्प्ट के LLM का सीधे परीक्षण करें (केवल एडमिन)",
+  "adminPanel": "प्रशासन पैनल",
+  "adminPanelDesc": "उपयोगकर्ताओं, गोपनीयता घटनाओं और AI परीक्षण का प्रबंधन",
+  "breachRegister": "घटना रजिस्टर",
+  "breachRegisterDesc": "गोपनीयता घटनाओं को रिकॉर्ड और प्रबंधित करें (कानून 25)",
   "installApp": "SanoTalk इंस्टॉल करें",
   "installAppDescription": "त्वरित पहुंच के लिए होम स्क्रीन पर जोड़ें, ऑफ़लाइन भी",
   "installButton": "इंस्टॉल"
