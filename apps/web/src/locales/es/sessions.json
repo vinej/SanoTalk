@@ -136,6 +136,12 @@
         "desc": "«{{title}}» se eliminará permanentemente. Esta acción no se puede deshacer.",
         "cancel": "Cancelar",
         "confirm": "Eliminar"
+      },
+      "duplicateDialog": {
+        "title": "El nombre ya existe",
+        "desc": "Ya existe una conversación guardada llamada «{{title}}». ¿Guardar de todos modos?",
+        "cancel": "Cancelar",
+        "confirm": "Guardar de todos modos"
       }
     },
     "speaking": "Hablando…",
@@ -155,6 +161,12 @@
     "titleTest": "Test Agente IA",
     "emptyTest": "Envía un mensaje para probar el LLM directamente.",
     "placeholderTest": "Escribe un mensaje…",
+    "titleExercise": "Asistente IA de Ejercicio",
+    "emptyExercise": "Pregunta sobre ejercicios adecuados para tu edad y condición física.",
+    "placeholderExercise": "Pregunta sobre ejercicios para mayores…",
+    "titleEatwell": "Asistente Comer Bien",
+    "emptyEatwell": "Pregunte sobre nutrición o qué comer según sus condiciones.",
+    "placeholderEatwell": "Qué alimentos son buenos para mi salud…",
     "urgency": {
       "emergency": "Llame al 911 — Emergencia",
       "emergencyDesc": "Sus síntomas pueden poner en peligro su vida. Llame al 911 inmediatamente o vaya a la sala de emergencias más cercana.",

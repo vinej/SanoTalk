@@ -30,7 +30,9 @@ import { Route as AuthKanbanRouteImport } from './routes/_auth/kanban'
 import { Route as AuthHealthHelpRouteImport } from './routes/_auth/health-help'
 import { Route as AuthGoOutsideRouteImport } from './routes/_auth/go-outside'
 import { Route as AuthFriendChatRouteImport } from './routes/_auth/friend-chat'
+import { Route as AuthExerciseAiRouteImport } from './routes/_auth/exercise-ai'
 import { Route as AuthErAlertsRouteImport } from './routes/_auth/er-alerts'
+import { Route as AuthEatWellRouteImport } from './routes/_auth/eat-well'
 import { Route as AuthDrugInfoRouteImport } from './routes/_auth/drug-info'
 import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
 import { Route as AuthCompanionRouteImport } from './routes/_auth/companion'
@@ -148,9 +150,19 @@ const AuthFriendChatRoute = AuthFriendChatRouteImport.update({
   path: '/friend-chat',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthExerciseAiRoute = AuthExerciseAiRouteImport.update({
+  id: '/exercise-ai',
+  path: '/exercise-ai',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthErAlertsRoute = AuthErAlertsRouteImport.update({
   id: '/er-alerts',
   path: '/er-alerts',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthEatWellRoute = AuthEatWellRouteImport.update({
+  id: '/eat-well',
+  path: '/eat-well',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthDrugInfoRoute = AuthDrugInfoRouteImport.update({
@@ -232,7 +244,9 @@ export interface FileRoutesByFullPath {
   '/companion': typeof AuthCompanionRoute
   '/dashboard': typeof AuthDashboardRoute
   '/drug-info': typeof AuthDrugInfoRoute
+  '/eat-well': typeof AuthEatWellRoute
   '/er-alerts': typeof AuthErAlertsRoute
+  '/exercise-ai': typeof AuthExerciseAiRoute
   '/friend-chat': typeof AuthFriendChatRoute
   '/go-outside': typeof AuthGoOutsideRoute
   '/health-help': typeof AuthHealthHelpRoute
@@ -266,7 +280,9 @@ export interface FileRoutesByTo {
   '/companion': typeof AuthCompanionRoute
   '/dashboard': typeof AuthDashboardRoute
   '/drug-info': typeof AuthDrugInfoRoute
+  '/eat-well': typeof AuthEatWellRoute
   '/er-alerts': typeof AuthErAlertsRoute
+  '/exercise-ai': typeof AuthExerciseAiRoute
   '/friend-chat': typeof AuthFriendChatRoute
   '/go-outside': typeof AuthGoOutsideRoute
   '/health-help': typeof AuthHealthHelpRoute
@@ -303,7 +319,9 @@ export interface FileRoutesById {
   '/_auth/companion': typeof AuthCompanionRoute
   '/_auth/dashboard': typeof AuthDashboardRoute
   '/_auth/drug-info': typeof AuthDrugInfoRoute
+  '/_auth/eat-well': typeof AuthEatWellRoute
   '/_auth/er-alerts': typeof AuthErAlertsRoute
+  '/_auth/exercise-ai': typeof AuthExerciseAiRoute
   '/_auth/friend-chat': typeof AuthFriendChatRoute
   '/_auth/go-outside': typeof AuthGoOutsideRoute
   '/_auth/health-help': typeof AuthHealthHelpRoute
@@ -341,7 +359,9 @@ export interface FileRouteTypes {
     | '/companion'
     | '/dashboard'
     | '/drug-info'
+    | '/eat-well'
     | '/er-alerts'
+    | '/exercise-ai'
     | '/friend-chat'
     | '/go-outside'
     | '/health-help'
@@ -375,7 +395,9 @@ export interface FileRouteTypes {
     | '/companion'
     | '/dashboard'
     | '/drug-info'
+    | '/eat-well'
     | '/er-alerts'
+    | '/exercise-ai'
     | '/friend-chat'
     | '/go-outside'
     | '/health-help'
@@ -411,7 +433,9 @@ export interface FileRouteTypes {
     | '/_auth/companion'
     | '/_auth/dashboard'
     | '/_auth/drug-info'
+    | '/_auth/eat-well'
     | '/_auth/er-alerts'
+    | '/_auth/exercise-ai'
     | '/_auth/friend-chat'
     | '/_auth/go-outside'
     | '/_auth/health-help'
@@ -590,11 +614,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthFriendChatRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/exercise-ai': {
+      id: '/_auth/exercise-ai'
+      path: '/exercise-ai'
+      fullPath: '/exercise-ai'
+      preLoaderRoute: typeof AuthExerciseAiRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/er-alerts': {
       id: '/_auth/er-alerts'
       path: '/er-alerts'
       fullPath: '/er-alerts'
       preLoaderRoute: typeof AuthErAlertsRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/eat-well': {
+      id: '/_auth/eat-well'
+      path: '/eat-well'
+      fullPath: '/eat-well'
+      preLoaderRoute: typeof AuthEatWellRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/drug-info': {
@@ -694,7 +732,9 @@ interface AuthRouteChildren {
   AuthCompanionRoute: typeof AuthCompanionRoute
   AuthDashboardRoute: typeof AuthDashboardRoute
   AuthDrugInfoRoute: typeof AuthDrugInfoRoute
+  AuthEatWellRoute: typeof AuthEatWellRoute
   AuthErAlertsRoute: typeof AuthErAlertsRoute
+  AuthExerciseAiRoute: typeof AuthExerciseAiRoute
   AuthFriendChatRoute: typeof AuthFriendChatRoute
   AuthGoOutsideRoute: typeof AuthGoOutsideRoute
   AuthHealthHelpRoute: typeof AuthHealthHelpRoute
@@ -723,7 +763,9 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthCompanionRoute: AuthCompanionRoute,
   AuthDashboardRoute: AuthDashboardRoute,
   AuthDrugInfoRoute: AuthDrugInfoRoute,
+  AuthEatWellRoute: AuthEatWellRoute,
   AuthErAlertsRoute: AuthErAlertsRoute,
+  AuthExerciseAiRoute: AuthExerciseAiRoute,
   AuthFriendChatRoute: AuthFriendChatRoute,
   AuthGoOutsideRoute: AuthGoOutsideRoute,
   AuthHealthHelpRoute: AuthHealthHelpRoute,

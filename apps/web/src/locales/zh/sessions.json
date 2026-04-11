@@ -136,6 +136,12 @@
         "desc": "「{{title}}」将被永久删除，此操作无法撤销。",
         "cancel": "取消",
         "confirm": "删除"
+      },
+      "duplicateDialog": {
+        "title": "名称已存在",
+        "desc": "已存在名为「{{title}}」的保存对话。仍然保存吗？",
+        "cancel": "取消",
+        "confirm": "仍然保存"
       }
     },
     "speaking": "正在朗读…",
@@ -155,6 +161,12 @@
     "titleTest": "测试 AI 代理",
     "emptyTest": "发送消息以直接测试 LLM。",
     "placeholderTest": "输入消息…",
+    "titleExercise": "运动 AI 助手",
+    "emptyExercise": "询问适合您年龄和体能水平的运动建议。",
+    "placeholderExercise": "询问适合老年人的运动…",
+    "titleEatwell": "饮食助手",
+    "emptyEatwell": "询问营养、饮食或适合您健康状况的食物。",
+    "placeholderEatwell": "哪些食物适合我的健康…",
     "urgency": {
       "emergency": "拨打 911 — 紧急情况",
       "emergencyDesc": "您的症状可能危及生命。请立即拨打 911 或前往最近的急诊室。",

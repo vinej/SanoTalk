@@ -136,6 +136,12 @@
         "desc": "« {{title}} » sera supprimée définitivement. Cette action est irréversible.",
         "cancel": "Annuler",
         "confirm": "Supprimer"
+      },
+      "duplicateDialog": {
+        "title": "Ce nom existe déjà",
+        "desc": "Une conversation sauvegardée nommée « {{title}} » existe déjà. Sauvegarder quand même ?",
+        "cancel": "Annuler",
+        "confirm": "Sauvegarder quand même"
       }
     },
     "speaking": "Lecture en cours…",
@@ -155,6 +161,12 @@
     "titleTest": "Test Agent IA",
     "emptyTest": "Envoyez un message pour tester le LLM directement.",
     "placeholderTest": "Tapez un message…",
+    "titleExercise": "Assistant IA Exercice",
+    "emptyExercise": "Posez des questions sur les exercices adaptés à votre âge et condition physique.",
+    "placeholderExercise": "Posez une question sur les exercices pour aînés…",
+    "titleEatwell": "Assistant Bien Manger",
+    "emptyEatwell": "Posez des questions sur la nutrition ou quoi manger selon vos conditions.",
+    "placeholderEatwell": "Quels aliments sont bons pour ma santé…",
     "urgency": {
       "emergency": "Appelez le 911 — Urgence",
       "emergencyDesc": "Vos symptômes peuvent mettre votre vie en danger. Appelez le 911 immédiatement ou rendez-vous aux urgences les plus proches.",

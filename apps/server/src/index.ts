@@ -14,7 +14,7 @@ import { auth } from "@sanotalk/trpc/auth";
 import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
 import { logger } from "./logger";
 import { startDeepgramWebSocket } from "./deepgram";
-import { runPendingAgents, triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat, callPharmacistChat, callDrugInfoChat, callTestChat } from "./mastra/index";
+import { runPendingAgents, triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat, callPharmacistChat, callDrugInfoChat, callExerciseChat, callEatwellChat, callTestChat } from "./mastra/index";
 import { joinAiParticipant, removeAiParticipant, removeAllAiParticipants, isAiAssistant } from "./ai-voice/index";
 import http from "http";
 
@@ -175,6 +175,8 @@ app.use("/api/trpc/agents.sendCompanionChatMessage", medicalLimiter);
 app.use("/api/trpc/agents.sendNewsChatMessage", medicalLimiter);
 app.use("/api/trpc/agents.sendPharmacistChatMessage", medicalLimiter);
 app.use("/api/trpc/agents.sendDrugInfoChatMessage", medicalLimiter);
+app.use("/api/trpc/agents.sendExerciseChatMessage", medicalLimiter);
+app.use("/api/trpc/agents.sendEatwellChatMessage", medicalLimiter);
 app.use("/api/trpc/agents.sendTestChatMessage", medicalLimiter);
 app.use("/api/trpc/privacy.exportMyData", medicalLimiter);
 app.use("/api/trpc/vitals.shareWithProfessional", medicalLimiter);
@@ -201,7 +203,7 @@ app.use(
   "/api/trpc",
   createExpressMiddleware({
     router: appRouter,
-    createContext: (opts) => createTRPCContext(opts, { triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat, callPharmacistChat, callDrugInfoChat, callTestChat, joinAiParticipant, removeAiParticipant, removeAllAiParticipants, isAiAssistant }),
+    createContext: (opts) => createTRPCContext(opts, { triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat, callPharmacistChat, callDrugInfoChat, callExerciseChat, callEatwellChat, callTestChat, joinAiParticipant, removeAiParticipant, removeAllAiParticipants, isAiAssistant }),
     onError({ path, error }) {
       logger.error({ path, code: error.code }, "tRPC error");
     },

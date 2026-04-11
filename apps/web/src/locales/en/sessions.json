@@ -136,6 +136,12 @@
         "desc": "\"{{title}}\" will be permanently deleted. This cannot be undone.",
         "cancel": "Cancel",
         "confirm": "Delete"
+      },
+      "duplicateDialog": {
+        "title": "Name already exists",
+        "desc": "A saved conversation named \"{{title}}\" already exists. Save anyway?",
+        "cancel": "Cancel",
+        "confirm": "Save anyway"
       }
     },
     "speaking": "Speaking…",
@@ -155,6 +161,12 @@
     "titleTest": "Test AI Agent",
     "emptyTest": "Send a message to test the LLM directly.",
     "placeholderTest": "Type a message…",
+    "titleExercise": "Exercise AI Assistant",
+    "emptyExercise": "Ask about exercises suitable for your age and fitness level.",
+    "placeholderExercise": "Ask about exercises for seniors…",
+    "titleEatwell": "Eat Well Assistant",
+    "emptyEatwell": "Ask about nutrition, diet, or what to eat with your conditions.",
+    "placeholderEatwell": "What foods are good for my health…",
     "urgency": {
       "emergency": "Call 911 — Emergency",
       "emergencyDesc": "Your symptoms may be life-threatening. Call 911 immediately or go to the nearest emergency room.",

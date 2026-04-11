@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useCallback, type ComponentType, type ReactNode } from "react";
 import { Button } from "../../components/ui/button";
-import { Kanban, Bot, Heart, Hospital, Download, Activity, Video, Pill, ClipboardList, UserCircle, ShieldAlert, FlaskConical, ShieldCheck, FlaskRound, Newspaper, Search, MessageCircle, ChevronDown, Dumbbell, TreePine, CalendarDays } from "lucide-react";
+import { Kanban, Bot, Heart, Hospital, Download, Activity, Video, Pill, ClipboardList, UserCircle, ShieldAlert, FlaskConical, ShieldCheck, FlaskRound, Newspaper, Search, MessageCircle, ChevronDown, Dumbbell, TreePine, CalendarDays, UtensilsCrossed } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { usePwaInstall } from "../../hooks/use-pwa-install";
 import { trpc } from "../../lib/trpc";
@@ -51,6 +51,8 @@ const AI_ITEMS: FeatureItem[] = [
   { to: "/pharmacist", icon: FlaskConical, color: "text-emerald-600", bg: "bg-emerald-50 dark:bg-emerald-950/30", border: "border-emerald-200 dark:border-emerald-800", key: "pharmacist" },
   { to: "/drug-info", icon: Search, color: "text-purple-600", bg: "bg-purple-50 dark:bg-purple-950/30", border: "border-purple-200 dark:border-purple-800", key: "drugInfo" },
   { to: "/news", icon: Newspaper, color: "text-orange-600", bg: "bg-orange-50 dark:bg-orange-950/30", border: "border-orange-200 dark:border-orange-800", key: "news" },
+  { to: "/exercise-ai", icon: Dumbbell, color: "text-lime-600", bg: "bg-lime-50 dark:bg-lime-950/30", border: "border-lime-200 dark:border-lime-800", key: "exerciseAi" },
+  { to: "/eat-well", icon: UtensilsCrossed, color: "text-green-600", bg: "bg-green-50 dark:bg-green-950/30", border: "border-green-200 dark:border-green-800", key: "eatWell" },
 ];
 
 const ADMIN_ITEMS: FeatureItem[] = [
