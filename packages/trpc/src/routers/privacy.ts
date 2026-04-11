@@ -34,7 +34,7 @@ export const privacyRouter = createTRPCRouter({
     .input(z.object({
       consentType: consentTypeSchema,
       consented: z.boolean(),
-      anonymousId: z.string().max(100).optional(),
+      anonymousId: z.string().uuid().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
       const [row] = await ctx.db.insert(consentRecord).values({

@@ -798,7 +798,7 @@ export const agentsRouter = createTRPCRouter({
         const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
         if (!isAdmin) throw new TRPCError({ code: "FORBIDDEN" });
       }
-      return ctx.db
+      const rows = await ctx.db
         .select({
           id: savedConversation.id,
           title: savedConversation.title,
@@ -814,6 +814,7 @@ export const agentsRouter = createTRPCRouter({
         )
         .orderBy(desc(savedConversation.createdAt))
         .limit(200);
+      return rows.map(r => ({ ...r, title: decryptContent(r.title) ?? r.title }));
     }),
 
   saveConversation: protectedProcedure
@@ -845,13 +846,14 @@ export const agentsRouter = createTRPCRouter({
         content: m.content, // Already encrypted from chatMessage table — stored as-is
       }));
 
-      const existing = await ctx.db.query.savedConversation.findFirst({
+      // Find existing conversation by decrypting titles (can't do equality check on encrypted values)
+      const allSaved = await ctx.db.query.savedConversation.findMany({
         where: and(
           eq(savedConversation.userId, ctx.user.id),
           eq(savedConversation.chatType, input.chatType),
-          eq(savedConversation.title, input.title)
         ),
       });
+      const existing = allSaved.find(s => (decryptContent(s.title) ?? s.title) === input.title) ?? null;
 
       if (existing) {
         const [updated] = await ctx.db
@@ -859,15 +861,11 @@ export const agentsRouter = createTRPCRouter({
           .set({ messages: snapshot, createdAt: new Date() })
           .where(eq(savedConversation.id, existing.id))
           .returning({ id: savedConversation.id, title: savedConversation.title, chatType: savedConversation.chatType, createdAt: savedConversation.createdAt });
-        return updated;
+        return updated ? { ...updated, title: decryptContent(updated.title) ?? updated.title } : updated;
       }
 
-      // Enforce per-user limit on saved conversations
-      const [countResult] = await ctx.db
-        .select({ count: sql<number>`count(*)` })
-        .from(savedConversation)
-        .where(and(eq(savedConversation.userId, ctx.user.id), eq(savedConversation.chatType, input.chatType)));
-      if ((countResult?.count ?? 0) >= 50) {
+      // Enforce per-user limit on saved conversations (allSaved already fetched above)
+      if (allSaved.length >= 50) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Maximum saved conversations reached (50)" });
       }
 
@@ -876,11 +874,11 @@ export const agentsRouter = createTRPCRouter({
         .values({
           userId: ctx.user.id,
           chatType: input.chatType,
-          title: input.title,
+          title: encryptContent(input.title)!,
           messages: snapshot,
         })
         .returning({ id: savedConversation.id, title: savedConversation.title, chatType: savedConversation.chatType, createdAt: savedConversation.createdAt });
-      return saved;
+      return saved ? { ...saved, title: decryptContent(saved.title) ?? saved.title } : saved;
     }),
 
   loadSavedConversation: protectedProcedure

@@ -178,6 +178,21 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 12,
     maxPasswordLength: 128,
+    password: {
+      async hash(password: string) {
+        // Validate complexity before hashing — reject weak passwords server-side
+        if (!/[a-z]/.test(password) || !/[A-Z]/.test(password) || !/[0-9]/.test(password) || !/[^a-zA-Z0-9]/.test(password)) {
+          throw new Error("Password must contain uppercase, lowercase, number, and special character");
+        }
+        // Use Better Auth's default bcrypt hashing
+        const { hashPassword } = await import("better-auth/crypto");
+        return hashPassword(password);
+      },
+      async verify({ password, hash: storedHash }) {
+        const { verifyPassword } = await import("better-auth/crypto");
+        return verifyPassword({ password, hash: storedHash });
+      },
+    },
     // Disabled while Resend delivery to Hotmail/Outlook is unreliable with the
     // shared onboarding@resend.dev sender. Re-enable once a verified sending
     // domain is configured (EMAIL_FROM=noreply@yourdomain.com).

@@ -6,6 +6,8 @@ import { escapeHtml, sanitizeSubject } from "../lib/escape-html";
 import { eq, and, desc, gte, lte, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { encryptContent, decryptContent } from "../lib/crypto";
+import { checkDailyShareLimit } from "../lib/share-limit";
+import { logAuditEvent } from "../lib/audit";
 
 const vitalTypeEnum = z.enum([
   "blood_pressure", "heart_rate", "weight",
@@ -161,6 +163,7 @@ export const vitalsRouter = createTRPCRouter({
       language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
+      await checkDailyShareLimit(ctx.db, ctx.user.id);
       const sender = await ctx.db.query.user.findFirst({
         where: eq(user.id, ctx.user.id),
         columns: { id: true, name: true, role: true },
@@ -231,6 +234,11 @@ export const vitalsRouter = createTRPCRouter({
         status: "assigned",
         assignedUserId: recipient.id,
         taskType: "summary_review",
+      });
+
+      void logAuditEvent(ctx.db, {
+        userId: ctx.user.id, action: "share_data", targetUserId: input.recipientUserId,
+        resourceType: "vital_sign", metadata: { shareType: "vitals" },
       });
 
       return { sent: true };

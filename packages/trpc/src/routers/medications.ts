@@ -6,6 +6,8 @@ import { escapeHtml, sanitizeSubject } from "../lib/escape-html";
 import { eq, and, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { encryptContent, decryptContent } from "../lib/crypto";
+import { checkDailyShareLimit } from "../lib/share-limit";
+import { logAuditEvent } from "../lib/audit";
 
 function decryptMedFields<T extends { name: string; dosage: string; frequency: string; route: string | null; prescribedBy: string | null; reason: string | null; notes: string | null }>(m: T): T {
   return {
@@ -122,6 +124,7 @@ export const medicationsRouter = createTRPCRouter({
       language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
+      await checkDailyShareLimit(ctx.db, ctx.user.id);
       const sender = await ctx.db.query.user.findFirst({
         where: eq(user.id, ctx.user.id),
         columns: { id: true, name: true, role: true },
@@ -192,6 +195,11 @@ export const medicationsRouter = createTRPCRouter({
         status: "assigned",
         assignedUserId: recipient.id,
         taskType: "summary_review",
+      });
+
+      void logAuditEvent(ctx.db, {
+        userId: ctx.user.id, action: "share_data", targetUserId: input.recipientUserId,
+        resourceType: "medication", metadata: { shareType: "medications" },
       });
 
       return { sent: true };

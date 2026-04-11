@@ -392,9 +392,15 @@ export async function runTestChatDocsMode(
   }
 
   // Step 4: reader — read full document and answer
+  // Path traversal guard: ensure the resolved file stays within the docs directory
+  const fullPath = resolve(resolvedPath, picked);
+  if (!fullPath.startsWith(resolvedPath + "/") && fullPath !== resolvedPath) {
+    logger.warn({ picked, fullPath }, "[TestAgent] Path traversal attempt blocked");
+    return null;
+  }
   let content: string;
   try {
-    content = await readFile(join(resolvedPath, picked), "utf8");
+    content = await readFile(fullPath, "utf8");
   } catch (err) {
     logger.warn({ err, picked }, "[TestAgent] Failed to read selected doc — falling back");
     return null;

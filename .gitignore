@@ -36,3 +36,6 @@ drizzle/meta
 
 # Test coverage
 coverage
+
+# Seed files (contain predictable IDs — never use in production)
+seed-*.sql

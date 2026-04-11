@@ -38,6 +38,10 @@ function SignUpPage() {
       setError(t("signUp.passwordMismatch"));
       return;
     }
+    if (password.length < 12 || !/[a-z]/.test(password) || !/[A-Z]/.test(password) || !/[0-9]/.test(password) || !/[^a-zA-Z0-9]/.test(password)) {
+      setError(t("signUp.passwordComplexity", "Password must be at least 12 characters with uppercase, lowercase, number, and special character."));
+      return;
+    }
     setError(null);
     setIsPending(true);
     try {
@@ -45,7 +49,6 @@ function SignUpPage() {
         name,
         email,
         password,
-        role,
       });
       if (result?.error) {
         setError(t("signUp.failed", "Sign-up failed. Please try again."));

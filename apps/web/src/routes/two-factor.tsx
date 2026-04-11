@@ -53,7 +53,7 @@ function TwoFactorPage() {
     setIsPending(true);
     const { error } = await (authClient as any).twoFactor.verifyOtp({ code });
     if (error) {
-      setError(error.message ?? "Invalid code. Please try again.");
+      setError("Invalid code. Please try again.");
       setIsPending(false);
     } else {
       const raw = sessionStorage.getItem("postLoginRedirect") ?? "/dashboard";

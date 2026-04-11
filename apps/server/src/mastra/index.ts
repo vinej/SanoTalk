@@ -10,7 +10,7 @@ import { drugInfoChatAgent } from "./agents/drug-info-chat.js";
 import { runTestChatDocsMode, testDocsModeEnabled } from "./test-docs.js";
 import { db, agentRun, transcriptSummary, transcript, chatMessage, talkSession, userLink, user, task } from "@sanotalk/db";
 import { escapeHtml, sanitizeSubject } from "@sanotalk/trpc/lib/escape-html";
-import { encryptContent } from "@sanotalk/trpc/lib/crypto";
+import { encryptContent, decryptContent } from "@sanotalk/trpc/lib/crypto";
 import { eq, asc, and } from "drizzle-orm";
 import { z } from "zod";
 import { Resend } from "resend";
@@ -173,7 +173,7 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
         limit: 5000,
       });
       logger.info({ runId: run.id, rowCount: rows.length }, "Transcript rows found");
-      transcriptContent = rows.map((r) => r.content).join("\n");
+      transcriptContent = rows.map((r) => decryptContent(r.content) ?? r.content).join("\n");
 
       // Also include AI assistant conversation
       const chatRows = await db.query.chatMessage.findMany({
@@ -183,7 +183,7 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
       });
       if (chatRows.length > 0) {
         const chatContent = chatRows
-          .map((m) => `[${m.role === "user" ? "Patient" : "AI Assistant"}]: ${m.content}`)
+          .map((m) => `[${m.role === "user" ? "Patient" : "AI Assistant"}]: ${decryptContent(m.content) ?? m.content}`)
           .join("\n");
         transcriptContent += "\n\n--- AI Assistant Conversation ---\n" + chatContent;
       }

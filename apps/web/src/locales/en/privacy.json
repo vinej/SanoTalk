@@ -4,7 +4,7 @@
   "sections": {
     "dataCollected": {
       "title": "Personal Information We Collect",
-      "body": "SanoTalk collects the following personal information:\n\n- **Identity**: name, email address, role (patient, doctor, pharmacist)\n- **Health data**: vital signs, medications, symptoms, allergies, chronic conditions, RAMQ number\n- **Communications**: chat messages with AI agents, consultation transcripts, session recordings\n- **Technical data**: IP address, browser type, device information, session tokens\n- **Usage data**: feature usage, saved conversations, task boards"
+      "body": "SanoTalk collects the following personal information:\n\n- **Identity**: name, email address, role (patient, doctor, pharmacist)\n- **Health data**: vital signs, medications, symptoms, allergies, chronic conditions, RAMQ number. All health data is encrypted at rest using AES-256-GCM encryption with row-level security, ensuring that no one — including database administrators — can access your data in plaintext.\n- **Communications**: chat messages with AI agents, consultation transcripts, session recordings. All communications are encrypted at rest using AES-256-GCM encryption with row-level security to protect the confidentiality of your exchanges.\n- **Technical data**: IP address, browser type, device information, session tokens\n- **Usage data**: feature usage, saved conversations, task boards"
     },
     "purposes": {
       "title": "Why We Collect Your Data",

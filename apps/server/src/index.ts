@@ -23,7 +23,7 @@ const REQUIRED_ENV = [
   "APP_URL", "DATABASE_URL", "BETTER_AUTH_URL",
   "MINIO_ENDPOINT", "MINIO_ACCESS_KEY", "MINIO_SECRET_KEY",
   "LIVEKIT_URL", "LIVEKIT_API_KEY", "LIVEKIT_API_SECRET",
-  "DEEPGRAM_API_KEY", "ENCRYPTION_KEY",
+  "DEEPGRAM_API_KEY", "ENCRYPTION_KEY", "BETTER_AUTH_SECRET",
 ] as const;
 const missingEnv = REQUIRED_ENV.filter((k) => !process.env[k]);
 if (missingEnv.length > 0) {
@@ -31,6 +31,9 @@ if (missingEnv.length > 0) {
 }
 if (process.env.NODE_ENV === "production" && process.env.MINIO_ACCESS_KEY === "minioadmin") {
   throw new Error("Default MinIO credentials detected in production — change MINIO_ACCESS_KEY and MINIO_SECRET_KEY");
+}
+if (process.env.NODE_ENV === "production" && process.env.BETTER_AUTH_SECRET?.includes("your-super-secret")) {
+  throw new Error("Default BETTER_AUTH_SECRET detected in production — set a strong random secret");
 }
 
 const app = express();
@@ -177,6 +180,8 @@ app.use("/api/trpc/privacy.exportMyData", medicalLimiter);
 app.use("/api/trpc/vitals.shareWithProfessional", medicalLimiter);
 app.use("/api/trpc/medications.shareWithProfessional", medicalLimiter);
 app.use("/api/trpc/symptoms.shareWithProfessional", medicalLimiter);
+app.use("/api/trpc/privacy.requestDeletion", medicalLimiter);
+app.use("/api/trpc/privacy.cancelDeletion", medicalLimiter);
 // General API limiter for all other tRPC routes
 app.use("/api/trpc", apiLimiter);
 // CSRF protection: require custom header on all tRPC requests (triggers CORS preflight on cross-origin)
@@ -247,13 +252,15 @@ app.get("/api/avatar/:userId", apiLimiter, async (req, res) => {
     const userId = req.params.userId as string;
     if (!userId) { res.status(400).end(); return; }
 
+    const defaultAvatar = "https://api.dicebear.com/9.x/initials/svg?seed=ST";
+    // Validate userId format to prevent arbitrary DB queries
+    if (!/^[\w-]{1,100}$/.test(userId)) { res.redirect(defaultAvatar); return; }
     const record = await db.query.user.findFirst({
       where: eq(userTable.id, userId),
       columns: { image: true },
     });
     if (!record?.image) {
-      // Redirect to a generic default avatar to prevent user enumeration
-      res.redirect("https://api.dicebear.com/9.x/initials/svg?seed=ST");
+      res.redirect(defaultAvatar);
       return;
     }
 
