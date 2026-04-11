@@ -12,7 +12,7 @@ import { eatwellChatAgent } from "./agents/eatwell-chat.js";
 import { runTestChatDocsMode, testDocsModeEnabled } from "./test-docs.js";
 import { db, agentRun, transcriptSummary, transcript, chatMessage, talkSession, userLink, user, task } from "@sanotalk/db";
 import { escapeHtml, sanitizeSubject } from "@sanotalk/trpc/lib/escape-html";
-import { encryptContent, decryptContent } from "@sanotalk/trpc/lib/crypto";
+import { encryptContent, decryptContent, encryptArray } from "@sanotalk/trpc/lib/crypto";
 import { eq, asc, and } from "drizzle-orm";
 import { z } from "zod";
 import { Resend } from "resend";
@@ -239,20 +239,22 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
           assessment: encryptContent(parsed.soapNote.assessment) ?? parsed.soapNote.assessment,
           plan: encryptContent(parsed.soapNote.plan) ?? parsed.soapNote.plan,
         };
+        const encKeyPoints = encryptArray(parsed.keyPoints);
+        const encActionItems = encryptArray(parsed.actionItems);
         await db.insert(transcriptSummary)
           .values({
             sessionId,
             summary: encSummary,
-            keyPoints: parsed.keyPoints,
-            actionItems: parsed.actionItems,
+            keyPoints: encKeyPoints,
+            actionItems: encActionItems,
             soapNote: encSoap,
           })
           .onConflictDoUpdate({
             target: transcriptSummary.sessionId,
             set: {
               summary: encSummary,
-              keyPoints: parsed.keyPoints,
-              actionItems: parsed.actionItems,
+              keyPoints: encKeyPoints,
+              actionItems: encActionItems,
               soapNote: encSoap,
               updatedAt: new Date(),
             },

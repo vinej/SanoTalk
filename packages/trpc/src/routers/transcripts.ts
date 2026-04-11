@@ -3,7 +3,7 @@ import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { transcript, transcriptSummary, talkSession } from "@sanotalk/db";
 import { eq, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { encryptContent, decryptContent } from "../lib/crypto";
+import { encryptContent, decryptContent, decryptArray } from "../lib/crypto";
 
 /** Throws FORBIDDEN if the user is not the host or a participant of the session. */
 async function assertSessionAccess(
@@ -45,20 +45,23 @@ export const transcriptsRouter = createTRPCRouter({
         where: eq(transcriptSummary.sessionId, input.sessionId),
       });
       if (!row) return null;
+      const decrypted: typeof row & { summary: string; keyPoints: string[] | null; actionItems: string[] | null; soapNote: any } = {
+        ...row,
+        summary: decryptContent(row.summary) ?? row.summary,
+        keyPoints: decryptArray(row.keyPoints as string[] | null),
+        actionItems: decryptArray(row.actionItems as string[] | null),
+      };
       // Decrypt SOAP note fields if present
       if (row.soapNote && typeof row.soapNote === "object") {
         const soap = row.soapNote as Record<string, string>;
-        return {
-          ...row,
-          soapNote: {
-            subjective: decryptContent(soap.subjective) ?? soap.subjective,
-            objective: decryptContent(soap.objective) ?? soap.objective,
-            assessment: decryptContent(soap.assessment) ?? soap.assessment,
-            plan: decryptContent(soap.plan) ?? soap.plan,
-          },
+        decrypted.soapNote = {
+          subjective: decryptContent(soap.subjective) ?? soap.subjective,
+          objective: decryptContent(soap.objective) ?? soap.objective,
+          assessment: decryptContent(soap.assessment) ?? soap.assessment,
+          plan: decryptContent(soap.plan) ?? soap.plan,
         };
       }
-      return row;
+      return decrypted;
     }),
 
   save: protectedProcedure

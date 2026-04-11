@@ -16,7 +16,8 @@
       script-src 'self';
       style-src 'self' 'unsafe-inline';
       img-src 'self' data: blob: https://*.tile.openstreetmap.org https://api.dicebear.com;
-      connect-src 'self' wss: https://api.nal.usda.gov https://www.themealdb.com https://rxnav.nlm.nih.gov https://api.fda.gov;
+      connect-src 'self' wss://localhost:* wss://*.livekit.cloud https://api.nal.usda.gov https://www.themealdb.com https://rxnav.nlm.nih.gov https://api.fda.gov;
+      object-src 'none';
       font-src 'self';
       media-src 'self' blob:;
       worker-src 'self' blob:;

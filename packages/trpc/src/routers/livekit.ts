@@ -66,9 +66,13 @@ export const livekitRouter = createTRPCRouter({
         canPublishData: true,
       });
 
+      const livekitUrl = process.env.LIVEKIT_URL;
+      if (!livekitUrl || !livekitUrl.startsWith("wss://")) {
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "LiveKit not configured" });
+      }
       return {
         token: await at.toJwt(),
-        serverUrl: process.env.LIVEKIT_URL!,
+        serverUrl: livekitUrl,
       };
     }),
 });

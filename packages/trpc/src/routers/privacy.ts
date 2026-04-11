@@ -13,12 +13,16 @@ import {
   savedConversation,
   talkSession,
   transcript,
+  transcriptSummary,
   task,
   erFavorite,
   breachRecord,
   auditLog,
+  workoutLog,
+  outdoorLog,
+  agendaEvent,
 } from "@sanotalk/db";
-import { eq, and, desc, lte } from "drizzle-orm";
+import { eq, and, desc, lte, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { logAuditEvent, requestMeta } from "../lib/audit";
 import { verifyAdminFromDb } from "../lib/verify-admin";
@@ -195,9 +199,13 @@ export const privacyRouter = createTRPCRouter({
         saved,
         sessions,
         transcripts,
+        summaries,
         tasks,
         favorites,
         consents,
+        workouts,
+        outdoors,
+        events,
       ] = await Promise.all([
         ctx.db.select({
           id: user.id, name: user.name, email: user.email, role: user.role,
@@ -213,10 +221,21 @@ export const privacyRouter = createTRPCRouter({
         ctx.db.select().from(savedConversation).where(eq(savedConversation.userId, userId)),
         ctx.db.select().from(talkSession).where(eq(talkSession.hostId, userId)),
         ctx.db.select().from(transcript).where(eq(transcript.speakerId, userId)),
+        // placeholder — transcriptSummary queried below using session IDs
+        Promise.resolve([]) as Promise<(typeof transcriptSummary.$inferSelect)[]>,
         ctx.db.select().from(task).where(eq(task.assignedUserId, userId)),
         ctx.db.select().from(erFavorite).where(eq(erFavorite.userId, userId)),
         ctx.db.select().from(consentRecord).where(eq(consentRecord.userId, userId)),
+        ctx.db.select().from(workoutLog).where(eq(workoutLog.userId, userId)),
+        ctx.db.select().from(outdoorLog).where(eq(outdoorLog.userId, userId)),
+        ctx.db.select().from(agendaEvent).where(eq(agendaEvent.userId, userId)),
       ]);
+
+      // Fetch transcript summaries via session IDs (no direct userId column)
+      const sessionIds = sessions.map(s => s.id);
+      const realSummaries = sessionIds.length > 0
+        ? await ctx.db.select().from(transcriptSummary).where(inArray(transcriptSummary.sessionId, sessionIds))
+        : [];
 
       // Decrypt all encrypted data so the user receives readable data (Law 25 portability)
       const decryptedProperties = properties.map((r) => ({ ...r, value: decrypt(r.value) }));
@@ -290,9 +309,32 @@ export const privacyRouter = createTRPCRouter({
         })),
         talkSessions: sessions,
         transcripts: decryptedTranscripts,
+        transcriptSummaries: realSummaries.map(s => {
+          const soap = s.soapNote as Record<string, string> | null;
+          return {
+            ...s,
+            summary: decryptContent(s.summary) ?? s.summary,
+            keyPoints: decryptArray(s.keyPoints as string[] | null),
+            actionItems: decryptArray(s.actionItems as string[] | null),
+            soapNote: soap ? {
+              subjective: decryptContent(soap.subjective) ?? soap.subjective,
+              objective: decryptContent(soap.objective) ?? soap.objective,
+              assessment: decryptContent(soap.assessment) ?? soap.assessment,
+              plan: decryptContent(soap.plan) ?? soap.plan,
+            } : null,
+          };
+        }),
         tasks,
         erFavorites: favorites,
         consentRecords: consents,
+        workoutLogs: workouts.map(w => ({ ...w, notes: decryptContent(w.notes) })),
+        outdoorLogs: outdoors.map(o => ({ ...o, notes: decryptContent(o.notes) })),
+        agendaEvents: events.map(e => ({
+          ...e,
+          title: decryptContent(e.title) ?? e.title,
+          description: decryptContent(e.description),
+          location: decryptContent(e.location),
+        })),
       };
     }),
 

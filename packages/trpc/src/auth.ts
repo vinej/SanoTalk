@@ -138,7 +138,48 @@ function withCustomAdapter(adapterFactory: typeof _baseAdapter): typeof _baseAda
   };
 }
 
-const isProduction = process.env.NODE_ENV === "production";
+// Treat as production if NODE_ENV says so, OR if APP_URL is not localhost (deployed but NODE_ENV forgotten)
+const appUrl = process.env.APP_URL ?? "";
+const isProduction = process.env.NODE_ENV === "production"
+  || (!appUrl.includes("localhost") && !appUrl.includes("127.0.0.1") && appUrl.length > 0);
+
+// ── Per-account login lockout ──────────────────────────────────────────────
+// Tracks failed sign-in attempts per email. Locks the account for 15 minutes
+// after 5 consecutive failures — complements the per-IP rate limiter in index.ts.
+const LOGIN_MAX_ATTEMPTS = 5;
+const LOGIN_LOCKOUT_MS = 15 * 60 * 1000; // 15 minutes
+const loginAttempts = new Map<string, { count: number; lockedUntil: number }>();
+
+// Cleanup stale entries every 10 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [email, entry] of loginAttempts) {
+    if (now > entry.lockedUntil + LOGIN_LOCKOUT_MS) loginAttempts.delete(email);
+  }
+}, 10 * 60 * 1000);
+
+export function checkAccountLockout(email: string): void {
+  const entry = loginAttempts.get(email);
+  if (!entry) return;
+  if (entry.lockedUntil > Date.now()) {
+    throw new Error("Account temporarily locked due to too many failed login attempts. Please try again later.");
+  }
+  // Lockout expired — reset
+  if (entry.count >= LOGIN_MAX_ATTEMPTS) loginAttempts.delete(email);
+}
+
+export function recordFailedLogin(email: string): void {
+  const entry = loginAttempts.get(email) ?? { count: 0, lockedUntil: 0 };
+  entry.count += 1;
+  if (entry.count >= LOGIN_MAX_ATTEMPTS) {
+    entry.lockedUntil = Date.now() + LOGIN_LOCKOUT_MS;
+  }
+  loginAttempts.set(email, entry);
+}
+
+export function clearFailedLogins(email: string): void {
+  loginAttempts.delete(email);
+}
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
@@ -146,7 +187,7 @@ export const auth = betterAuth({
   session: {
     expiresIn: 60 * 60 * 8,      // 8-hour absolute session lifetime
     updateAge: 60 * 15,           // refresh session every 15 min of activity
-    cookieCache: { enabled: true, maxAge: 5 * 60 },
+    cookieCache: { enabled: true, maxAge: 60 },  // 1 min — short window for PHI app
   },
   advanced: {
     cookiePrefix: "sanotalk",
@@ -202,7 +243,7 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
     expiresIn: 3600, // 1 hour — limits window for token leakage via email/browser history
-    callbackURL: process.env.APP_URL ?? "http://localhost:5173",
+    // callbackURL handled by the verification link in sendVerificationEmail
     sendVerificationEmail: async ({ user, token }) => {
       const appUrl = process.env.APP_URL ?? "http://localhost:5173";
       const verifyUrl = `${appUrl}/verify-email?token=${token}`;
@@ -237,7 +278,7 @@ export const auth = betterAuth({
           });
           if (error) {
             authLog.error(`Failed to send OTP: ${(error as any)?.message ?? error}`);
-            throw new Error(`Failed to send OTP: ${error.message}`);
+            throw new Error("Failed to send verification code. Please try again.");
           }
         },
       },

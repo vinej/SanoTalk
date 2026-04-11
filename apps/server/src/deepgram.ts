@@ -66,7 +66,14 @@ export function startDeepgramWebSocket(server: Server, allowedOrigins?: string[]
       headers: new Headers(req.headers as Record<string, string>),
     });
     if (cookieSession?.user) {
-      userId = cookieSession.user.id;
+      // Enforce the same guards as protectedProcedure: email verified + account approved
+      const u = cookieSession.user as { id: string; emailVerified?: boolean; approved?: boolean };
+      if (!u.emailVerified || !u.approved) {
+        logger.warn({ sessionId }, "WebSocket rejected: account not active");
+        ws.close(1008, "Account not active");
+        return;
+      }
+      userId = u.id;
     } else {
       // Extract short-lived ticket from Sec-WebSocket-Protocol: "ticket.<uuid>"
       const protocols = (req.headers["sec-websocket-protocol"] ?? "").split(",").map((p) => p.trim());

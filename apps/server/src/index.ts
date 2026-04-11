@@ -10,7 +10,7 @@ import rateLimit from "express-rate-limit";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { appRouter } from "@sanotalk/trpc";
 import { createTRPCContext } from "@sanotalk/trpc";
-import { auth } from "@sanotalk/trpc/auth";
+import { auth, checkAccountLockout, recordFailedLogin, clearFailedLogins } from "@sanotalk/trpc/auth";
 import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
 import { logger } from "./logger";
 import { startDeepgramWebSocket } from "./deepgram";
@@ -145,6 +145,28 @@ app.use(express.json({ limit: "1mb" }));
 app.use("/api/auth/two-factor/verify-otp", otpLimiter);
 app.use("/api/auth/two-factor/verify-totp", otpLimiter);
 app.use("/api/auth/email-verification", otpLimiter);
+// Per-account lockout on sign-in: block after 5 consecutive failures for 15 min
+app.use("/api/auth/sign-in/email", express.json(), (req, res, next) => {
+  const email = (req.body as { email?: string } | undefined)?.email?.toLowerCase();
+  if (email) {
+    try {
+      checkAccountLockout(email);
+    } catch {
+      res.status(429).json({ error: { message: "Account temporarily locked. Please try again later." } });
+      return;
+    }
+  }
+  // After auth response, track success/failure
+  const origEnd = res.end.bind(res);
+  res.end = function (...args: Parameters<typeof origEnd>) {
+    if (email) {
+      if (res.statusCode >= 400) recordFailedLogin(email);
+      else clearFailedLogins(email);
+    }
+    return origEnd(...args);
+  } as typeof res.end;
+  next();
+});
 app.use("/api/auth", authLimiter, toNodeHandler(auth));
 
 // ─── tRPC ─────────────────────────────────────────────────────────────────
@@ -268,13 +290,13 @@ app.get("/api/avatar/:userId", apiLimiter, async (req, res) => {
 
     // External URLs — only redirect to allowlisted domains
     if (record.image.startsWith("http://") || record.image.startsWith("https://")) {
-      if (!isAllowedAvatarUrl(record.image)) { res.status(403).end(); return; }
+      if (!isAllowedAvatarUrl(record.image)) { res.redirect(defaultAvatar); return; }
       res.redirect(record.image);
       return;
     }
 
     // MinIO key — validate format before fetching (prevent serving arbitrary objects)
-    if (!/^avatars\/[\w-]+\.(jpg|png|webp)$/.test(record.image)) { res.status(403).end(); return; }
+    if (!/^avatars\/[\w-]+\.(jpg|png|webp)$/.test(record.image)) { res.redirect(defaultAvatar); return; }
     const client = getAvatarMinio();
     const bucket = process.env.MINIO_BUCKET ?? "sanotalk";
     const stream = await client.getObject(bucket, record.image);
@@ -286,7 +308,8 @@ app.get("/api/avatar/:userId", apiLimiter, async (req, res) => {
     res.setHeader("Cache-Control", "public, max-age=3600");
     stream.pipe(res);
   } catch {
-    res.status(404).end();
+    // Return default avatar on any error to prevent user enumeration
+    res.redirect("https://api.dicebear.com/9.x/initials/svg?seed=ST");
   }
 });
 
