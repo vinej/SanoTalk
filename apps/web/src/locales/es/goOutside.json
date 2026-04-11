@@ -1,0 +1,120 @@
+{
+  "title": "Sal afuera",
+  "subtitle": "Apunta a 150 minutos de actividad moderada por semana",
+  "tabs": {
+    "activities": "Actividades",
+    "progress": "Mi progreso",
+    "resources": "Recursos"
+  },
+  "categories": {
+    "all": "Todas",
+    "walking": "Caminata",
+    "fast_walking": "Caminata rápida",
+    "running": "Trote",
+    "cycling": "Ciclismo",
+    "swimming": "Natación",
+    "hiking": "Senderismo",
+    "gardening": "Jardinería",
+    "other": "Otro"
+  },
+  "intensity": {
+    "all": "Todos los niveles",
+    "light": "Ligera",
+    "moderate": "Moderada",
+    "vigorous": "Vigorosa"
+  },
+  "activity": {
+    "duration": "{{mins}} min",
+    "tips": "{{count}} consejos",
+    "viewActivity": "Ver actividad",
+    "logActivity": "Registrar",
+    "completed": "¡Completado!",
+    "watchVideos": "Ver videos",
+    "watchVideosDesc": "Encuentra demostraciones en YouTube",
+    "videoOffline": "Requiere internet",
+    "hasVideo": "Video",
+    "addYourOwn": "Añadir la tuya",
+    "addYourOwnDesc": "Crear una actividad personalizada",
+    "myActivities": "Mis actividades",
+    "noCustom": "Aún no hay actividades personalizadas",
+    "deleteCustomConfirm": "¿Eliminar esta actividad personalizada?"
+  },
+  "weeklyGoal": {
+    "title": "Meta semanal",
+    "progress": "{{current}} / {{goal}} min",
+    "percentage": "{{pct}}%",
+    "vigorousNote": "¡Los minutos vigorosos cuentan doble!",
+    "achieved": "¡Meta lograda! ¡Excelente!"
+  },
+  "progress": {
+    "thisWeek": "Esta semana",
+    "streak": "Racha actual",
+    "longestStreak": "Racha más larga",
+    "streakDays": "{{count}} día(s)",
+    "totalActivities": "Total de actividades",
+    "totalDuration": "Duración total",
+    "totalDistance": "Distancia total",
+    "minutes": "{{count}} min",
+    "km": "{{count}} km",
+    "noActivities": "Aún no hay actividades registradas. ¡Sal afuera!",
+    "history": "Historial de actividades",
+    "deleteConfirm": "¿Eliminar este registro de actividad?"
+  },
+  "log": {
+    "title": "Registrar actividad",
+    "duration": "Duración (minutos)",
+    "distance": "Distancia (km, opcional)",
+    "notes": "Notas (opcional)",
+    "notesPlaceholder": "¿Cómo te fue?",
+    "save": "Guardar",
+    "cancel": "Cancelar"
+  },
+  "create": {
+    "title": "Crear actividad",
+    "name": "Nombre de la actividad",
+    "namePlaceholder": "ej. Kayak, Petanca",
+    "category": "Categoría",
+    "intensityLabel": "Intensidad",
+    "suggestedMins": "Duración sugerida (minutos)",
+    "save": "Crear",
+    "cancel": "Cancelar"
+  },
+  "resources": {
+    "title": "Recursos útiles",
+    "subtitle": "Enlaces confiables para actividades al aire libre"
+  },
+  "safety": {
+    "title": "Recordatorios de seguridad",
+    "disclaimer": "Siempre consulte el clima antes de salir. Use calzado y ropa adecuados. Manténgase hidratado y lleve agua. Diga a alguien adónde va. Si siente mareos, falta de aire o dolor en el pecho, deténgase inmediatamente y busque ayuda."
+  },
+  "resourceNames": {
+    "go4life_walking": "Go4Life (NIA)",
+    "go4life_walkingDesc": "Programas de ejercicio del Instituto Nacional sobre el Envejecimiento",
+    "nhs_walking": "NHS Caminar para la salud",
+    "nhs_walkingDesc": "Guías y programas de caminata del NHS",
+    "traillink": "TrailLink",
+    "traillinkDesc": "Encuentra senderos para caminar y andar en bicicleta",
+    "silversneakers": "SilverSneakers",
+    "silversneakersDesc": "Programas de fitness y clases para mayores",
+    "cycling_uk": "Cycling UK",
+    "cycling_ukDesc": "Recursos y rutas ciclistas para todas las edades"
+  },
+  "activities": {
+    "walk_neighborhood": { "name": "Caminata por el barrio", "description": "Un paseo tranquilo por tu barrio a un ritmo cómodo.", "tips": ["Use zapatos cómodos con buen soporte", "Comience con 10 minutos y aumente gradualmente", "Camine por aceras bien iluminadas", "Lleve un teléfono por seguridad"], "safetyTip": "Evite caminar durante calor extremo o en condiciones de hielo." },
+    "walk_park": { "name": "Caminata en el parque", "description": "Una caminata a ritmo moderado por un parque local.", "tips": ["Elija un parque con senderos pavimentados o planos", "Camine a un ritmo donde pueda hablar pero sienta algo de falta de aire", "Disfrute del paisaje — mejora el ánimo", "Incluya algunas pendientes suaves"], "safetyTip": "Permanezca en los senderos marcados." },
+    "walk_nature_trail": { "name": "Sendero natural", "description": "Una caminata larga en un sendero natural con terreno variado.", "tips": ["Elija un sendero clasificado de fácil a moderado", "Use zapatos de caminata robustos", "Lleve agua y un refrigerio", "Use bastones de trekking para mayor estabilidad"], "safetyTip": "Verifique las condiciones del sendero antes de ir." },
+    "fast_walk_interval": { "name": "Caminata por intervalos", "description": "Alterne entre caminata normal y rápida para mejorar el cardio.", "tips": ["Camine normalmente 2 minutos, luego rápido 1 minuto", "Balancee los brazos naturalmente", "Mantenga buena postura", "Aumente los intervalos rápidos gradualmente"], "safetyTip": "Reduzca la velocidad si no puede pronunciar una oración corta." },
+    "fast_walk_poles": { "name": "Caminata con bastones", "description": "Caminar con bastones involucra la parte superior del cuerpo.", "tips": ["Use bastones a la altura correcta — codos a 90 grados", "Plante el bastón opuesto al pie que avanza", "Mantenga un ritmo natural", "Los bastones reducen la tensión en rodillas y caderas"], "safetyTip": "Aprenda la técnica adecuada para evitar lesiones en la muñeca." },
+    "nordic_walking": { "name": "Marcha nórdica", "description": "Técnica vigorosa de caminata que involucra todo el cuerpo.", "tips": ["Tome una clase para aprender la técnica", "Use bastones específicos con correas", "Active su torso y empuje con cada paso", "Quema un 20-40% más de calorías que caminar"], "safetyTip": "Comience lentamente y domine la técnica antes de aumentar la velocidad." },
+    "jog_easy": { "name": "Trote suave", "description": "Un trote suave a un ritmo que permite conversar.", "tips": ["Corra a un ritmo que permita mantener una conversación", "Aterrice suavemente con el medio del pie", "Comience con intervalos cortos si es nuevo", "Buenos zapatos de running son esenciales"], "safetyTip": "Consulte a su médico antes de comenzar un programa de trote." },
+    "jog_walk_intervals": { "name": "Intervalos trote-caminata", "description": "Alterne entre trotar y caminar para desarrollar resistencia.", "tips": ["Intente 1 minuto trotando, 2 minutos caminando", "Aumente el tiempo de trote gradualmente", "Camine a paso rápido durante los intervalos", "Método seguro y eficaz para principiantes"], "safetyTip": "Deje de trotar si siente dolor articular." },
+    "cycle_leisure": { "name": "Ciclismo de paseo", "description": "Un paseo relajado en bicicleta por terreno plano.", "tips": ["Ajuste el asiento para que su pierna esté ligeramente doblada", "Comience en caminos planos lejos del tráfico", "Use siempre casco", "Una bicicleta de paso bajo es más fácil de montar"], "safetyTip": "Use siempre casco y luces/reflectores." },
+    "cycle_path": { "name": "Ciclovía", "description": "Una salida moderada por una ciclovía dedicada.", "tips": ["Planifique su ruta usando ciclovías", "Mantenga un ritmo moderado y constante", "Señale sus giros a otros usuarios", "Lleve agua para salidas de más de 20 minutos"], "safetyTip": "Revise frenos y presión de neumáticos antes de cada salida." },
+    "cycle_hills": { "name": "Ciclismo en cuestas", "description": "Un recorrido exigente con cuestas para ejercicio cardiovascular vigoroso.", "tips": ["Cambie a una marcha más baja antes de la cuesta", "Póngase de pie brevemente en los pedales para secciones empinadas", "Controle la velocidad en bajadas con frenado suave", "Progrese hacia las cuestas durante varias semanas"], "safetyTip": "Evite descensos empinados hasta que se sienta seguro frenando." },
+    "swim_laps": { "name": "Natación en carriles", "description": "Nadar largos en una piscina a un ritmo constante.", "tips": ["Elija una piscina con zona poco profunda", "Comience con pocos largos y descanse entre ellos", "Espalda y pecho son más suaves para los hombros", "La natación es excelente para las articulaciones"], "safetyTip": "Nunca nade solo y use una piscina con salvavidas." },
+    "swim_aqua_walk": { "name": "Caminata acuática", "description": "Caminar en agua hasta la cintura para ejercicio de resistencia de bajo impacto.", "tips": ["Camine en agua hasta la cintura o el pecho", "El agua ofrece resistencia natural", "Mueva los brazos en el agua para trabajar la parte superior", "Excelente para artritis o dolor articular"], "safetyTip": "Use los pasamanos al entrar y salir de la piscina." },
+    "hike_easy": { "name": "Senderismo fácil", "description": "Una caminata moderada en senderos bien mantenidos.", "tips": ["Elija senderos clasificados fáciles y bien señalizados", "Use botas de senderismo con soporte de tobillo", "Lleve suficiente agua, refrigerios y sombrero", "Use bastones de trekking para estabilidad"], "safetyTip": "Informe a alguien su plan de senderismo y hora de regreso." },
+    "garden_active": { "name": "Jardinería activa", "description": "Actividades como cavar, desherbar, rastrillar y cargar.", "tips": ["Alterne tareas para usar diferentes músculos", "Use camas elevadas o rodilleras", "Tome descansos cada 20 minutos", "¡La jardinería quema más calorías de lo que cree!"], "safetyTip": "Use guantes, protección solar y manténgase hidratado." },
+    "outdoor_tai_chi": { "name": "Tai chi al aire libre", "description": "Practicar tai chi en un parque para equilibrio y atención plena.", "tips": ["Encuentre un área plana y tranquila en un parque", "Practique por la mañana para un inicio de día tranquilo", "Use ropa holgada y cómoda", "Únase a un grupo local para motivación"], "safetyTip": "Elija una superficie plana y no resbaladiza." }
+  }
+}

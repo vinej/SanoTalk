@@ -1,0 +1,200 @@
+{
+  "title": "Go Outside",
+  "subtitle": "Aim for 150 minutes of moderate activity per week",
+  "tabs": {
+    "activities": "Activities",
+    "progress": "My Progress",
+    "resources": "Resources"
+  },
+  "categories": {
+    "all": "All",
+    "walking": "Walking",
+    "fast_walking": "Fast Walking",
+    "running": "Running",
+    "cycling": "Cycling",
+    "swimming": "Swimming",
+    "hiking": "Hiking",
+    "gardening": "Gardening",
+    "other": "Other"
+  },
+  "intensity": {
+    "all": "All Levels",
+    "light": "Light",
+    "moderate": "Moderate",
+    "vigorous": "Vigorous"
+  },
+  "activity": {
+    "duration": "{{mins}} min",
+    "tips": "{{count}} tips",
+    "viewActivity": "View Activity",
+    "logActivity": "Log Activity",
+    "completed": "Completed!",
+    "watchVideos": "Watch Videos",
+    "watchVideosDesc": "Find demonstrations on YouTube",
+    "videoOffline": "Requires internet",
+    "hasVideo": "Video",
+    "addYourOwn": "Add Your Own",
+    "addYourOwnDesc": "Create a custom activity",
+    "myActivities": "My Activities",
+    "noCustom": "No custom activities yet",
+    "deleteCustomConfirm": "Delete this custom activity?"
+  },
+  "weeklyGoal": {
+    "title": "Weekly Goal",
+    "progress": "{{current}} / {{goal}} min",
+    "percentage": "{{pct}}%",
+    "vigorousNote": "Vigorous minutes count double!",
+    "achieved": "Goal achieved! Great job!"
+  },
+  "progress": {
+    "thisWeek": "This Week",
+    "streak": "Current Streak",
+    "longestStreak": "Longest Streak",
+    "streakDays": "{{count}} day(s)",
+    "totalActivities": "Total Activities",
+    "totalDuration": "Total Duration",
+    "totalDistance": "Total Distance",
+    "minutes": "{{count}} min",
+    "km": "{{count}} km",
+    "noActivities": "No activities logged yet. Get outside!",
+    "history": "Activity History",
+    "deleteConfirm": "Delete this activity log?"
+  },
+  "log": {
+    "title": "Log Activity",
+    "duration": "Duration (minutes)",
+    "distance": "Distance (km, optional)",
+    "notes": "Notes (optional)",
+    "notesPlaceholder": "How did it go?",
+    "save": "Save",
+    "cancel": "Cancel"
+  },
+  "create": {
+    "title": "Create Custom Activity",
+    "name": "Activity Name",
+    "namePlaceholder": "e.g., Kayaking, Bocce Ball",
+    "category": "Category",
+    "intensityLabel": "Intensity",
+    "suggestedMins": "Suggested Duration (minutes)",
+    "save": "Create",
+    "cancel": "Cancel"
+  },
+  "resources": {
+    "title": "Helpful Resources",
+    "subtitle": "Trusted links for senior outdoor activities"
+  },
+  "safety": {
+    "title": "Safety Reminders",
+    "disclaimer": "Always check the weather before heading out. Wear appropriate footwear and clothing. Stay hydrated and bring water. Tell someone where you are going. If you feel dizzy, short of breath, or experience chest pain, stop immediately and seek help."
+  },
+  "resourceNames": {
+    "go4life_walking": "Go4Life (NIA)",
+    "go4life_walkingDesc": "National Institute on Aging exercise programs",
+    "nhs_walking": "NHS Walking for Health",
+    "nhs_walkingDesc": "Walking guides and programs from the NHS",
+    "traillink": "TrailLink",
+    "traillinkDesc": "Find walking and cycling trails near you",
+    "silversneakers": "SilverSneakers",
+    "silversneakersDesc": "Fitness programs and classes for seniors",
+    "cycling_uk": "Cycling UK",
+    "cycling_ukDesc": "Cycling resources and routes for all ages"
+  },
+  "activities": {
+    "walk_neighborhood": {
+      "name": "Neighborhood Walk",
+      "description": "A gentle stroll around your neighborhood at a comfortable pace.",
+      "tips": ["Wear comfortable shoes with good support", "Start with 10 minutes and build up gradually", "Walk on well-lit sidewalks or paths", "Bring a phone for safety"],
+      "safetyTip": "Avoid walking during extreme heat or icy conditions."
+    },
+    "walk_park": {
+      "name": "Park Walk",
+      "description": "A moderate-paced walk through a local park or green space.",
+      "tips": ["Choose a park with paved or flat paths", "Walk at a pace where you can still talk but feel slightly breathless", "Enjoy the scenery — it boosts mood", "Try to include some gentle inclines"],
+      "safetyTip": "Stay on marked paths and let someone know your route."
+    },
+    "walk_nature_trail": {
+      "name": "Nature Trail Walk",
+      "description": "A longer walk on a nature trail with varied terrain.",
+      "tips": ["Choose a trail rated easy to moderate", "Wear sturdy walking shoes or boots", "Bring water and a snack for longer walks", "Use trekking poles for extra stability"],
+      "safetyTip": "Check trail conditions before you go and don't walk alone in remote areas."
+    },
+    "fast_walk_interval": {
+      "name": "Interval Fast Walk",
+      "description": "Alternate between normal and brisk walking to boost cardio fitness.",
+      "tips": ["Walk normally for 2 minutes, then briskly for 1 minute", "Swing your arms naturally to increase pace", "Focus on good posture — chin up, shoulders back", "Gradually increase the brisk intervals"],
+      "safetyTip": "Slow down if you feel too breathless to speak a short sentence."
+    },
+    "fast_walk_poles": {
+      "name": "Pole Walking",
+      "description": "Walking with poles engages the upper body and improves balance.",
+      "tips": ["Use poles at the right height — elbows at 90 degrees", "Plant the pole opposite to the stepping foot", "Keep a natural rhythm", "Poles reduce strain on knees and hips"],
+      "safetyTip": "Learn proper pole technique to avoid wrist strain."
+    },
+    "nordic_walking": {
+      "name": "Nordic Walking",
+      "description": "A vigorous full-body walking technique using specialized poles.",
+      "tips": ["Take a class to learn proper Nordic walking form", "Use Nordic-specific poles with wrist straps", "Engage your core and push through each stride", "It burns 20–40% more calories than regular walking"],
+      "safetyTip": "Start slowly and master the technique before increasing speed."
+    },
+    "jog_easy": {
+      "name": "Easy Jog",
+      "description": "A gentle jog at a conversational pace for cardiovascular health.",
+      "tips": ["Run at a pace where you can still hold a conversation", "Land softly with a midfoot strike", "Start with short jog intervals if you're new to running", "Good running shoes are essential"],
+      "safetyTip": "Consult your doctor before starting a jogging program, especially if you have joint issues."
+    },
+    "jog_walk_intervals": {
+      "name": "Jog–Walk Intervals",
+      "description": "Alternate between jogging and walking to build endurance gradually.",
+      "tips": ["Try 1 minute jogging, 2 minutes walking", "Increase jog time gradually over weeks", "Walk briskly during walking intervals", "This method is proven safe and effective for beginners"],
+      "safetyTip": "Stop jogging and walk if you feel any joint pain or discomfort."
+    },
+    "cycle_leisure": {
+      "name": "Leisure Cycling",
+      "description": "A relaxed bike ride on flat terrain at a comfortable pace.",
+      "tips": ["Adjust your seat so your leg is slightly bent at the bottom of the pedal", "Start on flat paths away from traffic", "Wear a helmet always", "A recumbent or step-through bike is easiest to mount"],
+      "safetyTip": "Always wear a helmet and use lights/reflectors when cycling."
+    },
+    "cycle_path": {
+      "name": "Cycle Path Ride",
+      "description": "A moderate ride along a dedicated cycling path.",
+      "tips": ["Plan your route using cycling paths or quiet roads", "Keep a steady moderate pace", "Signal your turns to other path users", "Bring water for rides over 20 minutes"],
+      "safetyTip": "Check your brakes and tire pressure before each ride."
+    },
+    "cycle_hills": {
+      "name": "Hill Cycling",
+      "description": "A challenging ride including hills for vigorous cardiovascular exercise.",
+      "tips": ["Shift to a lower gear before the hill", "Stand on the pedals briefly for steep sections", "Control speed on downhills with gentle braking", "Build up to hills gradually over several weeks"],
+      "safetyTip": "Avoid steep descents until you are confident with braking."
+    },
+    "swim_laps": {
+      "name": "Lap Swimming",
+      "description": "Swimming laps in a pool at a steady pace for full-body exercise.",
+      "tips": ["Choose a pool with a shallow end for comfort", "Start with a few laps and rest between them", "Backstroke and breaststroke are gentler on shoulders", "Swimming is excellent for joint health"],
+      "safetyTip": "Never swim alone and always use a pool with a lifeguard."
+    },
+    "swim_aqua_walk": {
+      "name": "Aqua Walking",
+      "description": "Walking in waist-deep water for low-impact resistance exercise.",
+      "tips": ["Walk in waist to chest-deep water", "The water provides natural resistance", "Move your arms through the water for upper body work", "Excellent for those with arthritis or joint pain"],
+      "safetyTip": "Use pool handrails when entering and exiting."
+    },
+    "hike_easy": {
+      "name": "Easy Hike",
+      "description": "A moderate hike on well-maintained trails with gentle elevation.",
+      "tips": ["Choose trails rated easy with well-marked paths", "Wear hiking boots with ankle support", "Bring plenty of water, snacks, and a hat", "Use trekking poles for stability on uneven ground"],
+      "safetyTip": "Tell someone your hiking plan and expected return time."
+    },
+    "garden_active": {
+      "name": "Active Gardening",
+      "description": "Gardening activities like digging, weeding, raking, and carrying supplies.",
+      "tips": ["Alternate between tasks to use different muscles", "Use raised beds or kneeling pads to reduce strain", "Take breaks every 20 minutes", "Gardening burns more calories than you think!"],
+      "safetyTip": "Wear gloves, sun protection, and stay hydrated."
+    },
+    "outdoor_tai_chi": {
+      "name": "Outdoor Tai Chi",
+      "description": "Practicing tai chi in a park or garden for balance and mindfulness.",
+      "tips": ["Find a flat, peaceful area in a park or garden", "Practice in the morning for a calm start to the day", "Wear loose, comfortable clothing", "Join a local outdoor tai chi group for motivation"],
+      "safetyTip": "Choose a surface that is flat and not slippery."
+    }
+  }
+}

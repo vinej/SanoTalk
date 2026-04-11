@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useCallback, type ComponentType, type ReactNode } from "react";
 import { Button } from "../../components/ui/button";
-import { Kanban, Bot, Heart, Hospital, Download, Activity, Video, Pill, ClipboardList, UserCircle, ShieldAlert, FlaskConical, ShieldCheck, FlaskRound, Newspaper, Search, MessageCircle, ChevronDown, Dumbbell } from "lucide-react";
+import { Kanban, Bot, Heart, Hospital, Download, Activity, Video, Pill, ClipboardList, UserCircle, ShieldAlert, FlaskConical, ShieldCheck, FlaskRound, Newspaper, Search, MessageCircle, ChevronDown, Dumbbell, TreePine } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { usePwaInstall } from "../../hooks/use-pwa-install";
 import { trpc } from "../../lib/trpc";
@@ -59,12 +59,20 @@ const ADMIN_ITEMS: FeatureItem[] = [
   { to: "/admin-breaches", icon: ShieldAlert, color: "text-red-600", bg: "bg-red-50 dark:bg-red-950/30", border: "border-red-200 dark:border-red-800", key: "breachRegister" },
 ];
 
-const DIRECT_FEATURES: FeatureItem[] = [
-  { to: "/health-help", icon: Hospital, color: "text-red-600", bg: "bg-red-50 dark:bg-red-950/30", border: "border-red-200 dark:border-red-800", key: "healthHelp" },
-  { to: "/sessions", icon: Video, color: "text-indigo-600", bg: "bg-indigo-50 dark:bg-indigo-950/30", border: "border-indigo-200 dark:border-indigo-800", key: "medicalConsultation" },
+const HEALTH_HELP_ITEM: FeatureItem = { to: "/health-help", icon: Hospital, color: "text-red-600", bg: "bg-red-50 dark:bg-red-950/30", border: "border-red-200 dark:border-red-800", key: "healthHelp" };
+
+const CONSULTATION_ITEMS: FeatureItem[] = [
   { to: "/friend-chat", icon: MessageCircle, color: "text-pink-600", bg: "bg-pink-50 dark:bg-pink-950/30", border: "border-pink-200 dark:border-pink-800", key: "friendChat" },
-  { to: "/kanban", icon: Kanban, color: "text-gray-700", bg: "bg-gray-50 dark:bg-gray-950/30", border: "border-gray-200 dark:border-gray-800", key: "kanban" },
+  { to: "/sessions", icon: Video, color: "text-indigo-600", bg: "bg-indigo-50 dark:bg-indigo-950/30", border: "border-indigo-200 dark:border-indigo-800", key: "medicalConsultation" },
+];
+
+const EXERCISE_ITEMS: FeatureItem[] = [
   { to: "/train-body", icon: Dumbbell, color: "text-lime-600", bg: "bg-lime-50 dark:bg-lime-950/30", border: "border-lime-200 dark:border-lime-800", key: "trainBody" },
+  { to: "/go-outside", icon: TreePine, color: "text-green-600", bg: "bg-green-50 dark:bg-green-950/30", border: "border-green-200 dark:border-green-800", key: "goOutside" },
+];
+
+const TASK_ITEMS: FeatureItem[] = [
+  { to: "/kanban", icon: Kanban, color: "text-gray-700", bg: "bg-gray-50 dark:bg-gray-950/30", border: "border-gray-200 dark:border-gray-800", key: "kanban" },
 ];
 
 function DashboardPage() {
@@ -84,11 +92,6 @@ function DashboardPage() {
 
   return (
     <div className="px-6 py-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">{t("dashboard:title")}</h1>
-        <p className="text-muted-foreground mt-1">{t("dashboard:subtitle")}</p>
-      </div>
-
       {canInstall && (
         <div className="flex items-center justify-between rounded-lg border bg-muted/50 px-4 py-3">
           <div className="text-sm">
@@ -102,6 +105,21 @@ function DashboardPage() {
           </Button>
         </div>
       )}
+
+      {/* Health Help — standalone centered */}
+      <div className="max-w-lg mx-auto">
+        <Link to={HEALTH_HELP_ITEM.to as any} className="group block">
+          <div className={`flex items-center gap-4 rounded-xl border-2 ${HEALTH_HELP_ITEM.border} ${HEALTH_HELP_ITEM.bg} p-5 transition-shadow hover:shadow-md`}>
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-gray-900 shadow-sm">
+              <HEALTH_HELP_ITEM.icon className={`h-6 w-6 ${HEALTH_HELP_ITEM.color}`} />
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold group-hover:underline">{t(`dashboard:${HEALTH_HELP_ITEM.key}`)}</p>
+              <p className="text-sm text-muted-foreground">{t(`dashboard:${HEALTH_HELP_ITEM.key}Desc`)}</p>
+            </div>
+          </div>
+        </Link>
+      </div>
 
       {/* Expandable groups */}
       <div className="space-y-4">
@@ -148,23 +166,39 @@ function DashboardPage() {
           onToggle={() => togglePanel("ai")}
           items={AI_ITEMS}
         />
-      </div>
 
-      {/* Direct link features */}
-      <div className="grid gap-4 sm:grid-cols-2">
-        {DIRECT_FEATURES.map((f) => (
-          <Link key={f.key} to={f.to as any} className="group">
-            <div className={`flex items-center gap-4 rounded-xl border-2 ${f.border} ${f.bg} p-5 transition-shadow hover:shadow-md`}>
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-gray-900 shadow-sm">
-                <f.icon className={`h-6 w-6 ${f.color}`} />
-              </div>
-              <div className="min-w-0">
-                <p className="font-semibold group-hover:underline">{t(`dashboard:${f.key}`)}</p>
-                <p className="text-sm text-muted-foreground">{t(`dashboard:${f.key}Desc`)}</p>
-              </div>
-            </div>
-          </Link>
-        ))}
+        <ExpandableGroup
+          icon={MessageCircle}
+          color="text-pink-600"
+          bg="bg-pink-50 dark:bg-pink-950/30"
+          border="border-pink-200 dark:border-pink-800"
+          titleKey="consultations"
+          isOpen={!!openPanels.consultations}
+          onToggle={() => togglePanel("consultations")}
+          items={CONSULTATION_ITEMS}
+        />
+
+        <ExpandableGroup
+          icon={Dumbbell}
+          color="text-lime-600"
+          bg="bg-lime-50 dark:bg-lime-950/30"
+          border="border-lime-200 dark:border-lime-800"
+          titleKey="exercises"
+          isOpen={!!openPanels.exercises}
+          onToggle={() => togglePanel("exercises")}
+          items={EXERCISE_ITEMS}
+        />
+
+        <ExpandableGroup
+          icon={Kanban}
+          color="text-gray-700"
+          bg="bg-gray-50 dark:bg-gray-950/30"
+          border="border-gray-200 dark:border-gray-800"
+          titleKey="tasks"
+          isOpen={!!openPanels.tasks}
+          onToggle={() => togglePanel("tasks")}
+          items={TASK_ITEMS}
+        />
       </div>
     </div>
   );

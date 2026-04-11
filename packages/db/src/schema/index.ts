@@ -18,3 +18,4 @@ export * from "./allergies";
 export * from "./privacy";
 export * from "./friend-chat";
 export * from "./workout-logs";
+export * from "./outdoor-logs";

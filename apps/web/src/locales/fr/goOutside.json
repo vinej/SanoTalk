@@ -1,0 +1,200 @@
+{
+  "title": "Sortir dehors",
+  "subtitle": "Visez 150 minutes d'activité modérée par semaine",
+  "tabs": {
+    "activities": "Activités",
+    "progress": "Ma progression",
+    "resources": "Ressources"
+  },
+  "categories": {
+    "all": "Toutes",
+    "walking": "Marche",
+    "fast_walking": "Marche rapide",
+    "running": "Course",
+    "cycling": "Vélo",
+    "swimming": "Natation",
+    "hiking": "Randonnée",
+    "gardening": "Jardinage",
+    "other": "Autre"
+  },
+  "intensity": {
+    "all": "Tous les niveaux",
+    "light": "Légère",
+    "moderate": "Modérée",
+    "vigorous": "Vigoureuse"
+  },
+  "activity": {
+    "duration": "{{mins}} min",
+    "tips": "{{count}} conseils",
+    "viewActivity": "Voir l'activité",
+    "logActivity": "Enregistrer",
+    "completed": "Terminé !",
+    "watchVideos": "Voir les vidéos",
+    "watchVideosDesc": "Trouvez des démonstrations sur YouTube",
+    "videoOffline": "Connexion internet requise",
+    "hasVideo": "Vidéo",
+    "addYourOwn": "Ajouter la vôtre",
+    "addYourOwnDesc": "Créer une activité personnalisée",
+    "myActivities": "Mes activités",
+    "noCustom": "Aucune activité personnalisée",
+    "deleteCustomConfirm": "Supprimer cette activité personnalisée ?"
+  },
+  "weeklyGoal": {
+    "title": "Objectif hebdomadaire",
+    "progress": "{{current}} / {{goal}} min",
+    "percentage": "{{pct}} %",
+    "vigorousNote": "Les minutes vigoureuses comptent double !",
+    "achieved": "Objectif atteint ! Bravo !"
+  },
+  "progress": {
+    "thisWeek": "Cette semaine",
+    "streak": "Série actuelle",
+    "longestStreak": "Plus longue série",
+    "streakDays": "{{count}} jour(s)",
+    "totalActivities": "Total des activités",
+    "totalDuration": "Durée totale",
+    "totalDistance": "Distance totale",
+    "minutes": "{{count}} min",
+    "km": "{{count}} km",
+    "noActivities": "Aucune activité enregistrée. Sortez dehors !",
+    "history": "Historique des activités",
+    "deleteConfirm": "Supprimer ce journal d'activité ?"
+  },
+  "log": {
+    "title": "Enregistrer l'activité",
+    "duration": "Durée (minutes)",
+    "distance": "Distance (km, optionnel)",
+    "notes": "Notes (optionnel)",
+    "notesPlaceholder": "Comment ça s'est passé ?",
+    "save": "Enregistrer",
+    "cancel": "Annuler"
+  },
+  "create": {
+    "title": "Créer une activité",
+    "name": "Nom de l'activité",
+    "namePlaceholder": "ex. Kayak, Pétanque",
+    "category": "Catégorie",
+    "intensityLabel": "Intensité",
+    "suggestedMins": "Durée suggérée (minutes)",
+    "save": "Créer",
+    "cancel": "Annuler"
+  },
+  "resources": {
+    "title": "Ressources utiles",
+    "subtitle": "Liens de confiance pour les activités de plein air"
+  },
+  "safety": {
+    "title": "Rappels de sécurité",
+    "disclaimer": "Vérifiez toujours la météo avant de sortir. Portez des chaussures et vêtements appropriés. Restez hydraté et apportez de l'eau. Informez quelqu'un de votre destination. Si vous ressentez des étourdissements, un essoufflement ou une douleur thoracique, arrêtez immédiatement et cherchez de l'aide."
+  },
+  "resourceNames": {
+    "go4life_walking": "Go4Life (NIA)",
+    "go4life_walkingDesc": "Programmes d'exercice du National Institute on Aging",
+    "nhs_walking": "NHS Marche et santé",
+    "nhs_walkingDesc": "Guides et programmes de marche du NHS",
+    "traillink": "TrailLink",
+    "traillinkDesc": "Trouvez des sentiers de marche et de vélo près de chez vous",
+    "silversneakers": "SilverSneakers",
+    "silversneakersDesc": "Programmes de fitness et cours pour les aînés",
+    "cycling_uk": "Cycling UK",
+    "cycling_ukDesc": "Ressources et itinéraires cyclables pour tous les âges"
+  },
+  "activities": {
+    "walk_neighborhood": {
+      "name": "Marche de quartier",
+      "description": "Une promenade tranquille dans votre quartier à un rythme confortable.",
+      "tips": ["Portez des chaussures confortables avec un bon soutien", "Commencez par 10 minutes et augmentez progressivement", "Marchez sur des trottoirs bien éclairés", "Apportez un téléphone pour la sécurité"],
+      "safetyTip": "Évitez de marcher par chaleur extrême ou en cas de verglas."
+    },
+    "walk_park": {
+      "name": "Marche au parc",
+      "description": "Une marche à rythme modéré dans un parc ou un espace vert local.",
+      "tips": ["Choisissez un parc avec des sentiers pavés ou plats", "Marchez à un rythme où vous pouvez encore parler mais êtes légèrement essoufflé", "Profitez du paysage — cela améliore l'humeur", "Essayez d'inclure quelques pentes douces"],
+      "safetyTip": "Restez sur les sentiers balisés et informez quelqu'un de votre itinéraire."
+    },
+    "walk_nature_trail": {
+      "name": "Sentier nature",
+      "description": "Une marche plus longue sur un sentier nature avec un terrain varié.",
+      "tips": ["Choisissez un sentier classé facile à modéré", "Portez des chaussures de marche robustes", "Apportez de l'eau et une collation pour les marches longues", "Utilisez des bâtons de marche pour plus de stabilité"],
+      "safetyTip": "Vérifiez l'état des sentiers avant de partir et ne marchez pas seul en zone isolée."
+    },
+    "fast_walk_interval": {
+      "name": "Marche par intervalles",
+      "description": "Alternez entre marche normale et rapide pour améliorer le cardio.",
+      "tips": ["Marchez normalement 2 minutes, puis rapidement 1 minute", "Balancez naturellement les bras pour augmenter le rythme", "Gardez une bonne posture — menton levé, épaules en arrière", "Augmentez progressivement les intervalles rapides"],
+      "safetyTip": "Ralentissez si vous ne pouvez plus prononcer une courte phrase."
+    },
+    "fast_walk_poles": {
+      "name": "Marche avec bâtons",
+      "description": "La marche avec bâtons sollicite le haut du corps et améliore l'équilibre.",
+      "tips": ["Utilisez des bâtons à la bonne hauteur — coudes à 90 degrés", "Plantez le bâton opposé au pied qui avance", "Gardez un rythme naturel", "Les bâtons réduisent la pression sur les genoux et les hanches"],
+      "safetyTip": "Apprenez la bonne technique pour éviter les tensions au poignet."
+    },
+    "nordic_walking": {
+      "name": "Marche nordique",
+      "description": "Une technique de marche vigoureuse qui sollicite tout le corps.",
+      "tips": ["Suivez un cours pour apprendre la bonne technique", "Utilisez des bâtons spécifiques avec des dragonnes", "Engagez votre tronc et poussez à chaque pas", "Brûle 20 à 40 % de calories de plus que la marche ordinaire"],
+      "safetyTip": "Commencez lentement et maîtrisez la technique avant d'augmenter la vitesse."
+    },
+    "jog_easy": {
+      "name": "Jogging léger",
+      "description": "Un jogging doux à un rythme permettant la conversation.",
+      "tips": ["Courez à un rythme qui permet de tenir une conversation", "Atterrissez doucement avec le milieu du pied", "Commencez par de courts intervalles de jogging si vous débutez", "De bonnes chaussures de course sont essentielles"],
+      "safetyTip": "Consultez votre médecin avant de commencer un programme de jogging."
+    },
+    "jog_walk_intervals": {
+      "name": "Intervalles jogging-marche",
+      "description": "Alternez entre jogging et marche pour développer l'endurance progressivement.",
+      "tips": ["Essayez 1 minute de jogging, 2 minutes de marche", "Augmentez le temps de jogging progressivement", "Marchez d'un bon pas pendant les intervalles de marche", "Cette méthode est sûre et efficace pour les débutants"],
+      "safetyTip": "Arrêtez de courir et marchez si vous ressentez une douleur articulaire."
+    },
+    "cycle_leisure": {
+      "name": "Vélo loisir",
+      "description": "Une balade à vélo détendue sur terrain plat à un rythme confortable.",
+      "tips": ["Réglez votre selle pour que votre jambe soit légèrement fléchie", "Commencez sur des pistes plates loin de la circulation", "Portez toujours un casque", "Un vélo à enjambement bas est plus facile à monter"],
+      "safetyTip": "Portez toujours un casque et utilisez des éclairages/réflecteurs."
+    },
+    "cycle_path": {
+      "name": "Piste cyclable",
+      "description": "Une sortie modérée sur une piste cyclable dédiée.",
+      "tips": ["Planifiez votre itinéraire en utilisant les pistes cyclables", "Maintenez un rythme modéré et régulier", "Signalez vos changements de direction", "Apportez de l'eau pour les sorties de plus de 20 minutes"],
+      "safetyTip": "Vérifiez vos freins et la pression des pneus avant chaque sortie."
+    },
+    "cycle_hills": {
+      "name": "Vélo en côte",
+      "description": "Un parcours exigeant incluant des côtes pour un exercice cardiovasculaire vigoureux.",
+      "tips": ["Passez à une vitesse inférieure avant la côte", "Levez-vous brièvement sur les pédales pour les sections raides", "Contrôlez la vitesse en descente avec un freinage doux", "Progressez vers les côtes sur plusieurs semaines"],
+      "safetyTip": "Évitez les descentes raides tant que vous n'êtes pas à l'aise avec le freinage."
+    },
+    "swim_laps": {
+      "name": "Nage en longueurs",
+      "description": "Nager des longueurs en piscine à un rythme régulier.",
+      "tips": ["Choisissez une piscine avec un petit bain", "Commencez par quelques longueurs avec des pauses", "La brasse et le dos crawlé sont plus doux pour les épaules", "La natation est excellente pour les articulations"],
+      "safetyTip": "Ne nagez jamais seul et choisissez une piscine avec un sauveteur."
+    },
+    "swim_aqua_walk": {
+      "name": "Marche aquatique",
+      "description": "Marcher dans l'eau jusqu'à la taille pour un exercice de résistance à faible impact.",
+      "tips": ["Marchez dans l'eau jusqu'à la taille ou la poitrine", "L'eau offre une résistance naturelle", "Bougez les bras dans l'eau pour travailler le haut du corps", "Excellent pour l'arthrite ou les douleurs articulaires"],
+      "safetyTip": "Utilisez les mains courantes pour entrer et sortir de la piscine."
+    },
+    "hike_easy": {
+      "name": "Randonnée facile",
+      "description": "Une randonnée modérée sur des sentiers bien entretenus avec un dénivelé doux.",
+      "tips": ["Choisissez des sentiers classés faciles et bien balisés", "Portez des chaussures de randonnée avec maintien de la cheville", "Apportez suffisamment d'eau, de collations et un chapeau", "Utilisez des bâtons de marche pour la stabilité"],
+      "safetyTip": "Informez quelqu'un de votre plan de randonnée et de votre heure de retour prévue."
+    },
+    "garden_active": {
+      "name": "Jardinage actif",
+      "description": "Activités de jardinage comme creuser, désherber, ratisser et transporter.",
+      "tips": ["Alternez les tâches pour solliciter différents muscles", "Utilisez des plates-bandes surélevées ou des coussins pour les genoux", "Faites des pauses toutes les 20 minutes", "Le jardinage brûle plus de calories que vous ne le pensez !"],
+      "safetyTip": "Portez des gants, protégez-vous du soleil et restez hydraté."
+    },
+    "outdoor_tai_chi": {
+      "name": "Tai-chi en plein air",
+      "description": "Pratiquer le tai-chi dans un parc ou un jardin pour l'équilibre et la pleine conscience.",
+      "tips": ["Trouvez un endroit plat et paisible dans un parc", "Pratiquez le matin pour un début de journée calme", "Portez des vêtements amples et confortables", "Rejoignez un groupe local pour la motivation"],
+      "safetyTip": "Choisissez une surface plate et non glissante."
+    }
+  }
+}

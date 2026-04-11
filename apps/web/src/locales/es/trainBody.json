@@ -25,7 +25,11 @@
     "steps": "{{count}} pasos",
     "viewExercise": "Ver ejercicio",
     "logWorkout": "Registrar",
-    "completed": "¡Completado!"
+    "completed": "¡Completado!",
+    "watchVideos": "Ver videos",
+    "watchVideosDesc": "Encuentra demostraciones en YouTube",
+    "videoOffline": "Requiere internet",
+    "hasVideo": "Video"
   },
   "progress": {
     "thisWeek": "Esta semana",

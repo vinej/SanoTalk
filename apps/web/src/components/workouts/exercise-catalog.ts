@@ -7,7 +7,17 @@ export interface Exercise {
   difficulty: DifficultyLevel;
   durationMins: number;
   stepCount: number;
+  youtubeId?: string;        // specific curated YouTube video ID
+  youtubeStart?: number;     // start time in seconds for the specific video
 }
+
+export const CATEGORY_ICONS = {
+  tai_chi: "Wind",
+  stretching: "MoveHorizontal",
+  balance: "Scale",
+  strength: "Dumbbell",
+  cardio: "HeartPulse",
+} as const;
 
 export const CATEGORIES: ExerciseCategory[] = [
   "tai_chi", "stretching", "balance", "strength", "cardio",

@@ -25,7 +25,11 @@
     "steps": "{{count}} चरण",
     "viewExercise": "व्यायाम देखें",
     "logWorkout": "दर्ज करें",
-    "completed": "पूरा हुआ!"
+    "completed": "पूरा हुआ!",
+    "watchVideos": "वीडियो देखें",
+    "watchVideosDesc": "YouTube पर प्रदर्शन खोजें",
+    "videoOffline": "इंटरनेट आवश्यक",
+    "hasVideo": "वीडियो"
   },
   "progress": {
     "thisWeek": "इस सप्ताह",

@@ -25,7 +25,11 @@
     "steps": "{{count}} خطوات",
     "viewExercise": "عرض التمرين",
     "logWorkout": "تسجيل",
-    "completed": "اكتمل!"
+    "completed": "اكتمل!",
+    "watchVideos": "شاهد الفيديوهات",
+    "watchVideosDesc": "ابحث عن عروض توضيحية على يوتيوب",
+    "videoOffline": "يتطلب اتصال بالإنترنت",
+    "hasVideo": "فيديو"
   },
   "progress": {
     "thisWeek": "هذا الأسبوع",

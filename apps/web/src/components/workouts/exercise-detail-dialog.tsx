@@ -12,6 +12,7 @@ import {
 } from "../ui/dialog";
 import type { Exercise } from "./exercise-catalog";
 import { DIFFICULTY_COLORS } from "./exercise-catalog";
+import { YouTubeVideoLink } from "./youtube-video-link";
 
 interface ExerciseDetailDialogProps {
   exercise: Exercise | null;
@@ -59,6 +60,11 @@ export function ExerciseDetailDialog({
             {t("exercise.steps", { count: exercise.stepCount })}
           </span>
         </div>
+
+        <YouTubeVideoLink
+          exercise={exercise}
+          exerciseName={t(`exercises.${exercise.id}.name`)}
+        />
 
         <ol className="mt-4 space-y-2 pl-5 list-decimal text-sm">
           {steps.map((step, i) => (

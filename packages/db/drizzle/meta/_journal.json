@@ -232,6 +232,13 @@
       "when": 1775911159219,
       "tag": "0032_lowly_masque",
       "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1775914452589,
+      "tag": "0033_fluffy_amazoness",
+      "breakpoints": true
     }
   ]
 }

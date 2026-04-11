@@ -25,7 +25,11 @@
     "steps": "{{count}} 步骤",
     "viewExercise": "查看锻炼",
     "logWorkout": "记录锻炼",
-    "completed": "已完成！"
+    "completed": "已完成！",
+    "watchVideos": "观看视频",
+    "watchVideosDesc": "在YouTube上查找演示",
+    "videoOffline": "需要网络连接",
+    "hasVideo": "视频"
   },
   "progress": {
     "thisWeek": "本周",
