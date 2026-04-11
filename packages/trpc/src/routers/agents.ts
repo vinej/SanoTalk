@@ -6,9 +6,20 @@ import { escapeHtml, sanitizeSubject } from "../lib/escape-html";
 import { eq, asc, desc, isNull, and, gte, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { verifyAdminFromDb } from "../lib/verify-admin";
-import { encryptContent, decryptContent, decryptArray } from "../lib/crypto";
+import { encryptContent, decryptContent, decryptArray, decryptNumeric } from "../lib/crypto";
 
 type DB = Parameters<Parameters<typeof protectedProcedure.query>[0]>[0]["ctx"]["db"];
+
+/** Symptom log with numeric fields restored after decryption (DB stores them as encrypted text). */
+type DecryptedSymptomLog = Omit<typeof symptomLog.$inferSelect, "painLevel" | "mood" | "energy" | "sleepQuality" | "sleepHours" | "stress" | "appetite"> & {
+  painLevel: number | null;
+  mood: number | null;
+  energy: number | null;
+  sleepQuality: number | null;
+  sleepHours: number | null;
+  stress: number | null;
+  appetite: number | null;
+};
 
 /** Decrypt chat message content for display (handles pre-encryption plaintext gracefully). */
 function decryptMessages<T extends { content: string }>(msgs: T[]): T[] {
@@ -49,7 +60,7 @@ async function getUserContext(db: DB, userId: string) {
       propertiesLanguage: userRow?.propertiesLanguage ?? "en",
       recentVitals: [] as (typeof vitalSign.$inferSelect)[],
       activeMedications: [] as (typeof medication.$inferSelect)[],
-      recentSymptoms: [] as (typeof symptomLog.$inferSelect)[],
+      recentSymptoms: [] as DecryptedSymptomLog[],
       userAllergies: [] as (typeof allergy.$inferSelect)[],
       userConditions: [] as (typeof chronicCondition.$inferSelect)[],
     };
@@ -110,6 +121,13 @@ async function getUserContext(db: DB, userId: string) {
     })),
     recentSymptoms: recentSymptoms.map(s => ({
       ...s,
+      painLevel: decryptNumeric(s.painLevel),
+      mood: decryptNumeric(s.mood),
+      energy: decryptNumeric(s.energy),
+      sleepQuality: decryptNumeric(s.sleepQuality),
+      sleepHours: decryptNumeric(s.sleepHours),
+      stress: decryptNumeric(s.stress),
+      appetite: decryptNumeric(s.appetite),
       customSymptoms: decryptArray(s.customSymptoms),
       bodyLocation: decryptContent(s.bodyLocation),
       notes: decryptContent(s.notes),
@@ -175,7 +193,7 @@ function buildMedicationsContext(meds: typeof medication.$inferSelect[]): Array<
 }
 
 /** Builds a symptoms context message pair for AI agents. */
-function buildSymptomsContext(logs: typeof symptomLog.$inferSelect[]): Array<{ role: "user" | "assistant"; content: string }> {
+function buildSymptomsContext(logs: DecryptedSymptomLog[]): Array<{ role: "user" | "assistant"; content: string }> {
   if (logs.length === 0) return [];
 
   const lines = logs.map((l) => {

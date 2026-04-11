@@ -22,7 +22,7 @@ import { eq, and, desc, lte } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { logAuditEvent } from "../lib/audit";
 import { verifyAdminFromDb } from "../lib/verify-admin";
-import { decrypt, decryptContent, decryptArray } from "../lib/crypto";
+import { decrypt, decryptContent, decryptArray, decryptNumeric } from "../lib/crypto";
 
 const CURRENT_POLICY_VERSION = "2026-04-10";
 
@@ -241,6 +241,13 @@ export const privacyRouter = createTRPCRouter({
       }));
       const decryptedSymptoms = symptoms.map(s => ({
         ...s,
+        painLevel: decryptNumeric(s.painLevel),
+        mood: decryptNumeric(s.mood),
+        energy: decryptNumeric(s.energy),
+        sleepQuality: decryptNumeric(s.sleepQuality),
+        sleepHours: decryptNumeric(s.sleepHours),
+        stress: decryptNumeric(s.stress),
+        appetite: decryptNumeric(s.appetite),
         customSymptoms: decryptArray(s.customSymptoms),
         bodyLocation: decryptContent(s.bodyLocation),
         notes: decryptContent(s.notes),

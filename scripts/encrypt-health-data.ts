@@ -2,7 +2,7 @@
  * One-shot script: encrypt all plaintext PHI fields in health data tables.
  *
  * Tables covered:
- *   - sanotalk_symptom_log     (custom_symptoms[], body_location, notes)
+ *   - sanotalk_symptom_log     (pain_level, mood, energy, sleep_quality, sleep_hours, stress, appetite, custom_symptoms[], body_location, notes)
  *   - sanotalk_vital_sign      (notes)
  *   - sanotalk_medication      (name, dosage, frequency, route, prescribed_by, reason, notes)
  *   - sanotalk_allergy         (name, reaction, notes)
@@ -65,25 +65,42 @@ async function main() {
   // ── 1. sanotalk_symptom_log ──────────────────────────────────────────────
   {
     const rows = await sql`
-      SELECT id, custom_symptoms, body_location, notes
+      SELECT id, pain_level, mood, energy, sleep_quality, sleep_hours, stress, appetite,
+             custom_symptoms, body_location, notes
       FROM sanotalk_symptom_log
-      WHERE (notes IS NOT NULL AND notes NOT LIKE 'enc:v1:%')
+      WHERE (pain_level IS NOT NULL AND pain_level NOT LIKE 'enc:v1:%')
+         OR (mood IS NOT NULL AND mood NOT LIKE 'enc:v1:%')
+         OR (energy IS NOT NULL AND energy NOT LIKE 'enc:v1:%')
+         OR (sleep_quality IS NOT NULL AND sleep_quality NOT LIKE 'enc:v1:%')
+         OR (sleep_hours IS NOT NULL AND sleep_hours NOT LIKE 'enc:v1:%')
+         OR (stress IS NOT NULL AND stress NOT LIKE 'enc:v1:%')
+         OR (appetite IS NOT NULL AND appetite NOT LIKE 'enc:v1:%')
+         OR (notes IS NOT NULL AND notes NOT LIKE 'enc:v1:%')
          OR (body_location IS NOT NULL AND body_location NOT LIKE 'enc:v1:%')
          OR (custom_symptoms IS NOT NULL AND array_length(custom_symptoms, 1) > 0)
     `;
 
     // Filter to rows that actually need encryption
     const toUpdate = rows.filter((r) => {
+      const needNumeric = [r.pain_level, r.mood, r.energy, r.sleep_quality, r.sleep_hours, r.stress, r.appetite]
+        .some((v) => v && !v.startsWith(PREFIX));
       const needNotes = r.notes && !r.notes.startsWith(PREFIX);
       const needBody = r.body_location && !r.body_location.startsWith(PREFIX);
       const needSymptoms = r.custom_symptoms?.some((s: string) => !s.startsWith(PREFIX));
-      return needNotes || needBody || needSymptoms;
+      return needNumeric || needNotes || needBody || needSymptoms;
     });
 
     console.log(`\n[symptom_log] ${toUpdate.length} rows to encrypt`);
     for (const row of toUpdate) {
       await sql`
         UPDATE sanotalk_symptom_log SET
+          pain_level = ${encryptIfNeeded(row.pain_level)},
+          mood = ${encryptIfNeeded(row.mood)},
+          energy = ${encryptIfNeeded(row.energy)},
+          sleep_quality = ${encryptIfNeeded(row.sleep_quality)},
+          sleep_hours = ${encryptIfNeeded(row.sleep_hours)},
+          stress = ${encryptIfNeeded(row.stress)},
+          appetite = ${encryptIfNeeded(row.appetite)},
           notes = ${encryptIfNeeded(row.notes)},
           body_location = ${encryptIfNeeded(row.body_location)},
           custom_symptoms = ${encryptArrayIfNeeded(row.custom_symptoms)},

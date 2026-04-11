@@ -5,13 +5,20 @@ import { resend } from "../lib/resend";
 import { escapeHtml, sanitizeSubject } from "../lib/escape-html";
 import { eq, and, desc, gte, lte } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { encryptContent, decryptContent, encryptArray, decryptArray } from "../lib/crypto";
+import { encryptContent, decryptContent, encryptArray, decryptArray, encryptNumeric, decryptNumeric } from "../lib/crypto";
 import { checkDailyShareLimit } from "../lib/share-limit";
 import { logAuditEvent } from "../lib/audit";
 
-function decryptSymptomFields<T extends { customSymptoms: string[] | null; bodyLocation: string | null; notes: string | null }>(s: T): T {
+function decryptSymptomFields<T extends Record<string, any>>(s: T) {
   return {
     ...s,
+    painLevel: decryptNumeric(s.painLevel),
+    mood: decryptNumeric(s.mood),
+    energy: decryptNumeric(s.energy),
+    sleepQuality: decryptNumeric(s.sleepQuality),
+    sleepHours: decryptNumeric(s.sleepHours),
+    stress: decryptNumeric(s.stress),
+    appetite: decryptNumeric(s.appetite),
     customSymptoms: decryptArray(s.customSymptoms),
     bodyLocation: decryptContent(s.bodyLocation),
     notes: decryptContent(s.notes),
@@ -41,13 +48,13 @@ export const symptomsRouter = createTRPCRouter({
       const values = {
         userId: ctx.user.id,
         date: input.date,
-        painLevel: input.painLevel ?? null,
-        mood: input.mood ?? null,
-        energy: input.energy ?? null,
-        sleepQuality: input.sleepQuality ?? null,
-        sleepHours: input.sleepHours ?? null,
-        stress: input.stress ?? null,
-        appetite: input.appetite ?? null,
+        painLevel: encryptNumeric(input.painLevel ?? null),
+        mood: encryptNumeric(input.mood ?? null),
+        energy: encryptNumeric(input.energy ?? null),
+        sleepQuality: encryptNumeric(input.sleepQuality ?? null),
+        sleepHours: encryptNumeric(input.sleepHours ?? null),
+        stress: encryptNumeric(input.stress ?? null),
+        appetite: encryptNumeric(input.appetite ?? null),
         customSymptoms: encCustomSymptoms,
         bodyLocation: encBodyLocation,
         notes: encNotes,

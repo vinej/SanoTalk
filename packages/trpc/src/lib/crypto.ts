@@ -55,6 +55,20 @@ export function decryptArray(arr: string[] | null | undefined): string[] | null 
   return arr.map((el) => decrypt(el));
 }
 
+/** Encrypt a numeric value as a string. Null/undefined inputs pass through. */
+export function encryptNumeric(value: number | null | undefined): string | null {
+  if (value === null || value === undefined) return null;
+  return encrypt(String(value));
+}
+
+/** Decrypt an encrypted string back to a number. Null/undefined inputs pass through. */
+export function decryptNumeric(text: string | null | undefined): number | null {
+  if (text === null || text === undefined) return null;
+  const decrypted = decrypt(text);
+  const num = Number(decrypted);
+  return Number.isNaN(num) ? null : num;
+}
+
 /** Deterministic SHA-256 hash for unique index lookup (case-insensitive, trimmed). */
 export function hashForIndex(text: string): string {
   return createHash("sha256").update(text.toLowerCase().trim()).digest("hex");
