@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { trpc } from "../../lib/trpc";
-import { EventCard, type TimelineItem } from "./event-card";
+import { EventCard, type TimelineItem, type EventType } from "./event-card";
 
 interface DayDetailPanelProps {
   date: Date;
@@ -27,7 +27,7 @@ export function DayDetailPanel({ date, onEditEvent }: DayDetailPanelProps) {
   });
 
   const eventItems: TimelineItem[] = (events ?? []).map((e) => ({
-    type: e.eventType as "appointment" | "exercise",
+    type: e.eventType as EventType,
     time: e.startAt instanceof Date ? e.startAt.toISOString().slice(11, 16) : new Date(e.startAt).toISOString().slice(11, 16),
     title: e.title,
     subtitle: e.description ?? null,

@@ -145,7 +145,15 @@ export const mastra = new Mastra({
 });
 
 async function executeRun(run: typeof agentRun.$inferSelect) {
-  const input = run.input as { sessionId?: string; agentType?: string } | null;
+  let input: { sessionId?: string; agentType?: string } | null = null;
+  if (run.input) {
+    try {
+      const decrypted = decryptContent(run.input) ?? run.input;
+      input = JSON.parse(decrypted);
+    } catch {
+      input = null;
+    }
+  }
   logger.info({ runId: run.id, agentName: run.agentName, sessionId: input?.sessionId }, "executeRun started");
 
   await db.update(agentRun)
@@ -192,7 +200,7 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
     if (!transcriptContent) {
       logger.warn({ runId: run.id, sessionId }, "No transcript content — aborting agent run");
       await db.update(agentRun)
-        .set({ status: "error", errorMessage: "No transcript content available for this session", completedAt: new Date() })
+        .set({ status: "error", errorMessage: encryptContent("No transcript content available for this session"), completedAt: new Date() })
         .where(eq(agentRun.id, run.id));
       return;
     }
@@ -270,15 +278,15 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
     await db.update(agentRun)
       .set({
         status: parseFailed ? "error" : "success",
-        output: { text: encryptContent(result.text) ?? result.text },
-        ...(parseFailed ? { errorMessage: "Failed to parse summary JSON from agent output" } : {}),
+        output: encryptContent(JSON.stringify({ text: result.text })),
+        ...(parseFailed ? { errorMessage: encryptContent("Failed to parse summary JSON from agent output") } : {}),
         completedAt: new Date(),
       })
       .where(eq(agentRun.id, run.id));
   } catch (err) {
     logger.error({ err, runId: run.id }, "Agent run failed");
     await db.update(agentRun)
-      .set({ status: "error", errorMessage: "An internal error occurred while processing this session.", completedAt: new Date() })
+      .set({ status: "error", errorMessage: encryptContent("An internal error occurred while processing this session."), completedAt: new Date() })
       .where(eq(agentRun.id, run.id));
   }
 }

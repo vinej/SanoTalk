@@ -6,7 +6,7 @@ import { Calendar } from "../ui/calendar";
 import { trpc } from "../../lib/trpc";
 import { DayDetailPanel } from "./day-detail-panel";
 import { AddEventDialog } from "./add-event-dialog";
-import type { TimelineItem } from "./event-card";
+import type { TimelineItem, CreatableEventType } from "./event-card";
 
 export function AgendaCalendarView() {
   const { t } = useTranslation("agenda");
@@ -52,7 +52,7 @@ export function AgendaCalendarView() {
       startAt: new Date(`${selectedDate.toISOString().slice(0, 10)}T${item.time}:00`),
       endAt: null,
       allDay: false,
-      eventType: item.type as "appointment" | "exercise",
+      eventType: item.type as CreatableEventType,
       recurrenceRule: null,
     });
   }

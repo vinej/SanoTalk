@@ -8,7 +8,7 @@ import { medication } from "./medications";
 export const agendaEvent = createTable("agenda_event", {
   id:             uuid("id").primaryKey().defaultRandom(),
   userId:         text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
-  eventType:      text("event_type", { enum: ["appointment", "exercise"] }).notNull(),
+  eventType:      text("event_type", { enum: ["appointment", "exercise", "personal", "birthday", "reservation", "other"] }).notNull(),
   title:          text("title").notNull(),            // encrypted
   description:    text("description"),                // encrypted
   location:       text("location"),                   // encrypted

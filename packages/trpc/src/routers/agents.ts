@@ -287,7 +287,7 @@ export const agentsRouter = createTRPCRouter({
         .insert(agentRun)
         .values({
           agentName,
-          input: { sessionId: input.sessionId, agentType },
+          input: encryptContent(JSON.stringify({ sessionId: input.sessionId, agentType })),
         })
         .returning({ id: agentRun.id, status: agentRun.status, agentName: agentRun.agentName, startedAt: agentRun.startedAt });
       if (run) ctx.triggerAgentRun(run.id);
@@ -301,7 +301,14 @@ export const agentsRouter = createTRPCRouter({
         where: eq(agentRun.id, input.runId),
       });
       if (!run) throw new TRPCError({ code: "NOT_FOUND", message: "Run not found" });
-      const sessionId = (run.input as { sessionId?: string } | null)?.sessionId;
+      let parsedInput: { sessionId?: string } | null = null;
+      if (run.input) {
+        try {
+          const decrypted = decryptContent(run.input) ?? run.input;
+          parsedInput = JSON.parse(decrypted);
+        } catch { /* ignore parse errors */ }
+      }
+      const sessionId = parsedInput?.sessionId;
       if (!sessionId) throw new TRPCError({ code: "FORBIDDEN", message: "Access denied" });
       await assertSessionAccess(ctx.db, sessionId, ctx.user.id);
       // Return only status fields — the full output (SOAP notes etc.) is accessed via transcripts.summaryBySession

@@ -4,7 +4,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { trpc } from "../../lib/trpc";
-import { EventCard, type TimelineItem } from "./event-card";
+import { EventCard, type TimelineItem, type CreatableEventType } from "./event-card";
 import { AddEventDialog } from "./add-event-dialog";
 
 export function AgendaTodayView() {
@@ -47,7 +47,7 @@ export function AgendaTodayView() {
       startAt: new Date(`${now.toISOString().slice(0, 10)}T${item.time}:00`),
       endAt: null,
       allDay: false,
-      eventType: item.type as "appointment" | "exercise",
+      eventType: item.type as CreatableEventType,
       recurrenceRule: null,
     });
   }

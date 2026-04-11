@@ -6,7 +6,7 @@ import { TRPCError } from "@trpc/server";
 import { encryptContent, decryptContent } from "../lib/crypto";
 import { verifyProfessionalFromDb } from "../lib/verify-professional";
 
-const eventTypeEnum = z.enum(["appointment", "exercise"]);
+const eventTypeEnum = z.enum(["appointment", "exercise", "personal", "birthday", "reservation", "other"]);
 const timeRegex = /^\d{2}:\d{2}$/;
 
 // ─── Helpers ────────────────────────────────────────────────────────────────

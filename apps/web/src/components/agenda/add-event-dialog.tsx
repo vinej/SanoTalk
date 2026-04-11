@@ -13,6 +13,7 @@ import {
   DialogFooter,
 } from "../ui/dialog";
 import { trpc } from "../../lib/trpc";
+import type { CreatableEventType } from "./event-card";
 
 interface AddEventDialogProps {
   open: boolean;
@@ -26,7 +27,7 @@ interface AddEventDialogProps {
     startAt: Date;
     endAt: Date | null;
     allDay: boolean;
-    eventType: "appointment" | "exercise";
+    eventType: CreatableEventType;
     recurrenceRule: string | null;
   };
 }
@@ -42,7 +43,7 @@ export function AddEventDialog({ open, onOpenChange, editEvent }: AddEventDialog
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
   const [allDay, setAllDay] = useState(false);
-  const [eventType, setEventType] = useState<"appointment" | "exercise">("appointment");
+  const [eventType, setEventType] = useState<CreatableEventType>("appointment");
   const [recurrence, setRecurrence] = useState<"none" | "daily" | "weekly" | "monthly">("none");
 
   useEffect(() => {
@@ -160,12 +161,16 @@ export function AddEventDialog({ open, onOpenChange, editEvent }: AddEventDialog
             <Label>{t("form.eventType")}</Label>
             <select
               value={eventType}
-              onChange={(e) => setEventType(e.target.value as "appointment" | "exercise")}
+              onChange={(e) => setEventType(e.target.value as CreatableEventType)}
               disabled={!!editEvent}
               className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               <option value="appointment">{t("event.appointment")}</option>
               <option value="exercise">{t("event.exercise")}</option>
+              <option value="personal">{t("event.personal")}</option>
+              <option value="birthday">{t("event.birthday")}</option>
+              <option value="reservation">{t("event.reservation")}</option>
+              <option value="other">{t("event.other")}</option>
             </select>
           </div>
 

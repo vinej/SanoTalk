@@ -1,4 +1,4 @@
-import { text, timestamp, uuid, jsonb } from "drizzle-orm/pg-core";
+import { text, timestamp, uuid } from "drizzle-orm/pg-core";
 import { createTable, user } from "./auth";
 import { talkSession } from "./sessions";
 
@@ -10,12 +10,12 @@ export const agentRun = createTable("agent_run", {
   }),
   userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
   agentName: text("agent_name").notNull(),
-  input: jsonb("input"),
-  output: jsonb("output"),
+  input: text("input"),                  // encrypted JSON
+  output: text("output"),                // encrypted JSON
   status: text("status", {
     enum: ["pending", "running", "success", "error"],
   }).notNull().default("pending"),
-  errorMessage: text("error_message"),
+  errorMessage: text("error_message"),   // encrypted
   startedAt: timestamp("started_at").defaultNow(),
   completedAt: timestamp("completed_at"),
 });

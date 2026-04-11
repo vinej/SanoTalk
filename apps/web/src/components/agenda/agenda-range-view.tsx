@@ -4,7 +4,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "../ui/button";
 import { trpc } from "../../lib/trpc";
-import { EventCard, type TimelineItem } from "./event-card";
+import { EventCard, type TimelineItem, type EventType, type CreatableEventType } from "./event-card";
 import { AddEventDialog } from "./add-event-dialog";
 
 interface AgendaRangeViewProps {
@@ -84,7 +84,7 @@ export function AgendaRangeView({ mode }: AgendaRangeViewProps) {
       startAt: new Date(`${dateStr}T${item.time}:00`),
       endAt: null,
       allDay: false,
-      eventType: item.type as "appointment" | "exercise",
+      eventType: item.type as CreatableEventType,
       recurrenceRule: null,
     });
   }
@@ -132,7 +132,7 @@ export function AgendaRangeView({ mode }: AgendaRangeViewProps) {
         });
 
         const items: TimelineItem[] = evts.map((e) => ({
-          type: e.eventType as "appointment" | "exercise",
+          type: e.eventType as EventType,
           time: (e.startAt instanceof Date ? e.startAt : new Date(e.startAt))
             .toISOString()
             .slice(11, 16),
