@@ -84,6 +84,7 @@ export function startDeepgramWebSocket(server: Server, allowedOrigins?: string[]
       });
       if (!talk) {
         logger.warn({ sessionId, userId }, "WebSocket rejected: session not found");
+        wsCountByUser.set(userId, (wsCountByUser.get(userId) ?? 1) - 1);
         ws.close(1008, "Session not found");
         return;
       }
@@ -98,6 +99,7 @@ export function startDeepgramWebSocket(server: Server, allowedOrigins?: string[]
         });
         if (!participant) {
           logger.warn({ sessionId, userId }, "WebSocket rejected: user not in session");
+          wsCountByUser.set(userId, (wsCountByUser.get(userId) ?? 1) - 1);
           ws.close(1008, "Access denied");
           return;
         }

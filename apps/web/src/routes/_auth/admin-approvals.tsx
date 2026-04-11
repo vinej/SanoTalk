@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { trpc } from "../../lib/trpc";
@@ -15,6 +15,11 @@ import {
 } from "../../components/ui/dialog";
 
 export const Route = createFileRoute("/_auth/admin-approvals")({
+  beforeLoad: async ({ context }: { context: { user?: { role?: string } } }) => {
+    if ((context.user as any)?.role !== "admin") {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: AdminApprovalsPage,
 });
 

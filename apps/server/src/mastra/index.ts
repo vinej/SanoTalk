@@ -270,7 +270,7 @@ async function executeRun(run: typeof agentRun.$inferSelect) {
     await db.update(agentRun)
       .set({
         status: parseFailed ? "error" : "success",
-        output: { text: result.text },
+        output: { text: encryptContent(result.text) ?? result.text },
         ...(parseFailed ? { errorMessage: "Failed to parse summary JSON from agent output" } : {}),
         completedAt: new Date(),
       })

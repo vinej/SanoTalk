@@ -8,6 +8,7 @@ import { synthesize } from "./tts-service.js";
 import { buildSessionPrompt } from "./prompts.js";
 import type { AiAssistantConfig, PipelineOptions, TranscriptSegment } from "./types.js";
 import { db, transcript as transcriptTable } from "@sanotalk/db";
+import { encryptContent } from "@sanotalk/trpc/lib/crypto";
 
 /**
  * AiVoicePipeline manages the full lifecycle of an AI participant in a session:
@@ -315,7 +316,7 @@ export class AiVoicePipeline {
       await db.insert(transcriptTable).values({
         sessionId: this.options.sessionId,
         speakerId: speakerId ?? this.options.assistant.userId,
-        content: text,
+        content: encryptContent(text) ?? text,
         confidence: 1.0,
         startMs: Date.now(),
         endMs: Date.now(),

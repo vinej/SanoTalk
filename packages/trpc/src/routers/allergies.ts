@@ -2,6 +2,15 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { allergy, chronicCondition } from "@sanotalk/db";
 import { eq, and, desc } from "drizzle-orm";
+import { encryptContent, decryptContent, encryptArray, decryptArray, hashForIndex } from "../lib/crypto";
+
+function decryptAllergyFields<T extends { name: string; reaction: string | null; notes: string | null }>(a: T): T {
+  return { ...a, name: decryptContent(a.name) ?? a.name, reaction: decryptContent(a.reaction), notes: decryptContent(a.notes) };
+}
+
+function decryptConditionFields<T extends { name: string; medications: string[] | null; notes: string | null }>(c: T): T {
+  return { ...c, name: decryptContent(c.name) ?? c.name, medications: decryptArray(c.medications), notes: decryptContent(c.notes) };
+}
 
 const allergyTypeEnum = z.enum(["drug", "food", "environmental", "other"]);
 const severityEnum = z.enum(["mild", "moderate", "severe", "life_threatening"]);
@@ -12,12 +21,13 @@ export const allergiesRouter = createTRPCRouter({
   // ── Allergies ───────────────────────────────────────────────────────────
 
   listAllergies: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db
+    const rows = await ctx.db
       .select()
       .from(allergy)
       .where(eq(allergy.userId, ctx.user.id))
       .orderBy(desc(allergy.createdAt))
       .limit(200);
+    return rows.map(decryptAllergyFields);
   }),
 
   addAllergy: protectedProcedure
@@ -35,25 +45,27 @@ export const allergiesRouter = createTRPCRouter({
         .values({
           userId: ctx.user.id,
           type: input.type,
-          name: input.name,
+          name: encryptContent(input.name)!,
+          nameHash: hashForIndex(input.name),
           severity: input.severity,
-          reaction: input.reaction ?? null,
+          reaction: encryptContent(input.reaction ?? null),
           diagnosedDate: input.diagnosedDate ?? null,
-          notes: input.notes ?? null,
+          notes: encryptContent(input.notes ?? null),
         })
         .onConflictDoUpdate({
-          target: [allergy.userId, allergy.name],
+          target: [allergy.userId, allergy.nameHash],
           set: {
             type: input.type,
+            name: encryptContent(input.name)!,
             severity: input.severity,
-            reaction: input.reaction ?? null,
+            reaction: encryptContent(input.reaction ?? null),
             diagnosedDate: input.diagnosedDate ?? null,
-            notes: input.notes ?? null,
+            notes: encryptContent(input.notes ?? null),
             updatedAt: new Date(),
           },
         })
         .returning({ id: allergy.id, type: allergy.type, name: allergy.name, severity: allergy.severity, reaction: allergy.reaction, diagnosedDate: allergy.diagnosedDate, notes: allergy.notes, createdAt: allergy.createdAt, updatedAt: allergy.updatedAt });
-      return row;
+      return row ? decryptAllergyFields(row) : row;
     }),
 
   updateAllergy: protectedProcedure
@@ -71,11 +83,12 @@ export const allergiesRouter = createTRPCRouter({
         .update(allergy)
         .set({
           type: input.type,
-          name: input.name,
+          name: encryptContent(input.name)!,
+          nameHash: hashForIndex(input.name),
           severity: input.severity,
-          reaction: input.reaction ?? null,
+          reaction: encryptContent(input.reaction ?? null),
           diagnosedDate: input.diagnosedDate ?? null,
-          notes: input.notes ?? null,
+          notes: encryptContent(input.notes ?? null),
           updatedAt: new Date(),
         })
         .where(and(eq(allergy.id, input.id), eq(allergy.userId, ctx.user.id)));
@@ -92,12 +105,13 @@ export const allergiesRouter = createTRPCRouter({
   // ── Chronic Conditions ──────────────────────────────────────────────────
 
   listConditions: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.db
+    const rows = await ctx.db
       .select()
       .from(chronicCondition)
       .where(eq(chronicCondition.userId, ctx.user.id))
       .orderBy(desc(chronicCondition.createdAt))
       .limit(200);
+    return rows.map(decryptConditionFields);
   }),
 
   addCondition: protectedProcedure
@@ -114,26 +128,28 @@ export const allergiesRouter = createTRPCRouter({
         .insert(chronicCondition)
         .values({
           userId: ctx.user.id,
-          name: input.name,
+          name: encryptContent(input.name)!,
+          nameHash: hashForIndex(input.name),
           status: input.status,
           severity: input.severity,
           diagnosedDate: input.diagnosedDate ?? null,
-          medications: input.medications ?? null,
-          notes: input.notes ?? null,
+          medications: encryptArray(input.medications ?? null),
+          notes: encryptContent(input.notes ?? null),
         })
         .onConflictDoUpdate({
-          target: [chronicCondition.userId, chronicCondition.name],
+          target: [chronicCondition.userId, chronicCondition.nameHash],
           set: {
+            name: encryptContent(input.name)!,
             status: input.status,
             severity: input.severity,
             diagnosedDate: input.diagnosedDate ?? null,
-            medications: input.medications ?? null,
-            notes: input.notes ?? null,
+            medications: encryptArray(input.medications ?? null),
+            notes: encryptContent(input.notes ?? null),
             updatedAt: new Date(),
           },
         })
         .returning({ id: chronicCondition.id, name: chronicCondition.name, status: chronicCondition.status, severity: chronicCondition.severity, diagnosedDate: chronicCondition.diagnosedDate, medications: chronicCondition.medications, notes: chronicCondition.notes, createdAt: chronicCondition.createdAt, updatedAt: chronicCondition.updatedAt });
-      return row;
+      return row ? decryptConditionFields(row) : row;
     }),
 
   updateCondition: protectedProcedure
@@ -150,12 +166,13 @@ export const allergiesRouter = createTRPCRouter({
       await ctx.db
         .update(chronicCondition)
         .set({
-          name: input.name,
+          name: encryptContent(input.name)!,
+          nameHash: hashForIndex(input.name),
           status: input.status,
           severity: input.severity,
           diagnosedDate: input.diagnosedDate ?? null,
-          medications: input.medications ?? null,
-          notes: input.notes ?? null,
+          medications: encryptArray(input.medications ?? null),
+          notes: encryptContent(input.notes ?? null),
           updatedAt: new Date(),
         })
         .where(and(eq(chronicCondition.id, input.id), eq(chronicCondition.userId, ctx.user.id)));

@@ -1,6 +1,20 @@
 import pino from "pino";
 
-const lokiUrl = process.env.LOKI_URL;
+// Validate LOKI_URL to prevent log exfiltration to arbitrary endpoints
+const rawLokiUrl = process.env.LOKI_URL;
+let lokiUrl: string | undefined;
+if (rawLokiUrl) {
+  try {
+    const parsed = new URL(rawLokiUrl);
+    if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+      lokiUrl = rawLokiUrl;
+    } else {
+      console.error(`[logger] LOKI_URL has invalid protocol: ${parsed.protocol} — ignoring`);
+    }
+  } catch {
+    console.error("[logger] LOKI_URL is not a valid URL — ignoring");
+  }
+}
 
 const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 

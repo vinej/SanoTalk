@@ -22,7 +22,7 @@ import { eq, and, desc, lte } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { logAuditEvent } from "../lib/audit";
 import { verifyAdminFromDb } from "../lib/verify-admin";
-import { decrypt, ENCRYPTED_KEYS } from "../lib/crypto";
+import { decrypt, decryptContent, decryptArray } from "../lib/crypto";
 
 const CURRENT_POLICY_VERSION = "2026-04-10";
 
@@ -216,28 +216,61 @@ export const privacyRouter = createTRPCRouter({
         ctx.db.select().from(consentRecord).where(eq(consentRecord.userId, userId)),
       ]);
 
-      // Decrypt encrypted properties so the user receives readable data (Law 25 portability)
-      const decryptedProperties = properties.map((r) =>
-        ENCRYPTED_KEYS.has(r.key) ? { ...r, value: decrypt(r.value) } : r
-      );
+      // Decrypt all encrypted data so the user receives readable data (Law 25 portability)
+      const decryptedProperties = properties.map((r) => ({ ...r, value: decrypt(r.value) }));
 
       void logAuditEvent(ctx.db, {
         userId, action: "export_data", resourceType: "user", resourceId: userId,
       });
 
+      // Decrypt chat messages and transcripts for readable export (Law 25 portability)
+      const decryptedChats = chats.map((m) => ({ ...m, content: decryptContent(m.content) ?? m.content }));
+      const decryptedTranscripts = transcripts.map((t) => ({ ...t, content: decryptContent(t.content) ?? t.content }));
+
+      // Decrypt health data fields
+      const decryptedVitals = vitals.map(v => ({ ...v, notes: decryptContent(v.notes) }));
+      const decryptedMeds = meds.map(m => ({
+        ...m,
+        name: decryptContent(m.name) ?? m.name,
+        dosage: decryptContent(m.dosage) ?? m.dosage,
+        frequency: decryptContent(m.frequency) ?? m.frequency,
+        route: decryptContent(m.route),
+        prescribedBy: decryptContent(m.prescribedBy),
+        reason: decryptContent(m.reason),
+        notes: decryptContent(m.notes),
+      }));
+      const decryptedSymptoms = symptoms.map(s => ({
+        ...s,
+        customSymptoms: decryptArray(s.customSymptoms),
+        bodyLocation: decryptContent(s.bodyLocation),
+        notes: decryptContent(s.notes),
+      }));
+      const decryptedAllergies = allergies.map(a => ({
+        ...a,
+        name: decryptContent(a.name) ?? a.name,
+        reaction: decryptContent(a.reaction),
+        notes: decryptContent(a.notes),
+      }));
+      const decryptedConditions = conditions.map(c => ({
+        ...c,
+        name: decryptContent(c.name) ?? c.name,
+        medications: decryptArray(c.medications),
+        notes: decryptContent(c.notes),
+      }));
+
       return {
         exportedAt: new Date().toISOString(),
         profile: profile[0] ?? null,
         properties: decryptedProperties,
-        vitalSigns: vitals,
-        medications: meds,
-        symptomLogs: symptoms,
-        allergies,
-        chronicConditions: conditions,
-        chatMessages: chats,
+        vitalSigns: decryptedVitals,
+        medications: decryptedMeds,
+        symptomLogs: decryptedSymptoms,
+        allergies: decryptedAllergies,
+        chronicConditions: decryptedConditions,
+        chatMessages: decryptedChats,
         savedConversations: saved,
         talkSessions: sessions,
-        transcripts,
+        transcripts: decryptedTranscripts,
         tasks,
         erFavorites: favorites,
         consentRecords: consents,

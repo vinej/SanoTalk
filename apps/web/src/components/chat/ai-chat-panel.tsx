@@ -13,6 +13,7 @@ import { useTranscriptSocket } from "../../hooks/use-transcript-socket";
 import { useTts } from "../../hooks/use-tts";
 import Markdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeSanitize from "rehype-sanitize";
 import {
   Dialog,
   DialogContent,
@@ -78,6 +79,7 @@ function renderMessageContent(content: string, t: (key: string) => string) {
     <>
       <Markdown
         remarkPlugins={[remarkGfm]}
+        rehypePlugins={[rehypeSanitize]}
         components={{
           // Open links in new tab for safety
           a: ({ children, href, ...props }) => (

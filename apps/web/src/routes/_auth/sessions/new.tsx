@@ -32,7 +32,7 @@ function NewSessionPage() {
           {createSession.isPending ? t("new.creating") : t("new.start")}
         </Button>
         {createSession.isError && (
-          <p className="text-destructive text-sm">{createSession.error.message}</p>
+          <p className="text-destructive text-sm">{t("new.failed", "Failed to create session. Please try again.")}</p>
         )}
       </div>
     </div>

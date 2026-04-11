@@ -5,7 +5,7 @@ import { eq, and, desc, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { verifyAdminFromDb } from "../lib/verify-admin";
 import { getRelatedUserIds } from "../lib/related-users";
-import { encrypt, decrypt, ENCRYPTED_KEYS } from "../lib/crypto";
+import { encrypt, decrypt } from "../lib/crypto";
 import { resend } from "../lib/resend";
 import { escapeHtml } from "../lib/escape-html";
 import { logAuditEvent } from "../lib/audit";
@@ -334,9 +334,7 @@ export const userRouter = createTRPCRouter({
       .where(eq(userProperty.userId, ctx.user.id))
       .orderBy(userProperty.createdAt)
       .limit(200);
-    return rows.map((r) =>
-      ENCRYPTED_KEYS.has(r.key) ? { ...r, value: decrypt(r.value) } : r
-    );
+    return rows.map((r) => ({ ...r, value: decrypt(r.value) }));
   }),
 
   setPropertiesLanguage: protectedProcedure
@@ -369,7 +367,7 @@ export const userRouter = createTRPCRouter({
         .set({ propertiesLanguage: input.language })
         .where(eq(user.id, ctx.user.id));
 
-      const valueToStore = ENCRYPTED_KEYS.has(input.key) ? encrypt(input.value) : input.value;
+      const valueToStore = encrypt(input.value);
 
       const [result] = await ctx.db
         .insert(userProperty)

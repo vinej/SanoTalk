@@ -1,0 +1,4 @@
+ALTER TABLE "sanotalk_allergy" ADD CONSTRAINT "allergy_type_check" CHECK ("sanotalk_allergy"."type" IN ('drug', 'food', 'environmental', 'other'));--> statement-breakpoint
+ALTER TABLE "sanotalk_allergy" ADD CONSTRAINT "allergy_severity_check" CHECK ("sanotalk_allergy"."severity" IN ('mild', 'moderate', 'severe', 'life_threatening'));--> statement-breakpoint
+ALTER TABLE "sanotalk_chronic_condition" ADD CONSTRAINT "chronic_condition_status_check" CHECK ("sanotalk_chronic_condition"."status" IN ('active', 'managed', 'resolved'));--> statement-breakpoint
+ALTER TABLE "sanotalk_chronic_condition" ADD CONSTRAINT "chronic_condition_severity_check" CHECK ("sanotalk_chronic_condition"."severity" IN ('mild', 'moderate', 'severe'));

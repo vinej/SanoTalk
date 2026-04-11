@@ -97,3 +97,33 @@ CREATE POLICY chat_message_owner ON sanotalk_chat_message
 
 CREATE POLICY consent_record_owner ON sanotalk_consent_record
   USING (user_id = current_setting('app.current_user_id', true));
+
+-- saved_conversation — has direct user_id
+ALTER TABLE sanotalk_saved_conversation ENABLE ROW LEVEL SECURITY;
+CREATE POLICY saved_conversation_owner ON sanotalk_saved_conversation
+  USING (user_id = current_setting('app.current_user_id', true));
+
+-- transcript — uses speaker_id as the user reference
+ALTER TABLE sanotalk_transcript ENABLE ROW LEVEL SECURITY;
+CREATE POLICY transcript_speaker ON sanotalk_transcript
+  USING (speaker_id = current_setting('app.current_user_id', true)
+    OR session_id IN (
+      SELECT id FROM sanotalk_talk_session
+      WHERE host_id = current_setting('app.current_user_id', true)
+    ));
+
+-- transcript_summary — access via session host
+ALTER TABLE sanotalk_transcript_summary ENABLE ROW LEVEL SECURITY;
+CREATE POLICY transcript_summary_session_host ON sanotalk_transcript_summary
+  USING (session_id IN (
+    SELECT id FROM sanotalk_talk_session
+    WHERE host_id = current_setting('app.current_user_id', true)
+  ));
+
+-- recording — access via session host
+ALTER TABLE sanotalk_recording ENABLE ROW LEVEL SECURITY;
+CREATE POLICY recording_session_host ON sanotalk_recording
+  USING (session_id IN (
+    SELECT id FROM sanotalk_talk_session
+    WHERE host_id = current_setting('app.current_user_id', true)
+  ));

@@ -1,9 +1,14 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { trpc } from "../../lib/trpc";
 import { ShieldCheck, ShieldAlert, FlaskRound, ArrowLeft } from "lucide-react";
 
 export const Route: any = createFileRoute("/_auth/admin-panel")({
+  beforeLoad: async ({ context }: { context: { user?: { role?: string } } }) => {
+    if ((context.user as any)?.role !== "admin") {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: AdminPanelPage,
 });
 

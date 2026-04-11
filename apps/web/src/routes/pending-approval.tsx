@@ -1,10 +1,17 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Button } from "../components/ui/button";
 import { Clock } from "lucide-react";
 import { LanguageSwitcher } from "../components/language-switcher";
+import { authClient } from "../lib/auth-client";
 
 export const Route: any = createFileRoute("/pending-approval")({
+  beforeLoad: async () => {
+    const session = await authClient.getSession();
+    if (!session.data?.user) {
+      throw redirect({ to: "/login" });
+    }
+  },
   component: PendingApprovalPage,
 });
 

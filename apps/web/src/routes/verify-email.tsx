@@ -28,7 +28,7 @@ function VerifyEmailPage() {
     authClient.verifyEmail({ query: { token } })
       .then(({ error }) => {
         if (error) {
-          setErrorMessage(error.message ?? "Verification failed.");
+          setErrorMessage("Verification failed. The link may have expired — please request a new one.");
           setStatus("error");
         } else {
           setStatus("success");

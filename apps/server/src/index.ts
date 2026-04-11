@@ -294,6 +294,9 @@ if (!process.env.NODE_ENV) {
   logger.warn("NODE_ENV is not set — security controls (rate limits, secure cookies) will use permissive defaults. Set NODE_ENV=production for production deployments.");
 }
 
+// ─── Mutual exclusion for purge jobs ─────────────────────────────────────
+let purgeRunning = false;
+
 // ─── Data Retention & Purge Jobs (Law 25) ────────────────────────────────
 // Default retention days (used when no row exists in the policy table)
 const DEFAULT_RETENTION: Record<string, number> = {
@@ -372,11 +375,37 @@ server.listen(PORT, () => {
   void snapshotErData(db);
   setInterval(() => void snapshotErData(db), 30 * 60 * 1000);
 
-  // Run data retention purge + account deletion daily
-  void purgeExpiredData();
-  void purgeDeletedAccounts();
-  setInterval(() => {
-    void purgeExpiredData();
-    void purgeDeletedAccounts();
-  }, 24 * 60 * 60 * 1000);
+  // Run data retention purge + account deletion daily (with mutual exclusion)
+  async function runPurgeJobs() {
+    if (purgeRunning) { logger.warn("Purge jobs already running, skipping"); return; }
+    purgeRunning = true;
+    try {
+      await purgeExpiredData();
+      await purgeDeletedAccounts();
+    } finally {
+      purgeRunning = false;
+    }
+  }
+  void runPurgeJobs();
+  setInterval(() => void runPurgeJobs(), 24 * 60 * 60 * 1000);
+});
+
+// ─── Graceful shutdown ───────────────────────────────────────────────────
+function shutdown(signal: string) {
+  logger.info(`${signal} received — shutting down gracefully`);
+  server.close(() => {
+    logger.info("HTTP server closed");
+    process.exit(0);
+  });
+  // Force exit after 10s if connections linger
+  setTimeout(() => { logger.warn("Forcing exit after timeout"); process.exit(1); }, 10_000).unref();
+}
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));
+process.on("uncaughtException", (err) => {
+  logger.error({ err }, "Uncaught exception");
+  shutdown("uncaughtException");
+});
+process.on("unhandledRejection", (reason) => {
+  logger.error({ err: reason }, "Unhandled rejection");
 });

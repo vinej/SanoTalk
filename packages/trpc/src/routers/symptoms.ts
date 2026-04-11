@@ -5,6 +5,16 @@ import { resend } from "../lib/resend";
 import { escapeHtml, sanitizeSubject } from "../lib/escape-html";
 import { eq, and, desc, gte, lte } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
+import { encryptContent, decryptContent, encryptArray, decryptArray } from "../lib/crypto";
+
+function decryptSymptomFields<T extends { customSymptoms: string[] | null; bodyLocation: string | null; notes: string | null }>(s: T): T {
+  return {
+    ...s,
+    customSymptoms: decryptArray(s.customSymptoms),
+    bodyLocation: decryptContent(s.bodyLocation),
+    notes: decryptContent(s.notes),
+  };
+}
 
 export const symptomsRouter = createTRPCRouter({
   log: protectedProcedure
@@ -22,6 +32,10 @@ export const symptomsRouter = createTRPCRouter({
       notes: z.string().max(500).nullable().optional(),
     }))
     .mutation(async ({ ctx, input }) => {
+      const encCustomSymptoms = encryptArray(input.customSymptoms ?? null);
+      const encBodyLocation = encryptContent(input.bodyLocation ?? null);
+      const encNotes = encryptContent(input.notes ?? null);
+
       const values = {
         userId: ctx.user.id,
         date: input.date,
@@ -32,9 +46,9 @@ export const symptomsRouter = createTRPCRouter({
         sleepHours: input.sleepHours ?? null,
         stress: input.stress ?? null,
         appetite: input.appetite ?? null,
-        customSymptoms: input.customSymptoms ?? null,
-        bodyLocation: input.bodyLocation ?? null,
-        notes: input.notes ?? null,
+        customSymptoms: encCustomSymptoms,
+        bodyLocation: encBodyLocation,
+        notes: encNotes,
       };
 
       const [row] = await ctx.db
@@ -57,7 +71,7 @@ export const symptomsRouter = createTRPCRouter({
           },
         })
         .returning({ id: symptomLog.id, date: symptomLog.date, painLevel: symptomLog.painLevel, mood: symptomLog.mood, energy: symptomLog.energy, sleepQuality: symptomLog.sleepQuality, sleepHours: symptomLog.sleepHours, stress: symptomLog.stress, appetite: symptomLog.appetite, customSymptoms: symptomLog.customSymptoms, bodyLocation: symptomLog.bodyLocation, notes: symptomLog.notes, createdAt: symptomLog.createdAt, updatedAt: symptomLog.updatedAt });
-      return row!;
+      return decryptSymptomFields(row!);
     }),
 
   list: protectedProcedure
@@ -71,12 +85,13 @@ export const symptomsRouter = createTRPCRouter({
       if (input?.from) conditions.push(gte(symptomLog.date, input.from));
       if (input?.to) conditions.push(lte(symptomLog.date, input.to));
 
-      return ctx.db
+      const rows = await ctx.db
         .select()
         .from(symptomLog)
         .where(and(...conditions))
         .orderBy(desc(symptomLog.date))
         .limit(input?.limit ?? 90);
+      return rows.map(decryptSymptomFields);
     }),
 
   delete: protectedProcedure

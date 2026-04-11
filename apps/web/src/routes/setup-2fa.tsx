@@ -32,7 +32,7 @@ function SetupTwoFactorPage() {
 
     const { error } = await (authClient as any).twoFactor.enable({ password });
     if (error) {
-      setError(error.message ?? "Could not enable 2FA. Check your password.");
+      setError("Could not enable 2FA. Please check your password and try again.");
       setIsPending(false);
       return;
     }

@@ -1,4 +1,4 @@
-import { createCipheriv, createDecipheriv, randomBytes } from "crypto";
+import { createCipheriv, createDecipheriv, createHash, randomBytes } from "crypto";
 
 const ALGORITHM = "aes-256-gcm";
 const IV_LENGTH = 12;
@@ -41,6 +41,23 @@ export function encryptContent(text: string | null | undefined): string | null {
 export function decryptContent(text: string | null | undefined): string | null {
   if (!text) return text as null;
   return decrypt(text);
+}
+
+/** Encrypt each element of a text array individually. Null/undefined arrays pass through. */
+export function encryptArray(arr: string[] | null | undefined): string[] | null {
+  if (!arr) return null;
+  return arr.map((el) => encrypt(el));
+}
+
+/** Decrypt each element of a text array. Handles pre-migration plaintext. Null/undefined arrays pass through. */
+export function decryptArray(arr: string[] | null | undefined): string[] | null {
+  if (!arr) return null;
+  return arr.map((el) => decrypt(el));
+}
+
+/** Deterministic SHA-256 hash for unique index lookup (case-insensitive, trimmed). */
+export function hashForIndex(text: string): string {
+  return createHash("sha256").update(text.toLowerCase().trim()).digest("hex");
 }
 
 /** Decrypt a value. Returns plaintext. Handles unencrypted values gracefully (migration). */

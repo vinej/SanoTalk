@@ -5,6 +5,20 @@ import { resend } from "../lib/resend";
 import { escapeHtml, sanitizeSubject } from "../lib/escape-html";
 import { eq, and, desc } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
+import { encryptContent, decryptContent } from "../lib/crypto";
+
+function decryptMedFields<T extends { name: string; dosage: string; frequency: string; route: string | null; prescribedBy: string | null; reason: string | null; notes: string | null }>(m: T): T {
+  return {
+    ...m,
+    name: decryptContent(m.name) ?? m.name,
+    dosage: decryptContent(m.dosage) ?? m.dosage,
+    frequency: decryptContent(m.frequency) ?? m.frequency,
+    route: decryptContent(m.route),
+    prescribedBy: decryptContent(m.prescribedBy),
+    reason: decryptContent(m.reason),
+    notes: decryptContent(m.notes),
+  };
+}
 
 export const medicationsRouter = createTRPCRouter({
   add: protectedProcedure
@@ -22,18 +36,18 @@ export const medicationsRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const [row] = await ctx.db.insert(medication).values({
         userId: ctx.user.id,
-        name: input.name,
-        dosage: input.dosage,
-        frequency: input.frequency,
-        route: input.route ?? null,
-        prescribedBy: input.prescribedBy ?? null,
-        reason: input.reason ?? null,
+        name: encryptContent(input.name)!,
+        dosage: encryptContent(input.dosage)!,
+        frequency: encryptContent(input.frequency)!,
+        route: encryptContent(input.route ?? null),
+        prescribedBy: encryptContent(input.prescribedBy ?? null),
+        reason: encryptContent(input.reason ?? null),
         startDate: new Date(input.startDate),
         endDate: input.endDate ? new Date(input.endDate) : null,
         isActive: true,
-        notes: input.notes ?? null,
+        notes: encryptContent(input.notes ?? null),
       }).returning({ id: medication.id, name: medication.name, dosage: medication.dosage, frequency: medication.frequency, route: medication.route, prescribedBy: medication.prescribedBy, reason: medication.reason, startDate: medication.startDate, endDate: medication.endDate, isActive: medication.isActive, notes: medication.notes, createdAt: medication.createdAt, updatedAt: medication.updatedAt });
-      return row!;
+      return decryptMedFields(row!);
     }),
 
   update: protectedProcedure
@@ -53,16 +67,16 @@ export const medicationsRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { id, ...fields } = input;
       const values: Record<string, unknown> = { updatedAt: new Date() };
-      if (fields.name !== undefined) values.name = fields.name;
-      if (fields.dosage !== undefined) values.dosage = fields.dosage;
-      if (fields.frequency !== undefined) values.frequency = fields.frequency;
-      if (fields.route !== undefined) values.route = fields.route;
-      if (fields.prescribedBy !== undefined) values.prescribedBy = fields.prescribedBy;
-      if (fields.reason !== undefined) values.reason = fields.reason;
+      if (fields.name !== undefined) values.name = encryptContent(fields.name);
+      if (fields.dosage !== undefined) values.dosage = encryptContent(fields.dosage);
+      if (fields.frequency !== undefined) values.frequency = encryptContent(fields.frequency);
+      if (fields.route !== undefined) values.route = encryptContent(fields.route);
+      if (fields.prescribedBy !== undefined) values.prescribedBy = encryptContent(fields.prescribedBy);
+      if (fields.reason !== undefined) values.reason = encryptContent(fields.reason);
       if (fields.startDate !== undefined) values.startDate = new Date(fields.startDate);
       if (fields.endDate !== undefined) values.endDate = fields.endDate ? new Date(fields.endDate) : null;
       if (fields.isActive !== undefined) values.isActive = fields.isActive;
-      if (fields.notes !== undefined) values.notes = fields.notes;
+      if (fields.notes !== undefined) values.notes = encryptContent(fields.notes);
 
       const [updated] = await ctx.db
         .update(medication)
@@ -70,7 +84,7 @@ export const medicationsRouter = createTRPCRouter({
         .where(and(eq(medication.id, id), eq(medication.userId, ctx.user.id)))
         .returning({ id: medication.id, name: medication.name, dosage: medication.dosage, frequency: medication.frequency, route: medication.route, prescribedBy: medication.prescribedBy, reason: medication.reason, startDate: medication.startDate, endDate: medication.endDate, isActive: medication.isActive, notes: medication.notes, createdAt: medication.createdAt, updatedAt: medication.updatedAt });
       if (!updated) throw new TRPCError({ code: "NOT_FOUND" });
-      return updated;
+      return decryptMedFields(updated);
     }),
 
   list: protectedProcedure
@@ -82,12 +96,13 @@ export const medicationsRouter = createTRPCRouter({
       const conditions = [eq(medication.userId, ctx.user.id)];
       if (input?.activeOnly) conditions.push(eq(medication.isActive, true));
 
-      return ctx.db
+      const rows = await ctx.db
         .select()
         .from(medication)
         .where(and(...conditions))
         .orderBy(desc(medication.isActive), desc(medication.startDate))
         .limit(input?.limit ?? 100);
+      return rows.map(decryptMedFields);
     }),
 
   delete: protectedProcedure

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useState } from "react";
 import { trpc } from "../../lib/trpc";
 import { Button } from "../../components/ui/button";
@@ -15,6 +15,11 @@ import { toast } from "sonner";
 import { ShieldAlert, Plus } from "lucide-react";
 
 export const Route: any = createFileRoute("/_auth/admin-breaches")({
+  beforeLoad: async ({ context }: { context: { user?: { role?: string } } }) => {
+    if ((context.user as any)?.role !== "admin") {
+      throw redirect({ to: "/dashboard" });
+    }
+  },
   component: AdminBreachesPage,
 });
 

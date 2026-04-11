@@ -218,7 +218,7 @@ function ProfilePage() {
 
   function handleAddProperty() {
     if (!propKey.trim() || !propValue.trim()) return;
-    setPropertyMutation.mutate({ key: propKey.trim(), value: propValue.trim(), language: propertiesLanguage as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
+    setPropertyMutation.mutate({ key: propKey.trim().toLowerCase().replace(/[^a-z0-9_]/g, "_").replace(/^[^a-z]/, "x$&"), value: propValue.trim(), language: propertiesLanguage as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
   }
 
   useEffect(() => {
@@ -593,7 +593,7 @@ function ProfilePage() {
                     key={key}
                     type="button"
                     onClick={() => {
-                      setPropKey(tProps(`properties.keys.${key}`));
+                      setPropKey(key);
                       setPropValue(tProps(`properties.hints.${key}`));
                       setTimeout(() => propValueRef.current?.focus(), 0);
                     }}

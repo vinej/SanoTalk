@@ -6,8 +6,14 @@ import { escapeHtml, sanitizeSubject } from "../lib/escape-html";
 import { eq, asc, desc, isNull, and, gte, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { verifyAdminFromDb } from "../lib/verify-admin";
+import { encryptContent, decryptContent, decryptArray } from "../lib/crypto";
 
 type DB = Parameters<Parameters<typeof protectedProcedure.query>[0]>[0]["ctx"]["db"];
+
+/** Decrypt chat message content for display (handles pre-encryption plaintext gracefully). */
+function decryptMessages<T extends { content: string }>(msgs: T[]): T[] {
+  return msgs.map((m) => ({ ...m, content: decryptContent(m.content) ?? m.content }));
+}
 
 /** Strip control characters, XML-like tags, and cap length to prevent prompt injection via medical data fields. */
 function sanitizeMedicalField(value: string | null | undefined, maxLen = 300): string {
@@ -87,14 +93,39 @@ async function getUserContext(db: DB, userId: string) {
   const SENSITIVE_KEYS = new Set(["ramq_number", "ramq_expiry"]);
   const safeProperties = properties.filter(p => !SENSITIVE_KEYS.has(p.key));
 
+  // Decrypt all encrypted PHI fields before passing to AI context builders
   return {
-    properties: safeProperties,
+    properties: safeProperties.map(p => ({ ...p, value: decryptContent(p.value) ?? p.value })),
     propertiesLanguage: userRow?.propertiesLanguage ?? "en",
-    recentVitals,
-    activeMedications,
-    recentSymptoms,
-    userAllergies,
-    userConditions,
+    recentVitals: recentVitals.map(v => ({ ...v, notes: decryptContent(v.notes) })),
+    activeMedications: activeMedications.map(m => ({
+      ...m,
+      name: decryptContent(m.name) ?? m.name,
+      dosage: decryptContent(m.dosage) ?? m.dosage,
+      frequency: decryptContent(m.frequency) ?? m.frequency,
+      route: decryptContent(m.route),
+      prescribedBy: decryptContent(m.prescribedBy),
+      reason: decryptContent(m.reason),
+      notes: decryptContent(m.notes),
+    })),
+    recentSymptoms: recentSymptoms.map(s => ({
+      ...s,
+      customSymptoms: decryptArray(s.customSymptoms),
+      bodyLocation: decryptContent(s.bodyLocation),
+      notes: decryptContent(s.notes),
+    })),
+    userAllergies: userAllergies.map(a => ({
+      ...a,
+      name: decryptContent(a.name) ?? a.name,
+      reaction: decryptContent(a.reaction),
+      notes: decryptContent(a.notes),
+    })),
+    userConditions: userConditions.map(c => ({
+      ...c,
+      name: decryptContent(c.name) ?? c.name,
+      medications: decryptArray(c.medications),
+      notes: decryptContent(c.notes),
+    })),
   };
 }
 
@@ -273,11 +304,12 @@ export const agentsRouter = createTRPCRouter({
     .input(z.object({ sessionId: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
       await assertSessionAccess(ctx.db, input.sessionId, ctx.user.id);
-      return ctx.db.query.chatMessage.findMany({
+      const rows = await ctx.db.query.chatMessage.findMany({
         where: eq(chatMessage.sessionId, input.sessionId),
         orderBy: [asc(chatMessage.createdAt)],
         limit: 500,
       });
+      return decryptMessages(rows);
     }),
 
   sendChatMessage: protectedProcedure
@@ -295,19 +327,19 @@ export const agentsRouter = createTRPCRouter({
       });
       const sessionLanguage = sessionRow?.language ?? "en";
 
-      // Fetch last 20 chat messages as conversation history
-      const pastMessages = await ctx.db.query.chatMessage.findMany({
+      // Fetch last 20 chat messages as conversation history (decrypt from at-rest encryption)
+      const pastMessages = decryptMessages(await ctx.db.query.chatMessage.findMany({
         where: eq(chatMessage.sessionId, input.sessionId),
         orderBy: [asc(chatMessage.createdAt)],
         limit: 20,
-      });
+      }));
 
-      // Fetch last 5 transcript entries for session context
-      const recentTranscripts = await ctx.db.query.transcript.findMany({
+      // Fetch last 5 transcript entries for session context (decrypt from at-rest encryption)
+      const recentTranscripts = decryptMessages(await ctx.db.query.transcript.findMany({
         where: eq(transcript.sessionId, input.sessionId),
         orderBy: [desc(transcript.startMs)],
         limit: 5,
-      });
+      }));
 
       // Build history array, prepending transcript context if available
       const history: Array<{ role: "user" | "assistant"; content: string }> = [];
@@ -334,7 +366,7 @@ export const agentsRouter = createTRPCRouter({
         sessionId: input.sessionId,
         userId: ctx.user.id,
         role: "user",
-        content: input.message,
+        content: encryptContent(input.message) ?? input.message,
       });
 
       // Fetch user properties + language + vitals + medications + symptoms for AI context
@@ -357,7 +389,7 @@ export const agentsRouter = createTRPCRouter({
       await ctx.db.insert(chatMessage).values({
         sessionId: input.sessionId,
         role: "assistant",
-        content: assistantText,
+        content: encryptContent(assistantText) ?? assistantText,
       });
 
       return { message: assistantText };
@@ -365,11 +397,11 @@ export const agentsRouter = createTRPCRouter({
 
   healthChatHistory: protectedProcedure
     .query(async ({ ctx }) => {
-      return ctx.db.query.chatMessage.findMany({
+      return decryptMessages(await ctx.db.query.chatMessage.findMany({
         where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "health")),
         orderBy: [asc(chatMessage.createdAt)],
         limit: 500,
-      });
+      }));
     }),
 
   sendHealthChatMessage: protectedProcedure
@@ -378,18 +410,18 @@ export const agentsRouter = createTRPCRouter({
       language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const pastMessages = await ctx.db.query.chatMessage.findMany({
+      const pastMessages = decryptMessages(await ctx.db.query.chatMessage.findMany({
         where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "health")),
         orderBy: [asc(chatMessage.createdAt)],
         limit: 20,
-      });
+      }));
 
       const _allowedRoles = new Set(["user", "assistant"]);
       const history: Array<{ role: "user" | "assistant"; content: string }> = pastMessages
         .filter((msg) => _allowedRoles.has(msg.role))
         .map((msg) => ({ role: msg.role as "user" | "assistant", content: msg.content }));
 
-      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "health", role: "user", content: input.message });
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "health", role: "user", content: encryptContent(input.message) ?? input.message });
 
       const { properties: userProperties, propertiesLanguage, recentVitals, activeMedications, recentSymptoms, userAllergies, userConditions } = await getUserContext(ctx.db, ctx.user.id);
       const vitalsContext = buildVitalsContext(recentVitals);
@@ -399,18 +431,18 @@ export const agentsRouter = createTRPCRouter({
       const fullHistory = [...vitalsContext, ...medsContext, ...symptomsContext, ...allergyContext, ...history];
       const assistantText = await ctx.callHealthChat(fullHistory, input.message, input.language ?? "en", userProperties, propertiesLanguage);
 
-      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "health", role: "assistant", content: assistantText });
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "health", role: "assistant", content: encryptContent(assistantText) ?? assistantText });
 
       return { message: assistantText };
     }),
 
   companionChatHistory: protectedProcedure
     .query(async ({ ctx }) => {
-      return ctx.db.query.chatMessage.findMany({
+      return decryptMessages(await ctx.db.query.chatMessage.findMany({
         where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "companion")),
         orderBy: [asc(chatMessage.createdAt)],
         limit: 500,
-      });
+      }));
     }),
 
   sendCompanionChatMessage: protectedProcedure
@@ -419,18 +451,18 @@ export const agentsRouter = createTRPCRouter({
       language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const pastMessages = await ctx.db.query.chatMessage.findMany({
+      const pastMessages = decryptMessages(await ctx.db.query.chatMessage.findMany({
         where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "companion")),
         orderBy: [asc(chatMessage.createdAt)],
         limit: 20,
-      });
+      }));
 
       const _allowedRoles = new Set(["user", "assistant"]);
       const history: Array<{ role: "user" | "assistant"; content: string }> = pastMessages
         .filter((msg) => _allowedRoles.has(msg.role))
         .map((msg) => ({ role: msg.role as "user" | "assistant", content: msg.content }));
 
-      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "companion", role: "user", content: input.message });
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "companion", role: "user", content: encryptContent(input.message) ?? input.message });
 
       const { properties: userProperties, propertiesLanguage, recentVitals, activeMedications, recentSymptoms, userAllergies, userConditions } = await getUserContext(ctx.db, ctx.user.id);
       const vitalsContext = buildVitalsContext(recentVitals);
@@ -440,7 +472,7 @@ export const agentsRouter = createTRPCRouter({
       const fullHistory = [...vitalsContext, ...medsContext, ...symptomsContext, ...allergyContext, ...history];
       const assistantText = await ctx.callCompanionChat(fullHistory, input.message, input.language ?? "en", userProperties, propertiesLanguage);
 
-      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "companion", role: "assistant", content: assistantText });
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "companion", role: "assistant", content: encryptContent(assistantText) ?? assistantText });
 
       return { message: assistantText };
     }),
@@ -463,11 +495,11 @@ export const agentsRouter = createTRPCRouter({
 
   newsChatHistory: protectedProcedure
     .query(async ({ ctx }) => {
-      return ctx.db.query.chatMessage.findMany({
+      return decryptMessages(await ctx.db.query.chatMessage.findMany({
         where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "news")),
         orderBy: [asc(chatMessage.createdAt)],
         limit: 500,
-      });
+      }));
     }),
 
   sendNewsChatMessage: protectedProcedure
@@ -476,23 +508,23 @@ export const agentsRouter = createTRPCRouter({
       language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const pastMessages = await ctx.db.query.chatMessage.findMany({
+      const pastMessages = decryptMessages(await ctx.db.query.chatMessage.findMany({
         where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "news")),
         orderBy: [asc(chatMessage.createdAt)],
         limit: 20,
-      });
+      }));
 
       const _allowedRoles = new Set(["user", "assistant"]);
       const history: Array<{ role: "user" | "assistant"; content: string }> = pastMessages
         .filter((msg) => _allowedRoles.has(msg.role))
         .map((msg) => ({ role: msg.role as "user" | "assistant", content: msg.content }));
 
-      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "news", role: "user", content: input.message });
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "news", role: "user", content: encryptContent(input.message) ?? input.message });
 
       const { properties: userProperties, propertiesLanguage } = await getUserContext(ctx.db, ctx.user.id);
       const assistantText = await ctx.callNewsChat(history, input.message, input.language ?? "en", userProperties, propertiesLanguage);
 
-      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "news", role: "assistant", content: assistantText });
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "news", role: "assistant", content: encryptContent(assistantText) ?? assistantText });
 
       return { message: assistantText };
     }),
@@ -507,11 +539,11 @@ export const agentsRouter = createTRPCRouter({
 
   pharmacistChatHistory: protectedProcedure
     .query(async ({ ctx }) => {
-      return ctx.db.query.chatMessage.findMany({
+      return decryptMessages(await ctx.db.query.chatMessage.findMany({
         where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "pharmacist")),
         orderBy: [asc(chatMessage.createdAt)],
         limit: 500,
-      });
+      }));
     }),
 
   sendPharmacistChatMessage: protectedProcedure
@@ -520,18 +552,18 @@ export const agentsRouter = createTRPCRouter({
       language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const pastMessages = await ctx.db.query.chatMessage.findMany({
+      const pastMessages = decryptMessages(await ctx.db.query.chatMessage.findMany({
         where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "pharmacist")),
         orderBy: [asc(chatMessage.createdAt)],
         limit: 20,
-      });
+      }));
 
       const _allowedRoles = new Set(["user", "assistant"]);
       const history: Array<{ role: "user" | "assistant"; content: string }> = pastMessages
         .filter((msg) => _allowedRoles.has(msg.role))
         .map((msg) => ({ role: msg.role as "user" | "assistant", content: msg.content }));
 
-      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "pharmacist", role: "user", content: input.message });
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "pharmacist", role: "user", content: encryptContent(input.message) ?? input.message });
 
       const { properties: userProperties, propertiesLanguage, recentVitals, activeMedications, recentSymptoms, userAllergies, userConditions } = await getUserContext(ctx.db, ctx.user.id);
       const vitalsContext = buildVitalsContext(recentVitals);
@@ -541,7 +573,7 @@ export const agentsRouter = createTRPCRouter({
       const fullHistory = [...vitalsContext, ...medsContext, ...symptomsContext, ...allergyContext, ...history];
       const assistantText = await ctx.callPharmacistChat(fullHistory, input.message, input.language ?? "en", userProperties, propertiesLanguage);
 
-      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "pharmacist", role: "assistant", content: assistantText });
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "pharmacist", role: "assistant", content: encryptContent(assistantText) ?? assistantText });
 
       return { message: assistantText };
     }),
@@ -558,11 +590,11 @@ export const agentsRouter = createTRPCRouter({
 
   drugInfoChatHistory: protectedProcedure
     .query(async ({ ctx }) => {
-      return ctx.db.query.chatMessage.findMany({
+      return decryptMessages(await ctx.db.query.chatMessage.findMany({
         where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "drugInfo")),
         orderBy: [asc(chatMessage.createdAt)],
         limit: 500,
-      });
+      }));
     }),
 
   sendDrugInfoChatMessage: protectedProcedure
@@ -571,18 +603,18 @@ export const agentsRouter = createTRPCRouter({
       language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      const pastMessages = await ctx.db.query.chatMessage.findMany({
+      const pastMessages = decryptMessages(await ctx.db.query.chatMessage.findMany({
         where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "drugInfo")),
         orderBy: [asc(chatMessage.createdAt)],
         limit: 20,
-      });
+      }));
 
       const _allowedRoles = new Set(["user", "assistant"]);
       const history: Array<{ role: "user" | "assistant"; content: string }> = pastMessages
         .filter((msg) => _allowedRoles.has(msg.role))
         .map((msg) => ({ role: msg.role as "user" | "assistant", content: msg.content }));
 
-      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "drugInfo", role: "user", content: input.message });
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "drugInfo", role: "user", content: encryptContent(input.message) ?? input.message });
 
       const { properties: userProperties, propertiesLanguage, recentVitals, activeMedications, recentSymptoms, userAllergies, userConditions } = await getUserContext(ctx.db, ctx.user.id);
       const vitalsContext = buildVitalsContext(recentVitals);
@@ -592,7 +624,7 @@ export const agentsRouter = createTRPCRouter({
       const fullHistory = [...vitalsContext, ...medsContext, ...symptomsContext, ...allergyContext, ...history];
       const assistantText = await ctx.callDrugInfoChat(fullHistory, input.message, input.language ?? "en", userProperties, propertiesLanguage);
 
-      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "drugInfo", role: "assistant", content: assistantText });
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "drugInfo", role: "assistant", content: encryptContent(assistantText) ?? assistantText });
 
       return { message: assistantText };
     }),
@@ -611,11 +643,11 @@ export const agentsRouter = createTRPCRouter({
     .query(async ({ ctx }) => {
       const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
       if (!isAdmin) throw new TRPCError({ code: "FORBIDDEN" });
-      return ctx.db.query.chatMessage.findMany({
+      return decryptMessages(await ctx.db.query.chatMessage.findMany({
         where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "test")),
         orderBy: [asc(chatMessage.createdAt)],
         limit: 500,
-      });
+      }));
     }),
 
   sendTestChatMessage: protectedProcedure
@@ -627,22 +659,22 @@ export const agentsRouter = createTRPCRouter({
       const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
       if (!isAdmin) throw new TRPCError({ code: "FORBIDDEN" });
 
-      const pastMessages = await ctx.db.query.chatMessage.findMany({
+      const pastMessages = decryptMessages(await ctx.db.query.chatMessage.findMany({
         where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "test")),
         orderBy: [asc(chatMessage.createdAt)],
         limit: 20,
-      });
+      }));
 
       const _allowedRoles = new Set(["user", "assistant"]);
       const history: Array<{ role: "user" | "assistant"; content: string }> = pastMessages
         .filter((msg) => _allowedRoles.has(msg.role))
         .map((msg) => ({ role: msg.role as "user" | "assistant", content: msg.content }));
 
-      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "test", role: "user", content: input.message });
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "test", role: "user", content: encryptContent(input.message) ?? input.message });
 
       const assistantText = await ctx.callTestChat(history, input.message, input.language ?? "en");
 
-      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "test", role: "assistant", content: assistantText });
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "test", role: "assistant", content: encryptContent(assistantText) ?? assistantText });
 
       return { message: assistantText };
     }),
@@ -806,7 +838,12 @@ export const agentsRouter = createTRPCRouter({
       if (liveMessages.length === 0) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "No messages to save" });
       }
-      const snapshot = liveMessages.map((m) => ({ role: m.role, content: m.content }));
+      // Encrypt the snapshot content at rest in JSONB (messages in chatMessage are already encrypted,
+      // but we re-encrypt here to ensure the saved conversation JSONB is consistently encrypted)
+      const snapshot = liveMessages.map((m) => ({
+        role: m.role,
+        content: m.content, // Already encrypted from chatMessage table — stored as-is
+      }));
 
       const existing = await ctx.db.query.savedConversation.findFirst({
         where: and(
@@ -859,7 +896,7 @@ export const agentsRouter = createTRPCRouter({
       const chatType = z.enum(["health", "companion", "news", "pharmacist", "drugInfo", "test"]).parse(saved.chatType);
       const savedMsgSchema = z.array(z.object({
         role: z.enum(["user", "assistant"]),
-        content: z.string().max(10000),
+        content: z.string().max(30000), // Higher limit to accommodate encrypted content (hex-encoded ciphertext ~2.5x plaintext)
       })).max(1000);
       const rawMsgs = saved.messages as Array<{ role: string; content: string }>;
       const msgs = savedMsgSchema.parse(rawMsgs.filter((m) => m.role === "user" || m.role === "assistant"));
@@ -877,7 +914,7 @@ export const agentsRouter = createTRPCRouter({
               userId: ctx.user.id,
               chatType,
               role: m.role,
-              content: m.content,
+              content: m.content, // Already encrypted in the saved snapshot — insert as-is
             }))
           );
         }

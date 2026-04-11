@@ -5,6 +5,7 @@ import { resend } from "../lib/resend";
 import { escapeHtml, sanitizeSubject } from "../lib/escape-html";
 import { eq, and, desc, gte, lte, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
+import { encryptContent, decryptContent } from "../lib/crypto";
 
 const vitalTypeEnum = z.enum([
   "blood_pressure", "heart_rate", "weight",
@@ -61,7 +62,7 @@ export const vitalsRouter = createTRPCRouter({
         valuePrimary: input.valuePrimary,
         valueSecondary: input.valueSecondary ?? null,
         unit: input.unit,
-        notes: input.notes ?? null,
+        notes: encryptContent(input.notes ?? null),
         source: "manual",
         measuredAt,
       }).returning({ id: vitalSign.id });
@@ -83,12 +84,13 @@ export const vitalsRouter = createTRPCRouter({
       if (input.from) conditions.push(gte(vitalSign.measuredAt, new Date(input.from)));
       if (input.to) conditions.push(lte(vitalSign.measuredAt, new Date(input.to)));
 
-      return ctx.db
+      const rows = await ctx.db
         .select()
         .from(vitalSign)
         .where(and(...conditions))
         .orderBy(desc(vitalSign.measuredAt))
         .limit(input.limit ?? 200);
+      return rows.map(r => ({ ...r, notes: decryptContent(r.notes) }));
     }),
 
   latest: protectedProcedure
@@ -97,12 +99,13 @@ export const vitalsRouter = createTRPCRouter({
       const types = ["blood_pressure", "heart_rate", "weight", "blood_glucose", "temperature", "oxygen_saturation"] as const;
       const results: Record<string, typeof vitalSign.$inferSelect | null> = {};
 
-      const rows = await ctx.db
+      const rawRows = await ctx.db
         .select()
         .from(vitalSign)
         .where(eq(vitalSign.userId, ctx.user.id))
         .orderBy(desc(vitalSign.measuredAt))
         .limit(100);
+      const rows = rawRows.map(r => ({ ...r, notes: decryptContent(r.notes) }));
 
       for (const t of types) {
         results[t] = rows.find(r => r.type === t) ?? null;
