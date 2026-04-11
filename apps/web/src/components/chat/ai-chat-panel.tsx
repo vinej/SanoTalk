@@ -96,11 +96,32 @@ function renderMessageContent(content: string, t: (key: string) => string) {
   );
 }
 
+// ── Variant configuration ───────────────────────────────────────────────────
+
+type ChatType = "health" | "companion" | "news" | "pharmacist" | "drugInfo" | "test" | "exercise" | "eatwell";
+
+const VARIANT_STYLE: Record<ChatType, {
+  titleKey: string;
+  emptyKey: string;
+  placeholderKey: string;
+  headerClass: string;
+  bubbleClass: string;
+}> = {
+  health:     { titleKey: "chat.titleGeneral",    emptyKey: "chat.empty",            placeholderKey: "chat.placeholder",            headerClass: "bg-muted/50 text-foreground",                                                         bubbleClass: "bg-muted text-foreground" },
+  companion:  { titleKey: "chat.titleCompanion",  emptyKey: "chat.emptyCompanion",   placeholderKey: "chat.placeholderCompanion",   headerClass: "bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300",                          bubbleClass: "bg-sky-50 dark:bg-sky-950/30 text-foreground" },
+  news:       { titleKey: "chat.titleNews",       emptyKey: "chat.emptyNews",        placeholderKey: "chat.placeholderNews",        headerClass: "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300",                  bubbleClass: "bg-amber-50 dark:bg-amber-950/30 text-foreground" },
+  pharmacist: { titleKey: "chat.titlePharmacist", emptyKey: "chat.emptyPharmacist",  placeholderKey: "chat.placeholderPharmacist",  headerClass: "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300",          bubbleClass: "bg-emerald-50 dark:bg-emerald-950/30 text-foreground" },
+  drugInfo:   { titleKey: "chat.titleDrugInfo",   emptyKey: "chat.emptyDrugInfo",    placeholderKey: "chat.placeholderDrugInfo",    headerClass: "bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300",              bubbleClass: "bg-purple-50 dark:bg-purple-950/30 text-foreground" },
+  test:       { titleKey: "chat.titleTest",       emptyKey: "chat.emptyTest",        placeholderKey: "chat.placeholderTest",        headerClass: "bg-gray-50 dark:bg-gray-950/30 text-gray-700 dark:text-gray-300",                      bubbleClass: "bg-gray-100 dark:bg-gray-950/30 text-foreground" },
+  exercise:   { titleKey: "chat.titleExercise",   emptyKey: "chat.emptyExercise",    placeholderKey: "chat.placeholderExercise",    headerClass: "bg-muted/50 text-foreground",                                                         bubbleClass: "bg-muted text-foreground" },
+  eatwell:    { titleKey: "chat.titleEatwell",    emptyKey: "chat.emptyEatwell",     placeholderKey: "chat.placeholderEatwell",     headerClass: "bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300",                  bubbleClass: "bg-green-50 dark:bg-green-950/30 text-foreground" },
+};
+
 // ── Props ────────────────────────────────────────────────────────────────────
 
 interface Props {
   sessionId?: string;
-  variant?: "health" | "companion" | "news" | "pharmacist" | "drugInfo" | "test" | "exercise" | "eatwell";
+  variant?: ChatType;
   pendingVoiceText?: string;
   onVoiceTextConsumed?: () => void;
 }
@@ -109,16 +130,11 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
   const { t, i18n } = useTranslation("sessions");
   const { data: sessionData } = useSession();
   const userId = sessionData?.user?.id;
+  const lang = i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi";
 
   const isSessionMode = !!sessionId;
-  const isCompanion = !isSessionMode && variant === "companion";
-  const isNews = !isSessionMode && variant === "news";
-  const isPharmacist = !isSessionMode && variant === "pharmacist";
-  const isDrugInfo = !isSessionMode && variant === "drugInfo";
-  const isTest = !isSessionMode && variant === "test";
-  const isExercise = !isSessionMode && variant === "exercise";
-  const isEatwell = !isSessionMode && variant === "eatwell";
-  const chatTypeArg = isCompanion ? "companion" : isNews ? "news" : isPharmacist ? "pharmacist" : isDrugInfo ? "drugInfo" : isTest ? "test" : isExercise ? "exercise" : isEatwell ? "eatwell" : "health";
+  const chatTypeArg = isSessionMode ? ("health" as ChatType) : variant;
+  const variantCfg = VARIANT_STYLE[chatTypeArg];
   const titleStorageKey = userId
     ? `sanotalk_chat_loaded_title_${chatTypeArg}_${userId}`
     : null;
@@ -152,40 +168,44 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
     { enabled: isSessionMode }
   );
   const { data: healthMessages = [], refetch: refetchHealth } = trpc.agents.healthChatHistory.useQuery(
-    undefined,
-    { enabled: !isSessionMode && !isCompanion && !isNews && !isDrugInfo && !isExercise && !isEatwell }
+    undefined, { enabled: !isSessionMode && chatTypeArg === "health" }
   );
   const { data: companionMessages = [], refetch: refetchCompanion } = trpc.agents.companionChatHistory.useQuery(
-    undefined,
-    { enabled: isCompanion }
+    undefined, { enabled: chatTypeArg === "companion" }
   );
   const { data: newsMessages = [], refetch: refetchNews } = trpc.agents.newsChatHistory.useQuery(
-    undefined,
-    { enabled: isNews }
+    undefined, { enabled: chatTypeArg === "news" }
   );
   const { data: pharmacistMessages = [], refetch: refetchPharmacist } = trpc.agents.pharmacistChatHistory.useQuery(
-    undefined,
-    { enabled: isPharmacist }
+    undefined, { enabled: chatTypeArg === "pharmacist" }
   );
   const { data: drugInfoMessages = [], refetch: refetchDrugInfo } = trpc.agents.drugInfoChatHistory.useQuery(
-    undefined,
-    { enabled: isDrugInfo }
+    undefined, { enabled: chatTypeArg === "drugInfo" }
   );
   const { data: testMessages = [], refetch: refetchTest } = trpc.agents.testChatHistory.useQuery(
-    undefined,
-    { enabled: isTest }
+    undefined, { enabled: chatTypeArg === "test" }
   );
   const { data: exerciseMessages = [], refetch: refetchExercise } = trpc.agents.exerciseChatHistory.useQuery(
-    undefined,
-    { enabled: isExercise }
+    undefined, { enabled: chatTypeArg === "exercise" }
   );
   const { data: eatwellMessages = [], refetch: refetchEatwell } = trpc.agents.eatwellChatHistory.useQuery(
-    undefined,
-    { enabled: isEatwell }
+    undefined, { enabled: chatTypeArg === "eatwell" }
   );
 
-  const messages = isSessionMode ? sessionMessages : isCompanion ? companionMessages : isNews ? newsMessages : isPharmacist ? pharmacistMessages : isDrugInfo ? drugInfoMessages : isTest ? testMessages : isExercise ? exerciseMessages : isEatwell ? eatwellMessages : healthMessages;
-  const refetch = isSessionMode ? refetchSession : isCompanion ? refetchCompanion : isNews ? refetchNews : isPharmacist ? refetchPharmacist : isDrugInfo ? refetchDrugInfo : isTest ? refetchTest : isExercise ? refetchExercise : isEatwell ? refetchEatwell : refetchHealth;
+  // ── Variant hook map (queries) ────────────────────────────────────────────
+  const variantQueries: Record<ChatType, { messages: typeof healthMessages; refetch: typeof refetchHealth }> = {
+    health:     { messages: healthMessages,     refetch: refetchHealth },
+    companion:  { messages: companionMessages,  refetch: refetchCompanion },
+    news:       { messages: newsMessages,       refetch: refetchNews },
+    pharmacist: { messages: pharmacistMessages, refetch: refetchPharmacist },
+    drugInfo:   { messages: drugInfoMessages,   refetch: refetchDrugInfo },
+    test:       { messages: testMessages,       refetch: refetchTest },
+    exercise:   { messages: exerciseMessages,   refetch: refetchExercise },
+    eatwell:    { messages: eatwellMessages,    refetch: refetchEatwell },
+  };
+
+  const messages = isSessionMode ? sessionMessages : variantQueries[chatTypeArg].messages;
+  const refetch = isSessionMode ? refetchSession : variantQueries[chatTypeArg].refetch;
 
   // ── Saved conversations ────────────────────────────────────────────────────
   const { data: savedList = [], refetch: refetchSaved } = trpc.agents.listSavedConversations.useQuery(
@@ -218,64 +238,47 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
   });
 
   // ── Mutations ──────────────────────────────────────────────────────────────
-  const sendSessionMessage = trpc.agents.sendChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
-  const sendHealthMessage = trpc.agents.sendHealthChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
-  const sendCompanionMessage = trpc.agents.sendCompanionChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
-  const sendNewsMessage = trpc.agents.sendNewsChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
-  const sendPharmacistMessage = trpc.agents.sendPharmacistChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
-  const sendDrugInfoMessage = trpc.agents.sendDrugInfoChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
-  const sendTestMessage = trpc.agents.sendTestChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
-  const sendExerciseMessage = trpc.agents.sendExerciseChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
-  const sendEatwellMessage = trpc.agents.sendEatwellChatMessage.useMutation({ onSuccess: () => { void refetch(); } });
-  const clearHealth = trpc.agents.clearHealthChat.useMutation({ onSuccess: () => { void refetch(); } });
-  const clearCompanion = trpc.agents.clearCompanionChat.useMutation({ onSuccess: () => { void refetch(); } });
-  const clearNews = trpc.agents.clearNewsChat.useMutation({ onSuccess: () => { void refetch(); } });
-  const clearPharmacist = trpc.agents.clearPharmacistChat.useMutation({ onSuccess: () => { void refetch(); } });
-  const clearDrugInfo = trpc.agents.clearDrugInfoChat.useMutation({ onSuccess: () => { void refetch(); } });
-  const clearTest = trpc.agents.clearTestChat.useMutation({ onSuccess: () => { void refetch(); } });
-  const clearExercise = trpc.agents.clearExerciseChat.useMutation({ onSuccess: () => { void refetch(); } });
-  const clearEatwell = trpc.agents.clearEatwellChat.useMutation({ onSuccess: () => { void refetch(); } });
+  const onMutationSuccess = { onSuccess: () => { void refetch(); } };
+  const sendSessionMessage = trpc.agents.sendChatMessage.useMutation(onMutationSuccess);
+  const sendHealthMessage = trpc.agents.sendHealthChatMessage.useMutation(onMutationSuccess);
+  const sendCompanionMessage = trpc.agents.sendCompanionChatMessage.useMutation(onMutationSuccess);
+  const sendNewsMessage = trpc.agents.sendNewsChatMessage.useMutation(onMutationSuccess);
+  const sendPharmacistMessage = trpc.agents.sendPharmacistChatMessage.useMutation(onMutationSuccess);
+  const sendDrugInfoMessage = trpc.agents.sendDrugInfoChatMessage.useMutation(onMutationSuccess);
+  const sendTestMessage = trpc.agents.sendTestChatMessage.useMutation(onMutationSuccess);
+  const sendExerciseMessage = trpc.agents.sendExerciseChatMessage.useMutation(onMutationSuccess);
+  const sendEatwellMessage = trpc.agents.sendEatwellChatMessage.useMutation(onMutationSuccess);
+  const clearHealth = trpc.agents.clearHealthChat.useMutation(onMutationSuccess);
+  const clearCompanion = trpc.agents.clearCompanionChat.useMutation(onMutationSuccess);
+  const clearNews = trpc.agents.clearNewsChat.useMutation(onMutationSuccess);
+  const clearPharmacist = trpc.agents.clearPharmacistChat.useMutation(onMutationSuccess);
+  const clearDrugInfo = trpc.agents.clearDrugInfoChat.useMutation(onMutationSuccess);
+  const clearTest = trpc.agents.clearTestChat.useMutation(onMutationSuccess);
+  const clearExercise = trpc.agents.clearExerciseChat.useMutation(onMutationSuccess);
+  const clearEatwell = trpc.agents.clearEatwellChat.useMutation(onMutationSuccess);
 
-  const isPending = isSessionMode
-    ? sendSessionMessage.isPending
-    : isCompanion
-      ? sendCompanionMessage.isPending
-      : isNews
-        ? sendNewsMessage.isPending
-        : isPharmacist
-          ? sendPharmacistMessage.isPending
-          : isDrugInfo
-            ? sendDrugInfoMessage.isPending
-            : isTest
-              ? sendTestMessage.isPending
-              : isExercise
-                ? sendExerciseMessage.isPending
-                : isEatwell
-                  ? sendEatwellMessage.isPending
-                  : sendHealthMessage.isPending;
+  // ── Variant hook map (mutations) ──────────────────────────────────────────
+  const variantMutations: Record<ChatType, { send: typeof sendHealthMessage; clear: typeof clearHealth }> = {
+    health:     { send: sendHealthMessage,     clear: clearHealth },
+    companion:  { send: sendCompanionMessage,  clear: clearCompanion },
+    news:       { send: sendNewsMessage,       clear: clearNews },
+    pharmacist: { send: sendPharmacistMessage, clear: clearPharmacist },
+    drugInfo:   { send: sendDrugInfoMessage,   clear: clearDrugInfo },
+    test:       { send: sendTestMessage,       clear: clearTest },
+    exercise:   { send: sendExerciseMessage,   clear: clearExercise },
+    eatwell:    { send: sendEatwellMessage,    clear: clearEatwell },
+  };
+
+  const activeSend = variantMutations[chatTypeArg].send;
+  const activeClear = variantMutations[chatTypeArg].clear;
+  const isPending = isSessionMode ? sendSessionMessage.isPending : activeSend.isPending;
 
   // ── Voice (non-session modes) ──────────────────────────────────────────────
   const { isRecording, micError } = useTranscriptSocket(undefined, {
     enabled: !isSessionMode && voiceEnabled && !!sessionData?.session?.token,
-    language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi",
+    language: lang,
     onFinalTranscript: (text) => {
-      if (isCompanion) {
-        sendCompanionMessage.mutate({ message: text, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
-      } else if (isNews) {
-        sendNewsMessage.mutate({ message: text, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
-      } else if (isPharmacist) {
-        sendPharmacistMessage.mutate({ message: text, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
-      } else if (isDrugInfo) {
-        sendDrugInfoMessage.mutate({ message: text, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
-      } else if (isTest) {
-        sendTestMessage.mutate({ message: text, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
-      } else if (isExercise) {
-        sendExerciseMessage.mutate({ message: text, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
-      } else if (isEatwell) {
-        sendEatwellMessage.mutate({ message: text, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
-      } else {
-        sendHealthMessage.mutate({ message: text, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
-      }
+      activeSend.mutate({ message: text, language: lang });
     },
   });
 
@@ -309,28 +312,14 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
     if (isSessionMode) {
       const agentType = variant === "companion" ? "companion" as const : variant === "pharmacist" ? "pharmacist" as const : "health" as const;
       sendSessionMessage.mutate({ sessionId: sessionId!, message: trimmed, agentType });
-    } else if (isCompanion) {
-      sendCompanionMessage.mutate({ message: trimmed, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
-    } else if (isNews) {
-      sendNewsMessage.mutate({ message: trimmed, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
-    } else if (isPharmacist) {
-      sendPharmacistMessage.mutate({ message: trimmed, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
-    } else if (isDrugInfo) {
-      sendDrugInfoMessage.mutate({ message: trimmed, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
-    } else if (isTest) {
-      sendTestMessage.mutate({ message: trimmed, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
-    } else if (isExercise) {
-      sendExerciseMessage.mutate({ message: trimmed, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
-    } else if (isEatwell) {
-      sendEatwellMessage.mutate({ message: trimmed, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
     } else {
-      sendHealthMessage.mutate({ message: trimmed, language: i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi" });
+      activeSend.mutate({ message: trimmed, language: lang });
     }
   }
 
   function handleClearConfirmed() {
     stopTts();
-    (isCompanion ? clearCompanion : isNews ? clearNews : isPharmacist ? clearPharmacist : isDrugInfo ? clearDrugInfo : isTest ? clearTest : isExercise ? clearExercise : isEatwell ? clearEatwell : clearHealth).mutate(undefined, {
+    activeClear.mutate(undefined, {
       onSuccess: () => {
         setShowClearDialog(false);
         setShowSaveInput(false);
@@ -361,19 +350,11 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
 
   function handleDownloadConversation() {
     if (messages.length === 0) return;
-    const titleKey = isCompanion ? "chat.titleCompanion"
-      : isNews ? "chat.titleNews"
-      : isPharmacist ? "chat.titlePharmacist"
-      : isDrugInfo ? "chat.titleDrugInfo"
-      : isTest ? "chat.titleTest"
-      : isExercise ? "chat.titleExercise"
-      : isEatwell ? "chat.titleEatwell"
-      : "chat.titleGeneral";
     const now = new Date();
     const pad = (n: number) => String(n).padStart(2, "0");
     const stamp = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}-${pad(now.getHours())}${pad(now.getMinutes())}`;
     const header =
-      `# ${t(titleKey)}\n` +
+      `# ${t(variantCfg.titleKey)}\n` +
       (loadedConversationTitle ? `## ${loadedConversationTitle}\n` : "") +
       `\n_${now.toISOString()}_\n\n---\n\n`;
     const body = messages
@@ -414,21 +395,12 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
   return (
     <div className="flex flex-col h-full border rounded-lg bg-card overflow-hidden">
       {!isSessionMode && (
-        <div className={cn(
-          "px-4 py-3 border-b font-semibold text-sm",
-          isCompanion ? "bg-sky-50 dark:bg-sky-950/30 text-sky-700 dark:text-sky-300"
-          : isNews ? "bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300"
-          : isPharmacist ? "bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300"
-          : isDrugInfo ? "bg-purple-50 dark:bg-purple-950/30 text-purple-700 dark:text-purple-300"
-          : isTest ? "bg-gray-50 dark:bg-gray-950/30 text-gray-700 dark:text-gray-300"
-          : isEatwell ? "bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300"
-          : "bg-muted/50 text-foreground"
-        )}>
+        <div className={cn("px-4 py-3 border-b font-semibold text-sm", variantCfg.headerClass)}>
           <div className="flex items-center gap-2 min-w-0">
-            <span className="shrink-0">{t(isCompanion ? "chat.titleCompanion" : isNews ? "chat.titleNews" : isPharmacist ? "chat.titlePharmacist" : isDrugInfo ? "chat.titleDrugInfo" : isTest ? "chat.titleTest" : isExercise ? "chat.titleExercise" : isEatwell ? "chat.titleEatwell" : "chat.titleGeneral")}</span>
+            <span className="shrink-0">{t(variantCfg.titleKey)}</span>
             {loadedConversationTitle && (
               <>
-                <span className="shrink-0 opacity-40">·</span>
+                <span className="shrink-0 opacity-40">&middot;</span>
                 <span className="truncate font-normal opacity-70">{loadedConversationTitle}</span>
               </>
             )}
@@ -439,7 +411,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
         <div className="p-3 space-y-3">
           {messages.length === 0 && !isPending && (
             <p className="text-sm text-muted-foreground text-center py-8">
-              {t(isCompanion ? "chat.emptyCompanion" : isNews ? "chat.emptyNews" : isPharmacist ? "chat.emptyPharmacist" : isDrugInfo ? "chat.emptyDrugInfo" : isTest ? "chat.emptyTest" : isExercise ? "chat.emptyExercise" : isEatwell ? "chat.emptyEatwell" : "chat.empty")}
+              {t(variantCfg.emptyKey)}
             </p>
           )}
 
@@ -450,16 +422,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
                 "max-w-[85%] rounded-lg px-3 py-2 text-sm",
                 msg.role === "user"
                   ? "ml-auto bg-primary text-primary-foreground whitespace-pre-wrap"
-                  : cn(
-                      "mr-auto chat-markdown",
-                      isCompanion ? "bg-sky-50 dark:bg-sky-950/30 text-foreground"
-                        : isNews ? "bg-amber-50 dark:bg-amber-950/30 text-foreground"
-                        : isPharmacist ? "bg-emerald-50 dark:bg-emerald-950/30 text-foreground"
-                        : isDrugInfo ? "bg-purple-50 dark:bg-purple-950/30 text-foreground"
-                        : isTest ? "bg-gray-100 dark:bg-gray-950/30 text-foreground"
-                        : isEatwell ? "bg-green-50 dark:bg-green-950/30 text-foreground"
-                        : "bg-muted text-foreground"
-                    )
+                  : cn("mr-auto chat-markdown", variantCfg.bubbleClass)
               )}
             >
               {msg.role === "assistant" ? renderMessageContent(msg.content, t) : msg.content}
@@ -553,7 +516,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
               size="sm"
               variant="ghost"
               onClick={() => { setSaveTitle(loadedConversationTitle ?? ""); setShowClearDialog(true); }}
-              disabled={messages.length === 0 || clearHealth.isPending || clearCompanion.isPending || clearPharmacist.isPending || clearDrugInfo.isPending || clearTest.isPending || clearExercise.isPending || clearEatwell.isPending}
+              disabled={messages.length === 0 || activeClear.isPending}
               title={t("chat.clearConversation")}
               className="text-muted-foreground hover:text-destructive"
             >
@@ -622,7 +585,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
               handleSend();
             }
           }}
-          placeholder={t(isCompanion ? "chat.placeholderCompanion" : isNews ? "chat.placeholderNews" : isPharmacist ? "chat.placeholderPharmacist" : isDrugInfo ? "chat.placeholderDrugInfo" : isTest ? "chat.placeholderTest" : isExercise ? "chat.placeholderExercise" : isEatwell ? "chat.placeholderEatwell" : "chat.placeholder")}
+          placeholder={t(variantCfg.placeholderKey)}
           disabled={isPending}
           rows={3}
           className="flex-1 text-sm resize-none overflow-y-auto"
@@ -702,7 +665,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
               <Button
                 size="sm"
                 className="w-full"
-                disabled={!saveTitle.trim() || saveConversationMutation.isPending || clearHealth.isPending || clearCompanion.isPending || clearPharmacist.isPending || clearExercise.isPending || clearEatwell.isPending}
+                disabled={!saveTitle.trim() || saveConversationMutation.isPending || activeClear.isPending}
                 onClick={handleSaveAndClear}
               >
                 {saveConversationMutation.isPending
@@ -714,7 +677,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
               variant="destructive"
               size="sm"
               className="w-full"
-              disabled={clearHealth.isPending || clearCompanion.isPending || clearPharmacist.isPending || clearExercise.isPending || clearEatwell.isPending}
+              disabled={activeClear.isPending}
               onClick={handleClearConfirmed}
             >
               {t("chat.clearDialog.clearOnly")}
