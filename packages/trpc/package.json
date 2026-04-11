@@ -18,7 +18,7 @@
     "@sanotalk/db": "workspace:*",
     "@trpc/server": "^11.0.0",
     "better-auth": "^1.2.0",
-    "drizzle-orm": "^0.41.0",
+    "drizzle-orm": "^0.45.2",
     "livekit-server-sdk": "^2.15.0",
     "minio": "^8.0.7",
     "nanoid": "^5.1.7",

@@ -20,7 +20,7 @@ import {
 } from "@sanotalk/db";
 import { eq, and, desc, lte } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
-import { logAuditEvent } from "../lib/audit";
+import { logAuditEvent, requestMeta } from "../lib/audit";
 import { verifyAdminFromDb } from "../lib/verify-admin";
 import { decrypt, decryptContent, decryptArray, decryptNumeric } from "../lib/crypto";
 
@@ -116,6 +116,7 @@ export const privacyRouter = createTRPCRouter({
         action: "withdraw_consent",
         resourceType: "consent",
         resourceId: input.consentType,
+        ...requestMeta(ctx.req),
       });
 
       return { withdrawn: true };
@@ -153,6 +154,7 @@ export const privacyRouter = createTRPCRouter({
         action: input.consented ? "enable_ai_data_sharing" : "disable_ai_data_sharing",
         resourceType: "user",
         resourceId: ctx.user.id,
+        ...requestMeta(ctx.req),
       });
 
       return { consented: input.consented };
@@ -221,6 +223,7 @@ export const privacyRouter = createTRPCRouter({
 
       void logAuditEvent(ctx.db, {
         userId, action: "export_data", resourceType: "user", resourceId: userId,
+        ...requestMeta(ctx.req),
       });
 
       // Decrypt chat messages and transcripts for readable export (Law 25 portability)
@@ -275,7 +278,16 @@ export const privacyRouter = createTRPCRouter({
         allergies: decryptedAllergies,
         chronicConditions: decryptedConditions,
         chatMessages: decryptedChats,
-        savedConversations: saved,
+        savedConversations: saved.map(s => ({
+          ...s,
+          title: decryptContent(s.title) ?? s.title,
+          messages: Array.isArray(s.messages)
+            ? (s.messages as Array<{ role: string; content: string }>).map(m => ({
+                role: m.role,
+                content: decryptContent(m.content) ?? m.content,
+              }))
+            : s.messages,
+        })),
         talkSessions: sessions,
         transcripts: decryptedTranscripts,
         tasks,
@@ -300,6 +312,7 @@ export const privacyRouter = createTRPCRouter({
 
       void logAuditEvent(ctx.db, {
         userId: ctx.user.id, action: "request_deletion", resourceType: "user", resourceId: ctx.user.id,
+        ...requestMeta(ctx.req),
       });
 
       return { scheduledFor: scheduledFor.toISOString() };
@@ -318,6 +331,7 @@ export const privacyRouter = createTRPCRouter({
 
       void logAuditEvent(ctx.db, {
         userId: ctx.user.id, action: "cancel_deletion", resourceType: "user", resourceId: ctx.user.id,
+        ...requestMeta(ctx.req),
       });
 
       return { cancelled: true };

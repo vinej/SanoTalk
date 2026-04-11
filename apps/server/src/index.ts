@@ -300,6 +300,10 @@ const server = http.createServer(app);
 startDeepgramWebSocket(server, allowedOrigins);
 
 if (!process.env.NODE_ENV) {
+  // In Docker / production containers, NODE_ENV must be set — fail hard.
+  if (process.env.DOCKER === "true" || process.env.KUBERNETES_SERVICE_HOST) {
+    throw new Error("NODE_ENV must be set in containerized environments. Set NODE_ENV=production.");
+  }
   logger.warn("NODE_ENV is not set — security controls (rate limits, secure cookies) will use permissive defaults. Set NODE_ENV=production for production deployments.");
 }
 

@@ -111,7 +111,8 @@ export const agendaRouter = createTRPCRouter({
         .select()
         .from(agendaEvent)
         .where(and(...conditions))
-        .orderBy(agendaEvent.startAt);
+        .orderBy(agendaEvent.startAt)
+        .limit(1000);
 
       // Expand recurrences and filter to range
       const expanded = rows.flatMap(row => expandRecurrences(row, fromDate, toDate));

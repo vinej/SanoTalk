@@ -159,6 +159,14 @@ export const friendChatRouter = createTRPCRouter({
   heartbeat: protectedProcedure
     .input(z.object({ roomId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
+      // Verify caller is a participant before updating
+      const membership = await ctx.db.query.friendChatParticipant.findFirst({
+        where: and(
+          eq(friendChatParticipant.roomId, input.roomId),
+          eq(friendChatParticipant.userId, ctx.user.id),
+        ),
+      });
+      if (!membership) throw new TRPCError({ code: "FORBIDDEN" });
       await ctx.db
         .update(friendChatRoom)
         .set({ lastActivityAt: new Date() })

@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   # ─── Security Scanning ────────────────────────────────────────────────
   secrets-scan:
@@ -38,7 +41,7 @@ jobs:
     name: Semgrep (SAST)
     runs-on: ubuntu-latest
     container:
-      image: semgrep/semgrep
+      image: semgrep/semgrep:1.100.0
     steps:
       - uses: actions/checkout@v4
       - run: semgrep scan --config=auto --error --severity=ERROR .

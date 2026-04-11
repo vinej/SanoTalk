@@ -1,3 +1,4 @@
+import type { IncomingMessage } from "node:http";
 import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { auditLog } from "@sanotalk/db";
 
@@ -11,6 +12,15 @@ interface AuditEvent {
   ipAddress?: string;
   userAgent?: string;
   sessionId?: string;
+}
+
+/** Extract IP and User-Agent from a Node request for audit logging. */
+export function requestMeta(req: IncomingMessage | undefined | null): { ipAddress: string; userAgent: string } {
+  if (!req) return { ipAddress: "", userAgent: "" };
+  const forwarded = req.headers["x-forwarded-for"];
+  const ip = typeof forwarded === "string" ? forwarded.split(",")[0]!.trim() : req.socket?.remoteAddress ?? "";
+  const ua = (typeof req.headers["user-agent"] === "string" ? req.headers["user-agent"] : "") ?? "";
+  return { ipAddress: ip, userAgent: ua };
 }
 
 export async function logAuditEvent(db: PostgresJsDatabase<any>, event: AuditEvent) {

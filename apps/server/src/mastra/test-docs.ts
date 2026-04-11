@@ -1,5 +1,5 @@
 import { readdir, readFile, writeFile, stat } from "node:fs/promises";
-import { join, resolve, extname } from "node:path";
+import { join, resolve, extname, relative, isAbsolute } from "node:path";
 import { logger } from "../logger.js";
 import { testChatAgent } from "./agents/test-chat.js";
 
@@ -394,7 +394,8 @@ export async function runTestChatDocsMode(
   // Step 4: reader — read full document and answer
   // Path traversal guard: ensure the resolved file stays within the docs directory
   const fullPath = resolve(resolvedPath, picked);
-  if (!fullPath.startsWith(resolvedPath + "/") && fullPath !== resolvedPath) {
+  const rel = relative(resolvedPath, fullPath);
+  if (rel.startsWith("..") || isAbsolute(rel)) {
     logger.warn({ picked, fullPath }, "[TestAgent] Path traversal attempt blocked");
     return null;
   }

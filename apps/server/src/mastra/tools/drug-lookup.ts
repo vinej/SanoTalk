@@ -1,6 +1,14 @@
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
 
+const FETCH_TIMEOUT = 10_000; // 10 seconds
+
+function fetchWithTimeout(url: string, timeoutMs = FETCH_TIMEOUT): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(timer));
+}
+
 // ── Canadian brand prefixes to strip when RxNorm doesn't find the raw name ──
 const CA_PREFIXES = [
   "Apo-", "Teva-", "ratio-", "Sandoz-", "Mylan-", "pms-", "ACT-", "Jamp-",
@@ -13,7 +21,7 @@ const CA_PREFIXES = [
 
 async function rxNormLookup(name: string) {
   const url = `https://rxnav.nlm.nih.gov/REST/drugs.json?name=${encodeURIComponent(name)}`;
-  const res = await fetch(url);
+  const res = await fetchWithTimeout(url);
   if (!res.ok) return null;
   const data = await res.json() as any;
   const groups = data?.drugGroup?.conceptGroup;
@@ -37,7 +45,7 @@ async function rxNormLookup(name: string) {
 async function rxNormGetGenericName(name: string): Promise<string | null> {
   // Try /rxcui endpoint for a cleaner ingredient-level match
   const url = `https://rxnav.nlm.nih.gov/REST/rxcui.json?name=${encodeURIComponent(name)}`;
-  const res = await fetch(url);
+  const res = await fetchWithTimeout(url);
   if (!res.ok) return null;
   const data = await res.json() as any;
   const ids = data?.idGroup?.rxnormId;
@@ -144,7 +152,7 @@ export const getDrugLabel = createTool({
 
     let res: Response;
     try {
-      res = await fetch(url);
+      res = await fetchWithTimeout(url);
     } catch (err) {
       return { found: false, drugName, message: "Failed to reach OpenFDA API." };
     }
@@ -153,7 +161,7 @@ export const getDrugLabel = createTool({
       // Try a broader search (substance_name)
       const fallbackUrl = `https://api.fda.gov/drug/label.json?search=openfda.substance_name:${searchTerm}&limit=1`;
       try {
-        res = await fetch(fallbackUrl);
+        res = await fetchWithTimeout(fallbackUrl);
       } catch {
         return { found: false, drugName, message: "Failed to reach OpenFDA API." };
       }

@@ -9,6 +9,9 @@ import { eq, and } from "drizzle-orm";
 import { consumeTicket } from "@sanotalk/trpc/lib/ws-tickets";
 
 const MAX_WS_PER_USER = 2;
+const WS_CONNECT_LIMIT = 10;
+const WS_CONNECT_WINDOW = 60_000; // 1 minute
+const wsAttemptsByIp = new Map<string, { count: number; resetAt: number }>();
 
 export function startDeepgramWebSocket(server: Server, allowedOrigins?: string[]) {
   const wss = new WebSocketServer({
@@ -19,6 +22,18 @@ export function startDeepgramWebSocket(server: Server, allowedOrigins?: string[]
       const origin = req.headers.origin;
       if (!origin || !allowedOrigins?.includes(origin)) {
         done(false, 403, "Origin not allowed");
+        return;
+      }
+      // IP-based connection rate limiting (before auth to protect DB)
+      const ip = req.socket.remoteAddress ?? "unknown";
+      const now = Date.now();
+      const entry = wsAttemptsByIp.get(ip) ?? { count: 0, resetAt: now + WS_CONNECT_WINDOW };
+      if (now > entry.resetAt) { entry.count = 0; entry.resetAt = now + WS_CONNECT_WINDOW; }
+      entry.count++;
+      wsAttemptsByIp.set(ip, entry);
+      if (entry.count > WS_CONNECT_LIMIT) {
+        logger.warn({ ip }, "WebSocket rejected: IP rate limit exceeded");
+        done(false, 429, "Too many connection attempts");
         return;
       }
       done(true);

@@ -408,7 +408,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
         </div>
       )}
       <ScrollArea className="flex-1 min-h-0">
-        <div className="p-3 space-y-3">
+        <div data-openreplay-obscured className="p-3 space-y-3">
           {messages.length === 0 && !isPending && (
             <p className="text-sm text-muted-foreground text-center py-8">
               {t(variantCfg.emptyKey)}

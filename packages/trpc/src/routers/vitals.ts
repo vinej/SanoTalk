@@ -7,7 +7,7 @@ import { eq, and, desc, gte, lte, sql } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { encryptContent, decryptContent } from "../lib/crypto";
 import { checkDailyShareLimit } from "../lib/share-limit";
-import { logAuditEvent } from "../lib/audit";
+import { logAuditEvent, requestMeta } from "../lib/audit";
 
 const vitalTypeEnum = z.enum([
   "blood_pressure", "heart_rate", "weight",
@@ -239,6 +239,7 @@ export const vitalsRouter = createTRPCRouter({
       void logAuditEvent(ctx.db, {
         userId: ctx.user.id, action: "share_data", targetUserId: input.recipientUserId,
         resourceType: "vital_sign", metadata: { shareType: "vitals" },
+        ...requestMeta(ctx.req),
       });
 
       return { sent: true };

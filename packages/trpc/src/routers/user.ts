@@ -8,7 +8,7 @@ import { getRelatedUserIds } from "../lib/related-users";
 import { encrypt, decrypt } from "../lib/crypto";
 import { resend } from "../lib/resend";
 import { escapeHtml } from "../lib/escape-html";
-import { logAuditEvent } from "../lib/audit";
+import { logAuditEvent, requestMeta } from "../lib/audit";
 
 export const userRouter = createTRPCRouter({
   profile: protectedProcedure.query(async ({ ctx }) => {
@@ -404,6 +404,7 @@ export const userRouter = createTRPCRouter({
         resourceType: "user",
         resourceId: input.targetUserId,
         metadata: { previousRole: target.role, newRole: input.role },
+        ...requestMeta(ctx.req),
       });
 
       return { ok: true, previousRole: target.role, newRole: input.role };
@@ -429,6 +430,7 @@ export const userRouter = createTRPCRouter({
         resourceType: "user",
         resourceId: input.targetUserId,
         metadata: { previousRole: target.role },
+        ...requestMeta(ctx.req),
       });
 
       return { ok: true, previousRole: target.role };
@@ -483,6 +485,7 @@ export const userRouter = createTRPCRouter({
         targetUserId: input.targetUserId,
         resourceType: "user",
         resourceId: input.targetUserId,
+        ...requestMeta(ctx.req),
       });
 
       return { ok: true };
@@ -510,6 +513,7 @@ export const userRouter = createTRPCRouter({
         targetUserId: input.targetUserId,
         resourceType: "user",
         resourceId: input.targetUserId,
+        ...requestMeta(ctx.req),
       });
 
       const from = process.env.EMAIL_FROM ?? "onboarding@resend.dev";

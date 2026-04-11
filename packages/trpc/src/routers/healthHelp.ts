@@ -4,6 +4,15 @@ import { erFavorite, erSnapshot } from "@sanotalk/db";
 import { eq, and, desc, gte, sql, avg } from "drizzle-orm";
 import hospitalsData from "../data/quebec-hospitals.json";
 
+const FETCH_TIMEOUT = 15_000; // 15 seconds (external CSV/Overpass can be slow)
+
+function fetchWithTimeout(url: string, init?: RequestInit, timeoutMs = FETCH_TIMEOUT): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  const merged = { ...init, signal: controller.signal };
+  return fetch(url, merged).finally(() => clearTimeout(timer));
+}
+
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface StaticEntry {
@@ -191,7 +200,7 @@ async function fetchFacilities(): Promise<FacilityRecord[]> {
   }
 
   try {
-    const res = await fetch(INSTALLATIONS_URL);
+    const res = await fetchWithTimeout(INSTALLATIONS_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const text = await res.text();
     const csvFacilities = parseInstallationsCsv(text);
@@ -322,7 +331,7 @@ export async function fetchErData(): Promise<Map<string, ParsedErRow>> {
   }
 
   try {
-    const res = await fetch(ER_CSV_URL);
+    const res = await fetchWithTimeout(ER_CSV_URL);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const buf = await res.arrayBuffer();
     const text = new TextDecoder("iso-8859-1").decode(buf);
@@ -418,7 +427,7 @@ const OVERPASS_ENDPOINTS = [
 async function queryOverpass(query: string): Promise<{ elements: OverpassElement[] }> {
   for (const endpoint of OVERPASS_ENDPOINTS) {
     try {
-      const res = await fetch(endpoint, {
+      const res = await fetchWithTimeout(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `data=${encodeURIComponent(query)}`,

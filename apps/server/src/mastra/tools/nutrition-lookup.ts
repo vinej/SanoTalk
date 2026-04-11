@@ -1,6 +1,14 @@
 import { createTool } from "@mastra/core/tools";
 import { z } from "zod";
 
+const FETCH_TIMEOUT = 10_000; // 10 seconds
+
+function fetchWithTimeout(url: string, timeoutMs = FETCH_TIMEOUT): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { signal: controller.signal }).finally(() => clearTimeout(timer));
+}
+
 // ── Tool 1: lookupNutrition ───────────────────────────────────────────────
 // Searches the USDA FoodData Central database for nutritional composition
 // of a food item. Returns key nutrients per 100g serving.
@@ -52,7 +60,7 @@ export const lookupNutrition = createTool({
 
     let res: Response;
     try {
-      res = await fetch(url);
+      res = await fetchWithTimeout(url);
     } catch {
       return { found: false, query, message: "Failed to reach USDA FoodData Central API." };
     }
@@ -109,7 +117,7 @@ export const searchRecipes = createTool({
 
     let res: Response;
     try {
-      res = await fetch(url);
+      res = await fetchWithTimeout(url);
     } catch {
       return { found: false, query, message: "Failed to reach recipe database." };
     }
@@ -125,7 +133,7 @@ export const searchRecipes = createTool({
       // Fallback: search by meal name
       const nameUrl = `https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(query)}`;
       try {
-        const nameRes = await fetch(nameUrl);
+        const nameRes = await fetchWithTimeout(nameUrl);
         if (nameRes.ok) {
           const nameData = await nameRes.json() as any;
           if (Array.isArray(nameData?.meals) && nameData.meals.length > 0) {
@@ -152,7 +160,7 @@ export const searchRecipes = createTool({
     for (const meal of topMeals) {
       try {
         const detailUrl = `https://www.themealdb.com/api/json/v1/1/lookup.php?i=${meal.idMeal}`;
-        const detailRes = await fetch(detailUrl);
+        const detailRes = await fetchWithTimeout(detailUrl);
         if (detailRes.ok) {
           const detailData = await detailRes.json() as any;
           const m = detailData?.meals?.[0];

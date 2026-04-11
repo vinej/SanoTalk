@@ -2,18 +2,37 @@ import { createCipheriv, createDecipheriv, createHash, randomBytes } from "crypt
 
 const ALGORITHM = "aes-256-gcm";
 const IV_LENGTH = 12;
-const PREFIX = "enc:v1:";
+
+// ── Key rotation support ────────────────────────────────────────────────────
+// Current key version used for NEW encryptions.
+// Decryption reads the version from the prefix and selects the right key.
+// To rotate: set ENCRYPTION_KEY_V2 in env, bump CURRENT_KEY_VERSION to 2,
+// then run a migration script that re-encrypts all enc:v1: values.
+const CURRENT_KEY_VERSION = 1;
+
+const keyCache = new Map<number, Buffer>();
+
+function getKeyForVersion(version: number): Buffer {
+  const cached = keyCache.get(version);
+  if (cached) return cached;
+
+  // v1 uses ENCRYPTION_KEY, v2+ use ENCRYPTION_KEY_V<n>
+  const envVar = version === 1 ? "ENCRYPTION_KEY" : `ENCRYPTION_KEY_V${version}`;
+  const hex = process.env[envVar];
+  if (!hex || hex.length !== 64) {
+    throw new Error(`${envVar} must be a 64-char hex string (32 bytes)`);
+  }
+  const key = Buffer.from(hex, "hex");
+  keyCache.set(version, key);
+  return key;
+}
+
+function getKey(): Buffer {
+  return getKeyForVersion(CURRENT_KEY_VERSION);
+}
 
 /** Keys that must be encrypted at rest. */
 export const ENCRYPTED_KEYS = new Set<string>([]);
-
-function getKey(): Buffer {
-  const hex = process.env.ENCRYPTION_KEY;
-  if (!hex || hex.length !== 64) {
-    throw new Error("ENCRYPTION_KEY must be a 64-char hex string (32 bytes)");
-  }
-  return Buffer.from(hex, "hex");
-}
 
 /** Encrypt a plaintext string with AES-256-GCM. Returns a prefixed string. */
 export function encrypt(plaintext: string): string {
@@ -22,7 +41,7 @@ export function encrypt(plaintext: string): string {
   const cipher = createCipheriv(ALGORITHM, key, iv);
   const encrypted = Buffer.concat([cipher.update(plaintext, "utf8"), cipher.final()]);
   const tag = cipher.getAuthTag();
-  return `${PREFIX}${iv.toString("hex")}:${tag.toString("hex")}:${encrypted.toString("hex")}`;
+  return `enc:v${CURRENT_KEY_VERSION}:${iv.toString("hex")}:${tag.toString("hex")}:${encrypted.toString("hex")}`;
 }
 
 /**
@@ -76,9 +95,13 @@ export function hashForIndex(text: string): string {
 
 /** Decrypt a value. Returns plaintext. Handles unencrypted values gracefully (migration). */
 export function decrypt(value: string): string {
-  if (!value.startsWith(PREFIX)) return value; // already plaintext (pre-migration data)
-  const key = getKey();
-  const rest = value.slice(PREFIX.length);
+  // Parse versioned prefix: enc:v<N>:iv:tag:data
+  const versionMatch = value.match(/^enc:v(\d+):/);
+  if (!versionMatch) return value; // plaintext (pre-migration data)
+
+  const version = Number(versionMatch[1]);
+  const key = getKeyForVersion(version);
+  const rest = value.slice(versionMatch[0].length);
   const [ivHex, tagHex, dataHex] = rest.split(":");
   if (!ivHex || !tagHex || !dataHex) throw new Error("Malformed encrypted value");
   const iv = Buffer.from(ivHex, "hex");

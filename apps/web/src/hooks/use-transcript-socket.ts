@@ -44,7 +44,12 @@ export function useTranscriptSocket(
     const lang = options?.language ?? "en";
     const params = new URLSearchParams({ language: lang });
     if (sessionId) params.set("sessionId", sessionId);
-    const wsUrl = `${import.meta.env.VITE_WS_URL}/ws/transcribe?${params.toString()}`;
+    const wsBase = import.meta.env.VITE_WS_URL;
+    if (!import.meta.env.DEV && wsBase && !wsBase.startsWith("wss://")) {
+      console.error("VITE_WS_URL must use wss:// in production");
+      return;
+    }
+    const wsUrl = `${wsBase}/ws/transcribe?${params.toString()}`;
 
     getTicketMutation.mutate(undefined, {
       onSuccess: ({ ticket }) => {

@@ -55,7 +55,7 @@ export const livekitRouter = createTRPCRouter({
         identity: ctx.user.id,
         name: input.participantName ?? ctx.user.name,
         metadata,
-        ttl: "1h",
+        ttl: "30m",
       });
 
       at.addGrant({

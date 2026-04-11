@@ -7,7 +7,7 @@ import { eq, and, desc, gte, lte } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { encryptContent, decryptContent, encryptArray, decryptArray, encryptNumeric, decryptNumeric } from "../lib/crypto";
 import { checkDailyShareLimit } from "../lib/share-limit";
-import { logAuditEvent } from "../lib/audit";
+import { logAuditEvent, requestMeta } from "../lib/audit";
 
 function decryptSymptomFields<T extends Record<string, any>>(s: T) {
   return {
@@ -196,6 +196,7 @@ export const symptomsRouter = createTRPCRouter({
       void logAuditEvent(ctx.db, {
         userId: ctx.user.id, action: "share_data", targetUserId: input.recipientUserId,
         resourceType: "symptom_log", metadata: { shareType: "symptoms" },
+        ...requestMeta(ctx.req),
       });
 
       return { sent: true };
