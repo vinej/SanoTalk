@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { trpc } from "../../lib/trpc";
 import { Button } from "../../components/ui/button";
-import { Plus, Share2, Loader2 } from "lucide-react";
+import { Plus, Share2, Loader2, ArrowLeft } from "lucide-react";
 import { VitalSummaryCard } from "../../components/vitals/vital-summary-card";
 import { VitalChart } from "../../components/vitals/vital-chart";
 import { LogVitalDialog } from "../../components/vitals/log-vital-dialog";
@@ -54,7 +54,15 @@ function VitalsPage() {
   return (
     <div className="flex-1 flex flex-col min-h-0 px-6 py-6 space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between shrink-0">
+      <div className="shrink-0 space-y-1">
+        <Link
+          to="/dashboard"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t("common:backToDashboard")}
+        </Link>
+        <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
           <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
@@ -68,6 +76,7 @@ function VitalsPage() {
             <Plus className="h-3.5 w-3.5 mr-1.5" />
             {t("logReading")}
           </Button>
+        </div>
         </div>
       </div>
 

@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef, useMemo } from "react";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { trpc } from "../../lib/trpc";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
-import { Trash2, Pencil, X, Clock, Camera, Loader2, Download, Shield, AlertTriangle } from "lucide-react";
+import { Trash2, Pencil, X, Clock, Camera, Loader2, Download, Shield, AlertTriangle, ArrowLeft } from "lucide-react";
 import { useAvatarUrl, getInitials } from "../../lib/avatar-url";
 import { RamqSection } from "../../components/profile/ramq-section";
 import { PrivacyDataSection } from "../../components/profile/privacy-data-section";
@@ -253,6 +253,13 @@ function ProfilePage() {
     <div className="flex-1 flex flex-col min-h-0 px-6 py-6 space-y-6 overflow-y-auto">
       {/* Header */}
       <div>
+        <Link
+          to="/dashboard"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t("common:backToDashboard")}
+        </Link>
         <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
         <p className="text-sm text-muted-foreground">{profile?.name ?? ""}</p>
       </div>

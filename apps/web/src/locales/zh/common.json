@@ -15,6 +15,7 @@
   "delete": "删除",
   "create": "创建",
   "back": "返回",
+  "backToDashboard": "控制台",
   "signUp": {
     "title": "创建您的账户",
     "name": "全名",

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { trpc } from "../../../lib/trpc";
 import { LiveSessionRoom } from "../../../components/sessions/live-session-room";
@@ -7,6 +7,7 @@ import { SummaryPanel } from "../../../components/summary/summary-panel";
 import { AiChatPanel } from "../../../components/chat/ai-chat-panel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import { useTranslation } from "react-i18next";
+import { ArrowLeft } from "lucide-react";
 
 
 export const Route = createFileRoute("/_auth/sessions/$sessionId")({
@@ -117,6 +118,15 @@ function SessionPage() {
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
+      <div className="px-4 py-1.5 border-b shrink-0">
+        <Link
+          to="/sessions"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t("sessions:pageTitle")}
+        </Link>
+      </div>
       <div className="flex-1 min-h-0">
         <div className="grid grid-cols-1 lg:grid-cols-2 lg:grid-rows-1 h-full gap-0">
           {/* Live Room — occupies 1/2 on desktop */}

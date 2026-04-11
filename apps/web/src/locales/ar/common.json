@@ -15,6 +15,7 @@
   "delete": "حذف",
   "create": "إنشاء",
   "back": "رجوع",
+  "backToDashboard": "لوحة التحكم",
   "signUp": {
     "title": "أنشئ حسابك",
     "name": "الاسم الكامل",

@@ -15,6 +15,7 @@
   "delete": "Delete",
   "create": "Create",
   "back": "Back",
+  "backToDashboard": "Dashboard",
   "signUp": {
     "title": "Create your account",
     "name": "Full name",

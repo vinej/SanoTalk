@@ -1,5 +1,6 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute, redirect, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { trpc } from "../../lib/trpc";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -12,7 +13,7 @@ import {
   DialogFooter,
 } from "../../components/ui/dialog";
 import { toast } from "sonner";
-import { ShieldAlert, Plus } from "lucide-react";
+import { ShieldAlert, Plus, ArrowLeft } from "lucide-react";
 
 export const Route: any = createFileRoute("/_auth/admin-breaches")({
   beforeLoad: async ({ context }: { context: { user?: { role?: string } } }) => {
@@ -37,6 +38,7 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 function AdminBreachesPage() {
+  const { t } = useTranslation("common");
   const { data: profile } = trpc.user.profile.useQuery();
   const { data: breaches = [], refetch } = trpc.privacy.listBreaches.useQuery(undefined, {
     enabled: profile?.role === "admin",
@@ -85,7 +87,15 @@ function AdminBreachesPage() {
 
   return (
     <div className="flex-1 flex flex-col min-h-0 px-6 py-6 space-y-4 overflow-y-auto">
-      <div className="flex items-center justify-between">
+      <div className="space-y-1">
+        <Link
+          to="/dashboard"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t("common:backToDashboard")}
+        </Link>
+        <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <ShieldAlert className="h-6 w-6 text-destructive" />
           <h1 className="text-2xl font-bold">Privacy Breach Register</h1>
@@ -94,6 +104,7 @@ function AdminBreachesPage() {
           <Plus className="h-4 w-4 mr-1" />
           Record Breach
         </Button>
+        </div>
       </div>
 
       <p className="text-sm text-muted-foreground">

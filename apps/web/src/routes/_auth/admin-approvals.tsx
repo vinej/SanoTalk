@@ -1,9 +1,9 @@
-import { createFileRoute, useNavigate, redirect } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, redirect, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { trpc } from "../../lib/trpc";
 import { Button } from "../../components/ui/button";
-import { CheckCircle, XCircle, Users } from "lucide-react";
+import { CheckCircle, XCircle, Users, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -53,9 +53,18 @@ function AdminApprovalsPage() {
 
   return (
     <div className="px-6 py-6 space-y-6 max-w-4xl mx-auto">
-      <div className="flex items-center gap-3">
-        <Users className="h-6 w-6 text-primary" />
-        <h1 className="text-2xl font-bold">{t("dashboard:adminApprovals")}</h1>
+      <div>
+        <Link
+          to="/dashboard"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-2"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t("common:backToDashboard")}
+        </Link>
+        <div className="flex items-center gap-3">
+          <Users className="h-6 w-6 text-primary" />
+          <h1 className="text-2xl font-bold">{t("dashboard:adminApprovals")}</h1>
+        </div>
       </div>
 
       {pending.length === 0 ? (

@@ -15,6 +15,7 @@ import enMedications from "../locales/en/medications.json";
 import enSymptoms from "../locales/en/symptoms.json";
 import enAllergies from "../locales/en/allergies.json";
 import enPrivacy from "../locales/en/privacy.json";
+import enChat from "../locales/en/chat.json";
 
 // French
 import frCommon from "../locales/fr/common.json";
@@ -29,6 +30,7 @@ import frMedications from "../locales/fr/medications.json";
 import frSymptoms from "../locales/fr/symptoms.json";
 import frAllergies from "../locales/fr/allergies.json";
 import frPrivacy from "../locales/fr/privacy.json";
+import frChat from "../locales/fr/chat.json";
 
 // Spanish
 import esCommon from "../locales/es/common.json";
@@ -43,6 +45,7 @@ import esMedications from "../locales/es/medications.json";
 import esSymptoms from "../locales/es/symptoms.json";
 import esAllergies from "../locales/es/allergies.json";
 import esPrivacy from "../locales/es/privacy.json";
+import esChat from "../locales/es/chat.json";
 
 // Chinese (Simplified)
 import zhCommon from "../locales/zh/common.json";
@@ -57,6 +60,7 @@ import zhMedications from "../locales/zh/medications.json";
 import zhSymptoms from "../locales/zh/symptoms.json";
 import zhAllergies from "../locales/zh/allergies.json";
 import zhPrivacy from "../locales/zh/privacy.json";
+import zhChat from "../locales/zh/chat.json";
 
 // Arabic
 import arCommon from "../locales/ar/common.json";
@@ -71,6 +75,7 @@ import arMedications from "../locales/ar/medications.json";
 import arSymptoms from "../locales/ar/symptoms.json";
 import arAllergies from "../locales/ar/allergies.json";
 import arPrivacy from "../locales/ar/privacy.json";
+import arChat from "../locales/ar/chat.json";
 
 // Hindi
 import hiCommon from "../locales/hi/common.json";
@@ -85,6 +90,7 @@ import hiMedications from "../locales/hi/medications.json";
 import hiSymptoms from "../locales/hi/symptoms.json";
 import hiAllergies from "../locales/hi/allergies.json";
 import hiPrivacy from "../locales/hi/privacy.json";
+import hiChat from "../locales/hi/chat.json";
 
 export const SUPPORTED_LANGUAGES = [
   { code: "en", label: "English", flag: "🇺🇸" },
@@ -108,12 +114,12 @@ i18n
   .use(initReactI18next)
   .init({
     resources: {
-      en: { common: enCommon, dashboard: enDashboard, kanban: enKanban, sessions: enSessions, profile: enProfile, auth: enAuth, healthHelp: enHealthHelp, vitals: enVitals, medications: enMedications, symptoms: enSymptoms, allergies: enAllergies, privacy: enPrivacy },
-      fr: { common: frCommon, dashboard: frDashboard, kanban: frKanban, sessions: frSessions, profile: frProfile, auth: frAuth, healthHelp: frHealthHelp, vitals: frVitals, medications: frMedications, symptoms: frSymptoms, allergies: frAllergies, privacy: frPrivacy },
-      es: { common: esCommon, dashboard: esDashboard, kanban: esKanban, sessions: esSessions, profile: esProfile, auth: esAuth, healthHelp: esHealthHelp, vitals: esVitals, medications: esMedications, symptoms: esSymptoms, allergies: esAllergies, privacy: esPrivacy },
-      zh: { common: zhCommon, dashboard: zhDashboard, kanban: zhKanban, sessions: zhSessions, profile: zhProfile, auth: zhAuth, healthHelp: zhHealthHelp, vitals: zhVitals, medications: zhMedications, symptoms: zhSymptoms, allergies: zhAllergies, privacy: zhPrivacy },
-      ar: { common: arCommon, dashboard: arDashboard, kanban: arKanban, sessions: arSessions, profile: arProfile, auth: arAuth, healthHelp: arHealthHelp, vitals: arVitals, medications: arMedications, symptoms: arSymptoms, allergies: arAllergies, privacy: arPrivacy },
-      hi: { common: hiCommon, dashboard: hiDashboard, kanban: hiKanban, sessions: hiSessions, profile: hiProfile, auth: hiAuth, healthHelp: hiHealthHelp, vitals: hiVitals, medications: hiMedications, symptoms: hiSymptoms, allergies: hiAllergies, privacy: hiPrivacy },
+      en: { common: enCommon, dashboard: enDashboard, kanban: enKanban, sessions: enSessions, profile: enProfile, auth: enAuth, healthHelp: enHealthHelp, vitals: enVitals, medications: enMedications, symptoms: enSymptoms, allergies: enAllergies, privacy: enPrivacy, chat: enChat },
+      fr: { common: frCommon, dashboard: frDashboard, kanban: frKanban, sessions: frSessions, profile: frProfile, auth: frAuth, healthHelp: frHealthHelp, vitals: frVitals, medications: frMedications, symptoms: frSymptoms, allergies: frAllergies, privacy: frPrivacy, chat: frChat },
+      es: { common: esCommon, dashboard: esDashboard, kanban: esKanban, sessions: esSessions, profile: esProfile, auth: esAuth, healthHelp: esHealthHelp, vitals: esVitals, medications: esMedications, symptoms: esSymptoms, allergies: esAllergies, privacy: esPrivacy, chat: esChat },
+      zh: { common: zhCommon, dashboard: zhDashboard, kanban: zhKanban, sessions: zhSessions, profile: zhProfile, auth: zhAuth, healthHelp: zhHealthHelp, vitals: zhVitals, medications: zhMedications, symptoms: zhSymptoms, allergies: zhAllergies, privacy: zhPrivacy, chat: zhChat },
+      ar: { common: arCommon, dashboard: arDashboard, kanban: arKanban, sessions: arSessions, profile: arProfile, auth: arAuth, healthHelp: arHealthHelp, vitals: arVitals, medications: arMedications, symptoms: arSymptoms, allergies: arAllergies, privacy: arPrivacy, chat: arChat },
+      hi: { common: hiCommon, dashboard: hiDashboard, kanban: hiKanban, sessions: hiSessions, profile: hiProfile, auth: hiAuth, healthHelp: hiHealthHelp, vitals: hiVitals, medications: hiMedications, symptoms: hiSymptoms, allergies: hiAllergies, privacy: hiPrivacy, chat: hiChat },
     },
     fallbackLng: "en",
     defaultNS: "common",

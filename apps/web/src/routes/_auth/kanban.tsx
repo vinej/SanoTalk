@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { trpc } from "../../lib/trpc";
 import { useTranslation } from "react-i18next";
@@ -259,7 +259,15 @@ function KanbanPage() {
   return (
     <div style={{ flex: 1, backgroundColor: "#f8fafc" }}>
       {/* Page header */}
-      <div style={{ borderBottom: "1px solid #e2e8f0", backgroundColor: "white", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div style={{ borderBottom: "1px solid #e2e8f0", backgroundColor: "white", padding: "16px 24px" }}>
+        <Link
+          to="/dashboard"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-1"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t("common:backToDashboard")}
+        </Link>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div>
           <h1 style={{ fontSize: "20px", fontWeight: 600, margin: 0 }}>{t("kanban:title")}</h1>
           <p style={{ fontSize: "13px", color: "#64748b", margin: "2px 0 0 0" }}>
@@ -273,6 +281,7 @@ function KanbanPage() {
               {t("kanban:newTask")}
             </Button>
           )}
+        </div>
         </div>
       </div>
 

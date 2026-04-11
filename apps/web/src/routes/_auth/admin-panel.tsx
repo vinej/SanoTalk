@@ -59,7 +59,7 @@ function AdminPanelPage() {
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-2"
         >
           <ArrowLeft className="h-4 w-4" />
-          {t("dashboard:title")}
+          {t("common:backToDashboard")}
         </Link>
         <h1 className="text-2xl font-bold tracking-tight">{t("dashboard:adminPanel")}</h1>
         <p className="text-muted-foreground mt-1 text-sm">{t("dashboard:adminPanelDesc")}</p>

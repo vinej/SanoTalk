@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { trpc } from "../../lib/trpc";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { SessionCard } from "../../components/sessions/session-card";
-import { Plus } from "lucide-react";
+import { Plus, ArrowLeft } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -92,7 +92,15 @@ function SessionsPage() {
       </Dialog>
 
       <div className="px-6 py-6 space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="space-y-1">
+          <Link
+            to="/dashboard"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {t("common:backToDashboard")}
+          </Link>
+          <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold tracking-tight">{t("sessions:pageTitle")}</h1>
             <p className="text-sm text-muted-foreground">{t("sessions:pageSubtitle")}</p>
@@ -101,6 +109,7 @@ function SessionsPage() {
             <Plus className="mr-2 h-4 w-4" />
             {t("sessions:new.title")}
           </Button>
+          </div>
         </div>
 
         {isLoading ? (

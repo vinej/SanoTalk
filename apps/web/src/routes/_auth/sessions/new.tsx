@@ -1,7 +1,8 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { trpc } from "../../../lib/trpc";
 import { Button } from "../../../components/ui/button";
 import { useTranslation } from "react-i18next";
+import { ArrowLeft } from "lucide-react";
 
 export const Route = createFileRoute("/_auth/sessions/new")({
   component: NewSessionPage,
@@ -23,6 +24,13 @@ function NewSessionPage() {
   return (
     <div className="flex items-center justify-center flex-1">
       <div className="text-center space-y-4">
+        <Link
+          to="/sessions"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t("common:backToDashboard")}
+        </Link>
         <h1 className="text-2xl font-bold">{t("new.title")}</h1>
         <p className="text-muted-foreground">{t("new.subtitle")}</p>
         <Button

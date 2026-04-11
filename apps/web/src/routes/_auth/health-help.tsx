@@ -8,7 +8,7 @@ import { MapPanel } from "../../components/health-help/map-panel";
 import { EmergencyNumbers } from "../../components/health-help/emergency-numbers";
 import { Button } from "../../components/ui/button";
 import { AiTransparencyNotice } from "../../components/ai-transparency-notice";
-import { MapPin, RefreshCw, Loader2, Bell } from "lucide-react";
+import { MapPin, RefreshCw, Loader2, Bell, ArrowLeft } from "lucide-react";
 
 export type FacilityType = "hospital" | "clsc" | "pharmacy" | "clinic";
 
@@ -93,6 +93,15 @@ function HealthHelpPage() {
   if (lat === null || lng === null) {
     return (
       <div className="flex-1 flex flex-col min-h-0">
+        <div className="px-4 pt-3">
+          <Link
+            to="/dashboard"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            {t("common:backToDashboard")}
+          </Link>
+        </div>
         <EmergencyNumbers />
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="text-center space-y-4 max-w-sm">
@@ -146,6 +155,13 @@ function HealthHelpPage() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2 border-b shrink-0">
         <div>
+          <Link
+            to="/dashboard"
+            className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            {t("common:backToDashboard")}
+          </Link>
           <h1 className="text-lg font-semibold">{t("title")}</h1>
           <p className="text-xs text-muted-foreground">{t("subtitle")}</p>
         </div>

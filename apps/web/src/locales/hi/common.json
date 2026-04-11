@@ -15,6 +15,7 @@
   "delete": "हटाएं",
   "create": "बनाएं",
   "back": "वापस",
+  "backToDashboard": "डैशबोर्ड",
   "signUp": {
     "title": "अपना खाता बनाएं",
     "name": "पूरा नाम",

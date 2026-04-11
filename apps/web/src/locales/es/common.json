@@ -15,6 +15,7 @@
   "delete": "Eliminar",
   "create": "Crear",
   "back": "Volver",
+  "backToDashboard": "Panel",
   "signUp": {
     "title": "Crea tu cuenta",
     "name": "Nombre completo",
