@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useCallback, type ComponentType, type ReactNode } from "react";
 import { Button } from "../../components/ui/button";
-import { Kanban, Bot, Heart, Hospital, Download, Activity, Video, Pill, ClipboardList, UserCircle, ShieldAlert, FlaskConical, ShieldCheck, FlaskRound, Newspaper, Search, MessageCircle, ChevronDown, Dumbbell, TreePine } from "lucide-react";
+import { Kanban, Bot, Heart, Hospital, Download, Activity, Video, Pill, ClipboardList, UserCircle, ShieldAlert, FlaskConical, ShieldCheck, FlaskRound, Newspaper, Search, MessageCircle, ChevronDown, Dumbbell, TreePine, CalendarDays } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { usePwaInstall } from "../../hooks/use-pwa-install";
 import { trpc } from "../../lib/trpc";
@@ -73,6 +73,7 @@ const EXERCISE_ITEMS: FeatureItem[] = [
 
 const TASK_ITEMS: FeatureItem[] = [
   { to: "/kanban", icon: Kanban, color: "text-gray-700", bg: "bg-gray-50 dark:bg-gray-950/30", border: "border-gray-200 dark:border-gray-800", key: "kanban" },
+  { to: "/agenda", icon: CalendarDays, color: "text-cyan-600", bg: "bg-cyan-50 dark:bg-cyan-950/30", border: "border-cyan-200 dark:border-cyan-800", key: "agenda" },
 ];
 
 function DashboardPage() {
@@ -207,8 +208,6 @@ function DashboardPage() {
 function ExpandableGroup({
   icon: Icon,
   color,
-  bg,
-  border,
   titleKey,
   isOpen,
   onToggle,
@@ -217,8 +216,8 @@ function ExpandableGroup({
 }: {
   icon: ComponentType<{ className?: string }>;
   color: string;
-  bg: string;
-  border: string;
+  bg?: string;
+  border?: string;
   titleKey: string;
   isOpen: boolean;
   onToggle: () => void;
@@ -227,26 +226,24 @@ function ExpandableGroup({
 }) {
   const { t } = useTranslation("dashboard");
 
-  return (
-    <div>
-      <button onClick={onToggle} className="w-full text-left group">
-        <div className={`flex items-center gap-4 rounded-xl border-2 ${border} ${bg} p-5 transition-shadow hover:shadow-md`}>
-          {avatar ?? (
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-gray-900 shadow-sm">
-              <Icon className={`h-6 w-6 ${color}`} />
-            </div>
-          )}
-          <div className="min-w-0 flex-1">
-            <p className="font-semibold group-hover:underline">{t(titleKey)}</p>
-            <p className="text-sm text-muted-foreground">{t(`${titleKey}Desc`)}</p>
+  // When open: single-line collapse bar
+  if (isOpen) {
+    return (
+      <div>
+        <button onClick={onToggle} className="w-full text-left group">
+          <div className="flex items-center gap-3 rounded-lg border border-border bg-muted/40 px-4 py-2 hover:bg-muted/70 transition-colors">
+            {avatar ? (
+              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded overflow-hidden">
+                {avatar}
+              </div>
+            ) : (
+              <Icon className={`h-4 w-4 shrink-0 ${color}`} />
+            )}
+            <span className="text-sm font-medium flex-1">{t(titleKey)}</span>
+            <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 rotate-180 transition-transform duration-200" />
           </div>
-          <ChevronDown
-            className={`h-5 w-5 text-muted-foreground shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
-          />
-        </div>
-      </button>
+        </button>
 
-      {isOpen && (
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 mt-3">
           {items.map((f) => (
             <Link key={f.key} to={f.to as any} className="group">
@@ -262,7 +259,27 @@ function ExpandableGroup({
             </Link>
           ))}
         </div>
-      )}
-    </div>
+      </div>
+    );
+  }
+
+  // When closed: compact group header (no colored bg, no large icon box)
+  return (
+    <button onClick={onToggle} className="w-full text-left group">
+      <div className="flex items-center gap-3 rounded-lg border border-border px-4 py-3 hover:bg-muted/50 transition-colors">
+        {avatar ? (
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md overflow-hidden">
+            {avatar}
+          </div>
+        ) : (
+          <Icon className={`h-5 w-5 shrink-0 ${color}`} />
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="font-medium group-hover:underline">{t(titleKey)}</p>
+          <p className="text-xs text-muted-foreground">{t(`${titleKey}Desc`)}</p>
+        </div>
+        <ChevronDown className="h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-200" />
+      </div>
+    </button>
   );
 }

@@ -1,6 +1,7 @@
 import { text, timestamp, uuid, boolean, index } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createTable, user } from "./auth";
+import { medicationSchedule } from "./agenda";
 
 export const medication = createTable("medication", {
   id:           uuid("id").primaryKey().defaultRandom(),
@@ -22,11 +23,12 @@ export const medication = createTable("medication", {
   userActiveIdx: index("medication_user_active_idx").on(t.userId, t.isActive),
 }));
 
-export const medicationRelations = relations(medication, ({ one }) => ({
+export const medicationRelations = relations(medication, ({ one, many }) => ({
   user: one(user, {
     fields: [medication.userId],
     references: [user.id],
   }),
+  schedules: many(medicationSchedule),
 }));
 
 export type Medication = typeof medication.$inferSelect;

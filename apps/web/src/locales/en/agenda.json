@@ -1,0 +1,94 @@
+{
+  "title": "Agenda",
+  "subtitle": "Your appointments, reminders, and schedule",
+  "tabs": {
+    "today": "Today",
+    "week": "Week",
+    "month": "Month",
+    "calendar": "Calendar",
+    "medications": "Medications",
+    "availability": "Availability"
+  },
+  "today": {
+    "noEvents": "No events today",
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "addEvent": "Add Event"
+  },
+  "event": {
+    "appointment": "Appointment",
+    "exercise": "Exercise",
+    "medication": "Medication",
+    "editEvent": "Edit Event",
+    "deleteEvent": "Delete Event",
+    "deleteConfirm": "Are you sure you want to delete this event?",
+    "deleted": "Event deleted",
+    "created": "Event created",
+    "updated": "Event updated"
+  },
+  "form": {
+    "title": "Title",
+    "titlePlaceholder": "e.g. Doctor appointment",
+    "description": "Description",
+    "descriptionPlaceholder": "Optional details",
+    "location": "Location",
+    "locationPlaceholder": "e.g. City Hospital",
+    "date": "Date",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "allDay": "All Day",
+    "eventType": "Event Type",
+    "recurrence": "Repeat",
+    "recurrenceNone": "Does not repeat",
+    "recurrenceDaily": "Daily",
+    "recurrenceWeekly": "Weekly",
+    "recurrenceMonthly": "Monthly",
+    "recurrenceSpecificDays": "Specific days of the week",
+    "save": "Save",
+    "cancel": "Cancel",
+    "color": "Color"
+  },
+  "medications": {
+    "title": "Medication Reminders",
+    "subtitle": "Set reminder times for each medication",
+    "noMedications": "No active medications",
+    "noReminders": "No reminders set",
+    "addTime": "Add Reminder",
+    "removeTime": "Remove",
+    "saveSchedule": "Save Schedule",
+    "saved": "Schedule saved",
+    "timeOfDay": "Time",
+    "label": "Label",
+    "labelPlaceholder": "e.g. Morning dose"
+  },
+  "availability": {
+    "title": "My Availability",
+    "subtitle": "Set your consultation availability for each day",
+    "noSlots": "No availability set",
+    "addSlot": "Add Slot",
+    "removeSlot": "Remove",
+    "slotDuration": "Slot Duration",
+    "minutes": "{{count}} min",
+    "save": "Save Availability",
+    "saved": "Availability saved",
+    "startTime": "From",
+    "endTime": "To"
+  },
+  "calendar": {
+    "monthView": "Month",
+    "weekView": "Week",
+    "today": "Today",
+    "thisWeek": "This Week",
+    "thisMonth": "This Month",
+    "noEvents": "No events on this day"
+  },
+  "days": {
+    "sun": "Sun",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat"
+  }
+}

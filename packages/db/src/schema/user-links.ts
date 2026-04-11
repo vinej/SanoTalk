@@ -1,6 +1,7 @@
 import { text, timestamp, uuid, uniqueIndex } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createTable, user, account, session } from "./auth";
+import { agendaEvent, availabilitySlot } from "./agenda";
 
 // ─── Professional links (patient ↔ doctor/pharmacist) ──────────────────────
 
@@ -65,4 +66,6 @@ export const userRelations = relations(user, ({ many }) => ({
   friends:           many(userFriend,        { relationName: "friendsOf" }),
   sentRequests:      many(connectionRequest, { relationName: "sentRequests" }),
   receivedRequests:  many(connectionRequest, { relationName: "receivedRequests" }),
+  agendaEvents:      many(agendaEvent),
+  availabilitySlots: many(availabilitySlot),
 }));

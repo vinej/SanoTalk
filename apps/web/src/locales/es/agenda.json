@@ -1,0 +1,94 @@
+{
+  "title": "Agenda",
+  "subtitle": "Tus citas, recordatorios y horario",
+  "tabs": {
+    "today": "Hoy",
+    "week": "Semana",
+    "month": "Mes",
+    "calendar": "Calendario",
+    "medications": "Medicamentos",
+    "availability": "Disponibilidad"
+  },
+  "today": {
+    "noEvents": "No hay eventos hoy",
+    "upcoming": "Próximos",
+    "past": "Pasados",
+    "addEvent": "Agregar evento"
+  },
+  "event": {
+    "appointment": "Cita",
+    "exercise": "Ejercicio",
+    "medication": "Medicamento",
+    "editEvent": "Editar evento",
+    "deleteEvent": "Eliminar evento",
+    "deleteConfirm": "¿Estás seguro de que deseas eliminar este evento?",
+    "deleted": "Evento eliminado",
+    "created": "Evento creado",
+    "updated": "Evento actualizado"
+  },
+  "form": {
+    "title": "Título",
+    "titlePlaceholder": "ej. Cita con el médico",
+    "description": "Descripción",
+    "descriptionPlaceholder": "Detalles opcionales",
+    "location": "Ubicación",
+    "locationPlaceholder": "ej. Hospital de la ciudad",
+    "date": "Fecha",
+    "startTime": "Hora de inicio",
+    "endTime": "Hora de fin",
+    "allDay": "Todo el día",
+    "eventType": "Tipo de evento",
+    "recurrence": "Repetir",
+    "recurrenceNone": "No se repite",
+    "recurrenceDaily": "Diario",
+    "recurrenceWeekly": "Semanal",
+    "recurrenceMonthly": "Mensual",
+    "recurrenceSpecificDays": "Días específicos de la semana",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "color": "Color"
+  },
+  "medications": {
+    "title": "Recordatorios de medicamentos",
+    "subtitle": "Establece horarios de recordatorio para cada medicamento",
+    "noMedications": "No hay medicamentos activos",
+    "noReminders": "No hay recordatorios configurados",
+    "addTime": "Agregar recordatorio",
+    "removeTime": "Eliminar",
+    "saveSchedule": "Guardar horario",
+    "saved": "Horario guardado",
+    "timeOfDay": "Hora",
+    "label": "Etiqueta",
+    "labelPlaceholder": "ej. Dosis de la mañana"
+  },
+  "availability": {
+    "title": "Mi disponibilidad",
+    "subtitle": "Configura tu disponibilidad de consulta para cada día",
+    "noSlots": "No hay disponibilidad configurada",
+    "addSlot": "Agregar horario",
+    "removeSlot": "Eliminar",
+    "slotDuration": "Duración del turno",
+    "minutes": "{{count}} min",
+    "save": "Guardar disponibilidad",
+    "saved": "Disponibilidad guardada",
+    "startTime": "Desde",
+    "endTime": "Hasta"
+  },
+  "calendar": {
+    "monthView": "Mes",
+    "weekView": "Semana",
+    "today": "Hoy",
+    "thisWeek": "Esta semana",
+    "thisMonth": "Este mes",
+    "noEvents": "No hay eventos este día"
+  },
+  "days": {
+    "sun": "Dom",
+    "mon": "Lun",
+    "tue": "Mar",
+    "wed": "Mié",
+    "thu": "Jue",
+    "fri": "Vie",
+    "sat": "Sáb"
+  }
+}

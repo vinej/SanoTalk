@@ -1,0 +1,94 @@
+{
+  "title": "Agenda",
+  "subtitle": "Vos rendez-vous, rappels et emploi du temps",
+  "tabs": {
+    "today": "Aujourd'hui",
+    "week": "Semaine",
+    "month": "Mois",
+    "calendar": "Calendrier",
+    "medications": "Médicaments",
+    "availability": "Disponibilité"
+  },
+  "today": {
+    "noEvents": "Aucun événement aujourd'hui",
+    "upcoming": "À venir",
+    "past": "Passé",
+    "addEvent": "Ajouter un événement"
+  },
+  "event": {
+    "appointment": "Rendez-vous",
+    "exercise": "Exercice",
+    "medication": "Médicament",
+    "editEvent": "Modifier l'événement",
+    "deleteEvent": "Supprimer l'événement",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cet événement ?",
+    "deleted": "Événement supprimé",
+    "created": "Événement créé",
+    "updated": "Événement mis à jour"
+  },
+  "form": {
+    "title": "Titre",
+    "titlePlaceholder": "ex. Rendez-vous médecin",
+    "description": "Description",
+    "descriptionPlaceholder": "Détails optionnels",
+    "location": "Lieu",
+    "locationPlaceholder": "ex. Hôpital de la ville",
+    "date": "Date",
+    "startTime": "Heure de début",
+    "endTime": "Heure de fin",
+    "allDay": "Toute la journée",
+    "eventType": "Type d'événement",
+    "recurrence": "Répétition",
+    "recurrenceNone": "Ne se répète pas",
+    "recurrenceDaily": "Quotidien",
+    "recurrenceWeekly": "Hebdomadaire",
+    "recurrenceMonthly": "Mensuel",
+    "recurrenceSpecificDays": "Jours spécifiques de la semaine",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "color": "Couleur"
+  },
+  "medications": {
+    "title": "Rappels de médicaments",
+    "subtitle": "Définissez les heures de rappel pour chaque médicament",
+    "noMedications": "Aucun médicament actif",
+    "noReminders": "Aucun rappel défini",
+    "addTime": "Ajouter un rappel",
+    "removeTime": "Supprimer",
+    "saveSchedule": "Enregistrer le programme",
+    "saved": "Programme enregistré",
+    "timeOfDay": "Heure",
+    "label": "Libellé",
+    "labelPlaceholder": "ex. Dose du matin"
+  },
+  "availability": {
+    "title": "Ma disponibilité",
+    "subtitle": "Définissez votre disponibilité de consultation pour chaque jour",
+    "noSlots": "Aucune disponibilité définie",
+    "addSlot": "Ajouter un créneau",
+    "removeSlot": "Supprimer",
+    "slotDuration": "Durée du créneau",
+    "minutes": "{{count}} min",
+    "save": "Enregistrer la disponibilité",
+    "saved": "Disponibilité enregistrée",
+    "startTime": "De",
+    "endTime": "À"
+  },
+  "calendar": {
+    "monthView": "Mois",
+    "weekView": "Semaine",
+    "today": "Aujourd'hui",
+    "thisWeek": "Cette semaine",
+    "thisMonth": "Ce mois-ci",
+    "noEvents": "Aucun événement ce jour"
+  },
+  "days": {
+    "sun": "Dim",
+    "mon": "Lun",
+    "tue": "Mar",
+    "wed": "Mer",
+    "thu": "Jeu",
+    "fri": "Ven",
+    "sat": "Sam"
+  }
+}

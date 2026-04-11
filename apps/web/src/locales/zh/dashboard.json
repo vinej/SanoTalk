@@ -65,6 +65,8 @@
   "exercisesDesc": "训练计划和户外活动",
   "tasks": "任务与日程",
   "tasksDesc": "管理您的健康任务和随访",
+  "agenda": "日程",
+  "agendaDesc": "预约、用药提醒和您的日程安排",
   "installApp": "安装 SanoTalk",
   "installAppDescription": "添加到主屏幕，即使离线也能快速访问",
   "installButton": "安装"

@@ -1,0 +1,94 @@
+{
+  "title": "日程",
+  "subtitle": "您的预约、用药提醒和日程安排",
+  "tabs": {
+    "today": "今天",
+    "week": "本周",
+    "month": "本月",
+    "calendar": "日历",
+    "medications": "用药提醒",
+    "availability": "可用时间"
+  },
+  "today": {
+    "noEvents": "今天没有事件",
+    "upcoming": "即将到来",
+    "past": "已过",
+    "addEvent": "添加事件"
+  },
+  "event": {
+    "appointment": "预约",
+    "exercise": "锻炼",
+    "medication": "用药",
+    "editEvent": "编辑事件",
+    "deleteEvent": "删除事件",
+    "deleteConfirm": "确定要删除此事件吗？",
+    "deleted": "事件已删除",
+    "created": "事件已创建",
+    "updated": "事件已更新"
+  },
+  "form": {
+    "title": "标题",
+    "titlePlaceholder": "例如：看医生",
+    "description": "描述",
+    "descriptionPlaceholder": "可选详情",
+    "location": "地点",
+    "locationPlaceholder": "例如：市医院",
+    "date": "日期",
+    "startTime": "开始时间",
+    "endTime": "结束时间",
+    "allDay": "全天",
+    "eventType": "事件类型",
+    "recurrence": "重复",
+    "recurrenceNone": "不重复",
+    "recurrenceDaily": "每天",
+    "recurrenceWeekly": "每周",
+    "recurrenceMonthly": "每月",
+    "recurrenceSpecificDays": "每周特定日",
+    "save": "保存",
+    "cancel": "取消",
+    "color": "颜色"
+  },
+  "medications": {
+    "title": "用药提醒",
+    "subtitle": "为每种药物设置提醒时间",
+    "noMedications": "没有活跃的药物",
+    "noReminders": "未设置提醒",
+    "addTime": "添加提醒",
+    "removeTime": "删除",
+    "saveSchedule": "保存计划",
+    "saved": "计划已保存",
+    "timeOfDay": "时间",
+    "label": "标签",
+    "labelPlaceholder": "例如：早晨剂量"
+  },
+  "availability": {
+    "title": "我的可用时间",
+    "subtitle": "设置每天的咨询可用时间",
+    "noSlots": "未设置可用时间",
+    "addSlot": "添加时段",
+    "removeSlot": "删除",
+    "slotDuration": "时段时长",
+    "minutes": "{{count}} 分钟",
+    "save": "保存可用时间",
+    "saved": "可用时间已保存",
+    "startTime": "从",
+    "endTime": "到"
+  },
+  "calendar": {
+    "monthView": "月",
+    "weekView": "周",
+    "today": "今天",
+    "thisWeek": "本周",
+    "thisMonth": "本月",
+    "noEvents": "当天没有事件"
+  },
+  "days": {
+    "sun": "日",
+    "mon": "一",
+    "tue": "二",
+    "wed": "三",
+    "thu": "四",
+    "fri": "五",
+    "sat": "六"
+  }
+}

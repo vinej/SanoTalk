@@ -18,6 +18,7 @@ import enPrivacy from "../locales/en/privacy.json";
 import enChat from "../locales/en/chat.json";
 import enTrainBody from "../locales/en/trainBody.json";
 import enGoOutside from "../locales/en/goOutside.json";
+import enAgenda from "../locales/en/agenda.json";
 
 // French
 import frCommon from "../locales/fr/common.json";
@@ -35,6 +36,7 @@ import frPrivacy from "../locales/fr/privacy.json";
 import frChat from "../locales/fr/chat.json";
 import frTrainBody from "../locales/fr/trainBody.json";
 import frGoOutside from "../locales/fr/goOutside.json";
+import frAgenda from "../locales/fr/agenda.json";
 
 // Spanish
 import esCommon from "../locales/es/common.json";
@@ -52,6 +54,7 @@ import esPrivacy from "../locales/es/privacy.json";
 import esChat from "../locales/es/chat.json";
 import esTrainBody from "../locales/es/trainBody.json";
 import esGoOutside from "../locales/es/goOutside.json";
+import esAgenda from "../locales/es/agenda.json";
 
 // Chinese (Simplified)
 import zhCommon from "../locales/zh/common.json";
@@ -69,6 +72,7 @@ import zhPrivacy from "../locales/zh/privacy.json";
 import zhChat from "../locales/zh/chat.json";
 import zhTrainBody from "../locales/zh/trainBody.json";
 import zhGoOutside from "../locales/zh/goOutside.json";
+import zhAgenda from "../locales/zh/agenda.json";
 
 // Arabic
 import arCommon from "../locales/ar/common.json";
@@ -86,6 +90,7 @@ import arPrivacy from "../locales/ar/privacy.json";
 import arChat from "../locales/ar/chat.json";
 import arTrainBody from "../locales/ar/trainBody.json";
 import arGoOutside from "../locales/ar/goOutside.json";
+import arAgenda from "../locales/ar/agenda.json";
 
 // Hindi
 import hiCommon from "../locales/hi/common.json";
@@ -103,6 +108,7 @@ import hiPrivacy from "../locales/hi/privacy.json";
 import hiChat from "../locales/hi/chat.json";
 import hiTrainBody from "../locales/hi/trainBody.json";
 import hiGoOutside from "../locales/hi/goOutside.json";
+import hiAgenda from "../locales/hi/agenda.json";
 
 export const SUPPORTED_LANGUAGES = [
   { code: "en", label: "English", flag: "🇺🇸" },
@@ -126,12 +132,12 @@ i18n
   .use(initReactI18next)
   .init({
     resources: {
-      en: { common: enCommon, dashboard: enDashboard, kanban: enKanban, sessions: enSessions, profile: enProfile, auth: enAuth, healthHelp: enHealthHelp, vitals: enVitals, medications: enMedications, symptoms: enSymptoms, allergies: enAllergies, privacy: enPrivacy, chat: enChat, trainBody: enTrainBody, goOutside: enGoOutside },
-      fr: { common: frCommon, dashboard: frDashboard, kanban: frKanban, sessions: frSessions, profile: frProfile, auth: frAuth, healthHelp: frHealthHelp, vitals: frVitals, medications: frMedications, symptoms: frSymptoms, allergies: frAllergies, privacy: frPrivacy, chat: frChat, trainBody: frTrainBody, goOutside: frGoOutside },
-      es: { common: esCommon, dashboard: esDashboard, kanban: esKanban, sessions: esSessions, profile: esProfile, auth: esAuth, healthHelp: esHealthHelp, vitals: esVitals, medications: esMedications, symptoms: esSymptoms, allergies: esAllergies, privacy: esPrivacy, chat: esChat, trainBody: esTrainBody, goOutside: esGoOutside },
-      zh: { common: zhCommon, dashboard: zhDashboard, kanban: zhKanban, sessions: zhSessions, profile: zhProfile, auth: zhAuth, healthHelp: zhHealthHelp, vitals: zhVitals, medications: zhMedications, symptoms: zhSymptoms, allergies: zhAllergies, privacy: zhPrivacy, chat: zhChat, trainBody: zhTrainBody, goOutside: zhGoOutside },
-      ar: { common: arCommon, dashboard: arDashboard, kanban: arKanban, sessions: arSessions, profile: arProfile, auth: arAuth, healthHelp: arHealthHelp, vitals: arVitals, medications: arMedications, symptoms: arSymptoms, allergies: arAllergies, privacy: arPrivacy, chat: arChat, trainBody: arTrainBody, goOutside: arGoOutside },
-      hi: { common: hiCommon, dashboard: hiDashboard, kanban: hiKanban, sessions: hiSessions, profile: hiProfile, auth: hiAuth, healthHelp: hiHealthHelp, vitals: hiVitals, medications: hiMedications, symptoms: hiSymptoms, allergies: hiAllergies, privacy: hiPrivacy, chat: hiChat, trainBody: hiTrainBody, goOutside: hiGoOutside },
+      en: { common: enCommon, dashboard: enDashboard, kanban: enKanban, sessions: enSessions, profile: enProfile, auth: enAuth, healthHelp: enHealthHelp, vitals: enVitals, medications: enMedications, symptoms: enSymptoms, allergies: enAllergies, privacy: enPrivacy, chat: enChat, trainBody: enTrainBody, goOutside: enGoOutside, agenda: enAgenda },
+      fr: { common: frCommon, dashboard: frDashboard, kanban: frKanban, sessions: frSessions, profile: frProfile, auth: frAuth, healthHelp: frHealthHelp, vitals: frVitals, medications: frMedications, symptoms: frSymptoms, allergies: frAllergies, privacy: frPrivacy, chat: frChat, trainBody: frTrainBody, goOutside: frGoOutside, agenda: frAgenda },
+      es: { common: esCommon, dashboard: esDashboard, kanban: esKanban, sessions: esSessions, profile: esProfile, auth: esAuth, healthHelp: esHealthHelp, vitals: esVitals, medications: esMedications, symptoms: esSymptoms, allergies: esAllergies, privacy: esPrivacy, chat: esChat, trainBody: esTrainBody, goOutside: esGoOutside, agenda: esAgenda },
+      zh: { common: zhCommon, dashboard: zhDashboard, kanban: zhKanban, sessions: zhSessions, profile: zhProfile, auth: zhAuth, healthHelp: zhHealthHelp, vitals: zhVitals, medications: zhMedications, symptoms: zhSymptoms, allergies: zhAllergies, privacy: zhPrivacy, chat: zhChat, trainBody: zhTrainBody, goOutside: zhGoOutside, agenda: zhAgenda },
+      ar: { common: arCommon, dashboard: arDashboard, kanban: arKanban, sessions: arSessions, profile: arProfile, auth: arAuth, healthHelp: arHealthHelp, vitals: arVitals, medications: arMedications, symptoms: arSymptoms, allergies: arAllergies, privacy: arPrivacy, chat: arChat, trainBody: arTrainBody, goOutside: arGoOutside, agenda: arAgenda },
+      hi: { common: hiCommon, dashboard: hiDashboard, kanban: hiKanban, sessions: hiSessions, profile: hiProfile, auth: hiAuth, healthHelp: hiHealthHelp, vitals: hiVitals, medications: hiMedications, symptoms: hiSymptoms, allergies: hiAllergies, privacy: hiPrivacy, chat: hiChat, trainBody: hiTrainBody, goOutside: hiGoOutside, agenda: hiAgenda },
     },
     fallbackLng: "en",
     defaultNS: "common",

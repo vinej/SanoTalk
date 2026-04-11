@@ -1,0 +1,94 @@
+{
+  "title": "एजेंडा",
+  "subtitle": "आपकी अपॉइंटमेंट, दवा अनुस्मारक और शेड्यूल",
+  "tabs": {
+    "today": "आज",
+    "week": "सप्ताह",
+    "month": "महीना",
+    "calendar": "कैलेंडर",
+    "medications": "दवाइयाँ",
+    "availability": "उपलब्धता"
+  },
+  "today": {
+    "noEvents": "आज कोई कार्यक्रम नहीं",
+    "upcoming": "आगामी",
+    "past": "बीता हुआ",
+    "addEvent": "कार्यक्रम जोड़ें"
+  },
+  "event": {
+    "appointment": "अपॉइंटमेंट",
+    "exercise": "व्यायाम",
+    "medication": "दवा",
+    "editEvent": "कार्यक्रम संपादित करें",
+    "deleteEvent": "कार्यक्रम हटाएं",
+    "deleteConfirm": "क्या आप वाकई इस कार्यक्रम को हटाना चाहते हैं?",
+    "deleted": "कार्यक्रम हटाया गया",
+    "created": "कार्यक्रम बनाया गया",
+    "updated": "कार्यक्रम अपडेट किया गया"
+  },
+  "form": {
+    "title": "शीर्षक",
+    "titlePlaceholder": "जैसे: डॉक्टर की अपॉइंटमेंट",
+    "description": "विवरण",
+    "descriptionPlaceholder": "वैकल्पिक विवरण",
+    "location": "स्थान",
+    "locationPlaceholder": "जैसे: शहर का अस्पताल",
+    "date": "तिथि",
+    "startTime": "प्रारंभ समय",
+    "endTime": "समाप्ति समय",
+    "allDay": "पूरे दिन",
+    "eventType": "कार्यक्रम प्रकार",
+    "recurrence": "दोहराएं",
+    "recurrenceNone": "दोहराएं नहीं",
+    "recurrenceDaily": "दैनिक",
+    "recurrenceWeekly": "साप्ताहिक",
+    "recurrenceMonthly": "मासिक",
+    "recurrenceSpecificDays": "सप्ताह के विशिष्ट दिन",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "color": "रंग"
+  },
+  "medications": {
+    "title": "दवा अनुस्मारक",
+    "subtitle": "प्रत्येक दवा के लिए अनुस्मारक समय निर्धारित करें",
+    "noMedications": "कोई सक्रिय दवा नहीं",
+    "noReminders": "कोई अनुस्मारक सेट नहीं",
+    "addTime": "अनुस्मारक जोड़ें",
+    "removeTime": "हटाएं",
+    "saveSchedule": "शेड्यूल सहेजें",
+    "saved": "शेड्यूल सहेजा गया",
+    "timeOfDay": "समय",
+    "label": "लेबल",
+    "labelPlaceholder": "जैसे: सुबह की खुराक"
+  },
+  "availability": {
+    "title": "मेरी उपलब्धता",
+    "subtitle": "प्रत्येक दिन के लिए अपनी परामर्श उपलब्धता सेट करें",
+    "noSlots": "कोई उपलब्धता सेट नहीं",
+    "addSlot": "स्लॉट जोड़ें",
+    "removeSlot": "हटाएं",
+    "slotDuration": "स्लॉट अवधि",
+    "minutes": "{{count}} मिनट",
+    "save": "उपलब्धता सहेजें",
+    "saved": "उपलब्धता सहेजी गई",
+    "startTime": "से",
+    "endTime": "तक"
+  },
+  "calendar": {
+    "monthView": "महीना",
+    "weekView": "सप्ताह",
+    "today": "आज",
+    "thisWeek": "इस सप्ताह",
+    "thisMonth": "इस महीने",
+    "noEvents": "इस दिन कोई कार्यक्रम नहीं"
+  },
+  "days": {
+    "sun": "रवि",
+    "mon": "सोम",
+    "tue": "मंगल",
+    "wed": "बुध",
+    "thu": "गुरु",
+    "fri": "शुक्र",
+    "sat": "शनि"
+  }
+}

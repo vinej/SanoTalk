@@ -36,6 +36,7 @@ import { Route as AuthDashboardRouteImport } from './routes/_auth/dashboard'
 import { Route as AuthCompanionRouteImport } from './routes/_auth/companion'
 import { Route as AuthAllergiesRouteImport } from './routes/_auth/allergies'
 import { Route as AuthAiAssistantRouteImport } from './routes/_auth/ai-assistant'
+import { Route as AuthAgendaRouteImport } from './routes/_auth/agenda'
 import { Route as AuthAdminPanelRouteImport } from './routes/_auth/admin-panel'
 import { Route as AuthAdminBreachesRouteImport } from './routes/_auth/admin-breaches'
 import { Route as AuthAdminApprovalsRouteImport } from './routes/_auth/admin-approvals'
@@ -177,6 +178,11 @@ const AuthAiAssistantRoute = AuthAiAssistantRouteImport.update({
   path: '/ai-assistant',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthAgendaRoute = AuthAgendaRouteImport.update({
+  id: '/agenda',
+  path: '/agenda',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthAdminPanelRoute = AuthAdminPanelRouteImport.update({
   id: '/admin-panel',
   path: '/admin-panel',
@@ -220,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/admin-approvals': typeof AuthAdminApprovalsRoute
   '/admin-breaches': typeof AuthAdminBreachesRoute
   '/admin-panel': typeof AuthAdminPanelRoute
+  '/agenda': typeof AuthAgendaRoute
   '/ai-assistant': typeof AuthAiAssistantRoute
   '/allergies': typeof AuthAllergiesRoute
   '/companion': typeof AuthCompanionRoute
@@ -253,6 +260,7 @@ export interface FileRoutesByTo {
   '/admin-approvals': typeof AuthAdminApprovalsRoute
   '/admin-breaches': typeof AuthAdminBreachesRoute
   '/admin-panel': typeof AuthAdminPanelRoute
+  '/agenda': typeof AuthAgendaRoute
   '/ai-assistant': typeof AuthAiAssistantRoute
   '/allergies': typeof AuthAllergiesRoute
   '/companion': typeof AuthCompanionRoute
@@ -289,6 +297,7 @@ export interface FileRoutesById {
   '/_auth/admin-approvals': typeof AuthAdminApprovalsRoute
   '/_auth/admin-breaches': typeof AuthAdminBreachesRoute
   '/_auth/admin-panel': typeof AuthAdminPanelRoute
+  '/_auth/agenda': typeof AuthAgendaRoute
   '/_auth/ai-assistant': typeof AuthAiAssistantRoute
   '/_auth/allergies': typeof AuthAllergiesRoute
   '/_auth/companion': typeof AuthCompanionRoute
@@ -326,6 +335,7 @@ export interface FileRouteTypes {
     | '/admin-approvals'
     | '/admin-breaches'
     | '/admin-panel'
+    | '/agenda'
     | '/ai-assistant'
     | '/allergies'
     | '/companion'
@@ -359,6 +369,7 @@ export interface FileRouteTypes {
     | '/admin-approvals'
     | '/admin-breaches'
     | '/admin-panel'
+    | '/agenda'
     | '/ai-assistant'
     | '/allergies'
     | '/companion'
@@ -394,6 +405,7 @@ export interface FileRouteTypes {
     | '/_auth/admin-approvals'
     | '/_auth/admin-breaches'
     | '/_auth/admin-panel'
+    | '/_auth/agenda'
     | '/_auth/ai-assistant'
     | '/_auth/allergies'
     | '/_auth/companion'
@@ -620,6 +632,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthAiAssistantRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/agenda': {
+      id: '/_auth/agenda'
+      path: '/agenda'
+      fullPath: '/agenda'
+      preLoaderRoute: typeof AuthAgendaRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/admin-panel': {
       id: '/_auth/admin-panel'
       path: '/admin-panel'
@@ -669,6 +688,7 @@ interface AuthRouteChildren {
   AuthAdminApprovalsRoute: typeof AuthAdminApprovalsRoute
   AuthAdminBreachesRoute: typeof AuthAdminBreachesRoute
   AuthAdminPanelRoute: typeof AuthAdminPanelRoute
+  AuthAgendaRoute: typeof AuthAgendaRoute
   AuthAiAssistantRoute: typeof AuthAiAssistantRoute
   AuthAllergiesRoute: typeof AuthAllergiesRoute
   AuthCompanionRoute: typeof AuthCompanionRoute
@@ -697,6 +717,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthAdminApprovalsRoute: AuthAdminApprovalsRoute,
   AuthAdminBreachesRoute: AuthAdminBreachesRoute,
   AuthAdminPanelRoute: AuthAdminPanelRoute,
+  AuthAgendaRoute: AuthAgendaRoute,
   AuthAiAssistantRoute: AuthAiAssistantRoute,
   AuthAllergiesRoute: AuthAllergiesRoute,
   AuthCompanionRoute: AuthCompanionRoute,

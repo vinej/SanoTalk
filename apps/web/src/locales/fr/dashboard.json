@@ -65,6 +65,8 @@
   "exercisesDesc": "Programmes d'entraînement et activités en plein air",
   "tasks": "Tâches & Agendas",
   "tasksDesc": "Gérez vos tâches de santé et suivis",
+  "agenda": "Agenda",
+  "agendaDesc": "Rendez-vous, rappels de médicaments et votre emploi du temps",
   "installApp": "Installer SanoTalk",
   "installAppDescription": "Ajoutez à votre écran d'accueil pour un accès rapide, même hors ligne",
   "installButton": "Installer"

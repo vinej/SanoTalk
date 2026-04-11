@@ -239,6 +239,13 @@
       "when": 1775914452589,
       "tag": "0033_fluffy_amazoness",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1775917716955,
+      "tag": "0034_safe_betty_ross",
+      "breakpoints": true
     }
   ]
 }

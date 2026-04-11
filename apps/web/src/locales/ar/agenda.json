@@ -1,0 +1,94 @@
+{
+  "title": "الأجندة",
+  "subtitle": "مواعيدك وتذكيرات الأدوية وجدولك الزمني",
+  "tabs": {
+    "today": "اليوم",
+    "week": "الأسبوع",
+    "month": "الشهر",
+    "calendar": "التقويم",
+    "medications": "الأدوية",
+    "availability": "التوفر"
+  },
+  "today": {
+    "noEvents": "لا توجد أحداث اليوم",
+    "upcoming": "القادمة",
+    "past": "الماضية",
+    "addEvent": "إضافة حدث"
+  },
+  "event": {
+    "appointment": "موعد",
+    "exercise": "تمرين",
+    "medication": "دواء",
+    "editEvent": "تعديل الحدث",
+    "deleteEvent": "حذف الحدث",
+    "deleteConfirm": "هل أنت متأكد من حذف هذا الحدث؟",
+    "deleted": "تم حذف الحدث",
+    "created": "تم إنشاء الحدث",
+    "updated": "تم تحديث الحدث"
+  },
+  "form": {
+    "title": "العنوان",
+    "titlePlaceholder": "مثال: موعد مع الطبيب",
+    "description": "الوصف",
+    "descriptionPlaceholder": "تفاصيل اختيارية",
+    "location": "الموقع",
+    "locationPlaceholder": "مثال: مستشفى المدينة",
+    "date": "التاريخ",
+    "startTime": "وقت البدء",
+    "endTime": "وقت الانتهاء",
+    "allDay": "طوال اليوم",
+    "eventType": "نوع الحدث",
+    "recurrence": "التكرار",
+    "recurrenceNone": "لا يتكرر",
+    "recurrenceDaily": "يومي",
+    "recurrenceWeekly": "أسبوعي",
+    "recurrenceMonthly": "شهري",
+    "recurrenceSpecificDays": "أيام محددة من الأسبوع",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "color": "اللون"
+  },
+  "medications": {
+    "title": "تذكيرات الأدوية",
+    "subtitle": "حدد أوقات التذكير لكل دواء",
+    "noMedications": "لا توجد أدوية نشطة",
+    "noReminders": "لم يتم تعيين تذكيرات",
+    "addTime": "إضافة تذكير",
+    "removeTime": "حذف",
+    "saveSchedule": "حفظ الجدول",
+    "saved": "تم حفظ الجدول",
+    "timeOfDay": "الوقت",
+    "label": "التسمية",
+    "labelPlaceholder": "مثال: جرعة الصباح"
+  },
+  "availability": {
+    "title": "توفري",
+    "subtitle": "حدد أوقات الاستشارة المتاحة لكل يوم",
+    "noSlots": "لم يتم تعيين أوقات التوفر",
+    "addSlot": "إضافة فترة",
+    "removeSlot": "حذف",
+    "slotDuration": "مدة الفترة",
+    "minutes": "{{count}} دقيقة",
+    "save": "حفظ التوفر",
+    "saved": "تم حفظ التوفر",
+    "startTime": "من",
+    "endTime": "إلى"
+  },
+  "calendar": {
+    "monthView": "شهر",
+    "weekView": "أسبوع",
+    "today": "اليوم",
+    "thisWeek": "هذا الأسبوع",
+    "thisMonth": "هذا الشهر",
+    "noEvents": "لا توجد أحداث في هذا اليوم"
+  },
+  "days": {
+    "sun": "أحد",
+    "mon": "إثنين",
+    "tue": "ثلاثاء",
+    "wed": "أربعاء",
+    "thu": "خميس",
+    "fri": "جمعة",
+    "sat": "سبت"
+  }
+}
