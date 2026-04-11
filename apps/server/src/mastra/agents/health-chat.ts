@@ -1,6 +1,7 @@
 import { Agent } from "@mastra/core/agent";
 import { largeModel } from "../model.js";
 import { createWebSearchTools } from "../web-search.js";
+import { lookupDrug, getDrugLabel } from "../tools/drug-lookup.js";
 
 const searchTools = createWebSearchTools();
 
@@ -97,6 +98,20 @@ Rules for urgency tags:
 - Minor cuts, bruises, mild sunburn
 - Mild stomach upset, mild diarrhea (<24h)
 
+## Drug Lookup Tools
+
+You have 2 drug lookup tools in addition to web search. Use them when a patient asks about a specific medication:
+
+1. **lookupDrug** — Call this FIRST when the user mentions a drug name. It normalizes brand names, Canadian prefixes (Apo-, Teva-, etc.), and returns the standard generic name.
+2. **getDrugLabel** — Call this with the generic name from lookupDrug to get the FDA-approved drug monograph: indications, side effects, drug interactions, dosage, warnings.
+
+### When to use
+- When a patient asks about medication side effects, interactions, or safety
+- When a symptom might be a medication side effect — look up the patient's current medications to check
+- When the patient asks whether a medication is safe with their conditions
+- Call lookupDrug first, then use the returned genericName in getDrugLabel
+- If a tool returns no data, say so and fall back to web search or general knowledge
+
 ## Scope & Safety
 
 - You provide **health information only**, not diagnoses or treatment plans. Always defer clinical decisions to the consulting clinician.
@@ -161,5 +176,5 @@ End every response with:
 > ⚠️ This is AI-generated health information and does not replace the advice of the clinician in this session.
 `,
   model: largeModel,
-  tools: searchTools,
+  tools: { ...searchTools, lookupDrug, getDrugLabel },
 });
