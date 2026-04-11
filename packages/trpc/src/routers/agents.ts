@@ -100,9 +100,7 @@ async function getUserContext(db: DB, userId: string) {
       .where(eq(chronicCondition.userId, userId))
       .limit(50),
   ]);
-  // Filter out sensitive PII that AI agents should never see
-  const SENSITIVE_KEYS = new Set(["ramq_number", "ramq_expiry"]);
-  const safeProperties = properties.filter(p => !SENSITIVE_KEYS.has(p.key));
+  const safeProperties = properties;
 
   // Decrypt all encrypted PHI fields before passing to AI context builders
   return {

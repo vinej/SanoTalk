@@ -70,9 +70,7 @@
       "phone": "+33 6 12 34 56 78",
       "birth_date": "1990-03-26",
       "marital_status": "célibataire",
-      "living_situation": "seul(e)",
-      "ramq_number": "VINJ 9001 0151",
-      "ramq_expiry": "2027-06"
+      "living_situation": "seul(e)"
     },
     "keys": {
       "blood_type": "Groupe sanguin",
@@ -96,26 +94,11 @@
       "phone": "Téléphone",
       "birth_date": "Date de naissance",
       "marital_status": "Situation familiale",
-      "living_situation": "Situation de vie",
-      "ramq_number": "Numéro de carte RAMQ",
-      "ramq_expiry": "Expiration carte RAMQ"
+      "living_situation": "Situation de vie"
     }
   },
-  "ramq": {
-    "title": "Assurance maladie RAMQ",
-    "description": "Régime public d'assurance maladie du Québec (Régie de l'assurance maladie du Québec)",
-    "cardNumber": "Numéro de carte",
-    "cardExpiry": "Date d'expiration",
-    "noCardYet": "Aucune information de carte RAMQ enregistrée.",
-    "addCard": "Ajouter une carte RAMQ",
-    "editCard": "Modifier",
-    "saveCard": "Enregistrer",
-    "cancelEdit": "Annuler",
-    "removeCard": "Supprimer les infos RAMQ",
-    "confirmRemove": "Supprimer",
-    "portalLink": "Services en ligne RAMQ",
-    "portalDescription": "Accédez à votre compte RAMQ, vérifiez votre admissibilité, commandez une carte de remplacement.",
-    "coverageTitle": "Ce que couvre la RAMQ",
+  "ramqCoverage": {
+    "title": "Ce que couvre la RAMQ",
     "coverage_0": "Consultations médicales (omnipraticien et spécialiste)",
     "coverage_1": "Hospitalisation, chirurgie et services diagnostiques",
     "coverage_2": "Analyses de laboratoire et imagerie médicale",
@@ -123,10 +106,6 @@
     "coverage_4": "Examens de la vue (enfants de moins de 18 ans, aînés de 65 ans et plus)",
     "coverage_5": "Psychiatrie et services de santé mentale",
     "coverage_6": "Assurance médicaments (pour ceux sans couverture privée)",
-    "coverageNote": "La couverture peut varier. Consultez ramq.gouv.qc.ca pour les informations les plus récentes.",
-    "expiryValid": "Valide jusqu'au {{date}}",
-    "expirySoon": "Votre carte RAMQ expire bientôt : {{date}}. Pensez à la renouveler.",
-    "expiryExpired": "Votre carte RAMQ est expirée ({{date}}). Renouvelez-la sur le portail RAMQ.",
-    "invalidNumber": "Format invalide. Attendu : ABCD 1234 5678"
+    "note": "La couverture peut varier. Consultez ramq.gouv.qc.ca pour les informations les plus récentes."
   }
 }

@@ -5,7 +5,7 @@ const IV_LENGTH = 12;
 const PREFIX = "enc:v1:";
 
 /** Keys that must be encrypted at rest. */
-export const ENCRYPTED_KEYS = new Set(["ramq_number", "ramq_expiry"]);
+export const ENCRYPTED_KEYS = new Set<string>([]);
 
 function getKey(): Buffer {
   const hex = process.env.ENCRYPTION_KEY;

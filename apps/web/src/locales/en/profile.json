@@ -70,9 +70,7 @@
       "phone": "+1 514 555 0123",
       "birth_date": "1990-03-26",
       "marital_status": "single",
-      "living_situation": "alone",
-      "ramq_number": "VINJ 9001 0151",
-      "ramq_expiry": "2027-06"
+      "living_situation": "alone"
     },
     "keys": {
       "blood_type": "Blood type",
@@ -96,26 +94,11 @@
       "phone": "Phone",
       "birth_date": "Date of birth",
       "marital_status": "Marital status",
-      "living_situation": "Living situation",
-      "ramq_number": "RAMQ Card Number",
-      "ramq_expiry": "RAMQ Card Expiry"
+      "living_situation": "Living situation"
     }
   },
-  "ramq": {
-    "title": "RAMQ Health Insurance",
-    "description": "Quebec public health insurance (Régie de l'assurance maladie du Québec)",
-    "cardNumber": "Card Number",
-    "cardExpiry": "Expiry Date",
-    "noCardYet": "No RAMQ card information saved yet.",
-    "addCard": "Add RAMQ Card",
-    "editCard": "Edit",
-    "saveCard": "Save",
-    "cancelEdit": "Cancel",
-    "removeCard": "Remove RAMQ Info",
-    "confirmRemove": "Remove",
-    "portalLink": "RAMQ Online Services",
-    "portalDescription": "Access your RAMQ account, check eligibility, order a replacement card.",
-    "coverageTitle": "What RAMQ Covers",
+  "ramqCoverage": {
+    "title": "What RAMQ Covers",
     "coverage_0": "Physician visits (general practitioner and specialist)",
     "coverage_1": "Hospital stays, surgery and diagnostic services",
     "coverage_2": "Laboratory tests and medical imaging",
@@ -123,10 +106,6 @@
     "coverage_4": "Eye exams (children under 18, adults 65+)",
     "coverage_5": "Psychiatry and mental health services",
     "coverage_6": "Prescription drug insurance (for those without private coverage)",
-    "coverageNote": "Coverage may vary. Visit ramq.gouv.qc.ca for the most up-to-date information.",
-    "expiryValid": "Valid until {{date}}",
-    "expirySoon": "Your RAMQ card expires soon: {{date}}. Consider renewing.",
-    "expiryExpired": "Your RAMQ card has expired ({{date}}). Renew it on the RAMQ portal.",
-    "invalidNumber": "Invalid format. Expected: ABCD 1234 5678"
+    "note": "Coverage may vary. Visit ramq.gouv.qc.ca for the most up-to-date information."
   }
 }

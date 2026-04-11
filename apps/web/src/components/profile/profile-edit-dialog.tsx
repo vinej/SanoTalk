@@ -25,7 +25,6 @@ const PREDEFINED_KEYS = [
   "height", "weight", "bmi", "diet", "physical_activity", "smoking_status",
   "alcohol_consumption", "sleep_hours", "stress_level", "mood_baseline", "therapy_status",
   "city", "country", "region", "birth_date", "marital_status", "living_situation",
-  "ramq_number", "ramq_expiry",
 ];
 
 const SUPPORTED_LANGUAGES = [
