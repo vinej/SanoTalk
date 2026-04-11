@@ -225,6 +225,13 @@
       "when": 1775871254210,
       "tag": "0031_silly_patch",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1775911159219,
+      "tag": "0032_lowly_masque",
+      "breakpoints": true
     }
   ]
 }

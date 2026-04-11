@@ -41,6 +41,8 @@
   "friendChatDesc": "Start a conversation with your friends about health",
   "kanban": "Task Board",
   "kanbanDesc": "Manage your health tasks and follow-ups",
+  "trainBody": "Train Your Body",
+  "trainBodyDesc": "Exercise programs, Tai Chi, and fitness tracking for seniors",
   "adminApprovals": "User Approvals",
   "adminApprovalsDesc": "Review and approve pending user registrations",
   "approveButton": "Approve",

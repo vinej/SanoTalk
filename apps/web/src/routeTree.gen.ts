@@ -19,6 +19,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AuthIndexRouteImport } from './routes/_auth/index'
 import { Route as AuthVitalsRouteImport } from './routes/_auth/vitals'
+import { Route as AuthTrainBodyRouteImport } from './routes/_auth/train-body'
 import { Route as AuthTestAiRouteImport } from './routes/_auth/test-ai'
 import { Route as AuthSymptomsRouteImport } from './routes/_auth/symptoms'
 import { Route as AuthProfileRouteImport } from './routes/_auth/profile'
@@ -88,6 +89,11 @@ const AuthIndexRoute = AuthIndexRouteImport.update({
 const AuthVitalsRoute = AuthVitalsRouteImport.update({
   id: '/vitals',
   path: '/vitals',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthTrainBodyRoute = AuthTrainBodyRouteImport.update({
+  id: '/train-body',
+  path: '/train-body',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthTestAiRoute = AuthTestAiRouteImport.update({
@@ -223,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof AuthProfileRoute
   '/symptoms': typeof AuthSymptomsRoute
   '/test-ai': typeof AuthTestAiRoute
+  '/train-body': typeof AuthTrainBodyRoute
   '/vitals': typeof AuthVitalsRoute
   '/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
   '/sessions/new': typeof AuthSessionsNewRoute
@@ -254,6 +261,7 @@ export interface FileRoutesByTo {
   '/profile': typeof AuthProfileRoute
   '/symptoms': typeof AuthSymptomsRoute
   '/test-ai': typeof AuthTestAiRoute
+  '/train-body': typeof AuthTrainBodyRoute
   '/vitals': typeof AuthVitalsRoute
   '/': typeof AuthIndexRoute
   '/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
@@ -288,6 +296,7 @@ export interface FileRoutesById {
   '/_auth/profile': typeof AuthProfileRoute
   '/_auth/symptoms': typeof AuthSymptomsRoute
   '/_auth/test-ai': typeof AuthTestAiRoute
+  '/_auth/train-body': typeof AuthTrainBodyRoute
   '/_auth/vitals': typeof AuthVitalsRoute
   '/_auth/': typeof AuthIndexRoute
   '/_auth/sessions/$sessionId': typeof AuthSessionsSessionIdRoute
@@ -323,6 +332,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/symptoms'
     | '/test-ai'
+    | '/train-body'
     | '/vitals'
     | '/sessions/$sessionId'
     | '/sessions/new'
@@ -354,6 +364,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/symptoms'
     | '/test-ai'
+    | '/train-body'
     | '/vitals'
     | '/'
     | '/sessions/$sessionId'
@@ -387,6 +398,7 @@ export interface FileRouteTypes {
     | '/_auth/profile'
     | '/_auth/symptoms'
     | '/_auth/test-ai'
+    | '/_auth/train-body'
     | '/_auth/vitals'
     | '/_auth/'
     | '/_auth/sessions/$sessionId'
@@ -475,6 +487,13 @@ declare module '@tanstack/react-router' {
       path: '/vitals'
       fullPath: '/vitals'
       preLoaderRoute: typeof AuthVitalsRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/train-body': {
+      id: '/_auth/train-body'
+      path: '/train-body'
+      fullPath: '/train-body'
+      preLoaderRoute: typeof AuthTrainBodyRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/test-ai': {
@@ -646,6 +665,7 @@ interface AuthRouteChildren {
   AuthProfileRoute: typeof AuthProfileRoute
   AuthSymptomsRoute: typeof AuthSymptomsRoute
   AuthTestAiRoute: typeof AuthTestAiRoute
+  AuthTrainBodyRoute: typeof AuthTrainBodyRoute
   AuthVitalsRoute: typeof AuthVitalsRoute
   AuthIndexRoute: typeof AuthIndexRoute
   AuthSessionsSessionIdRoute: typeof AuthSessionsSessionIdRoute
@@ -672,6 +692,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthProfileRoute: AuthProfileRoute,
   AuthSymptomsRoute: AuthSymptomsRoute,
   AuthTestAiRoute: AuthTestAiRoute,
+  AuthTrainBodyRoute: AuthTrainBodyRoute,
   AuthVitalsRoute: AuthVitalsRoute,
   AuthIndexRoute: AuthIndexRoute,
   AuthSessionsSessionIdRoute: AuthSessionsSessionIdRoute,

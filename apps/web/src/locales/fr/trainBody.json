@@ -1,0 +1,393 @@
+{
+  "title": "Entraînez votre corps",
+  "subtitle": "Programmes d'exercices à domicile conçus pour les aînés",
+  "tabs": {
+    "exercises": "Exercices",
+    "progress": "Ma progression",
+    "resources": "Ressources"
+  },
+  "categories": {
+    "all": "Tous",
+    "tai_chi": "Tai Chi assis",
+    "stretching": "Étirements",
+    "balance": "Équilibre",
+    "strength": "Renforcement",
+    "cardio": "Cardio"
+  },
+  "difficulty": {
+    "all": "Tous les niveaux",
+    "beginner": "Débutant",
+    "intermediate": "Intermédiaire",
+    "advanced": "Avancé"
+  },
+  "exercise": {
+    "duration": "{{mins}} min",
+    "steps": "{{count}} étapes",
+    "viewExercise": "Voir l'exercice",
+    "logWorkout": "Enregistrer",
+    "completed": "Terminé !"
+  },
+  "progress": {
+    "thisWeek": "Cette semaine",
+    "streak": "Série actuelle",
+    "longestStreak": "Plus longue série",
+    "streakDays": "{{count}} jour(s)",
+    "totalWorkouts": "Total des entraînements",
+    "totalDuration": "Durée totale",
+    "minutes": "{{count}} min",
+    "noWorkouts": "Aucun entraînement enregistré. Commencez votre premier exercice !",
+    "history": "Historique des entraînements",
+    "deleteConfirm": "Supprimer cet entraînement ?"
+  },
+  "log": {
+    "title": "Enregistrer un entraînement",
+    "duration": "Durée (minutes)",
+    "notes": "Notes (optionnel)",
+    "notesPlaceholder": "Comment vous êtes-vous senti ?",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "cancel": "Annuler"
+  },
+  "resources": {
+    "title": "Ressources utiles",
+    "subtitle": "Sites externes fiables pour la mise en forme des aînés",
+    "visitSite": "Visiter le site"
+  },
+  "safety": {
+    "title": "Consignes de sécurité",
+    "disclaimer": "Consultez toujours votre médecin avant de commencer un nouveau programme d'exercices. Arrêtez immédiatement en cas de douleur, d'étourdissements ou d'essoufflement. Utilisez une chaise solide pour les exercices assis. Allez à votre rythme."
+  },
+  "resourceNames": {
+    "go4life": "Go4Life (NIA)",
+    "go4lifeDesc": "Ressources d'exercice et d'activité physique du National Institute on Aging",
+    "nhs_seniors": "NHS Exercices pour aînés",
+    "nhs_seniorsDesc": "Recommandations d'activité physique pour les personnes âgées du NHS britannique",
+    "tai_chi_health": "Tai Chi for Health Institute",
+    "tai_chi_healthDesc": "Programmes de Tai Chi fondés sur des données probantes, conçus par le Dr Paul Lam",
+    "silversneakers": "SilverSneakers",
+    "silversneakersDesc": "Programme de conditionnement physique pour aînés avec cours et entraînements en ligne",
+    "eldergym": "Eldergym Fitness",
+    "eldergymDesc": "Exercices sur chaise et routines de mise en forme pour la force et l'équilibre"
+  },
+  "exercises": {
+    "tai_chi_cloud_hands": {
+      "name": "Mains nuages (assis)",
+      "description": "Un mouvement doux et fluide des bras qui améliore la mobilité du haut du corps et la relaxation.",
+      "steps": [
+        "Asseyez-vous droit, pieds à plat sur le sol, mains sur les cuisses",
+        "Levez lentement la main droite à hauteur d'épaule, paume vers la gauche",
+        "Balayez la main droite devant vous vers la gauche en arc de cercle",
+        "En baissant la main droite, commencez à lever la main gauche",
+        "Alternez les mains en mouvement fluide pendant 8-10 répétitions",
+        "Respirez lentement et naturellement tout au long du mouvement"
+      ],
+      "safetyTip": "Gardez des mouvements lents et contrôlés. Ne tournez pas le torse au-delà du confort."
+    },
+    "tai_chi_brush_knee": {
+      "name": "Brosser le genou (assis)",
+      "description": "Un mouvement classique de Tai Chi adapté à la pratique assise, améliorant la coordination des bras.",
+      "steps": [
+        "Asseyez-vous droit, pieds à plat, écartés à la largeur des épaules",
+        "Levez la main droite près de l'oreille, paume vers l'avant",
+        "En même temps, amenez la main gauche au niveau de la hanche, paume vers le bas",
+        "Poussez la main droite vers l'avant tout en balayant la main gauche sur le genou",
+        "Revenez à la position de départ et changez de côté",
+        "Répétez 6-8 fois de chaque côté en respirant naturellement"
+      ],
+      "safetyTip": "Gardez le dos droit contre la chaise. Bougez uniquement les bras."
+    },
+    "tai_chi_repulse_monkey": {
+      "name": "Repousser le singe (assis)",
+      "description": "Un mouvement de recul adapté à la position assise, renforçant les bras et la coordination.",
+      "steps": [
+        "Asseyez-vous droit, pieds à plat, bras détendus",
+        "Étendez le bras droit vers l'avant à hauteur d'épaule, paume vers le haut",
+        "Amenez la main gauche derrière vous près de la hanche, paume vers le haut",
+        "Ramenez la main droite vers la hanche tout en poussant la main gauche vers l'avant",
+        "Les paumes se retournent pendant la transition",
+        "Alternez 6-8 répétitions de chaque côté",
+        "Maintenez une respiration lente et régulière"
+      ],
+      "safetyTip": "Concentrez-vous sur des transitions fluides. Ne précipitez pas les mouvements."
+    },
+    "tai_chi_wave_hands": {
+      "name": "Agiter les mains comme des nuages (assis)",
+      "description": "Un mouvement latéral fluide qui favorise la relaxation et une douce rotation de la colonne.",
+      "steps": [
+        "Asseyez-vous confortablement, pieds à plat, mains sur les genoux",
+        "Levez les deux mains à hauteur de poitrine, paumes vers le corps",
+        "Tournez lentement le haut du corps vers la droite en balayant les mains",
+        "En revenant au centre, laissez flotter les mains",
+        "Continuez la rotation vers la gauche",
+        "Répétez 8-10 fois en alternant les côtés"
+      ],
+      "safetyTip": "Tournez doucement à partir de la taille. Arrêtez si vous ressentez un inconfort dorsal."
+    },
+    "tai_chi_golden_rooster": {
+      "name": "Le coq d'or (assis)",
+      "description": "Un exercice d'équilibre assis avancé qui renforce les jambes et améliore la stabilité.",
+      "steps": [
+        "Asseyez-vous au bord avant d'une chaise solide, dos droit",
+        "Placez les deux mains sur vos cuisses pour le soutien",
+        "Levez lentement le genou droit aussi haut que confortable",
+        "En même temps, levez la main gauche à hauteur d'épaule, paume ouverte",
+        "Maintenez la position 3-5 secondes en vous concentrant sur l'équilibre",
+        "Abaissez lentement le genou et la main",
+        "Répétez de l'autre côté. Faites 5-6 répétitions par côté"
+      ],
+      "safetyTip": "Gardez une main sur l'assise si besoin. Ne vous penchez pas en arrière."
+    },
+    "stretch_neck_rolls": {
+      "name": "Rotations du cou",
+      "description": "Libère la tension dans le cou et les épaules. Peut se faire assis ou debout.",
+      "steps": [
+        "Asseyez-vous ou tenez-vous droit, épaules détendues",
+        "Laissez tomber lentement le menton vers la poitrine",
+        "Roulez doucement la tête vers la droite, oreille vers l'épaule",
+        "Continuez vers l'arrière puis vers la gauche",
+        "Faites un cercle complet lent, puis inversez le sens"
+      ],
+      "safetyTip": "Bougez très lentement. En cas de vertiges ou de douleur, réduisez l'amplitude."
+    },
+    "stretch_shoulder_shrugs": {
+      "name": "Haussements d'épaules",
+      "description": "Soulage la tension des épaules et du haut du dos.",
+      "steps": [
+        "Asseyez-vous ou tenez-vous debout, bras détendus",
+        "Levez lentement les deux épaules vers les oreilles",
+        "Maintenez 3-5 secondes",
+        "Relâchez naturellement vers le bas",
+        "Répétez 8-10 fois en expirant lors du relâchement"
+      ],
+      "safetyTip": "Ne forcez pas au-delà du confort. Gardez le cou détendu."
+    },
+    "stretch_seated_hamstring": {
+      "name": "Étirement des ischio-jambiers assis",
+      "description": "Étire l'arrière des cuisses en position assise. Maintient la souplesse des jambes.",
+      "steps": [
+        "Asseyez-vous au bord de la chaise",
+        "Étendez la jambe droite vers l'avant, talon au sol, orteils vers le haut",
+        "Gardez le pied gauche à plat, genou plié",
+        "Dos droit, penchez-vous lentement vers l'avant depuis les hanches",
+        "Avancez vers les orteils droits jusqu'à sentir un étirement doux",
+        "Maintenez 15-20 secondes, puis changez de jambe"
+      ],
+      "safetyTip": "Ne rebondissez pas. Gardez le dos droit — l'étirement vient de la flexion des hanches."
+    },
+    "stretch_ankle_circles": {
+      "name": "Cercles de chevilles",
+      "description": "Améliore la mobilité des chevilles et la circulation dans les jambes.",
+      "steps": [
+        "Asseyez-vous confortablement, pieds à plat",
+        "Soulevez légèrement le pied droit du sol",
+        "Faites tourner lentement la cheville dans le sens horaire",
+        "Faites 10 cercles, puis inversez le sens",
+        "Passez au pied gauche et répétez"
+      ],
+      "safetyTip": "Tenez-vous aux côtés de la chaise. Bougez lentement et régulièrement."
+    },
+    "stretch_wrist_hands": {
+      "name": "Étirements des poignets et mains",
+      "description": "Soulage la raideur des mains et poignets. Particulièrement utile pour l'arthrite.",
+      "steps": [
+        "Étendez le bras droit, paume vers le haut",
+        "Utilisez la main gauche pour tirer doucement les doigts droits vers le bas",
+        "Maintenez 10-15 secondes",
+        "Retournez la paume vers le bas et pressez doucement les doigts vers vous",
+        "Maintenez 10-15 secondes, puis changez de main",
+        "Terminez en faisant des poings doux et en relâchant 10 fois"
+      ],
+      "safetyTip": "Soyez doux. Les étirements ne doivent pas causer de douleur."
+    },
+    "balance_weight_shift": {
+      "name": "Transfert de poids",
+      "description": "Un exercice d'équilibre débutant qui enseigne la conscience de la répartition du poids.",
+      "steps": [
+        "Tenez-vous derrière une chaise solide, en tenant le dossier",
+        "Pieds écartés à la largeur des hanches",
+        "Transférez lentement le poids sur le pied droit",
+        "Maintenez 5-10 secondes",
+        "Transférez le poids sur le pied gauche et maintenez"
+      ],
+      "safetyTip": "Gardez toujours la chaise à portée. Ne lâchez pas tant que vous n'êtes pas confiant."
+    },
+    "balance_standing_march": {
+      "name": "Marche debout",
+      "description": "Améliore l'équilibre et la force des jambes en marchant sur place.",
+      "steps": [
+        "Tenez-vous derrière une chaise, main légèrement posée sur le dossier",
+        "Levez le genou droit aussi haut que confortable",
+        "Maintenez brièvement, puis abaissez lentement",
+        "Levez le genou gauche de la même façon",
+        "Alternez pendant 20 pas (10 de chaque côté)"
+      ],
+      "safetyTip": "Gardez la poitrine droite. Utilisez la chaise autant que nécessaire."
+    },
+    "balance_single_leg": {
+      "name": "Équilibre sur une jambe",
+      "description": "Exercice d'équilibre classique. Tenez-vous sur une jambe avec soutien de la chaise.",
+      "steps": [
+        "Tenez-vous à côté d'une chaise, une main sur le dossier",
+        "Levez lentement le pied droit de quelques centimètres",
+        "Essayez de tenir en équilibre sur la jambe gauche pendant 10-15 secondes",
+        "Posez le pied et reposez-vous brièvement",
+        "Changez de jambe",
+        "En progressant, essayez avec juste le bout des doigts sur la chaise"
+      ],
+      "safetyTip": "Gardez une prise ferme sur la chaise. Ne fermez jamais les yeux."
+    },
+    "balance_heel_toe_walk": {
+      "name": "Marche talon-pointe",
+      "description": "Marcher en ligne droite talon contre orteils pour l'équilibre et la coordination.",
+      "steps": [
+        "Tenez-vous près d'un mur ou comptoir pour le soutien",
+        "Placez le pied droit directement devant le gauche, talon contre orteils",
+        "Fixez un point devant vous pour l'équilibre",
+        "Avancez en plaçant le talon gauche contre les orteils droits",
+        "Continuez pendant 15-20 pas en ligne droite",
+        "Retournez-vous avec précaution et recommencez"
+      ],
+      "safetyTip": "Restez près d'un mur. Bougez lentement et délibérément."
+    },
+    "balance_tandem_stance": {
+      "name": "Position tandem statique",
+      "description": "Un défi d'équilibre statique avancé — maintenir la position talon-pointe prolongée.",
+      "steps": [
+        "Tenez-vous près d'un mur, une main le touchant légèrement",
+        "Placez un pied directement devant l'autre, talon contre orteils",
+        "Essayez de maintenir cette position pendant 30 secondes",
+        "Fixez un point fixe pour la stabilité",
+        "Changez quel pied est devant et répétez",
+        "En progressant, réduisez le contact avec le mur"
+      ],
+      "safetyTip": "Ayez toujours une surface de soutien à portée de bras."
+    },
+    "strength_chair_squats": {
+      "name": "Squats sur chaise",
+      "description": "Mouvement assis-debout avec chaise. Renforce les jambes pour les activités quotidiennes.",
+      "steps": [
+        "Asseyez-vous au bord d'une chaise solide, pieds écartés",
+        "Croisez les bras sur la poitrine ou étendez-les vers l'avant",
+        "Penchez-vous légèrement et poussez sur les talons pour vous lever",
+        "Faites une pause debout, bien droit",
+        "Rasseyez-vous lentement de façon contrôlée",
+        "Répétez 8-10 fois. Reposez-vous entre les séries"
+      ],
+      "safetyTip": "Utilisez les accoudoirs si nécessaire. Les genoux ne dépassent pas les orteils."
+    },
+    "strength_seated_leg_raise": {
+      "name": "Élévations de jambes assis",
+      "description": "Renforce les quadriceps en position assise. Excellent pour la stabilité des genoux.",
+      "steps": [
+        "Asseyez-vous droit, pieds à plat",
+        "Étendez lentement la jambe droite devant vous",
+        "Maintenez 3-5 secondes en contractant la cuisse",
+        "Abaissez lentement la jambe",
+        "Répétez 10 fois, puis changez de jambe"
+      ],
+      "safetyTip": "Tenez les côtés de la chaise. Bougez lentement, sans à-coups."
+    },
+    "strength_wall_pushups": {
+      "name": "Pompes murales",
+      "description": "Pompes debout contre un mur. Renforce la poitrine et les bras en toute sécurité.",
+      "steps": [
+        "Placez-vous face au mur, à environ un bras de distance",
+        "Posez les paumes à plat à hauteur et largeur d'épaules",
+        "Pliez lentement les coudes en vous penchant vers le mur",
+        "Le corps reste droit de la tête aux talons",
+        "Repoussez-vous à la position de départ",
+        "Répétez 8-12 fois"
+      ],
+      "safetyTip": "Gardez les pieds bien ancrés. Ne cambrez pas le bas du dos."
+    },
+    "strength_arm_curls": {
+      "name": "Flexions des bras (bouteilles d'eau)",
+      "description": "Flexions de biceps avec des bouteilles d'eau. Renforce les bras pour porter les courses.",
+      "steps": [
+        "Assis ou debout, une bouteille d'eau (500ml-1L) dans chaque main",
+        "Bras le long du corps, paumes vers l'avant",
+        "Levez lentement les deux bouteilles vers les épaules",
+        "Serrez brièvement en haut",
+        "Redescendez lentement à la position de départ",
+        "Répétez 10-12 fois pour 2 séries"
+      ],
+      "safetyTip": "Utilisez un poids confortable. Si c'est trop lourd, commencez avec des bouteilles vides."
+    },
+    "strength_calf_raises": {
+      "name": "Élévations de mollets",
+      "description": "Renforce les mollets pour une meilleure stabilité à la marche.",
+      "steps": [
+        "Tenez-vous derrière une chaise, mains sur le dossier",
+        "Pieds écartés à la largeur des hanches",
+        "Montez lentement sur la pointe des pieds",
+        "Maintenez 2-3 secondes en haut",
+        "Redescendez lentement les talons au sol",
+        "Répétez 12-15 fois pour 2 séries"
+      ],
+      "safetyTip": "Gardez une prise ferme sur la chaise. Contrôlez le mouvement."
+    },
+    "cardio_seated_march": {
+      "name": "Marche assise",
+      "description": "Un exercice cardio doux en position assise. Augmente le rythme cardiaque en toute sécurité.",
+      "steps": [
+        "Asseyez-vous droit, pieds à plat",
+        "Levez le genou droit vers la poitrine",
+        "Abaissez-le, puis levez le genou gauche",
+        "Continuez en alternant comme une marche",
+        "Balancez naturellement les bras"
+      ],
+      "safetyTip": "Commencez lentement et augmentez le rythme. Arrêtez si vous êtes essoufflé."
+    },
+    "cardio_arm_circles": {
+      "name": "Cercles de bras",
+      "description": "Cercles de bras assis ou debout qui échauffent les épaules et activent la circulation.",
+      "steps": [
+        "Assis ou debout, bras étendus sur les côtés à hauteur d'épaules",
+        "Faites de petits cercles vers l'avant",
+        "Augmentez progressivement la taille des cercles pendant 15 secondes",
+        "Inversez la direction pour des cercles vers l'arrière",
+        "Faites 30 secondes dans chaque direction"
+      ],
+      "safetyTip": "Baissez les bras si les épaules fatiguent. Respirez tout au long."
+    },
+    "cardio_step_in_place": {
+      "name": "Marche sur place",
+      "description": "Marche debout énergique. Exercice cardio modéré pour développer l'endurance.",
+      "steps": [
+        "Tenez-vous derrière une chaise pour le soutien",
+        "Marchez sur place en levant les genoux de plus en plus haut",
+        "Ajoutez le mouvement des bras — balancez le bras opposé",
+        "Maintenez un rythme régulier pendant 2-3 minutes",
+        "Ralentissez progressivement, puis reposez-vous 30 secondes",
+        "Répétez pour 2-3 intervalles"
+      ],
+      "safetyTip": "Gardez la chaise à proximité. Si vous êtes essoufflé, passez à la marche assise."
+    },
+    "cardio_seated_jacks": {
+      "name": "Jumping jacks assis",
+      "description": "Version adaptée à la chaise des jumping jacks. Travaille bras et jambes pour le cardio.",
+      "steps": [
+        "Asseyez-vous droit, pieds joints, bras le long du corps",
+        "Écartez simultanément les jambes et levez les bras au-dessus de la tête",
+        "Ramenez jambes et bras ensemble",
+        "Continuez à un rythme confortable pendant 30 secondes",
+        "Reposez-vous 15 secondes, puis répétez 3 fois",
+        "Coordonnez la respiration : inspirez en ouvrant, expirez en fermant"
+      ],
+      "safetyTip": "Restez bien assis sur la chaise. Réduisez l'amplitude si les épaules sont raides."
+    },
+    "cardio_side_steps": {
+      "name": "Pas latéraux debout",
+      "description": "Pas latéraux pour le cardio et la mobilité des hanches.",
+      "steps": [
+        "Debout, pieds joints, bras le long du corps ou sur les hanches",
+        "Faites un pas vers la droite avec le pied droit",
+        "Ramenez le pied gauche pour le rejoindre",
+        "Faites 4-5 pas vers la droite, puis inversez vers la gauche",
+        "Ajoutez des mouvements de bras — levez les bras sur les côtés",
+        "Continuez pendant 2-3 minutes à un rythme régulier"
+      ],
+      "safetyTip": "Assurez-vous que l'espace est dégagé. Restez près d'un comptoir ou mur."
+    }
+  }
+}

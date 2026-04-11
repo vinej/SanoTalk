@@ -1,0 +1,99 @@
+{
+  "title": "Entrena tu cuerpo",
+  "subtitle": "Programas de ejercicios en casa diseñados para personas mayores",
+  "tabs": {
+    "exercises": "Ejercicios",
+    "progress": "Mi progreso",
+    "resources": "Recursos"
+  },
+  "categories": {
+    "all": "Todos",
+    "tai_chi": "Tai Chi sentado",
+    "stretching": "Estiramientos",
+    "balance": "Equilibrio",
+    "strength": "Fuerza",
+    "cardio": "Cardio"
+  },
+  "difficulty": {
+    "all": "Todos los niveles",
+    "beginner": "Principiante",
+    "intermediate": "Intermedio",
+    "advanced": "Avanzado"
+  },
+  "exercise": {
+    "duration": "{{mins}} min",
+    "steps": "{{count}} pasos",
+    "viewExercise": "Ver ejercicio",
+    "logWorkout": "Registrar",
+    "completed": "¡Completado!"
+  },
+  "progress": {
+    "thisWeek": "Esta semana",
+    "streak": "Racha actual",
+    "longestStreak": "Racha más larga",
+    "streakDays": "{{count}} día(s)",
+    "totalWorkouts": "Total de entrenamientos",
+    "totalDuration": "Duración total",
+    "minutes": "{{count}} min",
+    "noWorkouts": "No hay entrenamientos registrados. ¡Empieza tu primer ejercicio!",
+    "history": "Historial de entrenamientos",
+    "deleteConfirm": "¿Eliminar este registro de entrenamiento?"
+  },
+  "log": {
+    "title": "Registrar entrenamiento",
+    "duration": "Duración (minutos)",
+    "notes": "Notas (opcional)",
+    "notesPlaceholder": "¿Cómo te sentiste?",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "cancel": "Cancelar"
+  },
+  "resources": {
+    "title": "Recursos útiles",
+    "subtitle": "Sitios externos confiables para la actividad física de mayores",
+    "visitSite": "Visitar sitio"
+  },
+  "safety": {
+    "title": "Pautas de seguridad",
+    "disclaimer": "Siempre consulte a su médico antes de iniciar un nuevo programa de ejercicios. Deténgase inmediatamente si siente dolor, mareo o dificultad para respirar. Use una silla resistente para los ejercicios sentados. Vaya a su propio ritmo."
+  },
+  "resourceNames": {
+    "go4life": "Go4Life (NIA)",
+    "go4lifeDesc": "Recursos de ejercicio y actividad física del Instituto Nacional sobre el Envejecimiento",
+    "nhs_seniors": "NHS Ejercicios para mayores",
+    "nhs_seniorsDesc": "Guías de actividad física para adultos mayores del Servicio Nacional de Salud del Reino Unido",
+    "tai_chi_health": "Tai Chi for Health Institute",
+    "tai_chi_healthDesc": "Programas de Tai Chi basados en evidencia diseñados por el Dr. Paul Lam",
+    "silversneakers": "SilverSneakers",
+    "silversneakersDesc": "Programa de fitness para mayores con clases y entrenamientos en línea",
+    "eldergym": "Eldergym Fitness",
+    "eldergymDesc": "Ejercicios en silla y rutinas de fitness para fuerza y equilibrio"
+  },
+  "exercises": {
+    "tai_chi_cloud_hands": { "name": "Manos de nube (sentado)", "description": "Movimiento suave y fluido de brazos que mejora la movilidad y relajación.", "steps": ["Siéntese erguido con los pies planos, manos sobre los muslos", "Levante lentamente la mano derecha a la altura del hombro, palma hacia la izquierda", "Barra la mano derecha por delante hacia la izquierda en un arco suave", "Mientras baja la mano derecha, comience a levantar la izquierda", "Alterne las manos en movimiento fluido durante 8-10 repeticiones", "Respire lenta y naturalmente durante todo el movimiento"], "safetyTip": "Mantenga movimientos lentos y controlados. No gire el torso más allá de lo cómodo." },
+    "tai_chi_brush_knee": { "name": "Cepillar la rodilla (sentado)", "description": "Movimiento clásico de Tai Chi adaptado para práctica sentada.", "steps": ["Siéntese erguido, pies planos, separados al ancho de hombros", "Levante la mano derecha junto a la oreja, palma hacia adelante", "Simultáneamente, lleve la mano izquierda a nivel de la cadera", "Empuje la mano derecha hacia adelante mientras barre la izquierda sobre la rodilla", "Vuelva a la posición inicial y cambie de lado", "Repita 6-8 veces de cada lado"], "safetyTip": "Mantenga la espalda recta contra la silla. Mueva solo los brazos." },
+    "tai_chi_repulse_monkey": { "name": "Repeler al mono (sentado)", "description": "Movimiento de retroceso adaptado para práctica sentada.", "steps": ["Siéntese erguido, pies planos, brazos relajados", "Extienda el brazo derecho hacia adelante a la altura del hombro, palma arriba", "Lleve la mano izquierda detrás cerca de la cadera, palma arriba", "Retire la mano derecha hacia la cadera mientras empuja la izquierda adelante", "Las palmas giran durante la transición", "Alterne 6-8 repeticiones de cada lado", "Mantenga una respiración lenta y constante"], "safetyTip": "Concéntrese en transiciones suaves. No apresure los movimientos." },
+    "tai_chi_wave_hands": { "name": "Mover manos como nubes (sentado)", "description": "Movimiento lateral fluido que promueve la relajación.", "steps": ["Siéntese cómodamente, pies planos, manos en el regazo", "Levante ambas manos a la altura del pecho, palmas hacia el cuerpo", "Gire lentamente el torso hacia la derecha, barriendo ambas manos", "Al volver al centro, deje flotar las manos", "Continúe girando hacia la izquierda", "Repita 8-10 veces alternando lados"], "safetyTip": "Rote suavemente desde la cintura. Deténgase si siente molestia en la espalda." },
+    "tai_chi_golden_rooster": { "name": "Gallo dorado (sentado)", "description": "Ejercicio avanzado de equilibrio sentado que fortalece las piernas.", "steps": ["Siéntese en el borde delantero de una silla resistente", "Coloque ambas manos sobre los muslos para apoyo", "Levante lentamente la rodilla derecha lo más alto posible", "Al mismo tiempo, levante la mano izquierda a la altura del hombro", "Mantenga 3-5 segundos concentrándose en el equilibrio", "Baje lentamente la rodilla y la mano", "Repita del otro lado. Haga 5-6 repeticiones por lado"], "safetyTip": "Mantenga una mano en el asiento si es necesario. No se incline hacia atrás." },
+    "stretch_neck_rolls": { "name": "Rotaciones de cuello", "description": "Libera tensión en cuello y hombros.", "steps": ["Siéntese o párese erguido, hombros relajados", "Deje caer lentamente la barbilla hacia el pecho", "Gire suavemente la cabeza hacia la derecha", "Continúe hacia atrás y luego hacia la izquierda", "Complete un círculo lento, luego invierta"], "safetyTip": "Muévase muy lentamente. Si siente mareo, reduzca el rango." },
+    "stretch_shoulder_shrugs": { "name": "Encogimiento de hombros", "description": "Alivia la tensión de hombros y espalda alta.", "steps": ["Siéntese o párese con brazos relajados", "Levante lentamente ambos hombros hacia las orejas", "Mantenga 3-5 segundos", "Suelte y deje caer los hombros", "Repita 8-10 veces, exhalando al soltar"], "safetyTip": "No fuerce más allá de lo cómodo. Mantenga el cuello relajado." },
+    "stretch_seated_hamstring": { "name": "Estiramiento de isquiotibiales sentado", "description": "Estira la parte posterior de los muslos mientras está sentado.", "steps": ["Siéntese en el borde de la silla", "Extienda la pierna derecha con el talón en el suelo, dedos hacia arriba", "Mantenga el pie izquierdo plano, rodilla flexionada", "Con espalda recta, inclínese desde las caderas", "Alcance hacia los dedos del pie derecho", "Mantenga 15-20 segundos, luego cambie de pierna"], "safetyTip": "No rebote. Mantenga la espalda recta." },
+    "stretch_ankle_circles": { "name": "Círculos de tobillo", "description": "Mejora la movilidad del tobillo y la circulación.", "steps": ["Siéntese cómodamente, pies planos", "Levante ligeramente el pie derecho", "Gire lentamente el tobillo en sentido horario", "Haga 10 círculos, luego invierta", "Cambie al pie izquierdo y repita"], "safetyTip": "Sujétese a los lados de la silla. Muévase lenta y suavemente." },
+    "stretch_wrist_hands": { "name": "Estiramientos de muñecas y manos", "description": "Alivia la rigidez de manos y muñecas. Útil para la artritis.", "steps": ["Extienda el brazo derecho, palma hacia arriba", "Use la mano izquierda para tirar suavemente los dedos hacia abajo", "Mantenga 10-15 segundos", "Gire la palma hacia abajo y presione los dedos hacia usted", "Mantenga 10-15 segundos, cambie de mano", "Termine haciendo puños suaves y soltando 10 veces"], "safetyTip": "Sea suave. Los estiramientos no deben causar dolor." },
+    "balance_weight_shift": { "name": "Cambio de peso", "description": "Ejercicio de equilibrio para principiantes.", "steps": ["Párese detrás de una silla resistente, sujetando el respaldo", "Pies separados al ancho de caderas", "Cambie lentamente el peso al pie derecho", "Mantenga 5-10 segundos", "Cambie al pie izquierdo y mantenga"], "safetyTip": "Mantenga siempre la silla al alcance." },
+    "balance_standing_march": { "name": "Marcha de pie", "description": "Mejora el equilibrio y la fuerza de piernas marchando en el lugar.", "steps": ["Párese detrás de una silla, mano ligeramente apoyada", "Levante la rodilla derecha lo más alto posible", "Mantenga brevemente, luego baje lentamente", "Levante la rodilla izquierda de la misma forma", "Alterne durante 20 pasos"], "safetyTip": "Mantenga el pecho erguido. Use la silla lo necesario." },
+    "balance_single_leg": { "name": "Equilibrio en una pierna", "description": "Ejercicio clásico de equilibrio con apoyo de silla.", "steps": ["Párese junto a una silla, una mano en el respaldo", "Levante lentamente el pie derecho unos centímetros", "Intente mantener el equilibrio 10-15 segundos", "Baje el pie y descanse brevemente", "Cambie de pierna", "Al mejorar, use solo las yemas de los dedos"], "safetyTip": "Agárrese bien de la silla. Nunca cierre los ojos." },
+    "balance_heel_toe_walk": { "name": "Caminata talón-punta", "description": "Caminar en línea recta colocando talón contra punta.", "steps": ["Párese cerca de una pared para apoyo", "Coloque el pie derecho delante del izquierdo, talón contra dedos", "Fije un punto al frente para el equilibrio", "Avance colocando el talón izquierdo contra los dedos derechos", "Continúe 15-20 pasos en línea recta", "Gire con cuidado y repita"], "safetyTip": "Quédese cerca de una pared. Muévase lenta y deliberadamente." },
+    "balance_tandem_stance": { "name": "Posición tándem estática", "description": "Desafío avanzado de equilibrio estático.", "steps": ["Párese cerca de una pared, una mano tocándola", "Coloque un pie directamente delante del otro", "Intente mantener la posición 30 segundos", "Fije los ojos en un punto fijo", "Cambie qué pie va delante y repita", "Al mejorar, reduzca el contacto con la pared"], "safetyTip": "Tenga siempre una superficie de apoyo al alcance." },
+    "strength_chair_squats": { "name": "Sentadillas en silla", "description": "Movimiento sentarse-pararse con silla. Fortalece las piernas.", "steps": ["Siéntese en el borde de una silla resistente", "Cruce los brazos sobre el pecho o extiéndalos", "Inclínese ligeramente y empuje con los talones para levantarse", "Pause de pie, erguido", "Siéntese lentamente de forma controlada", "Repita 8-10 veces"], "safetyTip": "Use los apoyabrazos si es necesario. Las rodillas no pasan de los dedos." },
+    "strength_seated_leg_raise": { "name": "Elevaciones de pierna sentado", "description": "Fortalece los cuádriceps sentado.", "steps": ["Siéntese erguido, pies planos", "Extienda lentamente la pierna derecha", "Mantenga 3-5 segundos apretando el muslo", "Baje lentamente la pierna", "Repita 10 veces, luego cambie de pierna"], "safetyTip": "Sujétese a los lados de la silla. Sin movimientos bruscos." },
+    "strength_wall_pushups": { "name": "Flexiones de pared", "description": "Flexiones de pie contra la pared. Fortalece pecho y brazos.", "steps": ["Párese frente a la pared, a un brazo de distancia", "Coloque las palmas planas a la altura de los hombros", "Doble lentamente los codos hacia la pared", "El cuerpo permanece recto", "Empújese de vuelta a la posición inicial", "Repita 8-12 veces"], "safetyTip": "Mantenga los pies firmes. No arquee la espalda baja." },
+    "strength_arm_curls": { "name": "Flexiones de brazos (botellas de agua)", "description": "Flexiones de bíceps con botellas de agua.", "steps": ["Sentado o de pie, una botella en cada mano", "Brazos a los lados, palmas hacia adelante", "Levante lentamente las botellas hacia los hombros", "Apriete brevemente arriba", "Baje lentamente a la posición inicial", "Repita 10-12 veces, 2 series"], "safetyTip": "Use un peso cómodo. Empiece con botellas vacías si es necesario." },
+    "strength_calf_raises": { "name": "Elevaciones de pantorrilla", "description": "Fortalece las pantorrillas para mejor estabilidad al caminar.", "steps": ["Párese detrás de una silla, manos en el respaldo", "Pies separados al ancho de caderas", "Suba lentamente sobre las puntas de los pies", "Mantenga 2-3 segundos arriba", "Baje lentamente los talones", "Repita 12-15 veces, 2 series"], "safetyTip": "Agárrese bien de la silla. Controle el movimiento." },
+    "cardio_seated_march": { "name": "Marcha sentado", "description": "Ejercicio cardio suave sentado.", "steps": ["Siéntese erguido, pies planos", "Levante la rodilla derecha hacia el pecho", "Bájela, luego levante la izquierda", "Continúe alternando como marchando", "Balancee los brazos naturalmente"], "safetyTip": "Empiece lento y aumente la velocidad. Pare si se queda sin aliento." },
+    "cardio_arm_circles": { "name": "Círculos de brazos", "description": "Círculos de brazos que calientan los hombros y activan la circulación.", "steps": ["Sentado o de pie, brazos extendidos a los lados", "Haga pequeños círculos hacia adelante", "Aumente el tamaño gradualmente durante 15 segundos", "Invierta la dirección", "Haga 30 segundos en cada dirección"], "safetyTip": "Baje los brazos si los hombros se fatigan." },
+    "cardio_step_in_place": { "name": "Marcha en el lugar", "description": "Marcha de pie energética. Cardio moderado.", "steps": ["Párese detrás de una silla para apoyo", "Marche en el lugar levantando más las rodillas", "Añada movimiento de brazos — balancee el brazo opuesto", "Mantenga un ritmo constante 2-3 minutos", "Reduzca la velocidad, descanse 30 segundos", "Repita 2-3 intervalos"], "safetyTip": "Mantenga la silla cerca. Si se queda sin aliento, pase a marcha sentada." },
+    "cardio_seated_jacks": { "name": "Saltos de tijera sentado", "description": "Versión adaptada a silla de los jumping jacks.", "steps": ["Siéntese erguido, pies juntos, brazos a los lados", "Abra simultáneamente las piernas y levante los brazos", "Junte piernas y baje los brazos", "Continúe 30 segundos a ritmo cómodo", "Descanse 15 segundos, repita 3 rondas", "Coordine la respiración: inhale al abrir, exhale al cerrar"], "safetyTip": "Quédese bien sentado. Reduzca la amplitud si los hombros están rígidos." },
+    "cardio_side_steps": { "name": "Pasos laterales de pie", "description": "Pasos laterales para cardio y movilidad de cadera.", "steps": ["De pie, pies juntos, brazos a los lados", "Dé un paso a la derecha con el pie derecho", "Junte el pie izquierdo", "Dé 4-5 pasos a la derecha, luego invierta a la izquierda", "Añada movimientos de brazos laterales", "Continúe 2-3 minutos a ritmo constante"], "safetyTip": "Asegúrese de que el área esté despejada. Quédese cerca de un apoyo." }
+  }
+}

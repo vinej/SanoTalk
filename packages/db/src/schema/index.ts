@@ -17,3 +17,4 @@ export * from "./er-favorites";
 export * from "./allergies";
 export * from "./privacy";
 export * from "./friend-chat";
+export * from "./workout-logs";

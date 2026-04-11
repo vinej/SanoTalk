@@ -1,0 +1,393 @@
+{
+  "title": "Train Your Body",
+  "subtitle": "Home exercise programs designed for seniors",
+  "tabs": {
+    "exercises": "Exercises",
+    "progress": "My Progress",
+    "resources": "Resources"
+  },
+  "categories": {
+    "all": "All",
+    "tai_chi": "Seated Tai Chi",
+    "stretching": "Stretching",
+    "balance": "Balance",
+    "strength": "Strength",
+    "cardio": "Cardio"
+  },
+  "difficulty": {
+    "all": "All Levels",
+    "beginner": "Beginner",
+    "intermediate": "Intermediate",
+    "advanced": "Advanced"
+  },
+  "exercise": {
+    "duration": "{{mins}} min",
+    "steps": "{{count}} steps",
+    "viewExercise": "View Exercise",
+    "logWorkout": "Log Workout",
+    "completed": "Completed!"
+  },
+  "progress": {
+    "thisWeek": "This Week",
+    "streak": "Current Streak",
+    "longestStreak": "Longest Streak",
+    "streakDays": "{{count}} day(s)",
+    "totalWorkouts": "Total Workouts",
+    "totalDuration": "Total Duration",
+    "minutes": "{{count}} min",
+    "noWorkouts": "No workouts logged yet. Start your first exercise!",
+    "history": "Workout History",
+    "deleteConfirm": "Delete this workout log?"
+  },
+  "log": {
+    "title": "Log Workout",
+    "duration": "Duration (minutes)",
+    "notes": "Notes (optional)",
+    "notesPlaceholder": "How did it feel?",
+    "save": "Save",
+    "saving": "Saving...",
+    "cancel": "Cancel"
+  },
+  "resources": {
+    "title": "Helpful Resources",
+    "subtitle": "Trusted external sites for senior fitness",
+    "visitSite": "Visit Site"
+  },
+  "safety": {
+    "title": "Safety Guidelines",
+    "disclaimer": "Always consult your doctor before starting a new exercise program. Stop immediately if you feel pain, dizziness, or shortness of breath. Use a sturdy chair for seated exercises. Go at your own pace."
+  },
+  "resourceNames": {
+    "go4life": "Go4Life (NIA)",
+    "go4lifeDesc": "Exercise and physical activity resources from the National Institute on Aging",
+    "nhs_seniors": "NHS Exercises for Older Adults",
+    "nhs_seniorsDesc": "Physical activity guidelines for older adults from the UK National Health Service",
+    "tai_chi_health": "Tai Chi for Health Institute",
+    "tai_chi_healthDesc": "Evidence-based Tai Chi programs designed by Dr. Paul Lam for health improvement",
+    "silversneakers": "SilverSneakers",
+    "silversneakersDesc": "Fitness program designed for seniors with classes and online workouts",
+    "eldergym": "Eldergym Fitness",
+    "eldergymDesc": "Chair exercises and senior fitness routines for strength and balance"
+  },
+  "exercises": {
+    "tai_chi_cloud_hands": {
+      "name": "Cloud Hands (Seated)",
+      "description": "A gentle, flowing arm movement that improves upper body mobility and relaxation.",
+      "steps": [
+        "Sit tall in your chair with feet flat on the floor, hands resting on your thighs",
+        "Slowly raise your right hand to shoulder height, palm facing left",
+        "Sweep your right hand across your body to the left in a smooth arc",
+        "As your right hand lowers, begin raising your left hand",
+        "Continue alternating hands in a flowing motion for 8-10 repetitions",
+        "Breathe slowly and naturally throughout the movement"
+      ],
+      "safetyTip": "Keep movements slow and controlled. Do not twist your torso beyond comfort."
+    },
+    "tai_chi_brush_knee": {
+      "name": "Brush Knee (Seated)",
+      "description": "A classic Tai Chi movement adapted for seated practice, improving arm coordination and flexibility.",
+      "steps": [
+        "Sit upright with feet flat on the floor, shoulder-width apart",
+        "Raise your right hand beside your ear, palm facing forward",
+        "Simultaneously, bring your left hand to hip level, palm facing down",
+        "Push your right hand forward while sweeping your left hand across your knee",
+        "Return to the starting position and switch sides",
+        "Repeat 6-8 times on each side, breathing naturally"
+      ],
+      "safetyTip": "Keep your back straight against the chair. Move your arms only, not your torso."
+    },
+    "tai_chi_repulse_monkey": {
+      "name": "Repulse Monkey (Seated)",
+      "description": "A backward stepping movement adapted for seated practice, building arm strength and coordination.",
+      "steps": [
+        "Sit tall with feet flat, arms relaxed at your sides",
+        "Extend your right arm forward at shoulder height, palm up",
+        "Bring your left hand behind you near your hip, palm up",
+        "Pull your right hand back toward your hip while pushing your left hand forward",
+        "Your palms turn over during the transition — right palm faces up as it retreats",
+        "Continue alternating for 6-8 repetitions on each side",
+        "Maintain slow, steady breathing throughout"
+      ],
+      "safetyTip": "Focus on smooth transitions between arms. Do not rush the movements."
+    },
+    "tai_chi_wave_hands": {
+      "name": "Wave Hands Like Clouds (Seated)",
+      "description": "A flowing side-to-side movement that promotes relaxation and gentle spinal rotation.",
+      "steps": [
+        "Sit comfortably with feet flat, hands on your lap",
+        "Raise both hands to chest height, palms facing your body",
+        "Slowly turn your upper body to the right, sweeping both hands right",
+        "As you turn back to center, let your hands float across",
+        "Continue turning to the left, sweeping hands in the same direction",
+        "Repeat 8-10 times, alternating sides with gentle breathing"
+      ],
+      "safetyTip": "Rotate from the waist gently. Stop if you feel any discomfort in your back."
+    },
+    "tai_chi_golden_rooster": {
+      "name": "Golden Rooster Stands (Seated)",
+      "description": "An advanced seated balance exercise that strengthens the legs and improves stability.",
+      "steps": [
+        "Sit at the front edge of a sturdy chair, back straight",
+        "Place both hands on your thighs for support",
+        "Slowly lift your right knee upward as high as comfortable",
+        "At the same time, raise your left hand to shoulder height, palm open",
+        "Hold the position for 3-5 seconds, focusing on balance",
+        "Slowly lower your knee and hand back to the starting position",
+        "Repeat on the other side. Do 5-6 repetitions per side"
+      ],
+      "safetyTip": "Keep one hand on the chair seat if needed for extra stability. Do not lean backward."
+    },
+    "stretch_neck_rolls": {
+      "name": "Gentle Neck Rolls",
+      "description": "Releases tension in the neck and upper shoulders. Can be done seated or standing.",
+      "steps": [
+        "Sit or stand tall, shoulders relaxed and down",
+        "Slowly drop your chin toward your chest",
+        "Roll your head gently to the right, bringing your ear toward your shoulder",
+        "Continue rolling your head back (look up gently) then to the left",
+        "Complete a full slow circle, then reverse direction"
+      ],
+      "safetyTip": "Move very slowly. If you feel dizziness or pain, reduce the range of motion."
+    },
+    "stretch_shoulder_shrugs": {
+      "name": "Shoulder Shrugs",
+      "description": "Relieves shoulder and upper back tension. Simple and effective for desk or chair sitting.",
+      "steps": [
+        "Sit or stand with arms relaxed at your sides",
+        "Slowly raise both shoulders toward your ears",
+        "Hold the raised position for 3-5 seconds",
+        "Release and let your shoulders drop back down naturally",
+        "Repeat 8-10 times, breathing out as you release"
+      ],
+      "safetyTip": "Do not force the shrug higher than comfortable. Keep your neck relaxed."
+    },
+    "stretch_seated_hamstring": {
+      "name": "Seated Hamstring Stretch",
+      "description": "Stretches the back of the thighs while seated. Helps maintain leg flexibility.",
+      "steps": [
+        "Sit at the front edge of your chair",
+        "Extend your right leg forward with heel on the floor, toes pointing up",
+        "Keep your left foot flat on the floor, knee bent",
+        "With a straight back, slowly hinge forward from your hips",
+        "Reach toward your right toes until you feel a gentle stretch behind your thigh",
+        "Hold for 15-20 seconds, then switch legs"
+      ],
+      "safetyTip": "Do not bounce. Keep your back straight — the stretch comes from the hip hinge, not rounding your back."
+    },
+    "stretch_ankle_circles": {
+      "name": "Ankle Circles",
+      "description": "Improves ankle mobility and circulation in the lower legs.",
+      "steps": [
+        "Sit comfortably with feet flat on the floor",
+        "Lift your right foot slightly off the floor",
+        "Slowly rotate your ankle clockwise in large circles",
+        "Do 10 circles, then reverse to counter-clockwise",
+        "Switch to your left foot and repeat"
+      ],
+      "safetyTip": "Support yourself by holding the sides of the chair. Move slowly and smoothly."
+    },
+    "stretch_wrist_hands": {
+      "name": "Wrist & Hand Stretches",
+      "description": "Relieves stiffness in the hands and wrists. Especially helpful for arthritis.",
+      "steps": [
+        "Extend your right arm forward, palm facing up",
+        "Use your left hand to gently pull your right fingers downward",
+        "Hold for 10-15 seconds, feeling the stretch along your forearm",
+        "Flip your right palm to face down and gently press fingers toward you",
+        "Hold for 10-15 seconds, then switch hands",
+        "Finish by making gentle fists and releasing 10 times"
+      ],
+      "safetyTip": "Be gentle — wrist stretches should not cause pain. Ease off if you feel tingling."
+    },
+    "balance_weight_shift": {
+      "name": "Weight Shifting",
+      "description": "A beginner balance exercise that teaches weight distribution awareness.",
+      "steps": [
+        "Stand behind a sturdy chair, holding the back for support",
+        "Place your feet hip-width apart",
+        "Slowly shift your weight onto your right foot",
+        "Hold for 5-10 seconds, feeling the balance on one side",
+        "Shift your weight to the left foot and hold"
+      ],
+      "safetyTip": "Always keep the chair within reach. Do not let go of the chair until you feel confident."
+    },
+    "balance_standing_march": {
+      "name": "Standing March",
+      "description": "Improves balance and leg strength by marching in place with high knees.",
+      "steps": [
+        "Stand behind a chair, holding the back lightly for balance",
+        "Lift your right knee as high as comfortable",
+        "Hold briefly, then slowly lower your foot back down",
+        "Lift your left knee in the same way",
+        "Continue alternating for 20 steps (10 each side)"
+      ],
+      "safetyTip": "Keep your chest upright. Use the chair as much as needed for stability."
+    },
+    "balance_single_leg": {
+      "name": "Single Leg Stand",
+      "description": "Classic balance exercise. Stand on one leg with chair support for safety.",
+      "steps": [
+        "Stand next to a sturdy chair, one hand on the back",
+        "Slowly lift your right foot a few inches off the floor",
+        "Try to balance on your left leg for 10-15 seconds",
+        "Lower your foot and rest briefly",
+        "Switch to the other leg",
+        "As you improve, try using just your fingertips on the chair"
+      ],
+      "safetyTip": "Keep a firm grip on the chair. Never close your eyes during this exercise."
+    },
+    "balance_heel_toe_walk": {
+      "name": "Heel-to-Toe Walk",
+      "description": "Walking in a straight line placing heel to toe, building balance and coordination.",
+      "steps": [
+        "Stand near a wall or counter for support if needed",
+        "Place your right foot directly in front of your left, heel touching toes",
+        "Focus on a point ahead for balance",
+        "Step forward placing your left heel against your right toes",
+        "Continue for 15-20 steps in a straight line",
+        "Turn around carefully and repeat back"
+      ],
+      "safetyTip": "Stay close to a wall or have someone nearby. Move slowly and deliberately."
+    },
+    "balance_tandem_stance": {
+      "name": "Tandem Stance Hold",
+      "description": "An advanced static balance challenge — holding heel-to-toe position for extended time.",
+      "steps": [
+        "Stand near a wall with one hand lightly touching it",
+        "Place one foot directly in front of the other, heel to toe",
+        "Try to hold this position for 30 seconds",
+        "Focus your eyes on a fixed point for stability",
+        "Switch which foot is in front and repeat",
+        "As you improve, reduce hand contact with the wall"
+      ],
+      "safetyTip": "Have a support surface always within arm's reach. Stop if you feel dizzy."
+    },
+    "strength_chair_squats": {
+      "name": "Chair Squats",
+      "description": "Sit-to-stand movement using a chair. Builds leg strength for daily activities.",
+      "steps": [
+        "Sit at the front edge of a sturdy chair, feet hip-width apart",
+        "Cross your arms over your chest or extend them forward",
+        "Lean slightly forward and press through your heels to stand up",
+        "Pause briefly at the top, standing tall",
+        "Slowly lower yourself back to the seated position",
+        "Repeat 8-10 times. Rest if needed between sets"
+      ],
+      "safetyTip": "Use your hands on the chair arms if needed. Do not let your knees extend past your toes."
+    },
+    "strength_seated_leg_raise": {
+      "name": "Seated Leg Raises",
+      "description": "Strengthens the quadriceps while seated. Great for knee stability.",
+      "steps": [
+        "Sit tall in your chair, feet flat on the floor",
+        "Slowly straighten your right leg out in front of you",
+        "Hold the raised position for 3-5 seconds, squeezing your thigh",
+        "Slowly lower your leg back to the floor",
+        "Repeat 10 times, then switch to the left leg"
+      ],
+      "safetyTip": "Hold the sides of the chair for support. Move slowly without jerking."
+    },
+    "strength_wall_pushups": {
+      "name": "Wall Push-Ups",
+      "description": "A standing push-up variation using a wall. Builds chest and arm strength safely.",
+      "steps": [
+        "Stand facing a wall, about arm's length away",
+        "Place your palms flat on the wall at shoulder height and width",
+        "Slowly bend your elbows, leaning your body toward the wall",
+        "Your body should stay straight from head to heels",
+        "Push yourself back to the starting position",
+        "Repeat 8-12 times"
+      ],
+      "safetyTip": "Keep your feet firmly planted. Do not arch your lower back."
+    },
+    "strength_arm_curls": {
+      "name": "Arm Curls (Water Bottles)",
+      "description": "Bicep curls using water bottles as weights. Builds arm strength for carrying groceries.",
+      "steps": [
+        "Sit or stand with a water bottle (500ml-1L) in each hand",
+        "Arms at your sides, palms facing forward",
+        "Slowly curl both bottles toward your shoulders",
+        "Squeeze briefly at the top",
+        "Slowly lower back to the starting position",
+        "Repeat 10-12 times for 2 sets"
+      ],
+      "safetyTip": "Use a comfortable weight. If water bottles are too heavy, start with empty ones."
+    },
+    "strength_calf_raises": {
+      "name": "Standing Calf Raises",
+      "description": "Strengthens the calves for better walking stability and balance.",
+      "steps": [
+        "Stand behind a chair, holding the back for support",
+        "Place feet hip-width apart",
+        "Slowly rise up onto your toes, lifting your heels as high as you can",
+        "Hold at the top for 2-3 seconds",
+        "Slowly lower your heels back to the floor",
+        "Repeat 12-15 times for 2 sets"
+      ],
+      "safetyTip": "Keep a firm grip on the chair. Control the movement — do not bounce."
+    },
+    "cardio_seated_march": {
+      "name": "Seated Marching",
+      "description": "A gentle cardio exercise done while sitting. Elevates heart rate safely.",
+      "steps": [
+        "Sit tall in your chair, feet flat on the floor",
+        "Lift your right knee up toward your chest",
+        "Lower it back down, then lift your left knee",
+        "Continue alternating like a marching motion",
+        "Swing your arms naturally as you march"
+      ],
+      "safetyTip": "Start slowly and increase speed gradually. Stop if you feel breathless."
+    },
+    "cardio_arm_circles": {
+      "name": "Arm Circles",
+      "description": "Seated or standing arm circles that warm up shoulders and get blood flowing.",
+      "steps": [
+        "Sit or stand with arms extended out to the sides at shoulder height",
+        "Make small forward circles with both arms",
+        "Gradually increase the circle size over 15 seconds",
+        "Reverse direction and make backward circles",
+        "Do 30 seconds in each direction"
+      ],
+      "safetyTip": "Lower your arms if your shoulders fatigue. Keep breathing throughout."
+    },
+    "cardio_step_in_place": {
+      "name": "Step-in-Place",
+      "description": "Standing march with more energy. A moderate cardio exercise to build endurance.",
+      "steps": [
+        "Stand behind a chair for support if needed",
+        "March in place, lifting your knees higher with each step",
+        "Add arm pumping — swing opposite arm with each step",
+        "Maintain a steady rhythm for 2-3 minutes",
+        "Slow down gradually, then rest for 30 seconds",
+        "Repeat for 2-3 intervals"
+      ],
+      "safetyTip": "Keep the chair nearby. If you feel winded, slow down or switch to seated marching."
+    },
+    "cardio_seated_jacks": {
+      "name": "Seated Jumping Jacks",
+      "description": "A chair-friendly version of jumping jacks. Works arms and legs together for cardio.",
+      "steps": [
+        "Sit tall in your chair, feet together, arms at your sides",
+        "Simultaneously spread your legs apart and raise your arms overhead",
+        "Bring your legs back together and lower your arms",
+        "Continue at a comfortable pace for 30 seconds",
+        "Rest for 15 seconds, then repeat for 3 rounds",
+        "Coordinate your breathing: inhale as you open, exhale as you close"
+      ],
+      "safetyTip": "Stay seated firmly in the chair. Reduce the range of arm movement if your shoulders are stiff."
+    },
+    "cardio_side_steps": {
+      "name": "Standing Side Steps",
+      "description": "Lateral stepping for cardio and hip mobility. An advanced standing exercise.",
+      "steps": [
+        "Stand with feet together, arms at your sides or on your hips",
+        "Step your right foot out to the right side",
+        "Bring your left foot to meet it",
+        "Take 4-5 steps to the right, then reverse to the left",
+        "Add arm raises as you step — lift arms out to the sides and lower them",
+        "Continue for 2-3 minutes at a steady pace"
+      ],
+      "safetyTip": "Ensure your exercise area is clear of obstacles. Stay near a counter or wall."
+    }
+  }
+}

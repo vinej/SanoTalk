@@ -15,6 +15,7 @@ import { allergiesRouter } from "./routers/allergies";
 import { systemRouter } from "./routers/system";
 import { privacyRouter } from "./routers/privacy";
 import { friendChatRouter } from "./routers/friendChat";
+import { workoutsRouter } from "./routers/workouts";
 
 export const appRouter = createTRPCRouter({
   sessions: sessionsRouter,
@@ -33,6 +34,7 @@ export const appRouter = createTRPCRouter({
   system: systemRouter,
   privacy: privacyRouter,
   friendChat: friendChatRouter,
+  workouts: workoutsRouter,
 });
 
 export type AppRouterSonoTalk = typeof appRouter;

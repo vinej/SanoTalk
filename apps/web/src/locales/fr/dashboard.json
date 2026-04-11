@@ -41,6 +41,8 @@
   "friendChatDesc": "Discutez avec vos amis de votre sante",
   "kanban": "Tableau de tâches",
   "kanbanDesc": "Gérer vos tâches et suivis de santé",
+  "trainBody": "Entraînez votre corps",
+  "trainBodyDesc": "Programmes d'exercices, Tai Chi et suivi de forme pour aînés",
   "adminApprovals": "Approbation des utilisateurs",
   "adminApprovalsDesc": "Examiner et approuver les inscriptions en attente",
   "approveButton": "Approuver",

@@ -41,6 +41,8 @@
   "friendChatDesc": "与朋友开始关于健康的对话",
   "kanban": "任务看板",
   "kanbanDesc": "管理您的健康任务和随访",
+  "trainBody": "锻炼身体",
+  "trainBodyDesc": "适合老年人的锻炼计划、太极和健身追踪",
   "adminApprovals": "用户审批",
   "adminApprovalsDesc": "审核和批准待注册用户",
   "approveButton": "批准",

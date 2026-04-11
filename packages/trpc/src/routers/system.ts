@@ -2,12 +2,7 @@ import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { verifyAdminFromDb } from "../lib/verify-admin";
 
 export const systemRouter = createTRPCRouter({
-  aiInfo: protectedProcedure.query(async ({ ctx }) => {
-    const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
-    if (!isAdmin) {
-      // Non-admin users only need to know AI is enabled, not the provider/model details
-      return { provider: "ai", model: null };
-    }
+  aiInfo: protectedProcedure.query(() => {
     return {
       provider: process.env.AI_PROVIDER ?? "anthropic",
       model: process.env.AI_MODEL_LARGE ?? null,
