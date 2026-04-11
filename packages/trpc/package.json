@@ -5,8 +5,12 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./auth": "./src/auth.ts",
     "./lib/ws-tickets": "./src/lib/ws-tickets.ts",
-    "./lib/er-snapshot": "./src/lib/er-snapshot.ts"
+    "./lib/er-snapshot": "./src/lib/er-snapshot.ts",
+    "./lib/minio-cleanup": "./src/lib/minio-cleanup.ts",
+    "./lib/escape-html": "./src/lib/escape-html.ts",
+    "./lib/crypto": "./src/lib/crypto.ts"
   },
   "scripts": {
     "build": "tsc",

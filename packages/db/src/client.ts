@@ -15,7 +15,7 @@ if (!connectionString) {
 // Disable prefetch as it's not supported for "Transaction" pool mode
 const client = postgres(connectionString, {
   prepare: false,
-  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: true } : false,
+  ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: true } : false,
   max: parseInt(process.env.DB_POOL_MAX ?? "20"),
   idle_timeout: 30,
   connect_timeout: 10,

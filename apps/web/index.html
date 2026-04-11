@@ -10,22 +10,9 @@
       content="Real-time AI-powered medical consultation platform with live transcription and SOAP note generation."
     />
     <!-- PWA meta tags -->
-    <!-- Security headers (production should set these via reverse proxy for full enforcement) -->
-    <meta http-equiv="Content-Security-Policy" content="
-      default-src 'self';
-      script-src 'self';
-      style-src 'self' 'unsafe-inline';
-      img-src 'self' data: blob: https://*.tile.openstreetmap.org https://api.dicebear.com;
-      connect-src 'self' wss://localhost:* wss://*.livekit.cloud https://api.nal.usda.gov https://www.themealdb.com https://rxnav.nlm.nih.gov https://api.fda.gov;
-      object-src 'none';
-      font-src 'self';
-      media-src 'self' blob:;
-      worker-src 'self' blob:;
-      frame-ancestors 'none';
-      base-uri 'self';
-      form-action 'self';
-    " />
-    <meta http-equiv="Permissions-Policy" content="camera=(self), microphone=(self), geolocation=(self), payment=()" />
+    <!-- Security headers (CSP, COOP, HSTS, etc.) are set via:
+         - Vite dev server: server.headers in vite.config.ts
+         - Production: Helmet middleware in Express (apps/server/src/index.ts) -->
     <meta name="theme-color" content="#6366f1" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
@@ -36,12 +23,6 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
-    <script>
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", () => {
-          navigator.serviceWorker.register("/sw.js");
-        });
-      }
-    </script>
+    <script src="/sw-register.js"></script>
   </body>
 </html>

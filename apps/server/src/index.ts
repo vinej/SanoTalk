@@ -17,6 +17,8 @@ import { startDeepgramWebSocket } from "./deepgram";
 import { runPendingAgents, triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat, callPharmacistChat, callDrugInfoChat, callExerciseChat, callEatwellChat, callTestChat } from "./mastra/index";
 import { joinAiParticipant, removeAiParticipant, removeAllAiParticipants, isAiAssistant } from "./ai-voice/index";
 import http from "http";
+import crypto from "crypto";
+import { existsSync, readFileSync } from "fs";
 
 // Fail fast if critical env vars are missing
 const REQUIRED_ENV = [
@@ -43,6 +45,54 @@ app.set('trust proxy', process.env.TRUSTED_PROXY ?? "loopback");
 const PORT = process.env.PORT ?? 3001;
 
 // ─── Security Headers ──────────────────────────────────────────────────────
+const isProduction = process.env.NODE_ENV === "production";
+
+// ─── HTTPS redirect (production behind a reverse proxy) ──────────────────
+// Only redirects when x-forwarded-proto is explicitly "http", meaning a
+// reverse proxy (Cloudflare/Nginx) forwarded an HTTP request.  Direct
+// local access (no proxy header) is left alone so local testing works.
+if (isProduction) {
+  app.use((req, res, next) => {
+    if (req.headers["x-forwarded-proto"] === "http") {
+      res.redirect(301, `https://${req.hostname}${req.originalUrl}`);
+      return;
+    }
+    next();
+  });
+}
+
+// CSP directives shared between Helmet (API responses) and the nonce-aware
+// SPA handler (HTML responses).  The SPA handler adds a per-request nonce to
+// script-src so we can avoid 'unsafe-inline' entirely.
+const cspConnectSrc = [
+  "'self'",
+  "wss://localhost:*",
+  "wss://*.livekit.cloud",
+  "https://api.nal.usda.gov",
+  "https://www.themealdb.com",
+  "https://rxnav.nlm.nih.gov",
+  "https://api.fda.gov",
+  process.env.LIVEKIT_URL ?? "",
+  process.env.VITE_API_URL ?? "",
+].filter(Boolean);
+
+const cspDirectives = {
+  defaultSrc: ["'self'"],
+  scriptSrc: ["'self'"],
+  styleSrc: ["'self'", "'unsafe-inline'"],
+  imgSrc: ["'self'", "data:", "https://*.tile.openstreetmap.org", "https://api.dicebear.com", "https://avatars.dicebear.com", "https://www.gravatar.com"],
+  fontSrc: ["'self'"],
+  connectSrc: cspConnectSrc,
+  mediaSrc: ["'self'"],
+  workerSrc: ["'self'"],
+  frameSrc: ["'none'"],
+  frameAncestors: ["'none'"],
+  objectSrc: ["'none'"],
+  baseUri: ["'self'"],
+  formAction: ["'self'"],
+  upgradeInsecureRequests: [],
+};
+
 app.use(helmet({
   referrerPolicy: { policy: "strict-origin-when-cross-origin" },
   crossOriginResourcePolicy: { policy: "same-origin" },
@@ -51,26 +101,16 @@ app.use(helmet({
     includeSubDomains: true,
     preload: true,
   },
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      imgSrc: ["'self'", "data:", "https://api.dicebear.com", "https://avatars.dicebear.com", "https://www.gravatar.com"],
-      fontSrc: ["'self'"],
-      connectSrc: [
-        "'self'",
-        process.env.LIVEKIT_URL ?? "",
-        process.env.VITE_API_URL ?? "",
-      ].filter(Boolean),
-      frameSrc: ["'none'"],
-      objectSrc: ["'none'"],
-      baseUri: ["'self'"],
-      formAction: ["'self'"],
-      upgradeInsecureRequests: [],
-    },
-  },
+  xContentTypeOptions: true,
+  // CSP for API responses (no nonce needed — no scripts served)
+  contentSecurityPolicy: { directives: cspDirectives },
 }));
+
+// Permissions-Policy header (Helmet doesn't have built-in support)
+app.use((_req, res, next) => {
+  res.setHeader("Permissions-Policy", "camera=(self), microphone=(self), geolocation=(self), payment=()");
+  next();
+});
 
 // ─── CORS ─────────────────────────────────────────────────────────────────
 // Only trust NGROK_URL if it matches a real ngrok domain pattern
@@ -317,6 +357,52 @@ app.get("/api/avatar/:userId", apiLimiter, async (req, res) => {
 app.get("/health", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });
 });
+
+// ─── SPA static serving (production) ──────────────────────────────────────
+// In production, serve the built web app so Helmet security headers apply to
+// the HTML page (HSTS, CSP, Referrer-Policy, X-Content-Type-Options).
+// In development, Vite dev server handles serving and proxies API calls here.
+const webDistPath = resolve(__dirname, "../../../apps/web/dist");
+if (isProduction && existsSync(webDistPath)) {
+  // Read index.html once at startup — nonces are injected per-request below
+  const indexHtmlTemplate = readFileSync(resolve(webDistPath, "index.html"), "utf-8");
+
+  app.use(express.static(webDistPath, { index: false }));
+
+  // SPA fallback — injects a per-request CSP nonce into every <script> tag
+  // so script-src can use 'nonce-xxx' instead of 'unsafe-inline'.
+  app.get("/{*splat}", (req, res) => {
+    if (req.path.startsWith("/api/") || req.path.startsWith("/ws/")) return res.status(404).end();
+
+    const nonce = crypto.randomBytes(16).toString("base64");
+
+    // Inject nonce into all <script> tags
+    const html = indexHtmlTemplate.replace(/<script/g, `<script nonce="${nonce}"`);
+
+    // Build CSP with the nonce — overrides Helmet's static CSP for this response
+    const directives = [
+      `default-src 'self'`,
+      `script-src 'self' 'nonce-${nonce}'`,
+      `style-src 'self' 'unsafe-inline'`,
+      `img-src 'self' data: https://*.tile.openstreetmap.org https://api.dicebear.com https://avatars.dicebear.com https://www.gravatar.com`,
+      `font-src 'self'`,
+      `connect-src ${cspConnectSrc.join(" ")}`,
+      `media-src 'self'`,
+      `worker-src 'self'`,
+      `frame-src 'none'`,
+      `frame-ancestors 'none'`,
+      `object-src 'none'`,
+      `base-uri 'self'`,
+      `form-action 'self'`,
+      `upgrade-insecure-requests`,
+    ].join("; ");
+
+    res.setHeader("Content-Security-Policy", directives);
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.send(html);
+  });
+  logger.info("Serving SPA from apps/web/dist (nonce-based CSP)");
+}
 
 // ─── HTTP + WebSocket server ───────────────────────────────────────────────
 const server = http.createServer(app);

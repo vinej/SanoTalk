@@ -17,11 +17,13 @@
     "build:server": "pnpm --filter @sanotalk/server build",
     "build:web": "pnpm --filter @sanotalk/web build",
     "clean": "node -e \"['packages/db/dist','packages/trpc/dist','apps/server/dist','apps/web/dist','packages/db/tsconfig.tsbuildinfo','packages/trpc/tsconfig.tsbuildinfo','apps/server/tsconfig.tsbuildinfo','apps/web/tsconfig.tsbuildinfo'].forEach(d=>{try{require('fs').rmSync(d,{recursive:true,force:true});console.log('removed',d)}catch(e){}})\"",
-    "build:all": "pnpm build:db && pnpm build:trpc && pnpm build:server && pnpm build:web"
+    "build:all": "pnpm build:db && pnpm build:trpc && pnpm build:server && pnpm build:web",
+    "start:prod": "cross-env NODE_ENV=production tsx apps/server/src/index.ts"
   },
   "devDependencies": {
-    "turbo": "^2.3.0",
+    "cross-env": "^10.1.0",
     "prettier": "^3.3.3",
+    "turbo": "^2.3.0",
     "typescript": "^5.6.3"
   },
   "engines": {
@@ -41,4 +43,3 @@
     }
   }
 }
-
