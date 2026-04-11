@@ -68,8 +68,7 @@ export function ChatMessageInput({ onSend, disabled }: ChatMessageInputProps) {
         placeholder={t("typeMessage")}
         disabled={disabled}
         rows={1}
-        className="flex-1 resize-none rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
-        style={{ maxHeight: 80 }}
+        className="flex-1 resize-none rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 max-h-20"
       />
       <Button
         size="sm"

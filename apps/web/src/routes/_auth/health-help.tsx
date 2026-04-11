@@ -192,7 +192,7 @@ function HealthHelpPage() {
       {/* Split layout — stacked on mobile, resizable side-by-side on lg+ */}
       <div className="flex-1 min-h-0 flex flex-col lg:flex-row" ref={containerRef}>
         {/* Left: Facility list */}
-        <div className="h-1/2 lg:h-full overflow-hidden min-w-0" style={{ flexBasis: `${leftPercent}%`, flexShrink: 0 }}>
+        <div className="h-1/2 lg:h-full overflow-hidden min-w-0 shrink-0" style={{ flexBasis: `${leftPercent}%` }}>
           <FacilityListPanel
             facilities={filteredFacilities}
             selectedId={selectedId}

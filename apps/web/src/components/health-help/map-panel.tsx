@@ -125,7 +125,7 @@ export function MapPanel({ userLat, userLng, facilities, selectedId, visibleType
     <MapContainer
       center={[userLat, userLng]}
       zoom={10}
-      style={{ width: "100%", height: "100%" }}
+      className="w-full h-full"
       scrollWheelZoom={true}
     >
       <TileLayer
@@ -167,8 +167,7 @@ export function MapPanel({ userLat, userLng, facilities, selectedId, visibleType
 
       {/* Legend – rendered after map so it paints on top */}
       <div
-        className="absolute top-2 right-2 bg-white/95 dark:bg-zinc-900/95 rounded-lg shadow-md border px-2 py-1.5 flex gap-3"
-        style={{ zIndex: 9999 }}
+        className="absolute top-2 right-2 bg-white/95 dark:bg-zinc-900/95 rounded-lg shadow-md border px-2 py-1.5 flex gap-3 z-[9999]"
       >
         {LEGEND_ITEMS.map(({ type, color, glyph }) => (
           <label key={type} className="flex items-center gap-1.5 cursor-pointer select-none">
@@ -180,8 +179,8 @@ export function MapPanel({ userLat, userLng, facilities, selectedId, visibleType
               style={{ accentColor: color }}
             />
             <span
-              className="inline-flex items-center justify-center rounded-full text-[10px] font-bold text-white"
-              style={{ background: color, width: 18, height: 18 }}
+              className="inline-flex items-center justify-center rounded-full text-[10px] font-bold text-white w-[18px] h-[18px]"
+              style={{ background: color }}
             >
               {glyph}
             </span>
@@ -193,8 +192,7 @@ export function MapPanel({ userLat, userLng, facilities, selectedId, visibleType
         {/* User location – no checkbox */}
         <div className="flex items-center gap-1.5 select-none border-l pl-3">
           <span
-            className="inline-block rounded-full"
-            style={{ background: USER_COLOR, width: 12, height: 12, border: "2px solid #fff", boxShadow: `0 0 0 1.5px ${USER_COLOR}` }}
+            className="inline-block rounded-full w-3 h-3 bg-orange-500 border-2 border-white shadow-[0_0_0_1.5px_#f97316]"
           />
           <span className="text-xs">{t("yourLocation")}</span>
         </div>

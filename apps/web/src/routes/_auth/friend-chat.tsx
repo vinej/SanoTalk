@@ -18,7 +18,7 @@ function FriendChatPage() {
   const currentUserId = profile?.id ?? "";
 
   return (
-    <div className="flex flex-col" style={{ height: "calc(100vh - 65px)" }}>
+    <div className="flex flex-col h-[calc(100vh-65px)]">
       {/* Top bar */}
       <div className="flex items-center gap-3 px-4 py-2 border-b bg-card shrink-0">
         {selectedRoomId ? (

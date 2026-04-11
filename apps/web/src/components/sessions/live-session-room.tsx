@@ -215,7 +215,7 @@ export function LiveSessionRoom({ session, onFinalTranscript, isSoloSession, onA
       video={false}
       audio={true}
       data-lk-theme="huddle"
-      style={{ height: "100%", width: "100%" }}
+      className="h-full w-full"
       onDisconnected={handleDisconnected}
     >
       <LocalizedVideoConference participants={(session as any).participants ?? []} />

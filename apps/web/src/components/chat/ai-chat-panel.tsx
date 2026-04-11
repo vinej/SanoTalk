@@ -56,7 +56,7 @@ function UrgencyBadge({ level, t }: { level: UrgencyLevel; t: (key: string) => s
               <Phone className="h-3 w-3" /> 911
             </a>
           )}
-          <Link to="/health-help" className="inline-flex items-center gap-1 text-xs font-medium underline" style={{ color: "inherit" }}>
+          <Link to="/health-help" className="inline-flex items-center gap-1 text-xs font-medium underline text-inherit">
             <MapPin className="h-3 w-3" /> {t("chat.urgency.findER")}
           </Link>
         </div>

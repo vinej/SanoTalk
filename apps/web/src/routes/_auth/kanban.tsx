@@ -42,29 +42,29 @@ const COLUMNS: {
   {
     status: "not_assigned",
     label: "Not Assigned",
-    dot: "#94a3b8",
-    border: "#cbd5e1",
-    bg: "#f8fafc",
-    headerBg: "#f1f5f9",
-    badgeBg: "#e2e8f0",
+    dot: "bg-slate-400",
+    border: "border-slate-300",
+    bg: "bg-slate-50",
+    headerBg: "bg-slate-100",
+    badgeBg: "bg-slate-200",
   },
   {
     status: "assigned",
     label: "Assigned",
-    dot: "#60a5fa",
-    border: "#bfdbfe",
-    bg: "#eff6ff",
-    headerBg: "#dbeafe",
-    badgeBg: "#bfdbfe",
+    dot: "bg-blue-400",
+    border: "border-blue-200",
+    bg: "bg-blue-50",
+    headerBg: "bg-blue-100",
+    badgeBg: "bg-blue-200",
   },
   {
     status: "completed",
     label: "Completed",
-    dot: "#34d399",
-    border: "#a7f3d0",
-    bg: "#f0fdf4",
-    headerBg: "#dcfce7",
-    badgeBg: "#bbf7d0",
+    dot: "bg-emerald-400",
+    border: "border-emerald-200",
+    bg: "bg-green-50",
+    headerBg: "bg-green-100",
+    badgeBg: "bg-green-200",
   },
 ];
 
@@ -257,9 +257,9 @@ function KanbanPage() {
   }
 
   return (
-    <div style={{ flex: 1, backgroundColor: "#f8fafc" }}>
+    <div className="flex-1 bg-slate-50">
       {/* Page header */}
-      <div style={{ borderBottom: "1px solid #e2e8f0", backgroundColor: "white", padding: "16px 24px" }}>
+      <div className="border-b border-slate-200 bg-white px-6 py-4">
         <Link
           to="/dashboard"
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground mb-1"
@@ -267,14 +267,14 @@ function KanbanPage() {
           <ArrowLeft className="h-4 w-4" />
           {t("common:backToDashboard")}
         </Link>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div className="flex items-center justify-between">
         <div>
-          <h1 style={{ fontSize: "20px", fontWeight: 600, margin: 0 }}>{t("kanban:title")}</h1>
-          <p style={{ fontSize: "13px", color: "#64748b", margin: "2px 0 0 0" }}>
+          <h1 className="text-xl font-semibold m-0">{t("kanban:title")}</h1>
+          <p className="text-[13px] text-slate-500 mt-0.5 mb-0">
             {t("kanban:tasksTotal", { count: tasks.length })}
           </p>
         </div>
-        <div style={{ display: "flex", gap: "8px" }}>
+        <div className="flex gap-2">
           {!isAdmin && (
             <Button size="sm" onClick={() => setCreateOpen(true)}>
               <Plus className="w-4 h-4 mr-1.5" />
@@ -286,37 +286,37 @@ function KanbanPage() {
       </div>
 
       {/* Board */}
-      <div style={{ padding: "24px", display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "20px", alignItems: "start" }}>
+      <div className="p-6 grid grid-cols-3 gap-5 items-start">
         {COLUMNS.map((col) => {
           const colTasks = (tasks as TaskWithUser[]).filter(
             (t) => t.status === col.status
           );
           return (
-            <div key={col.status} style={{ borderRadius: "12px", border: `2px solid ${col.border}`, backgroundColor: col.bg, boxShadow: "0 1px 3px rgba(0,0,0,0.06)" }}>
+            <div key={col.status} className={`rounded-xl border-2 ${col.border} ${col.bg} shadow-sm`}>
               {/* Column header */}
-              <div style={{ padding: "12px 16px", backgroundColor: col.headerBg, borderRadius: "10px 10px 0 0", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `1px solid ${col.border}` }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                  <span style={{ display: "inline-block", width: "10px", height: "10px", borderRadius: "50%", backgroundColor: col.dot, flexShrink: 0 }} />
-                  <span style={{ fontSize: "13px", fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.05em", color: "#475569" }}>
+              <div className={`px-4 py-3 ${col.headerBg} rounded-t-[10px] flex items-center justify-between border-b ${col.border}`}>
+                <div className="flex items-center gap-2">
+                  <span className={`inline-block w-2.5 h-2.5 rounded-full ${col.dot} shrink-0`} />
+                  <span className="text-[13px] font-semibold uppercase tracking-wide text-slate-600">
                     {t(`kanban:columns.${col.status}`)}
                   </span>
                 </div>
-                <span style={{ fontSize: "12px", fontWeight: 600, backgroundColor: col.badgeBg, color: "#475569", borderRadius: "999px", padding: "2px 10px" }}>
+                <span className={`text-xs font-semibold ${col.badgeBg} text-slate-600 rounded-full px-2.5 py-0.5`}>
                   {colTasks.length}
                 </span>
               </div>
 
               {/* Cards */}
-              <div style={{ padding: "10px 12px 12px", display: "flex", flexDirection: "column", gap: "10px" }}>
+              <div className="px-3 pt-2.5 pb-3 flex flex-col gap-2.5">
                 {isLoading && (
                   <>
-                    <div style={{ height: "80px", borderRadius: "8px", backgroundColor: "#e2e8f0" }} />
-                    <div style={{ height: "80px", borderRadius: "8px", backgroundColor: "#e2e8f0" }} />
+                    <div className="h-20 rounded-lg bg-slate-200" />
+                    <div className="h-20 rounded-lg bg-slate-200" />
                   </>
                 )}
 
                 {!isLoading && colTasks.length === 0 && (
-                  <div style={{ padding: "24px 0", textAlign: "center", fontSize: "13px", color: "#94a3b8", fontStyle: "italic" }}>
+                  <div className="py-6 text-center text-[13px] text-slate-400 italic">
                     {t("kanban:noTasks")}
                   </div>
                 )}
@@ -326,7 +326,7 @@ function KanbanPage() {
                     key={t.id}
                     task={t}
                     users={users}
-                    borderColor={col.border}
+                    borderClass={col.border}
                     {...(!isAdmin && col.status !== "completed" ? { onMoveForward: () => handleMoveForward(t) } : {})}
                     {...(!isAdmin && col.status !== "not_assigned" && !(t.taskType === "summary_review" && col.status === "assigned") ? { onMoveBack: () => handleMoveBack(t) } : {})}
                     {...(!isAdmin && t.taskType !== "summary_review" ? { onDelete: () => handleDeleteClick(t) } : {})}
@@ -354,8 +354,8 @@ function KanbanPage() {
           <DialogHeader>
             <DialogTitle>{t("kanban:dialog.title")}</DialogTitle>
           </DialogHeader>
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px", padding: "8px 0" }}>
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+          <div className="flex flex-col gap-4 py-2">
+            <div className="flex flex-col gap-1.5">
               <Label htmlFor="task-title">{t("kanban:dialog.titleLabel")}</Label>
               <Input
                 id="task-title"
@@ -367,7 +367,7 @@ function KanbanPage() {
                 className="!border-slate-400"
               />
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div className="flex flex-col gap-1.5">
               <Label htmlFor="task-desc">{t("kanban:dialog.descriptionLabel")}</Label>
               <Input
                 id="task-desc"
@@ -398,14 +398,14 @@ function KanbanPage() {
           <DialogHeader>
             <DialogTitle>{t("kanban:assign.dialogTitle")}</DialogTitle>
           </DialogHeader>
-          <DialogDescription style={{ fontSize: "13px", color: "#64748b", marginBottom: "12px" }}>
+          <DialogDescription className="text-[13px] text-slate-500 mb-3">
             {t("kanban:assign.dialogDescription")}
           </DialogDescription>
-          <div style={{ padding: "8px 0 4px" }}>
+          <div className="py-2 pb-1">
             <select
               value={pickedUserId}
               onChange={(e) => setPickedUserId(e.target.value)}
-              style={{ width: "100%", padding: "8px 10px", fontSize: "13px", borderRadius: "6px", border: "1px solid #cbd5e1", backgroundColor: "white", color: "#1e293b", outline: "none" }}
+              className="w-full px-2.5 py-2 text-[13px] rounded-md border border-slate-300 bg-white text-slate-800 outline-none"
             >
               <option value="">{t("kanban:assign.placeholder")}</option>
               {users.map((u) => (
@@ -433,10 +433,10 @@ function KanbanPage() {
           <DialogHeader>
             <DialogTitle>{t("kanban:editDialog.title")}</DialogTitle>
           </DialogHeader>
-          <div style={{ display: "flex", flexDirection: "column", gap: "16px", padding: "8px 0" }}>
+          <div className="flex flex-col gap-4 py-2">
             {editTask?.taskType !== "summary_review" && (
               <>
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <div className="flex flex-col gap-1.5">
                   <Label htmlFor="edit-title">{t("kanban:dialog.titleLabel")}</Label>
                   <Input
                     id="edit-title"
@@ -446,7 +446,7 @@ function KanbanPage() {
                     className="!border-slate-400"
                   />
                 </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                <div className="flex flex-col gap-1.5">
                   <Label htmlFor="edit-desc">{t("kanban:dialog.descriptionLabel")}</Label>
                   <Input
                     id="edit-desc"
@@ -458,7 +458,7 @@ function KanbanPage() {
                 </div>
               </>
             )}
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <div className="flex flex-col gap-1.5">
               <Label htmlFor="edit-remark">{t("kanban:editDialog.remarkLabel")}</Label>
               <Input
                 id="edit-remark"
@@ -470,7 +470,7 @@ function KanbanPage() {
               />
             </div>
             {editTask && (
-              <p style={{ fontSize: "12px", color: "#94a3b8", margin: 0 }}>
+              <p className="text-xs text-slate-400 m-0">
                 {t("kanban:editDialog.lastUpdated", {
                   date: new Date(editTask.updatedAt).toLocaleString(undefined, { dateStyle: "medium", timeStyle: "short" }),
                 })}
@@ -497,7 +497,7 @@ function KanbanPage() {
           <DialogHeader>
             <DialogTitle>{t("kanban:delete.dialogTitle")}</DialogTitle>
           </DialogHeader>
-          <DialogDescription style={{ fontSize: "13px", color: "#64748b", padding: "8px 0" }}>
+          <DialogDescription className="text-[13px] text-slate-500 py-2">
             {t("kanban:delete.dialogDescription", { title: confirmDeleteTask?.title ?? "" })}
           </DialogDescription>
           <DialogFooter>
@@ -524,7 +524,7 @@ function KanbanPage() {
               {confirmReassignIsAssignOther ? t("kanban:assignOther.dialogTitle") : t("kanban:reassign.dialogTitle")}
             </DialogTitle>
           </DialogHeader>
-          <DialogDescription style={{ fontSize: "13px", color: "#64748b", padding: "8px 0" }}>
+          <DialogDescription className="text-[13px] text-slate-500 py-2">
             {confirmReassignIsAssignOther ? t("kanban:assignOther.dialogDescription") : t("kanban:reassign.dialogDescription")}
           </DialogDescription>
           <DialogFooter>
@@ -544,7 +544,7 @@ function KanbanPage() {
           <DialogHeader>
             <DialogTitle>{t("kanban:unassign.dialogTitle")}</DialogTitle>
           </DialogHeader>
-          <DialogDescription style={{ fontSize: "13px", color: "#64748b", padding: "8px 0" }}>
+          <DialogDescription className="text-[13px] text-slate-500 py-2">
             {t("kanban:unassign.dialogDescription")}
           </DialogDescription>
           <DialogFooter>
@@ -568,7 +568,7 @@ function KanbanPage() {
 function TaskCard({
   task,
   users,
-  borderColor,
+  borderClass,
   onMoveForward,
   onMoveBack,
   onDelete,
@@ -581,7 +581,7 @@ function TaskCard({
 }: {
   task: TaskWithUser;
   users: UserOption[];
-  borderColor: string;
+  borderClass: string;
   onMoveForward?: (() => void) | undefined;
   onMoveBack?: (() => void) | undefined;
   onDelete?: () => void;
@@ -608,10 +608,10 @@ function TaskCard({
   }
 
   return (
-    <Card className="shadow-sm hover:shadow-md transition-shadow" style={{ gap: 0, padding: 0, border: `1px solid ${borderColor}` }}>
+    <Card className={`shadow-sm hover:shadow-md transition-shadow gap-0 p-0 border ${borderClass}`}>
       {/* Title row — always visible */}
-      <div style={{ padding: "10px 12px 10px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px" }}>
-        <p style={{ fontSize: "14px", fontWeight: 600, lineHeight: "1.4", margin: 0, flex: 1 }}>{task.title}</p>
+      <div className="py-2.5 px-3 pl-4 flex items-center justify-between gap-2">
+        <p className="text-sm font-semibold leading-snug m-0 flex-1">{task.title}</p>
         <Button size="icon" variant="ghost" className="h-6 w-6 shrink-0" onClick={onToggleMinimize} title={minimized ? t("actions.expand") : t("actions.minimize")}>
           {minimized ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronUp className="w-3.5 h-3.5" />}
         </Button>
@@ -620,24 +620,24 @@ function TaskCard({
       {/* Expanded content */}
       {!minimized && (
         <>
-          <CardContent style={{ padding: "0 16px 10px", display: "flex", flexDirection: "column", gap: "8px" }}>
+          <CardContent className="px-4 pb-2.5 pt-0 flex flex-col gap-2">
             {task.description && (
               <div>
-                <p style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "2px" }}>
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">
                   {t("dialog.descriptionLabel")}
                 </p>
                 {(() => { try { return /^https?:\/\//.test(task.description) && new URL(task.description).origin === window.location.origin; } catch { return false; } })() ? (
                   readOnly ? (
-                    <p style={{ fontSize: "13px", color: "#94a3b8", fontWeight: 500, margin: 0 }}>
+                    <p className="text-[13px] text-slate-400 font-medium m-0">
                       {t("viewSummary")}
                     </p>
                   ) : (
-                    <a href={task.description} target="_blank" rel="noopener noreferrer" style={{ fontSize: "13px", color: "#2563eb", fontWeight: 500, textDecoration: "underline" }}>
+                    <a href={task.description} target="_blank" rel="noopener noreferrer" className="text-[13px] text-blue-600 font-medium underline">
                       {t("viewSummary")}
                     </a>
                   )
                 ) : (
-                  <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", margin: 0, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                  <p className="text-[13px] text-slate-500 leading-normal m-0 line-clamp-3">
                     {task.description}
                   </p>
                 )}
@@ -646,10 +646,10 @@ function TaskCard({
 
             {task.remark && (
               <div>
-                <p style={{ fontSize: "11px", fontWeight: 600, color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: "2px" }}>
+                <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-0.5">
                   {t("editDialog.remarkLabel")}
                 </p>
-                <p style={{ fontSize: "13px", color: "#64748b", lineHeight: "1.5", margin: 0, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                <p className="text-[13px] text-slate-500 leading-normal m-0 line-clamp-2">
                   {task.remark}
                 </p>
               </div>
@@ -658,11 +658,11 @@ function TaskCard({
 
           {/* User assignment dropdown (hidden for summary_review tasks) */}
           {task.taskType !== "summary_review" && (
-            <div style={{ padding: "0 12px 10px" }}>
+            <div className="px-3 pb-2.5">
               <select
                 value={task.assignedUserId ?? ""}
                 onChange={handleSelectChange}
-                style={{ width: "100%", padding: "5px 8px", fontSize: "12px", borderRadius: "6px", border: "1px solid #e2e8f0", backgroundColor: task.assignedUserId ? "#eff6ff" : "#f8fafc", color: task.assignedUserId ? "#2563eb" : "#94a3b8", outline: "none", cursor: "pointer" }}
+                className={`w-full py-1 px-2 text-xs rounded-md border border-slate-200 outline-none cursor-pointer ${task.assignedUserId ? "bg-blue-50 text-blue-600" : "bg-slate-50 text-slate-400"}`}
               >
                 <option value="">{t("assign.unassigned")}</option>
                 {users.map((u) => (
@@ -672,22 +672,22 @@ function TaskCard({
             </div>
           )}
 
-          <CardFooter style={{ padding: "8px 12px", backgroundColor: "#f8fafc", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 0 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "6px", fontSize: "12px", color: "#64748b" }}>
+          <CardFooter className="px-3 py-2 bg-slate-50 flex items-center justify-between gap-0">
+            <div className="flex items-center gap-1.5 text-xs text-slate-500">
               {task.assignedUser ? (
-                <span style={{ display: "flex", alignItems: "center", gap: "4px", color: "hsl(var(--primary))", fontWeight: 500 }}>
+                <span className="flex items-center gap-1 text-primary font-medium">
                   <User className="w-3 h-3" />
                   {task.assignedUser.name}
                 </span>
               ) : (
-                <span style={{ display: "flex", alignItems: "center", gap: "4px" }}>
+                <span className="flex items-center gap-1">
                   <Calendar className="w-3 h-3" />
                   {createdDate}
                 </span>
               )}
             </div>
 
-            <div style={{ display: "flex", alignItems: "center", gap: "2px" }}>
+            <div className="flex items-center gap-0.5">
               {onMoveBack && (
                 <Button size="icon" variant="ghost" className="h-6 w-6" onClick={onMoveBack} title={t("actions.moveBack")}>
                   <ArrowLeft className="w-3.5 h-3.5" />

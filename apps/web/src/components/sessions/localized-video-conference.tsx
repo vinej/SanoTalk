@@ -59,7 +59,7 @@ function LocalizedControlBar() {
   const { enabled: screenShareEnabled } = useTrackToggle({ source: Track.Source.ScreenShare });
 
   return (
-    <div className="lk-control-bar" style={{ gap: "4px", padding: "0 4px" }}>
+    <div className="lk-control-bar gap-1 px-1 py-0">
       <div className="lk-button-group">
         <TrackToggle source={Track.Source.Microphone}>
           {t("room.controls.microphone")}
