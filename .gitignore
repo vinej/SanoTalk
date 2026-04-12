@@ -8,10 +8,13 @@ dist
 build
 out
 
-# Environment
+# Environment (plaintext — never commit)
 .env
 .env.local
 .env.*.local
+# SOPS encrypted files ARE safe to commit — do not ignore them
+!*.env.encrypted
+!.env.encrypted
 
 # Turbo
 .turbo

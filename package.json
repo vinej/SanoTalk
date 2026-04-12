@@ -18,7 +18,11 @@
     "build:web": "pnpm --filter @sanotalk/web build",
     "clean": "node -e \"['packages/db/dist','packages/trpc/dist','apps/server/dist','apps/web/dist','packages/db/tsconfig.tsbuildinfo','packages/trpc/tsconfig.tsbuildinfo','apps/server/tsconfig.tsbuildinfo','apps/web/tsconfig.tsbuildinfo'].forEach(d=>{try{require('fs').rmSync(d,{recursive:true,force:true});console.log('removed',d)}catch(e){}})\"",
     "build:all": "pnpm build:db && pnpm build:trpc && pnpm build:server && pnpm build:web",
-    "start:prod": "cross-env NODE_ENV=production tsx apps/server/src/index.ts"
+    "start:prod": "cross-env NODE_ENV=production tsx apps/server/src/index.ts",
+    "sops:setup": "powershell -ExecutionPolicy Bypass -File scripts/secrets.ps1 setup",
+    "sops:encrypt": "powershell -ExecutionPolicy Bypass -File scripts/secrets.ps1 encrypt",
+    "sops:decrypt": "powershell -ExecutionPolicy Bypass -File scripts/secrets.ps1 decrypt",
+    "sops:edit": "powershell -ExecutionPolicy Bypass -File scripts/secrets.ps1 edit"
   },
   "devDependencies": {
     "cross-env": "^10.1.0",

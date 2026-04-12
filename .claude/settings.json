@@ -10,7 +10,9 @@
       "Bash(node -e \"const d = require\\('./packages/trpc/src/data/quebec-hospitals.json'\\); d.forEach\\(h => console.log\\(h.msssName.toUpperCase\\(\\)\\)\\)\")",
       "Bash(ls -la /c/SanoTalk/SanoTalk/apps/web/*.config.*)",
       "Bash(node -e ':*)",
-      "Bash(pnpm --filter @sanotalk/db db:generate)"
+      "Bash(pnpm --filter @sanotalk/db db:generate)",
+      "Bash(find /c/SanoTalk/SanoTalk -maxdepth 1 -type d -name \".github\" -exec ls -la {} \\\\;)",
+      "Bash(powershell -Command \"winget list age 2>&1\")"
     ]
   }
 }
