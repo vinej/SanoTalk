@@ -142,7 +142,7 @@ app.use(
 // ─── Rate Limiting ─────────────────────────────────────────────────────────
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === "production" ? 30 : 500,
+  max: process.env.NODE_ENV === "production" ? 100 : 500,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many requests, please try again later." },
@@ -164,10 +164,10 @@ const medicalLimiter = rateLimit({
   message: { error: "Too many requests, please try again later." },
 });
 
-// Strict limiter for OTP/2FA verification — 5 attempts per 5 minutes per IP
+// Strict limiter for OTP/2FA — 10 attempts per 5 minutes per IP
 const otpLimiter = rateLimit({
   windowMs: 5 * 60 * 1000,
-  max: process.env.NODE_ENV === "production" ? 5 : 500,
+  max: process.env.NODE_ENV === "production" ? 10 : 500,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many verification attempts, please try again later." },
@@ -182,6 +182,7 @@ app.use((_req, res, next) => {
 app.use(express.json({ limit: "1mb" }));
 
 // ─── Better Auth ───────────────────────────────────────────────────────────
+app.use("/api/auth/two-factor/send-otp", otpLimiter);
 app.use("/api/auth/two-factor/verify-otp", otpLimiter);
 app.use("/api/auth/two-factor/verify-totp", otpLimiter);
 app.use("/api/auth/email-verification", otpLimiter);

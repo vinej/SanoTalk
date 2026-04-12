@@ -61,7 +61,7 @@ export function AgendaRangeView({ mode }: AgendaRangeViewProps) {
     const map = new Map<string, typeof events>();
     for (const ev of events) {
       const d = ev.startAt instanceof Date ? ev.startAt : new Date(ev.startAt);
-      const key = d.toISOString().slice(0, 10);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
       const arr = map.get(key) ?? [];
       arr.push(ev);
       map.set(key, arr);
@@ -123,7 +123,7 @@ export function AgendaRangeView({ mode }: AgendaRangeViewProps) {
 
       {groupedByDay.map(({ dateStr, events: evts }) => {
         const d = new Date(dateStr + "T12:00:00");
-        const todayStr = now.toISOString().slice(0, 10);
+        const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
         const isToday = dateStr === todayStr;
         const dayLabel = d.toLocaleDateString(undefined, {
           weekday: "long",
@@ -133,9 +133,7 @@ export function AgendaRangeView({ mode }: AgendaRangeViewProps) {
 
         const items: TimelineItem[] = evts.map((e) => ({
           type: e.eventType as EventType,
-          time: (e.startAt instanceof Date ? e.startAt : new Date(e.startAt))
-            .toISOString()
-            .slice(11, 16),
+          time: (() => { const d = e.startAt instanceof Date ? e.startAt : new Date(e.startAt); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; })(),
           title: e.title,
           subtitle: e.description ?? null,
           id: e.id,

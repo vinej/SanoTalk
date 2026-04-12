@@ -51,9 +51,9 @@ export function AddEventDialog({ open, onOpenChange, editEvent }: AddEventDialog
       setTitle(editEvent.title);
       setDescription(editEvent.description ?? "");
       setLocation(editEvent.location ?? "");
-      setDate(editEvent.startAt.toISOString().slice(0, 10));
-      setStartTime(editEvent.startAt.toISOString().slice(11, 16));
-      setEndTime(editEvent.endAt ? editEvent.endAt.toISOString().slice(11, 16) : "");
+      setDate(`${editEvent.startAt.getFullYear()}-${String(editEvent.startAt.getMonth() + 1).padStart(2, "0")}-${String(editEvent.startAt.getDate()).padStart(2, "0")}`);
+      setStartTime(`${String(editEvent.startAt.getHours()).padStart(2, "0")}:${String(editEvent.startAt.getMinutes()).padStart(2, "0")}`);
+      setEndTime(editEvent.endAt ? `${String(editEvent.endAt.getHours()).padStart(2, "0")}:${String(editEvent.endAt.getMinutes()).padStart(2, "0")}` : "");
       setAllDay(editEvent.allDay);
       setEventType(editEvent.eventType);
       if (editEvent.recurrenceRule) {
@@ -71,7 +71,7 @@ export function AddEventDialog({ open, onOpenChange, editEvent }: AddEventDialog
       setDescription("");
       setLocation("");
       const today = new Date();
-      setDate(today.toISOString().slice(0, 10));
+      setDate(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`);
       setStartTime("09:00");
       setEndTime("");
       setAllDay(false);

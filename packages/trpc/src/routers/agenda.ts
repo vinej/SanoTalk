@@ -17,6 +17,16 @@ interface RecurrenceRule {
   until?: string;
 }
 
+/** Format Date as YYYY-MM-DD in the server's local timezone (not UTC). */
+function localDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+/** Format Date as HH:MM in the server's local timezone (not UTC). */
+function localTimeStr(d: Date): string {
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
 function decryptEventFields<T extends { title: string; description: string | null; location: string | null }>(e: T): T {
   return {
     ...e,
@@ -35,7 +45,7 @@ function expandRecurrences(
   if (!event.recurrenceRule) {
     // Non-recurring: include if in range
     if (event.startAt >= from && event.startAt <= to) {
-      return [{ ...event, occurrenceDate: event.startAt.toISOString().slice(0, 10) }];
+      return [{ ...event, occurrenceDate: localDateStr(event.startAt) }];
     }
     return [];
   }
@@ -78,7 +88,7 @@ function expandRecurrences(
       results.push({
         ...event,
         startAt: new Date(cursor),
-        occurrenceDate: cursor.toISOString().slice(0, 10),
+        occurrenceDate: localDateStr(cursor),
       });
     }
 
@@ -211,14 +221,14 @@ export const agendaRouter = createTRPCRouter({
         .flatMap(e => expandRecurrences(e, startOfDay, endOfDay))
         .map(e => ({
           type: e.eventType as "appointment" | "exercise",
-          time: e.startAt.toISOString().slice(11, 16),
+          time: localTimeStr(e.startAt),
           title: decryptContent(e.title) ?? e.title,
           subtitle: decryptContent(e.description) ?? null,
           id: e.id,
         }));
 
       // 2. Medication reminders
-      const todayStr = now.toISOString().slice(0, 10);
+      const todayStr = localDateStr(now);
       const meds = await ctx.db
         .select({
           scheduleId: medicationSchedule.id,
@@ -240,10 +250,10 @@ export const agendaRouter = createTRPCRouter({
 
       const medReminders = meds
         .filter(m => {
-          const start = m.medStartDate.toISOString().slice(0, 10);
+          const start = localDateStr(m.medStartDate);
           if (start > todayStr) return false;
           if (m.medEndDate) {
-            const end = m.medEndDate.toISOString().slice(0, 10);
+            const end = localDateStr(m.medEndDate);
             if (end < todayStr) return false;
           }
           return true;
@@ -288,10 +298,10 @@ export const agendaRouter = createTRPCRouter({
 
       return meds
         .filter(m => {
-          const start = m.medStartDate.toISOString().slice(0, 10);
+          const start = localDateStr(m.medStartDate);
           if (start > input.date) return false;
           if (m.medEndDate) {
-            const end = m.medEndDate.toISOString().slice(0, 10);
+            const end = localDateStr(m.medEndDate);
             if (end < input.date) return false;
           }
           return true;

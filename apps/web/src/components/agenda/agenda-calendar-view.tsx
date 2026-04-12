@@ -38,7 +38,7 @@ export function AgendaCalendarView() {
     const set = new Set<string>();
     (monthEvents ?? []).forEach((e) => {
       const d = e.startAt instanceof Date ? e.startAt : new Date(e.startAt);
-      set.add(d.toISOString().slice(0, 10));
+      set.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
     });
     return set;
   }, [monthEvents]);
@@ -49,7 +49,7 @@ export function AgendaCalendarView() {
       title: item.title,
       description: item.subtitle,
       location: null,
-      startAt: new Date(`${selectedDate.toISOString().slice(0, 10)}T${item.time}:00`),
+      startAt: new Date(`${selectedDate.getFullYear()}-${String(selectedDate.getMonth() + 1).padStart(2, "0")}-${String(selectedDate.getDate()).padStart(2, "0")}T${item.time}:00`),
       endAt: null,
       allDay: false,
       eventType: item.type as CreatableEventType,
@@ -85,7 +85,7 @@ export function AgendaCalendarView() {
           month={month}
           onMonthChange={setMonth}
           modifiers={{
-            hasEvent: (date) => daysWithEvents.has(date.toISOString().slice(0, 10)),
+            hasEvent: (date) => daysWithEvents.has(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`),
           }}
           modifiersClassNames={{
             hasEvent: "relative after:absolute after:bottom-1 after:left-1/2 after:-translate-x-1/2 after:h-1 after:w-1 after:rounded-full after:bg-blue-500",

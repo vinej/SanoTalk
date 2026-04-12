@@ -44,7 +44,7 @@ export function AgendaTodayView() {
       title: item.title,
       description: item.subtitle,
       location: null,
-      startAt: new Date(`${now.toISOString().slice(0, 10)}T${item.time}:00`),
+      startAt: new Date(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}T${item.time}:00`),
       endAt: null,
       allDay: false,
       eventType: item.type as CreatableEventType,

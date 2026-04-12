@@ -15,7 +15,7 @@ export function DayDetailPanel({ date, onEditEvent }: DayDetailPanelProps) {
   const to = new Date(date);
   to.setHours(23, 59, 59, 999);
 
-  const dateStr = date.toISOString().slice(0, 10);
+  const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 
   const { data: events } = trpc.agenda.listEvents.useQuery({
     from: from.toISOString(),
@@ -28,7 +28,7 @@ export function DayDetailPanel({ date, onEditEvent }: DayDetailPanelProps) {
 
   const eventItems: TimelineItem[] = (events ?? []).map((e) => ({
     type: e.eventType as EventType,
-    time: e.startAt instanceof Date ? e.startAt.toISOString().slice(11, 16) : new Date(e.startAt).toISOString().slice(11, 16),
+    time: (() => { const d = e.startAt instanceof Date ? e.startAt : new Date(e.startAt); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; })(),
     title: e.title,
     subtitle: e.description ?? null,
     id: e.id,

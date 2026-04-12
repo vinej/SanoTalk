@@ -109,23 +109,18 @@ function DashboardPage() {
         </div>
       )}
 
-      {/* Health Help — standalone centered */}
-      <div className="max-w-lg mx-auto">
-        <Link to={HEALTH_HELP_ITEM.to as any} className="group block">
-          <div className={`flex items-center gap-4 rounded-xl border-2 ${HEALTH_HELP_ITEM.border} ${HEALTH_HELP_ITEM.bg} p-5 transition-shadow hover:shadow-md`}>
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-white dark:bg-gray-900 shadow-sm">
-              <HEALTH_HELP_ITEM.icon className={`h-6 w-6 ${HEALTH_HELP_ITEM.color}`} />
-            </div>
-            <div className="min-w-0">
-              <p className="font-semibold group-hover:underline">{t(`dashboard:${HEALTH_HELP_ITEM.key}`)}</p>
-              <p className="text-sm text-muted-foreground">{t(`dashboard:${HEALTH_HELP_ITEM.key}Desc`)}</p>
+      {/* Groups */}
+      <div className="space-y-4">
+        {/* Health Help — same visual as group cards, red border */}
+        <Link to={HEALTH_HELP_ITEM.to as any} className="block group">
+          <div className={`flex items-center gap-3 rounded-lg border-2 ${HEALTH_HELP_ITEM.border} px-4 py-3 hover:bg-muted/50 transition-colors`}>
+            <HEALTH_HELP_ITEM.icon className={`h-5 w-5 shrink-0 ${HEALTH_HELP_ITEM.color}`} />
+            <div className="min-w-0 flex-1">
+              <p className="font-medium group-hover:underline">{t(`dashboard:${HEALTH_HELP_ITEM.key}`)}</p>
+              <p className="text-xs text-muted-foreground">{t(`dashboard:${HEALTH_HELP_ITEM.key}Desc`)}</p>
             </div>
           </div>
         </Link>
-      </div>
-
-      {/* Expandable groups */}
-      <div className="space-y-4">
         {profile?.role === "admin" && (
           <ExpandableGroup
             icon={ShieldCheck}
