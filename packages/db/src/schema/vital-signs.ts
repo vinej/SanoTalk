@@ -13,8 +13,8 @@ export const vitalSign = createTable("vital_sign", {
   unit:           text("unit").notNull(),
   notes:          text("notes"),
   source:         text("source").notNull().default("manual"),
-  measuredAt:     timestamp("measured_at").notNull(),
-  createdAt:      timestamp("created_at").notNull().defaultNow(),
+  measuredAt:     timestamp("measured_at", { withTimezone: true }).notNull(),
+  createdAt:      timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   userTypeIdx: index("vital_sign_user_type_idx").on(t.userId, t.type),
   measuredAtIdx: index("vital_sign_measured_at_idx").on(t.userId, t.measuredAt),

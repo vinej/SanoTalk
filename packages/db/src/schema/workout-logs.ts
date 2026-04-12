@@ -14,8 +14,8 @@ export const workoutLog = createTable("workout_log", {
                 }).notNull(),
   durationSecs: integer("duration_secs").notNull(),
   notes:        text("notes"),
-  completedAt:  timestamp("completed_at").notNull(),
-  createdAt:    timestamp("created_at").notNull().defaultNow(),
+  completedAt:  timestamp("completed_at", { withTimezone: true }).notNull(),
+  createdAt:    timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   userIdx: index("workout_log_user_idx").on(t.userId),
   userCompletedIdx: index("workout_log_user_completed_idx").on(t.userId, t.completedAt),

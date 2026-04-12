@@ -19,8 +19,8 @@ export const consentRecord = createTable("consent_record", {
   policyVersion:  text("policy_version").notNull(),
   ipAddress:      text("ip_address"),
   userAgent:      text("user_agent"),
-  createdAt:      timestamp("created_at").notNull().defaultNow(),
-  withdrawnAt:    timestamp("withdrawn_at"),
+  createdAt:      timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  withdrawnAt:    timestamp("withdrawn_at", { withTimezone: true }),
 }, (t) => ({
   userIdx: index("consent_record_user_idx").on(t.userId),
   typeIdx: index("consent_record_type_idx").on(t.consentType),
@@ -35,7 +35,7 @@ export const dataRetentionPolicy = createTable("data_retention_policy", {
   dataType:       text("data_type").notNull().unique(),
   retentionDays:  integer("retention_days").notNull(),
   description:    text("description"),
-  updatedAt:      timestamp("updated_at").notNull().defaultNow(),
+  updatedAt:      timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 // ─── Breach Register ────────────────────────────────────────────────────────
@@ -55,14 +55,14 @@ export const breachRecord = createTable("breach_record", {
   severity:             breachSeverityEnum("severity").notNull(),
   dataTypesAffected:    text("data_types_affected"),
   usersAffected:        integer("users_affected").notNull().default(0),
-  discoveredAt:         timestamp("discovered_at").notNull(),
-  reportedToCaiAt:      timestamp("reported_to_cai_at"),
-  usersNotifiedAt:      timestamp("users_notified_at"),
+  discoveredAt:         timestamp("discovered_at", { withTimezone: true }).notNull(),
+  reportedToCaiAt:      timestamp("reported_to_cai_at", { withTimezone: true }),
+  usersNotifiedAt:      timestamp("users_notified_at", { withTimezone: true }),
   remediationSteps:     text("remediation_steps"),
   status:               breachStatusEnum("status").notNull().default("open"),
   createdBy:            text("created_by").references(() => user.id, { onDelete: "set null" }),
-  createdAt:            timestamp("created_at").notNull().defaultNow(),
-  updatedAt:            timestamp("updated_at").notNull().defaultNow(),
+  createdAt:            timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt:            timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export type BreachRecord = typeof breachRecord.$inferSelect;
@@ -80,7 +80,7 @@ export const auditLog = createTable("audit_log", {
   ipAddress:      text("ip_address"),
   userAgent:      text("user_agent"),
   sessionId:      text("session_id"),
-  createdAt:      timestamp("created_at").notNull().defaultNow(),
+  createdAt:      timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   userIdx: index("audit_log_user_idx").on(t.userId),
   actionIdx: index("audit_log_action_idx").on(t.action),

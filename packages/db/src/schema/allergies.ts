@@ -12,8 +12,8 @@ export const allergy = createTable("allergy", {
   reaction:      text("reaction"),
   diagnosedDate: date("diagnosed_date", { mode: "string" }),
   notes:         text("notes"),
-  createdAt:     timestamp("created_at").notNull().defaultNow(),
-  updatedAt:     timestamp("updated_at").notNull().defaultNow(),
+  createdAt:     timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt:     timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   userIdx: index("allergy_user_id_idx").on(t.userId),
   userNameHashIdx: uniqueIndex("allergy_user_name_hash_idx").on(t.userId, t.nameHash),
@@ -38,8 +38,8 @@ export const chronicCondition = createTable("chronic_condition", {
   diagnosedDate: date("diagnosed_date", { mode: "string" }),
   medications:   text("medications").array(),
   notes:         text("notes"),
-  createdAt:     timestamp("created_at").notNull().defaultNow(),
-  updatedAt:     timestamp("updated_at").notNull().defaultNow(),
+  createdAt:     timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt:     timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   userIdx: index("chronic_condition_user_id_idx").on(t.userId),
   userNameHashIdx: uniqueIndex("chronic_condition_user_name_hash_idx").on(t.userId, t.nameHash),

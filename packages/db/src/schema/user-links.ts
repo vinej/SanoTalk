@@ -10,7 +10,7 @@ export const userLink = createTable("user_link", {
   patientId:      text("patient_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   professionalId: text("professional_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   linkType:       text("link_type").notNull().default("doctor"),
-  createdAt:      timestamp("created_at").notNull().defaultNow(),
+  createdAt:      timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   uniq: uniqueIndex("user_link_patient_professional_type_uniq").on(t.patientId, t.professionalId, t.linkType),
 }));
@@ -26,7 +26,7 @@ export const userFriend = createTable("user_friend", {
   id:        uuid("id").primaryKey().defaultRandom(),
   userId:    text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   friendId:  text("friend_id").notNull().references(() => user.id, { onDelete: "cascade" }),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   uniq: uniqueIndex("user_friend_uniq").on(t.userId, t.friendId),
 }));
@@ -45,8 +45,8 @@ export const connectionRequest = createTable("connection_request", {
   type:       text("type", { enum: ["link", "friend"] }).notNull(),
   linkType:   text("link_type").notNull().default("doctor"),
   status:     text("status", { enum: ["pending", "accepted", "refused"] }).notNull().default("pending"),
-  createdAt:  timestamp("created_at").notNull().defaultNow(),
-  updatedAt:  timestamp("updated_at").notNull().defaultNow(),
+  createdAt:  timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt:  timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   uniq: uniqueIndex("connection_request_from_to_type_link_uniq").on(t.fromUserId, t.toUserId, t.type, t.linkType),
 }));

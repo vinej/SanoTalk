@@ -14,7 +14,7 @@ export const recording = createTable("recording", {
   sizeBytes: integer("size_bytes"),
   durationMs: integer("duration_ms"),
   isProcessed: boolean("is_processed").notNull().default(false),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export type Recording = typeof recording.$inferSelect;

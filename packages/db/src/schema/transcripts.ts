@@ -19,7 +19,7 @@ export const transcript = createTable("transcript", {
   endMs: real("end_ms"),
   // Deepgram raw result stored for re-processing
   rawDeepgramResult: jsonb("raw_deepgram_result"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const transcriptSummary = createTable("transcript_summary", {
@@ -37,8 +37,8 @@ export const transcriptSummary = createTable("transcript_summary", {
     assessment: string;
     plan: string;
   }>(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const transcriptRelations = relations(transcript, ({ one }) => ({

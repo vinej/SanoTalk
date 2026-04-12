@@ -10,7 +10,7 @@ export const savedConversation = createTable("saved_conversation", {
   chatType: text("chat_type").notNull(), // "general" | "companion"
   title: text("title").notNull(),
   messages: jsonb("messages").notNull(), // Array<{ role: string; content: string }>
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const savedConversationRelations = relations(savedConversation, ({ one }) => ({

@@ -16,8 +16,8 @@ export const symptomLog = createTable("symptom_log", {
   customSymptoms:  text("custom_symptoms").array(),
   bodyLocation:    text("body_location"),
   notes:           text("notes"),
-  createdAt:       timestamp("created_at").notNull().defaultNow(),
-  updatedAt:       timestamp("updated_at").notNull().defaultNow(),
+  createdAt:       timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt:       timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   userDateIdx: uniqueIndex("symptom_log_user_date_idx").on(t.userId, t.date),
   userIdIdx: index("symptom_log_user_id_idx").on(t.userId),

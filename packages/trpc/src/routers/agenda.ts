@@ -17,14 +17,10 @@ interface RecurrenceRule {
   until?: string;
 }
 
-/** Format Date as YYYY-MM-DD in the server's local timezone (not UTC). */
+/** Format Date as YYYY-MM-DD in the server's local timezone.
+ *  TODO: For multi-timezone support, accept user TZ or use UTC. */
 function localDateStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
-}
-
-/** Format Date as HH:MM in the server's local timezone (not UTC). */
-function localTimeStr(d: Date): string {
-  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }
 
 function decryptEventFields<T extends { title: string; description: string | null; location: string | null }>(e: T): T {
@@ -221,7 +217,8 @@ export const agendaRouter = createTRPCRouter({
         .flatMap(e => expandRecurrences(e, startOfDay, endOfDay))
         .map(e => ({
           type: e.eventType as "appointment" | "exercise",
-          time: localTimeStr(e.startAt),
+          startAt: e.startAt,  // Date preserved by superjson; frontend formats in user's TZ
+          time: null as string | null,
           title: decryptContent(e.title) ?? e.title,
           subtitle: decryptContent(e.description) ?? null,
           id: e.id,
@@ -260,14 +257,21 @@ export const agendaRouter = createTRPCRouter({
         })
         .map(m => ({
           type: "medication" as const,
+          startAt: null as Date | null,
           time: m.timeOfDay,
           title: decryptContent(m.medName) ?? m.medName,
           subtitle: [decryptContent(m.medDosage), decryptContent(m.label)].filter(Boolean).join(" — ") || null,
           id: m.scheduleId,
         }));
 
-      // Merge and sort by time
-      const timeline = [...todayEvents, ...medReminders].sort((a, b) => a.time.localeCompare(b.time));
+      // Merge and sort by time (derive HH:MM for sorting)
+      function sortKey(item: { startAt: Date | null; time: string | null }): string {
+        if (item.startAt) {
+          return item.startAt.toISOString().slice(11, 16); // UTC HH:MM for consistent sort
+        }
+        return item.time ?? "00:00";
+      }
+      const timeline = [...todayEvents, ...medReminders].sort((a, b) => sortKey(a).localeCompare(sortKey(b)));
       return timeline;
     }),
 

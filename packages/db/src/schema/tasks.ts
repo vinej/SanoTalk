@@ -20,8 +20,8 @@ export const task = createTable("task", {
     .notNull()
     .default("standard"),
   remark: text("remark"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const taskRelations = relations(task, ({ one }) => ({

@@ -15,7 +15,7 @@ export const outdoorCustomActivity = createTable("outdoor_custom_activity", {
                    enum: ["light", "moderate", "vigorous"],
                  }).notNull(),
   suggestedMins: integer("suggested_mins").notNull().default(30),
-  createdAt:     timestamp("created_at").notNull().defaultNow(),
+  createdAt:     timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   userIdx: index("outdoor_custom_activity_user_idx").on(t.userId),
 }));
@@ -42,8 +42,8 @@ export const outdoorLog = createTable("outdoor_log", {
   durationSecs: integer("duration_secs").notNull(),
   distanceM:    integer("distance_m"),
   notes:        text("notes"),
-  completedAt:  timestamp("completed_at").notNull(),
-  createdAt:    timestamp("created_at").notNull().defaultNow(),
+  completedAt:  timestamp("completed_at", { withTimezone: true }).notNull(),
+  createdAt:    timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   userIdx: index("outdoor_log_user_idx").on(t.userId),
   userCompletedIdx: index("outdoor_log_user_completed_idx").on(t.userId, t.completedAt),

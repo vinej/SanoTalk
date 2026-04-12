@@ -9,8 +9,8 @@ export const friendChatRoom = createTable("friend_chat_room", {
   roomName:       text("room_name").notNull().unique(),
   createdById:    text("created_by_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   name:           text("name"),
-  lastActivityAt: timestamp("last_activity_at").notNull().defaultNow(),
-  createdAt:      timestamp("created_at").notNull().defaultNow(),
+  lastActivityAt: timestamp("last_activity_at", { withTimezone: true }).notNull().defaultNow(),
+  createdAt:      timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const friendChatRoomRelations = relations(friendChatRoom, ({ one, many }) => ({
@@ -24,7 +24,7 @@ export const friendChatParticipant = createTable("friend_chat_participant", {
   id:       uuid("id").primaryKey().defaultRandom(),
   roomId:   uuid("room_id").notNull().references(() => friendChatRoom.id, { onDelete: "cascade" }),
   userId:   text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
-  joinedAt: timestamp("joined_at").notNull().defaultNow(),
+  joinedAt: timestamp("joined_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   uniq: uniqueIndex("friend_chat_participant_room_user_uniq").on(t.roomId, t.userId),
   roomIdx: index("friend_chat_participant_room_idx").on(t.roomId),

@@ -8,7 +8,7 @@ export const erFavorite = createTable("er_favorite", {
   id:           uuid("id").primaryKey().defaultRandom(),
   userId:       text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   facilityName: text("facility_name").notNull(),
-  createdAt:    timestamp("created_at").notNull().defaultNow(),
+  createdAt:    timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   userFacilityIdx: uniqueIndex("er_favorite_user_facility_idx").on(t.userId, t.facilityName),
   userIdx: index("er_favorite_user_idx").on(t.userId),
@@ -35,7 +35,7 @@ export const erSnapshot = createTable("er_snapshot", {
   stretchersOccupied: smallint("stretchers_occupied").notNull(),
   patientsOver24h:    smallint("patients_over_24h").notNull(),
   patientsOver48h:    smallint("patients_over_48h").notNull(),
-  snapshotAt:         timestamp("snapshot_at").notNull().defaultNow(),
+  snapshotAt:         timestamp("snapshot_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   facilityTimeIdx: index("er_snapshot_facility_time_idx").on(t.facilityName, t.snapshotAt),
   timeIdx: index("er_snapshot_time_idx").on(t.snapshotAt),

@@ -12,13 +12,13 @@ export const agendaEvent = createTable("agenda_event", {
   title:          text("title").notNull(),            // encrypted
   description:    text("description"),                // encrypted
   location:       text("location"),                   // encrypted
-  startAt:        timestamp("start_at").notNull(),
-  endAt:          timestamp("end_at"),
+  startAt:        timestamp("start_at", { withTimezone: true }).notNull(),
+  endAt:          timestamp("end_at", { withTimezone: true }),
   allDay:         boolean("all_day").notNull().default(false),
   recurrenceRule: text("recurrence_rule"),             // JSON: { freq, daysOfWeek?, until? }
   color:          text("color"),                       // optional hex override
-  createdAt:      timestamp("created_at").notNull().defaultNow(),
-  updatedAt:      timestamp("updated_at").notNull().defaultNow(),
+  createdAt:      timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt:      timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   userIdx:        index("agenda_event_user_idx").on(t.userId),
   userStartIdx:   index("agenda_event_user_start_idx").on(t.userId, t.startAt),
@@ -41,8 +41,8 @@ export const availabilitySlot = createTable("availability_slot", {
   endTime:          text("end_time").notNull(),         // "12:00" HH:mm
   slotDurationMins: integer("slot_duration_mins").notNull().default(30),
   isActive:         boolean("is_active").notNull().default(true),
-  createdAt:        timestamp("created_at").notNull().defaultNow(),
-  updatedAt:        timestamp("updated_at").notNull().defaultNow(),
+  createdAt:        timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt:        timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   profIdx:        index("availability_slot_prof_idx").on(t.professionalId),
   profDayIdx:     index("availability_slot_prof_day_idx").on(t.professionalId, t.dayOfWeek),
@@ -65,7 +65,7 @@ export const medicationSchedule = createTable("medication_schedule", {
   timeOfDay:    text("time_of_day").notNull(),   // "08:00" HH:mm
   label:        text("label"),                   // encrypted ("Morning dose")
   isActive:     boolean("is_active").notNull().default(true),
-  createdAt:    timestamp("created_at").notNull().defaultNow(),
+  createdAt:    timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   userIdx: index("medication_schedule_user_idx").on(t.userId),
   medIdx:  index("medication_schedule_med_idx").on(t.medicationId),

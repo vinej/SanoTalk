@@ -12,7 +12,7 @@ export const chatMessage = createTable("chat_message", {
   chatType: text("chat_type"), // "general" | "companion", null for session messages
   role: text("role").notNull(), // "user" | "assistant"
   content: text("content").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 }, (t) => ({
   ownerRequired: check("chat_message_owner_required", sql`${t.userId} IS NOT NULL OR ${t.sessionId} IS NOT NULL`),
 }));

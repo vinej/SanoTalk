@@ -32,19 +32,33 @@ export function AgendaTodayView() {
     day: "numeric",
   });
 
-  const upcomingItems = (timeline ?? []).filter((item) => item.time >= currentTime);
-  const pastItems = (timeline ?? []).filter((item) => item.time < currentTime);
+  // Compute display time from startAt Date (browser local TZ) for events,
+  // or use the time string directly for medication items.
+  const items = (timeline ?? []).map((item) => {
+    if (item.startAt) {
+      const d = item.startAt instanceof Date ? item.startAt : new Date(item.startAt);
+      return {
+        ...item,
+        time: `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`,
+      };
+    }
+    return { ...item, time: item.time ?? "00:00" };
+  });
+
+  const upcomingItems = items.filter((item) => item.time >= currentTime);
+  const pastItems = items.filter((item) => item.time < currentTime);
 
   function handleEdit(item: TimelineItem) {
-    if (item.type === "medication") return; // medication reminders are not editable from here
-    // For events, we need to fetch the full event data.
-    // For now we open a simplified edit by creating a mock editEvent
+    if (item.type === "medication") return;
+    const startAt = item.startAt
+      ? (item.startAt instanceof Date ? item.startAt : new Date(item.startAt))
+      : new Date(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}T${item.time}:00`);
     setEditEvent({
       id: item.id,
       title: item.title,
       description: item.subtitle,
       location: null,
-      startAt: new Date(`${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}T${item.time}:00`),
+      startAt,
       endAt: null,
       allDay: false,
       eventType: item.type as CreatableEventType,

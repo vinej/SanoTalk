@@ -16,8 +16,8 @@ export const agentRun = createTable("agent_run", {
     enum: ["pending", "running", "success", "error"],
   }).notNull().default("pending"),
   errorMessage: text("error_message"),   // encrypted
-  startedAt: timestamp("started_at").defaultNow(),
-  completedAt: timestamp("completed_at"),
+  startedAt: timestamp("started_at", { withTimezone: true }).defaultNow(),
+  completedAt: timestamp("completed_at", { withTimezone: true }),
 });
 
 export type AgentRun = typeof agentRun.$inferSelect;

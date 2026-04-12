@@ -20,11 +20,11 @@ export const talkSession = createTable("talk_session", {
   hostId: text("host_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  scheduledAt: timestamp("scheduled_at"),
-  startedAt: timestamp("started_at"),
-  endedAt: timestamp("ended_at"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  scheduledAt: timestamp("scheduled_at", { withTimezone: true }),
+  startedAt: timestamp("started_at", { withTimezone: true }),
+  endedAt: timestamp("ended_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const sessionParticipant = createTable("session_participant", {
@@ -35,8 +35,8 @@ export const sessionParticipant = createTable("session_participant", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  joinedAt: timestamp("joined_at"),
-  leftAt: timestamp("left_at"),
+  joinedAt: timestamp("joined_at", { withTimezone: true }),
+  leftAt: timestamp("left_at", { withTimezone: true }),
   livekitParticipantId: text("livekit_participant_id"),
 });
 

@@ -7,6 +7,7 @@ export type EventType = CreatableEventType | "medication";
 export interface TimelineItem {
   type: EventType;
   time: string;
+  startAt?: Date | null;
   title: string;
   subtitle: string | null;
   id: string;
