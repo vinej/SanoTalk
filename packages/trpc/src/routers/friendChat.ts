@@ -17,7 +17,7 @@ export const friendChatRouter = createTRPCRouter({
   /** Create a new chat room and add selected friends as participants. */
   create: protectedProcedure
     .input(z.object({
-      friendIds: z.array(z.string().uuid()).min(1).max(20),
+      friendIds: z.array(z.string().min(1)).min(1).max(20),
       name: z.string().max(100).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
@@ -99,7 +99,7 @@ export const friendChatRouter = createTRPCRouter({
   addParticipant: protectedProcedure
     .input(z.object({
       roomId: z.string().uuid(),
-      friendId: z.string().uuid(),
+      friendId: z.string().min(1),
     }))
     .mutation(async ({ ctx, input }) => {
       // Verify caller is in the room

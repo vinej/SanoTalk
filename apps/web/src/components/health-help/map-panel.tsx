@@ -121,7 +121,41 @@ export function MapPanel({ userLat, userLng, facilities, selectedId, visibleType
   const isFr = i18n.language === "fr";
 
   return (
-    <div className="relative w-full h-full isolate">
+    <div className="w-full h-full flex flex-col sm:block sm:relative isolate">
+      {/* Legend – stacked above map on mobile, overlaid on desktop */}
+      <div
+        className="shrink-0 bg-white/95 dark:bg-zinc-900/95 border-b px-2 py-1.5 flex flex-wrap gap-x-3 gap-y-1 sm:absolute sm:top-2 sm:right-2 sm:border sm:rounded-lg sm:shadow-md sm:border-b sm:flex-nowrap sm:z-[9999]"
+      >
+        {LEGEND_ITEMS.map(({ type, color, glyph }) => (
+          <label key={type} className="flex items-center gap-1.5 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={visibleTypes.has(type)}
+              onChange={() => onToggleType(type)}
+              className="accent-current h-3.5 w-3.5 rounded cursor-pointer"
+              style={{ accentColor: color }}
+            />
+            <span
+              className="inline-flex items-center justify-center rounded-full text-[10px] font-bold text-white w-[18px] h-[18px]"
+              style={{ background: color }}
+            >
+              {glyph}
+            </span>
+            <span className="text-xs">
+              {type === "hospital" ? t("hospital") : type === "pharmacy" ? t("pharmacy") : type === "clinic" ? t("clinic") : t("clsc")}
+            </span>
+          </label>
+        ))}
+        {/* User location – no checkbox */}
+        <div className="flex items-center gap-1.5 select-none sm:border-l sm:pl-3">
+          <span
+            className="inline-block rounded-full w-3 h-3 bg-orange-500 border-2 border-white shadow-[0_0_0_1.5px_#f97316]"
+          />
+          <span className="text-xs">{t("yourLocation")}</span>
+        </div>
+      </div>
+
+      <div className="flex-1 min-h-0 sm:h-full sm:min-h-0 relative">
     <MapContainer
       center={[userLat, userLng]}
       zoom={10}
@@ -164,38 +198,6 @@ export function MapPanel({ userLat, userLng, facilities, selectedId, visibleType
         );
       })}
     </MapContainer>
-
-      {/* Legend – rendered after map so it paints on top */}
-      <div
-        className="absolute top-2 right-2 bg-white/95 dark:bg-zinc-900/95 rounded-lg shadow-md border px-2 py-1.5 flex gap-3 z-[9999]"
-      >
-        {LEGEND_ITEMS.map(({ type, color, glyph }) => (
-          <label key={type} className="flex items-center gap-1.5 cursor-pointer select-none">
-            <input
-              type="checkbox"
-              checked={visibleTypes.has(type)}
-              onChange={() => onToggleType(type)}
-              className="accent-current h-3.5 w-3.5 rounded cursor-pointer"
-              style={{ accentColor: color }}
-            />
-            <span
-              className="inline-flex items-center justify-center rounded-full text-[10px] font-bold text-white w-[18px] h-[18px]"
-              style={{ background: color }}
-            >
-              {glyph}
-            </span>
-            <span className="text-xs">
-              {type === "hospital" ? t("hospital") : type === "pharmacy" ? t("pharmacy") : type === "clinic" ? t("clinic") : t("clsc")}
-            </span>
-          </label>
-        ))}
-        {/* User location – no checkbox */}
-        <div className="flex items-center gap-1.5 select-none border-l pl-3">
-          <span
-            className="inline-block rounded-full w-3 h-3 bg-orange-500 border-2 border-white shadow-[0_0_0_1.5px_#f97316]"
-          />
-          <span className="text-xs">{t("yourLocation")}</span>
-        </div>
       </div>
     </div>
   );

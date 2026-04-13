@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { task, user } from "@sanotalk/db";
-import { eq, and, inArray } from "drizzle-orm";
+import { eq, and, or, inArray } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { verifyAdminFromDb } from "../lib/verify-admin";
 import { getRelatedUserIds } from "../lib/related-users";
@@ -26,7 +26,10 @@ export const tasksRouter = createTRPCRouter({
       }));
     }
     return ctx.db.query.task.findMany({
-      where: eq(task.assignedUserId, ctx.user.id),
+      where: or(
+        eq(task.assignedUserId, ctx.user.id),
+        eq(task.createdByUserId, ctx.user.id)
+      ),
       with: { assignedUser: { columns: { id: true, name: true, role: true } } },
       orderBy: (t, { desc }) => [desc(t.createdAt)],
       limit: 500,
@@ -46,9 +49,9 @@ export const tasksRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       if (await verifyAdminFromDb(ctx.db, ctx.user.id)) throw new TRPCError({ code: "FORBIDDEN", message: "Admins cannot create tasks" });
       if (input.assignedUserId && input.assignedUserId !== ctx.user.id) {
-        const relatedIds = await getRelatedUserIds(ctx.db, ctx.user.id);
+        const relatedIds = await getRelatedUserIds(ctx.db, ctx.user.id, { acceptedOnly: true });
         if (!relatedIds.has(input.assignedUserId)) {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Can only assign tasks to related users" });
+          throw new TRPCError({ code: "FORBIDDEN", message: "Can only assign tasks to users linked in your profile" });
         }
       }
       const status = input.assignedUserId ? "assigned" : "not_assigned";
@@ -59,6 +62,7 @@ export const tasksRouter = createTRPCRouter({
           description: input.description,
           status,
           assignedUserId: input.assignedUserId,
+          createdByUserId: ctx.user.id,
           taskType: input.taskType ?? "standard",
           remark: input.remark,
         })
@@ -81,14 +85,18 @@ export const tasksRouter = createTRPCRouter({
       const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
       if (isAdmin) throw new TRPCError({ code: "FORBIDDEN", message: "Admins cannot modify tasks" });
       if (input.assignedUserId && input.assignedUserId !== ctx.user.id) {
-        const relatedIds = await getRelatedUserIds(ctx.db, ctx.user.id);
+        const relatedIds = await getRelatedUserIds(ctx.db, ctx.user.id, { acceptedOnly: true });
         if (!relatedIds.has(input.assignedUserId)) {
-          throw new TRPCError({ code: "FORBIDDEN", message: "Can only assign tasks to related users" });
+          throw new TRPCError({ code: "FORBIDDEN", message: "Can only assign tasks to users linked in your profile" });
         }
       }
       return ctx.db.transaction(async (tx) => {
         const { id, ...fields } = input;
-        const existing = await tx.query.task.findFirst({ where: and(eq(task.id, id), eq(task.assignedUserId, ctx.user.id)) });
+        const accessFilter = or(
+          eq(task.assignedUserId, ctx.user.id),
+          eq(task.createdByUserId, ctx.user.id)
+        );
+        const existing = await tx.query.task.findFirst({ where: and(eq(task.id, id), accessFilter) });
         if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "Task not found" });
         if (existing.taskType === "summary_review") {
           if (fields.assignedUserId !== undefined) {
@@ -101,14 +109,14 @@ export const tasksRouter = createTRPCRouter({
           const [updated] = await tx
             .update(task)
             .set({ remark, status, updatedAt: new Date() })
-            .where(and(eq(task.id, id), eq(task.assignedUserId, ctx.user.id)))
+            .where(and(eq(task.id, id), accessFilter))
             .returning({ id: task.id, title: task.title, status: task.status, taskType: task.taskType, assignedUserId: task.assignedUserId, createdAt: task.createdAt });
           return updated;
         }
         const [updated] = await tx
           .update(task)
           .set({ ...fields, updatedAt: new Date() })
-          .where(and(eq(task.id, id), eq(task.assignedUserId, ctx.user.id)))
+          .where(and(eq(task.id, id), accessFilter))
           .returning({ id: task.id, title: task.title, status: task.status, taskType: task.taskType, assignedUserId: task.assignedUserId, createdAt: task.createdAt });
         return updated;
       });
@@ -118,12 +126,16 @@ export const tasksRouter = createTRPCRouter({
     .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
       if (await verifyAdminFromDb(ctx.db, ctx.user.id)) throw new TRPCError({ code: "FORBIDDEN", message: "Admins cannot delete tasks" });
-      const existing = await ctx.db.query.task.findFirst({ where: and(eq(task.id, input.id), eq(task.assignedUserId, ctx.user.id)) });
+      const accessFilter = or(
+        eq(task.assignedUserId, ctx.user.id),
+        eq(task.createdByUserId, ctx.user.id)
+      );
+      const existing = await ctx.db.query.task.findFirst({ where: and(eq(task.id, input.id), accessFilter) });
       if (!existing) throw new TRPCError({ code: "NOT_FOUND", message: "Task not found" });
       if (existing.taskType === "summary_review") {
         throw new TRPCError({ code: "FORBIDDEN", message: "Cannot delete a summary review task" });
       }
-      await ctx.db.delete(task).where(and(eq(task.id, input.id), eq(task.assignedUserId, ctx.user.id)));
+      await ctx.db.delete(task).where(and(eq(task.id, input.id), accessFilter));
     }),
 
   listUsers: protectedProcedure.query(async ({ ctx }) => {
@@ -135,8 +147,11 @@ export const tasksRouter = createTRPCRouter({
         limit: 1000,
       });
     }
-    const relatedIds = await getRelatedUserIds(ctx.db, ctx.user.id);
-    if (relatedIds.size === 0) return [];
+    // Tasks may only be assigned to people in the user's profile
+    // (Doctor / Wellness / Pharmacist / Friends) — no pending requests.
+    // Include self so the user can also assign a task to themselves.
+    const relatedIds = await getRelatedUserIds(ctx.db, ctx.user.id, { acceptedOnly: true });
+    relatedIds.add(ctx.user.id);
     return ctx.db.query.user.findMany({
       where: inArray(user.id, [...relatedIds]),
       columns: { id: true, name: true, role: true },

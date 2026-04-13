@@ -21,7 +21,7 @@ function AgendaPage() {
   const isProfessional = profile?.role === "doctor" || profile?.role === "pharmacist";
 
   return (
-    <div data-openreplay-obscured className="flex flex-col h-full">
+    <div data-openreplay-obscured className="flex-1 min-h-0 flex flex-col">
       <div className="border-b px-6 py-4">
         <div className="flex items-center gap-4">
           <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">

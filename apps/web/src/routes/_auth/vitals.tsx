@@ -52,7 +52,7 @@ function VitalsPage() {
   const { data: recentAll = [] } = trpc.vitals.list.useQuery({ limit: 50 });
 
   return (
-    <div data-openreplay-obscured className="flex-1 flex flex-col min-h-0 px-6 py-6 space-y-4">
+    <div data-openreplay-obscured className="flex-1 flex flex-col min-h-0 px-6 py-6 space-y-4 overflow-y-auto sm:overflow-visible">
       {/* Header */}
       <div className="shrink-0 space-y-1">
         <Link
@@ -99,12 +99,12 @@ function VitalsPage() {
       </div>
 
       {/* Chart + date range */}
-      <div className="flex-1 min-h-0 flex flex-col">
-        <div className="flex items-center justify-between mb-2 shrink-0">
+      <div className="shrink-0 sm:flex-1 sm:min-h-0 flex flex-col">
+        <div className="flex items-center justify-between mb-2 shrink-0 flex-wrap gap-2">
           <h2 className="text-sm font-semibold" style={{ color: VITAL_CONFIGS.find(c => c.type === selectedType)?.color }}>
             {t(`types.${selectedType}`)}
           </h2>
-          <div className="flex gap-1">
+          <div className="flex gap-1 flex-wrap">
             {(["7d", "30d", "90d", "1y", "all"] as DateRange[]).map((r) => (
               <Button
                 key={r}
@@ -119,7 +119,7 @@ function VitalsPage() {
           </div>
         </div>
 
-        <div className="flex-1 min-h-[200px] max-h-[350px]">
+        <div className="h-64 sm:h-auto sm:flex-1 sm:min-h-[200px] sm:max-h-[350px]">
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -131,7 +131,7 @@ function VitalsPage() {
       </div>
 
       {/* History table */}
-      <div className="shrink-0 border rounded-lg max-h-[250px] overflow-hidden">
+      <div className="shrink-0 border rounded-lg sm:max-h-[250px] overflow-hidden">
         <div className="px-3 py-2 border-b bg-muted/30">
           <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{t("history")}</span>
         </div>

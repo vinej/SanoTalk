@@ -408,7 +408,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
         </div>
       )}
       <ScrollArea className="flex-1 min-h-0">
-        <div data-openreplay-obscured className="p-3 space-y-3">
+        <div data-openreplay-obscured className="w-full px-1 py-3 sm:p-3 space-y-3">
           {messages.length === 0 && !isPending && (
             <p className="text-sm text-muted-foreground text-center py-8">
               {t(variantCfg.emptyKey)}
@@ -419,10 +419,10 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
             <div
               key={msg.id}
               className={cn(
-                "max-w-[85%] rounded-lg px-3 py-2 text-sm",
+                "rounded-lg py-2 text-sm",
                 msg.role === "user"
-                  ? "ml-auto bg-primary text-primary-foreground whitespace-pre-wrap"
-                  : cn("mr-auto chat-markdown", variantCfg.bubbleClass)
+                  ? "ml-auto max-w-[85%] px-3 bg-primary text-primary-foreground whitespace-pre-wrap"
+                  : cn("w-full px-2 sm:px-3 chat-markdown", variantCfg.bubbleClass)
               )}
             >
               {msg.role === "assistant" ? renderMessageContent(msg.content, t) : msg.content}
@@ -509,7 +509,8 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
           {micError}
         </div>
       )}
-      <div className="border-t p-2 flex gap-2 shrink-0 items-end">
+      <div className="border-t p-2 flex flex-col gap-2 shrink-0 sm:flex-row sm:items-end">
+        <div className="flex flex-wrap gap-1 order-2 sm:order-1 sm:flex-nowrap sm:gap-2 sm:items-end">
         {!isSessionMode && (
           <>
             <Button
@@ -576,6 +577,8 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
         >
           {voiceEnabled ? <Mic className="h-3 w-3" /> : <MicOff className="h-3 w-3" />}
         </Button>
+        </div>
+        <div className="flex gap-2 items-end order-1 sm:order-2 sm:flex-1">
         <Textarea
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
@@ -593,6 +596,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
         <Button size="sm" onClick={handleSend} disabled={isPending || !inputValue.trim()}>
           {isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Send className="h-3 w-3" />}
         </Button>
+        </div>
       </div>
 
       {/* Delete saved conversation confirmation dialog */}

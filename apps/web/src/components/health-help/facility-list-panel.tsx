@@ -72,7 +72,7 @@ export function FacilityListPanel({ facilities, selectedId, onSelect, favorites,
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-muted-foreground">{idx + 1}</span>
-                    <h3 className="text-sm font-semibold truncate">{name}</h3>
+                    <h3 className="text-sm font-semibold truncate" title={name}>{name}</h3>
                     {onToggleFavorite && f.type === "hospital" && (
                       <button
                         type="button"

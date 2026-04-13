@@ -64,7 +64,7 @@ function TrainBodyPage() {
         </p>
       </details>
 
-      <Tabs defaultValue="exercises" className="flex-1 flex flex-col min-h-0">
+      <Tabs defaultValue="exercises" className="flex flex-col sm:flex-1 sm:min-h-0">
         <TabsList className="shrink-0">
           <TabsTrigger value="exercises">{t("trainBody:tabs.exercises")}</TabsTrigger>
           <TabsTrigger value="progress">{t("trainBody:tabs.progress")}</TabsTrigger>
@@ -72,7 +72,7 @@ function TrainBodyPage() {
         </TabsList>
 
         {/* Exercises Tab */}
-        <TabsContent value="exercises" className="flex-1 overflow-auto space-y-4 mt-4">
+        <TabsContent value="exercises" className="sm:flex-1 sm:overflow-auto space-y-4 mt-4">
           {/* Category filter */}
           <div className="flex flex-wrap gap-1.5">
             <Button
@@ -132,14 +132,14 @@ function TrainBodyPage() {
         </TabsContent>
 
         {/* Progress Tab */}
-        <TabsContent value="progress" className="flex-1 overflow-auto space-y-6 mt-4">
+        <TabsContent value="progress" className="sm:flex-1 sm:overflow-auto space-y-6 mt-4">
           <WeekCalendar />
           <WorkoutStatsCard />
           <WorkoutHistoryTable />
         </TabsContent>
 
         {/* Resources Tab */}
-        <TabsContent value="resources" className="flex-1 overflow-auto mt-4">
+        <TabsContent value="resources" className="sm:flex-1 sm:overflow-auto mt-4">
           <ResourceList />
         </TabsContent>
       </Tabs>

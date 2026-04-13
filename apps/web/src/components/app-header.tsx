@@ -61,11 +61,11 @@ export function AppHeader() {
   return (
     <>
       <ConnectionRequestsDialog open={requestsOpen} onOpenChange={setRequestsOpen} />
-      <div className="flex items-center justify-between px-6 py-3 bg-white border-b shrink-0">
-        <Link to="/dashboard">
+      <div className="flex items-center justify-between px-2 sm:px-6 py-3 bg-white border-b shrink-0 gap-2">
+        <Link to="/dashboard" className="shrink-0">
           <SanoTalkLogoV2 size={64} showText={true} />
         </Link>
-        <div className="flex flex-col items-center text-[10px] text-muted-foreground/60 font-mono">
+        <div className="hidden sm:flex flex-col items-center text-[10px] text-muted-foreground/60 font-mono">
           <span>
             v{__APP_VERSION__}{aiInfo && <> powered by {aiInfo.model ?? aiInfo.provider}</>}
           </span>
@@ -76,8 +76,8 @@ export function AppHeader() {
           )}
         </div>
         {profile && (
-          <div className="text-sm grid grid-cols-[auto_auto_auto] items-center gap-x-3 gap-y-0 shrink-0">
-            <span className="font-medium text-right">{profile.name}</span>
+          <div className="text-sm grid grid-cols-[auto_auto] sm:grid-cols-[auto_auto_auto] items-center gap-x-3 gap-y-0 shrink-0">
+            <span className="hidden sm:inline font-medium text-right">{profile.name}</span>
             <span className="text-[10px] text-muted-foreground bg-muted rounded px-1.5 py-0.5 uppercase tracking-wide text-center">
               {t(`common:roles.${profile.role}`)}
             </span>
@@ -88,8 +88,8 @@ export function AppHeader() {
                 className="relative h-6 px-2 text-xs"
                 onClick={() => setRequestsOpen(true)}
               >
-                <Bell className="h-3 w-3 mr-1" />
-                {t("dashboard:requests")}
+                <Bell className="h-3 w-3 sm:mr-1" />
+                <span className="hidden sm:inline">{t("dashboard:requests")}</span>
                 {pendingCount > 0 && (
                   <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-white font-bold">
                     {pendingCount}
@@ -97,14 +97,14 @@ export function AppHeader() {
                 )}
               </Button>
             </div>
-            <span className="text-muted-foreground text-right">{profile.email}</span>
+            <span className="hidden sm:inline text-muted-foreground text-right">{profile.email}</span>
             <div className="flex justify-center">
               <LanguageSwitcher />
             </div>
             <div className="flex gap-1 justify-end">
               <Button size="sm" variant="ghost" className="h-6 px-2 text-xs" onClick={() => setLogoutOpen(true)}>
-                <LogOut className="h-3 w-3 mr-1" />
-                {t("common:logout")}
+                <LogOut className="h-3 w-3 sm:mr-1" />
+                <span className="hidden sm:inline">{t("common:logout")}</span>
               </Button>
             </div>
           </div>

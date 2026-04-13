@@ -1,0 +1,2 @@
+ALTER TABLE "sanotalk_task" ADD COLUMN "created_by_user_id" text;--> statement-breakpoint
+ALTER TABLE "sanotalk_task" ADD CONSTRAINT "sanotalk_task_created_by_user_id_sanotalk_user_id_fk" FOREIGN KEY ("created_by_user_id") REFERENCES "public"."sanotalk_user"("id") ON DELETE set null ON UPDATE no action;

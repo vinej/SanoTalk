@@ -21,6 +21,7 @@ import {
 import { Plus, Trash2, ArrowRight, ArrowLeft, User, Calendar, Pencil, ChevronDown, ChevronUp } from "lucide-react";
 import { Label } from "../../components/ui/label";
 import { Input } from "../../components/ui/input";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../components/ui/tabs";
 import type { Task } from "@sanotalk/db";
 
 export const Route = createFileRoute("/_auth/kanban")({
@@ -186,11 +187,14 @@ function KanbanPage() {
       }
     } else {
       // Warn whenever the current user will lose visibility after the assignment
-      // (assigning to someone else from not_assigned, or reassigning away from self)
-      const isAssignOther = task.status === "not_assigned" && newUserId !== currentUserId;
+      // (reassigning away from self, unless the user is also the creator — creators
+      // always see their own tasks regardless of assignment)
+      const isCreator = task.createdByUserId === currentUserId;
+      const isAssignOther = task.status === "not_assigned" && newUserId !== currentUserId && !isCreator;
       const willLoseVisibility =
         (task.status === "not_assigned" || task.assignedUserId === currentUserId) &&
-        newUserId !== currentUserId;
+        newUserId !== currentUserId &&
+        !isCreator;
       if (willLoseVisibility) {
         setConfirmReassignTask(task);
         setConfirmReassignNewUserId(newUserId);
@@ -286,67 +290,111 @@ function KanbanPage() {
       </div>
 
       {/* Board */}
-      <div className="p-6 grid grid-cols-3 gap-5 items-start">
-        {COLUMNS.map((col) => {
+      {(() => {
+        const renderColumnCards = (col: typeof COLUMNS[number]) => {
           const colTasks = (tasks as TaskWithUser[]).filter(
-            (t) => t.status === col.status
+            (task) => task.status === col.status
           );
           return (
-            <div key={col.status} className={`rounded-xl border-2 ${col.border} ${col.bg} shadow-sm`}>
-              {/* Column header */}
-              <div className={`px-4 py-3 ${col.headerBg} rounded-t-[10px] flex items-center justify-between border-b ${col.border}`}>
-                <div className="flex items-center gap-2">
-                  <span className={`inline-block w-2.5 h-2.5 rounded-full ${col.dot} shrink-0`} />
-                  <span className="text-[13px] font-semibold uppercase tracking-wide text-slate-600">
-                    {t(`kanban:columns.${col.status}`)}
-                  </span>
+            <div className="px-3 pt-2.5 pb-3 flex flex-col gap-2.5">
+              {isLoading && (
+                <>
+                  <div className="h-20 rounded-lg bg-slate-200" />
+                  <div className="h-20 rounded-lg bg-slate-200" />
+                </>
+              )}
+
+              {!isLoading && colTasks.length === 0 && (
+                <div className="py-6 text-center text-[13px] text-slate-400 italic">
+                  {t("kanban:noTasks")}
                 </div>
-                <span className={`text-xs font-semibold ${col.badgeBg} text-slate-600 rounded-full px-2.5 py-0.5`}>
-                  {colTasks.length}
-                </span>
-              </div>
+              )}
 
-              {/* Cards */}
-              <div className="px-3 pt-2.5 pb-3 flex flex-col gap-2.5">
-                {isLoading && (
-                  <>
-                    <div className="h-20 rounded-lg bg-slate-200" />
-                    <div className="h-20 rounded-lg bg-slate-200" />
-                  </>
-                )}
-
-                {!isLoading && colTasks.length === 0 && (
-                  <div className="py-6 text-center text-[13px] text-slate-400 italic">
-                    {t("kanban:noTasks")}
-                  </div>
-                )}
-
-                {colTasks.map((t) => (
-                  <TaskCard
-                    key={t.id}
-                    task={t}
-                    users={users}
-                    borderClass={col.border}
-                    {...(!isAdmin && col.status !== "completed" ? { onMoveForward: () => handleMoveForward(t) } : {})}
-                    {...(!isAdmin && col.status !== "not_assigned" && !(t.taskType === "summary_review" && col.status === "assigned") ? { onMoveBack: () => handleMoveBack(t) } : {})}
-                    {...(!isAdmin && t.taskType !== "summary_review" ? { onDelete: () => handleDeleteClick(t) } : {})}
-                    {...(!isAdmin && t.assignedUserId === currentUserId ? { onEdit: () => handleOpenEdit(t) } : {})}
-                    {...(!isAdmin ? { onAssignUser: (userId: string) => handleDropdownChange(t, userId) } : {})}
-                    {...(!isAdmin ? { onUnassignUser: () => handleDropdownChange(t, "") } : {})}
-                    readOnly={isAdmin}
-                    minimized={minimizedTasks.has(t.id)}
-                    onToggleMinimize={() => setMinimizedTasks((prev) => {
-                      const next = new Set(prev);
-                      next.has(t.id) ? next.delete(t.id) : next.add(t.id);
-                      return next;
-                    })}
-                  />
-                ))}
-              </div>
+              {colTasks.map((task) => (
+                <TaskCard
+                  key={task.id}
+                  task={task}
+                  users={users}
+                  borderClass={col.border}
+                  {...(!isAdmin && col.status !== "completed" ? { onMoveForward: () => handleMoveForward(task) } : {})}
+                  {...(!isAdmin && col.status !== "not_assigned" && !(task.taskType === "summary_review" && col.status === "assigned") ? { onMoveBack: () => handleMoveBack(task) } : {})}
+                  {...(!isAdmin && task.taskType !== "summary_review" ? { onDelete: () => handleDeleteClick(task) } : {})}
+                  {...(!isAdmin && (task.assignedUserId === currentUserId || task.createdByUserId === currentUserId) ? { onEdit: () => handleOpenEdit(task) } : {})}
+                  {...(!isAdmin ? { onAssignUser: (userId: string) => handleDropdownChange(task, userId) } : {})}
+                  {...(!isAdmin ? { onUnassignUser: () => handleDropdownChange(task, "") } : {})}
+                  readOnly={isAdmin}
+                  minimized={minimizedTasks.has(task.id)}
+                  onToggleMinimize={() => setMinimizedTasks((prev) => {
+                    const next = new Set(prev);
+                    next.has(task.id) ? next.delete(task.id) : next.add(task.id);
+                    return next;
+                  })}
+                />
+              ))}
             </div>
           );
-        })}
-      </div>
+        };
+
+        return (
+          <>
+            {/* Mobile: tabs (< sm) */}
+            <Tabs defaultValue="not_assigned" className="sm:hidden p-3">
+              <TabsList className="w-full grid grid-cols-3">
+                {COLUMNS.map((col) => {
+                  const count = (tasks as TaskWithUser[]).filter((x) => x.status === col.status).length;
+                  return (
+                    <TabsTrigger
+                      key={col.status}
+                      value={col.status}
+                      className="flex items-center gap-1.5 min-w-0"
+                    >
+                      <span className={`inline-block w-2 h-2 rounded-full ${col.dot} shrink-0`} />
+                      <span className="truncate text-xs">{t(`kanban:columns.${col.status}`)}</span>
+                      <span className={`text-[10px] font-semibold ${col.badgeBg} text-slate-600 rounded-full px-1.5 shrink-0`}>
+                        {count}
+                      </span>
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+              {COLUMNS.map((col) => (
+                <TabsContent key={col.status} value={col.status} className="mt-3">
+                  <div className={`rounded-xl border-2 ${col.border} ${col.bg} shadow-sm`}>
+                    {renderColumnCards(col)}
+                  </div>
+                </TabsContent>
+              ))}
+            </Tabs>
+
+            {/* Desktop: 3-column grid (>= sm) */}
+            <div className="hidden sm:grid p-6 grid-cols-3 gap-5 items-start">
+              {COLUMNS.map((col) => {
+                const colTasks = (tasks as TaskWithUser[]).filter(
+                  (task) => task.status === col.status
+                );
+                return (
+                  <div key={col.status} className={`rounded-xl border-2 ${col.border} ${col.bg} shadow-sm`}>
+                    {/* Column header */}
+                    <div className={`px-4 py-3 ${col.headerBg} rounded-t-[10px] flex items-center justify-between border-b ${col.border}`}>
+                      <div className="flex items-center gap-2">
+                        <span className={`inline-block w-2.5 h-2.5 rounded-full ${col.dot} shrink-0`} />
+                        <span className="text-[13px] font-semibold uppercase tracking-wide text-slate-600">
+                          {t(`kanban:columns.${col.status}`)}
+                        </span>
+                      </div>
+                      <span className={`text-xs font-semibold ${col.badgeBg} text-slate-600 rounded-full px-2.5 py-0.5`}>
+                        {colTasks.length}
+                      </span>
+                    </div>
+
+                    {renderColumnCards(col)}
+                  </div>
+                );
+              })}
+            </div>
+          </>
+        );
+      })()}
 
       {/* Create dialog */}
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>

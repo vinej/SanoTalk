@@ -14,6 +14,9 @@ export const task = createTable("task", {
   assignedUserId: text("assigned_user_id").references(() => user.id, {
     onDelete: "set null",
   }),
+  createdByUserId: text("created_by_user_id").references(() => user.id, {
+    onDelete: "set null",
+  }),
   taskType: text("task_type", {
     enum: ["standard", "summary_review"],
   })
@@ -28,6 +31,12 @@ export const taskRelations = relations(task, ({ one }) => ({
   assignedUser: one(user, {
     fields: [task.assignedUserId],
     references: [user.id],
+    relationName: "task_assignedUser",
+  }),
+  createdByUser: one(user, {
+    fields: [task.createdByUserId],
+    references: [user.id],
+    relationName: "task_createdByUser",
   }),
 }));
 

@@ -1,10 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Phone, ChevronDown, ChevronUp } from "lucide-react";
 
+const STORAGE_KEY = "sanotalk_emergency_numbers_open";
+
 export function EmergencyNumbers({ defaultOpen = true }: { defaultOpen?: boolean }) {
   const { t } = useTranslation("healthHelp");
-  const [open, setOpen] = useState(defaultOpen);
+  const [open, setOpen] = useState<boolean>(() => {
+    if (typeof window === "undefined") return defaultOpen;
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    return stored === null ? defaultOpen : stored === "1";
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    window.localStorage.setItem(STORAGE_KEY, open ? "1" : "0");
+  }, [open]);
+
+  // Sync state when another instance on the same page toggles it
+  useEffect(() => {
+    function onStorage(e: StorageEvent) {
+      if (e.key === STORAGE_KEY && e.newValue !== null) {
+        setOpen(e.newValue === "1");
+      }
+    }
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
 
   return (
     <div className="bg-red-50 dark:bg-red-950/30 border-b border-red-200 dark:border-red-900">

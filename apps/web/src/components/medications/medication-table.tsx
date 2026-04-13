@@ -55,7 +55,51 @@ export function MedicationTable({ data, onEdit }: Props) {
   return (
     <>
       <ScrollArea className="h-full">
-        <table className="w-full text-sm">
+        {/* Mobile: card layout */}
+        <div className="sm:hidden divide-y">
+          {data.map((row) => (
+            <div key={row.id} className="p-3 flex gap-2">
+              <div className="flex-1 min-w-0 space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-medium text-sm">{row.name}</span>
+                  <Badge variant="secondary" className={row.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}>
+                    {row.isActive ? t("active") : t("inactive")}
+                  </Badge>
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  {row.dosage} &middot; {t(`freq.${row.frequency}`, row.frequency)}
+                </div>
+                {row.prescribedBy && (
+                  <div className="text-xs text-muted-foreground">{t("prescribedBy")}: {row.prescribedBy}</div>
+                )}
+                <div className="text-xs text-muted-foreground">
+                  {t("startDate")}: {new Date(row.startDate).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" })}
+                </div>
+              </div>
+              <div className="flex flex-col gap-1 shrink-0">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7 text-muted-foreground hover:text-foreground"
+                  onClick={() => onEdit(row)}
+                >
+                  <Pencil className="h-3 w-3" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                  onClick={() => setConfirmId(row.id)}
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop: table layout */}
+        <table className="hidden sm:table w-full text-sm">
           <thead>
             <tr className="border-b text-muted-foreground text-xs">
               <th className="text-left py-2 px-2 font-medium">{t("name")}</th>

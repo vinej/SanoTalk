@@ -260,6 +260,13 @@
       "when": 1775959557787,
       "tag": "0036_volatile_harrier",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1776044866512,
+      "tag": "0037_glorious_blazing_skull",
+      "breakpoints": true
     }
   ]
 }

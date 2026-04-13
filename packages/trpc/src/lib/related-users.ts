@@ -6,12 +6,21 @@ type DB = Parameters<Parameters<typeof protectedProcedure.query>[0]>[0]["ctx"]["
 
 /**
  * Returns the set of user IDs that `userId` has a relationship with:
- * linked professionals/patients, friends, and pending connection requests.
+ * linked professionals/patients, friends, and (by default) pending connection requests.
+ *
+ * Pass `{ acceptedOnly: true }` to restrict the result to established relationships
+ * only — e.g. for Kanban task assignment, where a user may only assign tasks to
+ * people already in their profile (Doctor / Wellness / Pharmacist / Friends) and
+ * not to people with only a pending connection request.
  */
-export async function getRelatedUserIds(db: DB, userId: string): Promise<Set<string>> {
+export async function getRelatedUserIds(
+  db: DB,
+  userId: string,
+  options: { acceptedOnly?: boolean } = {}
+): Promise<Set<string>> {
   const ids = new Set<string>();
 
-  // Professional links (patient ↔ doctor/pharmacist)
+  // Professional links (patient ↔ doctor/pharmacist/wellness)
   const links = await db
     .select({ patientId: userLink.patientId, professionalId: userLink.professionalId })
     .from(userLink)
@@ -30,20 +39,22 @@ export async function getRelatedUserIds(db: DB, userId: string): Promise<Set<str
     ids.add(f.friendId);
   }
 
-  // Pending connection requests (both directions — so the user can still
-  // see people they've sent requests to or received requests from)
-  const requests = await db
-    .select({ fromUserId: connectionRequest.fromUserId, toUserId: connectionRequest.toUserId })
-    .from(connectionRequest)
-    .where(
-      and(
-        or(eq(connectionRequest.fromUserId, userId), eq(connectionRequest.toUserId, userId)),
-        eq(connectionRequest.status, "pending")
-      )
-    );
-  for (const r of requests) {
-    ids.add(r.fromUserId);
-    ids.add(r.toUserId);
+  if (!options.acceptedOnly) {
+    // Pending connection requests (both directions — so the user can still
+    // see people they've sent requests to or received requests from)
+    const requests = await db
+      .select({ fromUserId: connectionRequest.fromUserId, toUserId: connectionRequest.toUserId })
+      .from(connectionRequest)
+      .where(
+        and(
+          or(eq(connectionRequest.fromUserId, userId), eq(connectionRequest.toUserId, userId)),
+          eq(connectionRequest.status, "pending")
+        )
+      );
+    for (const r of requests) {
+      ids.add(r.fromUserId);
+      ids.add(r.toUserId);
+    }
   }
 
   // Remove self

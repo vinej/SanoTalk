@@ -99,7 +99,7 @@ function GoOutsidePage() {
         </p>
       </details>
 
-      <Tabs defaultValue="activities" className="flex-1 flex flex-col min-h-0">
+      <Tabs defaultValue="activities" className="flex flex-col sm:flex-1 sm:min-h-0">
         <TabsList className="shrink-0">
           <TabsTrigger value="activities">{t("goOutside:tabs.activities")}</TabsTrigger>
           <TabsTrigger value="progress">{t("goOutside:tabs.progress")}</TabsTrigger>
@@ -107,7 +107,7 @@ function GoOutsidePage() {
         </TabsList>
 
         {/* Activities Tab */}
-        <TabsContent value="activities" className="flex-1 overflow-auto space-y-4 mt-4">
+        <TabsContent value="activities" className="sm:flex-1 sm:overflow-auto space-y-4 mt-4">
           {/* Category filter */}
           <div className="flex flex-wrap gap-1.5">
             <Button
@@ -218,14 +218,14 @@ function GoOutsidePage() {
         </TabsContent>
 
         {/* Progress Tab */}
-        <TabsContent value="progress" className="flex-1 overflow-auto space-y-6 mt-4">
+        <TabsContent value="progress" className="sm:flex-1 sm:overflow-auto space-y-6 mt-4">
           <OutdoorWeekCalendar />
           <OutdoorStatsCard />
           <OutdoorHistoryTable />
         </TabsContent>
 
         {/* Resources Tab */}
-        <TabsContent value="resources" className="flex-1 overflow-auto mt-4">
+        <TabsContent value="resources" className="sm:flex-1 sm:overflow-auto mt-4">
           <OutdoorResourceList />
         </TabsContent>
       </Tabs>
