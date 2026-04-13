@@ -8,6 +8,7 @@ import { VitalSummaryCard } from "../../components/vitals/vital-summary-card";
 import { VitalChart } from "../../components/vitals/vital-chart";
 import { LogVitalDialog } from "../../components/vitals/log-vital-dialog";
 import { VitalHistoryTable } from "../../components/vitals/vital-history-table";
+import { ConnectionsCard } from "../../components/vitals/connections-card";
 import { VITAL_CONFIGS, type VitalType } from "../../components/vitals/vital-config";
 import {
   Dialog,
@@ -129,6 +130,9 @@ function VitalsPage() {
           )}
         </div>
       </div>
+
+      {/* Wearable connections */}
+      <ConnectionsCard />
 
       {/* History table */}
       <div className="shrink-0 border rounded-lg sm:max-h-[250px] overflow-hidden">

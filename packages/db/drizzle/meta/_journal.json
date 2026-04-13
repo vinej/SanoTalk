@@ -267,6 +267,13 @@
       "when": 1776044866512,
       "tag": "0037_glorious_blazing_skull",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1776088581068,
+      "tag": "0038_far_the_fury",
+      "breakpoints": true
     }
   ]
 }

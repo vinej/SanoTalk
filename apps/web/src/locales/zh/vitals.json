@@ -5,6 +5,42 @@
   "logReading": "记录测量",
   "logReadingDesc": "记录新的生命体征测量值",
   "history": "近期历史",
+  "sourceCol": "来源",
+  "sources": {
+    "manual": "手动",
+    "garmin": "Garmin",
+    "fitbit": "Fitbit",
+    "google": "Google Fit"
+  },
+  "connections": {
+    "title": "已连接设备",
+    "none": "尚未连接任何设备",
+    "connect": "连接可穿戴设备",
+    "disconnect": "断开连接",
+    "lastSynced": "最近同步：{{time}}",
+    "never": "从未",
+    "justNow": "刚刚",
+    "minAgo": "{{n}} 分钟前",
+    "hourAgo": "{{n}} 小时前",
+    "dayAgo": "{{n}} 天前",
+    "provider": {
+      "garmin": "Garmin",
+      "fitbit": "Fitbit",
+      "google": "Google Fit",
+      "other": "其他"
+    },
+    "status": {
+      "active": "活跃",
+      "revoked": "已撤销",
+      "error": "错误"
+    },
+    "dialogTitle": "连接可穿戴设备",
+    "dialogDesc": "授权 SanoTalk 从您的可穿戴设备接收生命体征数据。",
+    "dialogHelp": "我们将打开一个安全窗口，您可以登录可穿戴设备账户。授权后，您的测量结果将自动显示在这里。",
+    "openWidget": "打开连接页面",
+    "waitingForCallback": "请在新标签页中完成步骤——连接成功后此对话框将自动关闭。",
+    "popupBlocked": "浏览器阻止了弹出窗口。请允许弹出窗口后重试。"
+  },
   "noHistory": "尚无测量记录",
   "noData": "此期间无数据",
   "date": "日期",

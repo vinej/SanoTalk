@@ -14,6 +14,8 @@ import { auth, checkAccountLockout, recordFailedLogin, clearFailedLogins } from 
 import { toNodeHandler, fromNodeHeaders } from "better-auth/node";
 import { logger } from "./logger";
 import { startDeepgramWebSocket } from "./deepgram";
+import { terraWebhookHandler } from "./terra/webhook";
+import { runReconcilePoll, loadPollConfig } from "./terra/poll";
 import { runPendingAgents, triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat, callPharmacistChat, callDrugInfoChat, callExerciseChat, callEatwellChat, callTestChat } from "./mastra/index";
 import { joinAiParticipant, removeAiParticipant, removeAllAiParticipants, isAiAssistant } from "./ai-voice/index";
 import http from "http";
@@ -36,6 +38,12 @@ if (process.env.NODE_ENV === "production" && process.env.MINIO_ACCESS_KEY === "m
 }
 if (process.env.NODE_ENV === "production" && process.env.BETTER_AUTH_SECRET?.includes("your-super-secret")) {
   throw new Error("Default BETTER_AUTH_SECRET detected in production — set a strong random secret");
+}
+// Terra is optional, but partial config is almost always a mistake.
+const TERRA_VARS = ["TERRA_API_KEY", "TERRA_DEV_ID", "TERRA_WEBHOOK_SECRET"] as const;
+const terraSet = TERRA_VARS.filter((k) => !!process.env[k]);
+if (terraSet.length > 0 && terraSet.length < TERRA_VARS.length) {
+  throw new Error(`Partial Terra configuration: set all of ${TERRA_VARS.join(", ")} or none. Missing: ${TERRA_VARS.filter((k) => !process.env[k]).join(", ")}`);
 }
 
 const app = express();
@@ -178,6 +186,13 @@ const otpLimiter = rateLimit({
 app.use((_req, res, next) => {
   res.setHeader("Permissions-Policy", "camera=(), microphone=(self), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=()");
   next();
+});
+
+// ─── Terra webhook ─────────────────────────────────────────────────────────
+// Must mount BEFORE express.json so HMAC verification can read the raw body.
+// The handler verifies the signature, then JSON.parses the verified buffer.
+app.post("/api/webhooks/terra", express.raw({ type: "application/json", limit: "1mb" }), (req, res, next) => {
+  void terraWebhookHandler(req, res).catch(next);
 });
 
 app.use(express.json({ limit: "1mb" }));
@@ -498,6 +513,20 @@ server.listen(PORT, () => {
   void runPendingAgents();
   void snapshotErData(db);
   setInterval(() => void snapshotErData(db), 30 * 60 * 1000);
+
+  // Terra reconcile poll — catches measurements webhooks may have missed.
+  // Skips if Terra is not configured (logged inside runReconcilePoll).
+  // Disable entirely with TERRA_POLL_INTERVAL_MIN=0.
+  const terraCfg = loadPollConfig();
+  if (terraCfg.intervalMs > 0) {
+    void runReconcilePoll(terraCfg).catch((err) => logger.error({ err }, "Terra reconcile poll failed"));
+    setInterval(() => {
+      void runReconcilePoll(terraCfg).catch((err) => logger.error({ err }, "Terra reconcile poll failed"));
+    }, terraCfg.intervalMs);
+    logger.info({ intervalMin: terraCfg.intervalMs / 60_000, includeBody: terraCfg.includeBody, includeDaily: terraCfg.includeDaily }, "Terra reconcile poll scheduled");
+  } else {
+    logger.info("Terra reconcile poll disabled (TERRA_POLL_INTERVAL_MIN=0)");
+  }
 
   // Run data retention purge + account deletion daily (with mutual exclusion)
   async function runPurgeJobs() {

@@ -18,6 +18,7 @@ import { friendChatRouter } from "./routers/friendChat";
 import { workoutsRouter } from "./routers/workouts";
 import { outdoorRouter } from "./routers/outdoor";
 import { agendaRouter } from "./routers/agenda";
+import { wearablesRouter } from "./routers/wearables";
 
 export const appRouter = createTRPCRouter({
   sessions: sessionsRouter,
@@ -39,6 +40,7 @@ export const appRouter = createTRPCRouter({
   workouts: workoutsRouter,
   outdoor: outdoorRouter,
   agenda: agendaRouter,
+  wearables: wearablesRouter,
 });
 
 export type AppRouterSonoTalk = typeof appRouter;

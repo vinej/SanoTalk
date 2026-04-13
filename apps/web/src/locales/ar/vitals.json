@@ -5,6 +5,42 @@
   "logReading": "تسجيل قراءة",
   "logReadingDesc": "تسجيل قياس جديد للعلامات الحيوية",
   "history": "السجل الأخير",
+  "sourceCol": "المصدر",
+  "sources": {
+    "manual": "يدوي",
+    "garmin": "Garmin",
+    "fitbit": "Fitbit",
+    "google": "Google Fit"
+  },
+  "connections": {
+    "title": "الأجهزة المتصلة",
+    "none": "لا توجد أجهزة متصلة بعد",
+    "connect": "ربط جهاز قابل للارتداء",
+    "disconnect": "قطع الاتصال",
+    "lastSynced": "آخر مزامنة {{time}}",
+    "never": "أبداً",
+    "justNow": "الآن",
+    "minAgo": "منذ {{n}} دقيقة",
+    "hourAgo": "منذ {{n}} ساعة",
+    "dayAgo": "منذ {{n}} يوم",
+    "provider": {
+      "garmin": "Garmin",
+      "fitbit": "Fitbit",
+      "google": "Google Fit",
+      "other": "أخرى"
+    },
+    "status": {
+      "active": "نشط",
+      "revoked": "ملغى",
+      "error": "خطأ"
+    },
+    "dialogTitle": "ربط جهاز قابل للارتداء",
+    "dialogDesc": "السماح لـ SanoTalk باستلام العلامات الحيوية من جهازك القابل للارتداء.",
+    "dialogHelp": "سنفتح نافذة آمنة لتسجيل الدخول بحساب جهازك. بعد منح الإذن، ستظهر القراءات هنا تلقائياً.",
+    "openWidget": "فتح صفحة الربط",
+    "waitingForCallback": "أكمل الخطوات في علامة التبويب الجديدة — سيتم إغلاق هذا المربع تلقائياً عند جاهزية الاتصال.",
+    "popupBlocked": "حظر المتصفح النافذة المنبثقة. يرجى السماح بالنوافذ المنبثقة وإعادة المحاولة."
+  },
   "noHistory": "لا توجد قراءات مسجلة",
   "noData": "لا توجد بيانات لهذه الفترة",
   "date": "التاريخ",

@@ -13,7 +13,19 @@ interface VitalRecord {
   valueSecondary?: number | null;
   unit: string;
   notes?: string | null;
+  source?: string | null;
   measuredAt: string | Date;
+}
+
+function sourceLabelKey(source: string | null | undefined): string {
+  if (!source || source === "manual") return "sources.manual";
+  if (source.startsWith("terra:")) {
+    const vendor = source.slice("terra:".length);
+    if (vendor === "garmin") return "sources.garmin";
+    if (vendor === "fitbit") return "sources.fitbit";
+    if (vendor === "google") return "sources.google";
+  }
+  return "sources.manual";
 }
 
 interface Props {
@@ -50,6 +62,7 @@ export function VitalHistoryTable({ data, selectedType }: Props) {
             {!selectedType && <th className="text-left py-2 px-2 font-medium">{t("vitalType")}</th>}
             <th className="text-right py-2 px-2 font-medium">{t("value")}</th>
             <th className="text-left py-2 px-2 font-medium">{t("notes")}</th>
+            <th className="text-left py-2 px-2 font-medium">{t("sourceCol")}</th>
             <th className="w-10"></th>
           </tr>
         </thead>
@@ -89,6 +102,16 @@ export function VitalHistoryTable({ data, selectedType }: Props) {
                 </td>
                 <td className="py-2 px-2 text-xs text-muted-foreground max-w-[150px] truncate">
                   {row.notes || "—"}
+                </td>
+                <td className="py-2 px-2">
+                  <span className={cn(
+                    "text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded font-medium whitespace-nowrap",
+                    row.source && row.source !== "manual"
+                      ? "bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300"
+                      : "bg-muted text-muted-foreground"
+                  )}>
+                    {t(sourceLabelKey(row.source))}
+                  </span>
                 </td>
                 <td className="py-2 px-1">
                   <Button

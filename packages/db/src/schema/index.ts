@@ -20,3 +20,4 @@ export * from "./friend-chat";
 export * from "./workout-logs";
 export * from "./outdoor-logs";
 export * from "./agenda";
+export * from "./wearable-connections";

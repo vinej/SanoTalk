@@ -5,6 +5,42 @@
   "logReading": "Log Reading",
   "logReadingDesc": "Record a new vital sign measurement",
   "history": "Recent History",
+  "sourceCol": "Source",
+  "sources": {
+    "manual": "Manual",
+    "garmin": "Garmin",
+    "fitbit": "Fitbit",
+    "google": "Google Fit"
+  },
+  "connections": {
+    "title": "Connected devices",
+    "none": "No devices connected yet",
+    "connect": "Connect a wearable",
+    "disconnect": "Disconnect",
+    "lastSynced": "Last synced {{time}}",
+    "never": "never",
+    "justNow": "just now",
+    "minAgo": "{{n}} min ago",
+    "hourAgo": "{{n}}h ago",
+    "dayAgo": "{{n}}d ago",
+    "provider": {
+      "garmin": "Garmin",
+      "fitbit": "Fitbit",
+      "google": "Google Fit",
+      "other": "Other"
+    },
+    "status": {
+      "active": "Active",
+      "revoked": "Revoked",
+      "error": "Error"
+    },
+    "dialogTitle": "Connect a wearable device",
+    "dialogDesc": "Authorize SanoTalk to receive vitals from your wearable.",
+    "dialogHelp": "We'll open a secure window where you can sign in with your wearable account. After granting access, your readings will start appearing here automatically.",
+    "openWidget": "Open connection page",
+    "waitingForCallback": "Complete the steps in the new tab — this dialog will close when the connection is ready.",
+    "popupBlocked": "Browser blocked the popup. Please allow popups and try again."
+  },
   "noHistory": "No readings recorded yet",
   "noData": "No data for this period",
   "date": "Date",

@@ -5,6 +5,42 @@
   "logReading": "Nouvelle mesure",
   "logReadingDesc": "Enregistrer une nouvelle mesure de signes vitaux",
   "history": "Historique récent",
+  "sourceCol": "Source",
+  "sources": {
+    "manual": "Manuel",
+    "garmin": "Garmin",
+    "fitbit": "Fitbit",
+    "google": "Google Fit"
+  },
+  "connections": {
+    "title": "Appareils connectés",
+    "none": "Aucun appareil connecté",
+    "connect": "Connecter un objet connecté",
+    "disconnect": "Déconnecter",
+    "lastSynced": "Synchronisé {{time}}",
+    "never": "jamais",
+    "justNow": "à l'instant",
+    "minAgo": "il y a {{n}} min",
+    "hourAgo": "il y a {{n}} h",
+    "dayAgo": "il y a {{n}} j",
+    "provider": {
+      "garmin": "Garmin",
+      "fitbit": "Fitbit",
+      "google": "Google Fit",
+      "other": "Autre"
+    },
+    "status": {
+      "active": "Actif",
+      "revoked": "Révoqué",
+      "error": "Erreur"
+    },
+    "dialogTitle": "Connecter un appareil",
+    "dialogDesc": "Autoriser SanoTalk à recevoir vos signes vitaux depuis votre objet connecté.",
+    "dialogHelp": "Une fenêtre sécurisée va s'ouvrir pour vous permettre de vous connecter avec votre compte. Une fois l'accès accordé, vos mesures apparaîtront automatiquement ici.",
+    "openWidget": "Ouvrir la page de connexion",
+    "waitingForCallback": "Suivez les étapes dans le nouvel onglet — cette boîte de dialogue se fermera lorsque la connexion sera prête.",
+    "popupBlocked": "Le navigateur a bloqué la fenêtre. Veuillez autoriser les pop-ups et réessayer."
+  },
   "noHistory": "Aucune mesure enregistrée",
   "noData": "Aucune donnée pour cette période",
   "date": "Date",

@@ -5,6 +5,42 @@
   "logReading": "Nueva medición",
   "logReadingDesc": "Registrar una nueva medición de signos vitales",
   "history": "Historial reciente",
+  "sourceCol": "Origen",
+  "sources": {
+    "manual": "Manual",
+    "garmin": "Garmin",
+    "fitbit": "Fitbit",
+    "google": "Google Fit"
+  },
+  "connections": {
+    "title": "Dispositivos conectados",
+    "none": "Aún no hay dispositivos conectados",
+    "connect": "Conectar un wearable",
+    "disconnect": "Desconectar",
+    "lastSynced": "Sincronizado {{time}}",
+    "never": "nunca",
+    "justNow": "ahora mismo",
+    "minAgo": "hace {{n}} min",
+    "hourAgo": "hace {{n}} h",
+    "dayAgo": "hace {{n}} d",
+    "provider": {
+      "garmin": "Garmin",
+      "fitbit": "Fitbit",
+      "google": "Google Fit",
+      "other": "Otro"
+    },
+    "status": {
+      "active": "Activo",
+      "revoked": "Revocado",
+      "error": "Error"
+    },
+    "dialogTitle": "Conectar un dispositivo",
+    "dialogDesc": "Autorice a SanoTalk a recibir signos vitales desde su wearable.",
+    "dialogHelp": "Abriremos una ventana segura para que inicie sesión con su cuenta. Una vez concedido el acceso, sus mediciones aparecerán aquí automáticamente.",
+    "openWidget": "Abrir página de conexión",
+    "waitingForCallback": "Complete los pasos en la nueva pestaña — este diálogo se cerrará cuando la conexión esté lista.",
+    "popupBlocked": "El navegador bloqueó la ventana emergente. Permita las ventanas emergentes e intente de nuevo."
+  },
   "noHistory": "No hay mediciones registradas",
   "noData": "Sin datos para este período",
   "date": "Fecha",

@@ -12,7 +12,8 @@
       "Bash(node -e ':*)",
       "Bash(pnpm --filter @sanotalk/db db:generate)",
       "Bash(find /c/SanoTalk/SanoTalk -maxdepth 1 -type d -name \".github\" -exec ls -la {} \\\\;)",
-      "Bash(powershell -Command \"winget list age 2>&1\")"
+      "Bash(powershell -Command \"winget list age 2>&1\")",
+      "Bash(pnpm -F @sanotalk/server typecheck)"
     ]
   }
 }
