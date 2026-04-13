@@ -20,7 +20,11 @@
   "connected": "कनेक्टेड",
   "participants": "प्रतिभागी",
   "online": "ऑनलाइन",
+  "offline": "ऑफ़लाइन",
   "cancel": "रद्द करें",
   "leave": "छोड़ें",
-  "leftChat": "आपने बातचीत छोड़ दी"
+  "leftChat": "आपने बातचीत छोड़ दी",
+  "invitedToChat": "{{name}} ने आपको चैट के लिए आमंत्रित किया",
+  "join": "शामिल हों",
+  "someone": "कोई"
 }

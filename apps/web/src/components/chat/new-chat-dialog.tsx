@@ -82,6 +82,11 @@ export function NewChatDialog({ open, onOpenChange, onCreated }: NewChatDialogPr
                       onChange={() => toggleFriend(f.id)}
                       className="h-4 w-4 rounded border-input accent-primary"
                     />
+                    <span
+                      className={`inline-block h-2 w-2 rounded-full shrink-0 ${f.online ? "bg-green-500" : "bg-gray-400"}`}
+                      aria-label={t(f.online ? "online" : "offline")}
+                      title={t(f.online ? "online" : "offline")}
+                    />
                     <span className="text-sm">{f.name}</span>
                     {f.role && (
                       <span className="text-[10px] text-muted-foreground bg-muted rounded px-1.5 py-0.5 uppercase">

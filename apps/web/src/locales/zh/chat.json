@@ -20,7 +20,11 @@
   "connected": "已连接",
   "participants": "参与者",
   "online": "在线",
+  "offline": "离线",
   "cancel": "取消",
   "leave": "离开",
-  "leftChat": "你已离开对话"
+  "leftChat": "你已离开对话",
+  "invitedToChat": "{{name}} 邀请你加入聊天",
+  "join": "加入",
+  "someone": "某人"
 }

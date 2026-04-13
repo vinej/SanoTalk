@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 import { trpc } from "../../lib/trpc";
 import { Button } from "../ui/button";
 import { Plus, MessageCircle } from "lucide-react";
@@ -16,6 +17,31 @@ export function FriendChatRoomList({ currentUserId, selectedRoomId, onSelectRoom
   const { t } = useTranslation("chat");
   const { data: rooms = [] } = trpc.friendChat.list.useQuery(undefined, { refetchInterval: 30_000 });
   const [dialogOpen, setDialogOpen] = useState(false);
+
+  const seenRoomIdsRef = useRef<Set<string> | null>(null);
+  useEffect(() => {
+    if (!rooms) return;
+    const currentIds = new Set(rooms.map((r: any) => r.id));
+    if (seenRoomIdsRef.current === null) {
+      seenRoomIdsRef.current = currentIds;
+      return;
+    }
+    const seen = seenRoomIdsRef.current;
+    for (const room of rooms) {
+      if (seen.has(room.id)) continue;
+      if (room.createdById === currentUserId) continue;
+      if (room.id === selectedRoomId) continue;
+      const creator = (room.participants ?? []).find((p: any) => p.userId === room.createdById);
+      const creatorName = creator?.user?.name ?? t("someone");
+      toast(t("invitedToChat", { name: creatorName }), {
+        action: {
+          label: t("join"),
+          onClick: () => onSelectRoom(room.id),
+        },
+      });
+    }
+    seenRoomIdsRef.current = currentIds;
+  }, [rooms, currentUserId, selectedRoomId, onSelectRoom, t]);
 
   function getRoomDisplayName(room: any) {
     if (room.name) return room.name;

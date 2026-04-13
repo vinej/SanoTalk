@@ -111,7 +111,9 @@ function ProfilePage() {
   });
 
   // ── Friends ────────────────────────────────────────────────────────────────
-  const { data: friends = [], refetch: refetchFriends } = trpc.user.listFriends.useQuery();
+  const { data: friends = [], refetch: refetchFriends } = trpc.user.listFriends.useQuery(undefined, {
+    refetchInterval: 30_000,
+  });
   const { data: allUsers = [] } = trpc.user.listAll.useQuery();
 
   const [selectedFriendId, setSelectedFriendId] = useState("");
@@ -445,7 +447,14 @@ function ProfilePage() {
               <ul className="space-y-1">
                 {friends.map((f) => (
                   <li key={(f as any)?.id} className="flex items-center justify-between text-sm bg-muted rounded px-2 py-1">
-                    <span>{(f as any)?.name ?? (f as any)?.id}</span>
+                    <span className="flex items-center gap-2">
+                      <span
+                        className={`inline-block h-2 w-2 rounded-full shrink-0 ${(f as any)?.online ? "bg-green-500" : "bg-gray-400"}`}
+                        aria-label={t((f as any)?.online ? "onlineStatus.online" : "onlineStatus.offline")}
+                        title={t((f as any)?.online ? "onlineStatus.online" : "onlineStatus.offline")}
+                      />
+                      <span>{(f as any)?.name ?? (f as any)?.id}</span>
+                    </span>
                     <span className="text-xs text-muted-foreground ml-2 capitalize">{(f as any)?.role}</span>
                     <button
                       onClick={() => removeFriendMutation.mutate({ friendId: (f as any).id })}

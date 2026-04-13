@@ -9,6 +9,7 @@ import { encrypt, decrypt } from "../lib/crypto";
 import { resend } from "../lib/resend";
 import { escapeHtml } from "../lib/escape-html";
 import { logAuditEvent, requestMeta } from "../lib/audit";
+import { touch, getOnlineSet } from "../lib/presence";
 
 export const userRouter = createTRPCRouter({
   profile: protectedProcedure.query(async ({ ctx }) => {
@@ -198,7 +199,14 @@ export const userRouter = createTRPCRouter({
       with: { friend: { columns: { id: true, name: true, role: true, specialty: true } } },
       limit: 200,
     });
-    return rows.map((r) => r.friend);
+    const friends = rows.map((r) => r.friend);
+    const onlineSet = getOnlineSet(friends.map((f) => f.id));
+    return friends.map((f) => ({ ...f, online: onlineSet.has(f.id) }));
+  }),
+
+  heartbeat: protectedProcedure.mutation(async ({ ctx }) => {
+    touch(ctx.user.id);
+    return { ok: true };
   }),
 
   addFriend: protectedProcedure

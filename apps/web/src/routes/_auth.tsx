@@ -4,6 +4,7 @@ import { tracker } from "../lib/tracker";
 import { hasAnalyticsConsent } from "../components/cookie-consent-banner";
 import { AppHeader } from "../components/app-header";
 import { PrivacyFooter } from "../components/privacy-footer";
+import { useHeartbeat } from "../hooks/use-heartbeat";
 
 export const Route: any = createFileRoute("/_auth")({
   beforeLoad: async ({ location }) => {
@@ -33,7 +34,12 @@ export const Route: any = createFileRoute("/_auth")({
     }
     return { user: session.data.user };
   },
-  component: () => (
+  component: AuthLayout,
+});
+
+function AuthLayout() {
+  useHeartbeat();
+  return (
     <div className="h-screen flex flex-col">
       <AppHeader />
       <div className="flex-1 min-h-0 flex flex-col overflow-y-auto">
@@ -41,5 +47,5 @@ export const Route: any = createFileRoute("/_auth")({
         <PrivacyFooter />
       </div>
     </div>
-  ),
-});
+  );
+}

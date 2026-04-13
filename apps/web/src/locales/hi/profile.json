@@ -25,6 +25,7 @@
   "selectPatient": "मरीज़ चुनें…",
   "friends": "मित्र",
   "noFriends": "अभी कोई मित्र नहीं जोड़ा गया",
+  "onlineStatus": { "online": "ऑनलाइन", "offline": "ऑफ़लाइन" },
   "selectFriend": "उपयोगकर्ता चुनें…",
   "addFriend": "जोड़ें",
   "removeFriend": "हटाएं",

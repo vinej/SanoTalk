@@ -20,7 +20,11 @@
   "connected": "متصل",
   "participants": "المشاركون",
   "online": "متصل",
+  "offline": "غير متصل",
   "cancel": "إلغاء",
   "leave": "مغادرة",
-  "leftChat": "لقد غادرت المحادثة"
+  "leftChat": "لقد غادرت المحادثة",
+  "invitedToChat": "دعاك {{name}} إلى محادثة",
+  "join": "انضمام",
+  "someone": "شخص ما"
 }

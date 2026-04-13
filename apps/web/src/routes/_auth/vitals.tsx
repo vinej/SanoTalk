@@ -99,8 +99,11 @@ function VitalsPage() {
         })}
       </div>
 
+      {/* Wearable connections */}
+      <ConnectionsCard />
+
       {/* Chart + date range */}
-      <div className="shrink-0 sm:flex-1 sm:min-h-0 flex flex-col">
+      <div className="shrink-0 flex flex-col">
         <div className="flex items-center justify-between mb-2 shrink-0 flex-wrap gap-2">
           <h2 className="text-sm font-semibold" style={{ color: VITAL_CONFIGS.find(c => c.type === selectedType)?.color }}>
             {t(`types.${selectedType}`)}
@@ -120,7 +123,7 @@ function VitalsPage() {
           </div>
         </div>
 
-        <div className="h-64 sm:h-auto sm:flex-1 sm:min-h-[200px] sm:max-h-[350px]">
+        <div className="h-64 sm:h-[300px]">
           {isLoading ? (
             <div className="flex items-center justify-center h-full">
               <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
@@ -130,9 +133,6 @@ function VitalsPage() {
           )}
         </div>
       </div>
-
-      {/* Wearable connections */}
-      <ConnectionsCard />
 
       {/* History table */}
       <div className="shrink-0 border rounded-lg sm:max-h-[250px] overflow-hidden">

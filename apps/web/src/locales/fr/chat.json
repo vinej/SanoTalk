@@ -20,7 +20,11 @@
   "connected": "Connecte",
   "participants": "Participants",
   "online": "en ligne",
+  "offline": "hors ligne",
   "cancel": "Annuler",
   "leave": "Quitter",
-  "leftChat": "Vous avez quitte la conversation"
+  "leftChat": "Vous avez quitte la conversation",
+  "invitedToChat": "{{name}} vous invite a une discussion",
+  "join": "Rejoindre",
+  "someone": "Quelqu'un"
 }

@@ -25,6 +25,7 @@
   "selectPatient": "Seleccionar un paciente…",
   "friends": "Amigos",
   "noFriends": "Aún no se han añadido amigos",
+  "onlineStatus": { "online": "En línea", "offline": "Desconectado" },
   "selectFriend": "Seleccionar un usuario…",
   "addFriend": "Añadir",
   "removeFriend": "Quitar",

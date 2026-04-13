@@ -25,6 +25,7 @@
   "selectPatient": "اختر مريضاً…",
   "friends": "الأصدقاء",
   "noFriends": "لم يُضَف أي صديق بعد",
+  "onlineStatus": { "online": "متصل", "offline": "غير متصل" },
   "selectFriend": "اختر مستخدماً…",
   "addFriend": "إضافة",
   "removeFriend": "إزالة",
