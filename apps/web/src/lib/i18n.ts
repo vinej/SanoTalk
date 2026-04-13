@@ -112,7 +112,7 @@ import hiAgenda from "../locales/hi/agenda.json";
 
 export const SUPPORTED_LANGUAGES = [
   { code: "en", label: "English", flag: "🇺🇸" },
-  { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "fr", label: "Français", flag: "⚜️" },
   { code: "es", label: "Español", flag: "🇪🇸" },
   { code: "zh", label: "中文", flag: "🇨🇳" },
   { code: "ar", label: "العربية", flag: "🇸🇦" },
@@ -141,6 +141,12 @@ i18n
     },
     fallbackLng: "en",
     defaultNS: "common",
+    // Strip region from detected language ("fr-CA" → "fr") so server-side
+    // Zod enums that only accept ["en","fr","es","zh","ar","hi"] don't reject
+    // requests from phones whose navigator.language includes a region.
+    load: "languageOnly",
+    supportedLngs: ["en", "fr", "es", "zh", "ar", "hi"],
+    nonExplicitSupportedLngs: true,
     detection: {
       order: ["localStorage", "navigator"],
       caches: ["localStorage"],

@@ -168,6 +168,14 @@ export function startDeepgramWebSocket(server: Server, allowedOrigins?: string[]
       logger.error({ err }, "Deepgram error");
     });
 
+    dgConnection.on(LiveTranscriptionEvents.Close, (ev: unknown) => {
+      logger.info({ ev }, "Deepgram connection closed");
+    });
+
+    dgConnection.on(LiveTranscriptionEvents.Metadata, (meta: unknown) => {
+      logger.info({ meta }, "Deepgram metadata");
+    });
+
     let audioChunkCount = 0;
 
     // Buffer audio that arrives before Deepgram is ready
@@ -197,10 +205,25 @@ export function startDeepgramWebSocket(server: Server, allowedOrigins?: string[]
       // Accumulate final transcript text; only flush on UtteranceEnd
       let accumulatedText = "";
       let accumulatedConfidence = 1;
+      let transcriptEventCount = 0;
 
       dgConnection.on(LiveTranscriptionEvents.Transcript, (data) => {
         const transcript = data.channel.alternatives[0];
         if (!transcript) return;
+
+        transcriptEventCount++;
+        // Log the first 5 transcript events + every 20th so we can see whether
+        // Deepgram is returning anything at all (helps diagnose mobile audio
+        // that reaches the server but never produces a final utterance).
+        if (transcriptEventCount <= 5 || transcriptEventCount % 20 === 0) {
+          logger.info({
+            n: transcriptEventCount,
+            isFinal: data.is_final,
+            text: transcript.transcript.slice(0, 80),
+            confidence: transcript.confidence,
+            speechFinal: (data as unknown as { speech_final?: boolean }).speech_final,
+          }, "Deepgram transcript event");
+        }
 
         if (data.is_final && transcript.transcript.trim()) {
           // Append to accumulated buffer — do NOT send isFinal yet

@@ -130,7 +130,10 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
   const { t, i18n } = useTranslation("sessions");
   const { data: sessionData } = useSession();
   const userId = sessionData?.user?.id;
-  const lang = i18n.language as "en" | "fr" | "es" | "zh" | "ar" | "hi";
+  // Defensively strip region (e.g. "fr-CA" → "fr"). i18n is configured to do
+  // this globally, but we guard here so a stale cached localStorage value from
+  // before the fix can't crash the server with BAD_REQUEST on the Zod enum.
+  const lang = (((i18n.language ?? "en").split("-")[0]) as "en" | "fr" | "es" | "zh" | "ar" | "hi");
 
   const isSessionMode = !!sessionId;
   const chatTypeArg = isSessionMode ? ("health" as ChatType) : variant;
@@ -155,6 +158,8 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
     try { setLoadedConversationTitle(localStorage.getItem(titleStorageKey)); } catch { /* ignore */ }
   }, [titleStorageKey]);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; title: string } | null>(null);
+  // Optimistically show the user's message while the AI response is in flight.
+  const [pendingUserMessage, setPendingUserMessage] = useState<string | null>(null);
   const ttsStorageKey = `sanotalk_chat_tts_${chatTypeArg}`;
   const [ttsEnabled, setTtsEnabled] = useState(() => {
     try { return localStorage.getItem(ttsStorageKey) === "true"; } catch { return false; }
@@ -278,7 +283,10 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
     enabled: !isSessionMode && voiceEnabled && !!sessionData?.session?.token,
     language: lang,
     onFinalTranscript: (text) => {
-      activeSend.mutate({ message: text, language: lang });
+      setPendingUserMessage(text);
+      activeSend.mutate({ message: text, language: lang }, {
+        onSettled: () => setPendingUserMessage(null),
+      });
     },
   });
 
@@ -309,11 +317,13 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
     const trimmed = inputValue.trim();
     if (!trimmed || isPending) return;
     setInputValue("");
+    setPendingUserMessage(trimmed);
+    const clearPending = { onSettled: () => setPendingUserMessage(null) };
     if (isSessionMode) {
       const agentType = variant === "companion" ? "companion" as const : variant === "pharmacist" ? "pharmacist" as const : "health" as const;
-      sendSessionMessage.mutate({ sessionId: sessionId!, message: trimmed, agentType });
+      sendSessionMessage.mutate({ sessionId: sessionId!, message: trimmed, agentType }, clearPending);
     } else {
-      activeSend.mutate({ message: trimmed, language: lang });
+      activeSend.mutate({ message: trimmed, language: lang }, clearPending);
     }
   }
 
@@ -381,14 +391,17 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
   useEffect(() => {
     if (isSessionMode && voiceEnabled && pendingVoiceText && !isPending) {
       const agentType = variant === "companion" ? "companion" as const : variant === "pharmacist" ? "pharmacist" as const : "health" as const;
-      sendSessionMessage.mutate({ sessionId: sessionId!, message: pendingVoiceText, agentType });
+      setPendingUserMessage(pendingVoiceText);
+      sendSessionMessage.mutate({ sessionId: sessionId!, message: pendingVoiceText, agentType }, {
+        onSettled: () => setPendingUserMessage(null),
+      });
       onVoiceTextConsumed?.();
     }
   }, [pendingVoiceText, voiceEnabled]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.length, isPending]);
+  }, [messages.length, isPending, pendingUserMessage]);
 
   const listening = isSessionMode ? voiceEnabled : (voiceEnabled && isRecording);
 
@@ -428,6 +441,12 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
               {msg.role === "assistant" ? renderMessageContent(msg.content, t) : msg.content}
             </div>
           ))}
+
+          {pendingUserMessage && (
+            <div className="ml-auto max-w-[85%] px-3 py-2 text-sm rounded-lg bg-primary text-primary-foreground whitespace-pre-wrap opacity-80">
+              {pendingUserMessage}
+            </div>
+          )}
 
           {isPending && (
             <div className="mr-auto bg-muted rounded-lg px-3 py-2">
@@ -505,8 +524,9 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
         </div>
       )}
       {micError && (
-        <div className="border-t px-3 py-1.5 text-xs text-destructive shrink-0">
-          {micError}
+        <div className="border-t px-3 py-2 text-xs font-medium bg-destructive/10 text-destructive shrink-0 flex items-start gap-2 break-words">
+          <MicOff className="h-3.5 w-3.5 shrink-0 mt-[1px]" />
+          <span className="min-w-0 break-words">{micError}</span>
         </div>
       )}
       <div className="border-t p-2 flex flex-col gap-2 shrink-0 sm:flex-row sm:items-end">
@@ -660,15 +680,15 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
             </div>
           )}
 
-          <DialogFooter className="flex flex-col gap-2 sm:flex-col">
+          <DialogFooter className="flex flex-col gap-2 sm:flex-col min-w-0">
             {!showSaveInput ? (
-              <Button size="sm" className="w-full" onClick={() => setShowSaveInput(true)}>
+              <Button size="sm" className="w-full min-w-0 whitespace-normal h-auto py-1.5 text-center" onClick={() => setShowSaveInput(true)}>
                 {t("chat.clearDialog.saveFirst")}
               </Button>
             ) : (
               <Button
                 size="sm"
-                className="w-full"
+                className="w-full min-w-0 whitespace-normal h-auto py-1.5 text-center"
                 disabled={!saveTitle.trim() || saveConversationMutation.isPending || activeClear.isPending}
                 onClick={handleSaveAndClear}
               >
@@ -680,7 +700,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
             <Button
               variant="destructive"
               size="sm"
-              className="w-full"
+              className="w-full min-w-0 whitespace-normal h-auto py-1.5 text-center"
               disabled={activeClear.isPending}
               onClick={handleClearConfirmed}
             >
@@ -689,7 +709,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
             <Button
               variant="outline"
               size="sm"
-              className="w-full"
+              className="w-full min-w-0 whitespace-normal h-auto py-1.5 text-center"
               onClick={() => { setShowSaveInput(false); setSaveTitle(""); setShowClearDialog(false); }}
             >
               {t("chat.clearDialog.cancel")}

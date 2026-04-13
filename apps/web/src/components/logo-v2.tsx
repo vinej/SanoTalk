@@ -102,9 +102,12 @@ export function SanoTalkLogoV2({ size = 64, showText = true, light = false }: Lo
           }>
             SanoTalk
           </span>
+          {/* Hidden on phones: the uppercase + tracking-widest tagline forces
+              horizontal scroll on narrow viewports (especially in French) —
+              the logo + "SanoTalk" wordmark are enough identity on mobile. */}
           <span className={light
-            ? "text-[11px] font-medium tracking-widest text-white/70 uppercase"
-            : "text-[11px] font-medium tracking-widest text-muted-foreground uppercase"
+            ? "hidden sm:inline-block text-[11px] font-medium tracking-widest text-white/70 uppercase"
+            : "hidden sm:inline-block text-[11px] font-medium tracking-widest text-muted-foreground uppercase"
           }>
             {t("appSubtitle")}
           </span>

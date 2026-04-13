@@ -62,6 +62,10 @@ function DialogContent({
         data-slot="dialog-content"
         className={cn(
           "fixed top-1/2 left-1/2 z-50 grid w-full max-w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl bg-background p-4 text-sm ring-1 ring-foreground/10 duration-100 outline-none sm:max-w-sm data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out data-closed:fade-out-0 data-closed:zoom-out-95",
+          // Grid items default to `min-width: auto`, which lets long titles or
+          // interpolated user content force the dialog wider than its max-width.
+          // Constrain children so they shrink instead of pushing the dialog off-screen.
+          "[&>*]:min-w-0 overflow-hidden",
           className
         )}
         {...props}
@@ -108,6 +112,9 @@ function DialogFooter({
       data-slot="dialog-footer"
       className={cn(
         "-mx-4 -mb-4 flex flex-col-reverse gap-2 rounded-b-xl border-t bg-muted/50 p-4 sm:flex-row sm:justify-end",
+        // Prevent flex items with `whitespace-nowrap` (e.g. default Button labels)
+        // from forcing the footer wider than the dialog on narrow phones.
+        "min-w-0 [&>*]:min-w-0",
         className
       )}
       {...props}
@@ -130,7 +137,9 @@ function DialogTitle({
     <DialogPrimitive.Title
       data-slot="dialog-title"
       className={cn(
-        "font-heading text-base leading-none font-medium",
+        // `leading-none` + wrapped text clips descenders — use `leading-tight`
+        // so dialog titles that wrap on phones stay legible.
+        "font-heading text-base leading-tight font-medium break-words",
         className
       )}
       {...props}
@@ -146,7 +155,7 @@ function DialogDescription({
     <DialogPrimitive.Description
       data-slot="dialog-description"
       className={cn(
-        "text-sm text-muted-foreground *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground",
+        "text-sm text-muted-foreground break-words *:[a]:underline *:[a]:underline-offset-3 *:[a]:hover:text-foreground",
         className
       )}
       {...props}
