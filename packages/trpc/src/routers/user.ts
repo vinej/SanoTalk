@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trcp";
 import { user, userProperty, userLink, userFriend, connectionRequest, aiAssistantProfile, session } from "@sanotalk/db";
-import { eq, and, desc, inArray } from "drizzle-orm";
+import { eq, and, desc, inArray, isNull, count } from "drizzle-orm";
 import { TRPCError } from "@trpc/server";
 import { verifyAdminFromDb } from "../lib/verify-admin";
 import { getRelatedUserIds } from "../lib/related-users";
@@ -9,7 +9,9 @@ import { encrypt, decrypt } from "../lib/crypto";
 import { resend } from "../lib/resend";
 import { escapeHtml } from "../lib/escape-html";
 import { logAuditEvent, requestMeta } from "../lib/audit";
-import { touch, getOnlineSet } from "../lib/presence";
+import { touch, getOnlineSet, forget as forgetPresence } from "../lib/presence";
+
+const MAX_OUTSTANDING_REQUESTS_PER_USER = 50;
 
 export const userRouter = createTRPCRouter({
   profile: protectedProcedure.query(async ({ ctx }) => {
@@ -157,9 +159,23 @@ export const userRouter = createTRPCRouter({
       if (input.targetUserId === ctx.user.id) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot link to yourself" });
       }
-      const targetExists = await ctx.db.select({ id: user.id }).from(user).where(eq(user.id, input.targetUserId)).limit(1);
-      if (targetExists.length === 0) {
-        throw new TRPCError({ code: "BAD_REQUEST", message: "Could not create link" });
+      // Cap outstanding pending requests to prevent spam / enumeration amplification
+      const [{ value: outstanding } = { value: 0 }] = await ctx.db
+        .select({ value: count() })
+        .from(connectionRequest)
+        .where(and(eq(connectionRequest.fromUserId, ctx.user.id), eq(connectionRequest.status, "pending")));
+      if (outstanding >= MAX_OUTSTANDING_REQUESTS_PER_USER) {
+        throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many pending requests" });
+      }
+      // Verify the target exists AND is approved. Return a generic success
+      // either way to avoid user-ID enumeration via error channel.
+      const [target] = await ctx.db
+        .select({ id: user.id, approved: user.approved })
+        .from(user)
+        .where(eq(user.id, input.targetUserId))
+        .limit(1);
+      if (!target || !target.approved) {
+        return { ok: true };
       }
       await ctx.db
         .insert(connectionRequest)
@@ -205,8 +221,10 @@ export const userRouter = createTRPCRouter({
   }),
 
   heartbeat: protectedProcedure.mutation(async ({ ctx }) => {
-    touch(ctx.user.id);
-    return { ok: true };
+    // Returns `ok: false` when called more often than the min interval.
+    // The client never needs to retry; the interval enforcement is silent.
+    const accepted = touch(ctx.user.id);
+    return { ok: accepted };
   }),
 
   addFriend: protectedProcedure
@@ -218,6 +236,24 @@ export const userRouter = createTRPCRouter({
       }
       if (input.friendId === ctx.user.id) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "Cannot add yourself as a friend" });
+      }
+      // Cap outstanding pending requests to prevent spam / enumeration amplification
+      const [{ value: outstanding } = { value: 0 }] = await ctx.db
+        .select({ value: count() })
+        .from(connectionRequest)
+        .where(and(eq(connectionRequest.fromUserId, ctx.user.id), eq(connectionRequest.status, "pending")));
+      if (outstanding >= MAX_OUTSTANDING_REQUESTS_PER_USER) {
+        throw new TRPCError({ code: "TOO_MANY_REQUESTS", message: "Too many pending requests" });
+      }
+      // Verify the target exists AND is approved. Return a generic success
+      // either way to avoid user-ID enumeration via error channel.
+      const [target] = await ctx.db
+        .select({ id: user.id, approved: user.approved })
+        .from(user)
+        .where(eq(user.id, input.friendId))
+        .limit(1);
+      if (!target || !target.approved) {
+        return { ok: true };
       }
       await ctx.db
         .insert(connectionRequest)
@@ -275,45 +311,51 @@ export const userRouter = createTRPCRouter({
       response: z.enum(["accepted", "refused"]),
     }))
     .mutation(async ({ ctx, input }) => {
-      const req = await ctx.db.query.connectionRequest.findFirst({
-        where: and(
-          eq(connectionRequest.id, input.requestId),
-          eq(connectionRequest.toUserId, ctx.user.id),
-          eq(connectionRequest.status, "pending")
-        ),
-        with: { fromUser: { columns: { id: true, role: true } } },
-      });
-      if (!req) throw new TRPCError({ code: "NOT_FOUND" });
+      return ctx.db.transaction(async (tx) => {
+        const req = await tx.query.connectionRequest.findFirst({
+          where: and(
+            eq(connectionRequest.id, input.requestId),
+            eq(connectionRequest.toUserId, ctx.user.id),
+            eq(connectionRequest.status, "pending")
+          ),
+          with: { fromUser: { columns: { id: true, role: true } } },
+        });
+        if (!req) throw new TRPCError({ code: "NOT_FOUND" });
 
-      await ctx.db
-        .update(connectionRequest)
-        .set({ status: input.response, updatedAt: new Date() })
-        .where(eq(connectionRequest.id, input.requestId));
-
-      if (input.response === "accepted") {
-        if (req.type === "link") {
+        // Validate BEFORE status mutation so failures don't leave the request "accepted"
+        // without a corresponding userLink / userFriend row.
+        if (input.response === "accepted" && req.type === "link") {
           const fromRole = (req.fromUser as any).role as string;
           const toRole = (ctx.user as any).role as string;
           const roles = new Set([fromRole, toRole]);
-          // A link must be between exactly one patient and one professional
           if (!roles.has("patient") || (!roles.has("doctor") && !roles.has("pharmacist"))) {
             throw new TRPCError({ code: "BAD_REQUEST", message: "Link requires one patient and one doctor or pharmacist" });
           }
-          const [patientId, professionalId] = fromRole === "patient"
-            ? [req.fromUserId, ctx.user.id]
-            : [ctx.user.id, req.fromUserId];
-          await ctx.db.insert(userLink).values({ patientId, professionalId, linkType: req.linkType ?? "doctor" }).onConflictDoNothing();
-        } else {
-          // type === "friend" — mutual
-          await ctx.db.insert(userFriend)
-            .values([
-              { userId: req.fromUserId, friendId: ctx.user.id },
-              { userId: ctx.user.id,    friendId: req.fromUserId },
-            ])
-            .onConflictDoNothing();
         }
-      }
-      return { ok: true };
+
+        await tx
+          .update(connectionRequest)
+          .set({ status: input.response, updatedAt: new Date() })
+          .where(eq(connectionRequest.id, input.requestId));
+
+        if (input.response === "accepted") {
+          if (req.type === "link") {
+            const fromRole = (req.fromUser as any).role as string;
+            const [patientId, professionalId] = fromRole === "patient"
+              ? [req.fromUserId, ctx.user.id]
+              : [ctx.user.id, req.fromUserId];
+            await tx.insert(userLink).values({ patientId, professionalId, linkType: req.linkType ?? "doctor" }).onConflictDoNothing();
+          } else {
+            await tx.insert(userFriend)
+              .values([
+                { userId: req.fromUserId, friendId: ctx.user.id },
+                { userId: ctx.user.id,    friendId: req.fromUserId },
+              ])
+              .onConflictDoNothing();
+          }
+        }
+        return { ok: true };
+      });
     }),
 
   cancelRequest: protectedProcedure
@@ -323,12 +365,16 @@ export const userRouter = createTRPCRouter({
       linkType: z.enum(["doctor", "wellness"]).optional().default("doctor"),
     }))
     .mutation(async ({ ctx, input }) => {
+      // Friend requests have linkType = NULL; link requests match on the specific linkType.
+      const linkTypeFilter = input.type === "friend"
+        ? isNull(connectionRequest.linkType)
+        : eq(connectionRequest.linkType, input.linkType);
       await ctx.db.delete(connectionRequest).where(
         and(
           eq(connectionRequest.fromUserId, ctx.user.id),
           eq(connectionRequest.toUserId, input.targetUserId),
           eq(connectionRequest.type, input.type),
-          eq(connectionRequest.linkType, input.linkType),
+          linkTypeFilter,
           eq(connectionRequest.status, "pending")
         )
       );
@@ -359,13 +405,15 @@ export const userRouter = createTRPCRouter({
     .input(z.object({
       key: z.string().min(1).max(100).regex(/^[a-z][a-z0-9_]*$/, "Invalid property key"),
       value: z.string().max(1000),
-      language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).default("en"),
+      language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).optional(),
     }))
     .mutation(async ({ ctx, input }) => {
-      await ctx.db
-        .update(user)
-        .set({ propertiesLanguage: input.language })
-        .where(eq(user.id, ctx.user.id));
+      if (input.language !== undefined) {
+        await ctx.db
+          .update(user)
+          .set({ propertiesLanguage: input.language })
+          .where(eq(user.id, ctx.user.id));
+      }
 
       const valueToStore = encrypt(input.value);
 
@@ -404,6 +452,7 @@ export const userRouter = createTRPCRouter({
       await ctx.db.update(user).set({ role: input.role }).where(eq(user.id, input.targetUserId));
       // Invalidate all sessions for the target user so stale role claims are not used
       await ctx.db.delete(session).where(eq(session.userId, input.targetUserId));
+      forgetPresence(input.targetUserId);
 
       void logAuditEvent(ctx.db, {
         userId: ctx.user.id,
@@ -430,6 +479,7 @@ export const userRouter = createTRPCRouter({
       if (target.role === "admin") throw new TRPCError({ code: "BAD_REQUEST", message: "User is already admin" });
       await ctx.db.update(user).set({ role: "admin" }).where(eq(user.id, input.targetUserId));
       await ctx.db.delete(session).where(eq(session.userId, input.targetUserId));
+      forgetPresence(input.targetUserId);
 
       void logAuditEvent(ctx.db, {
         userId: ctx.user.id,
@@ -514,6 +564,7 @@ export const userRouter = createTRPCRouter({
       // approves the user between our check and delete.
       const [deleted] = await ctx.db.delete(user).where(and(eq(user.id, input.targetUserId), eq(user.approved, false))).returning({ id: user.id });
       if (!deleted) throw new TRPCError({ code: "CONFLICT", message: "User was modified concurrently" });
+      forgetPresence(input.targetUserId);
 
       void logAuditEvent(ctx.db, {
         userId: ctx.user.id,

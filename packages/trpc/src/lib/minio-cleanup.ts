@@ -14,6 +14,41 @@ function getClient(): Minio.Client {
   return _client;
 }
 
+/** Best-effort deletion of every object under a prefix (e.g. "avatars/userId-"). */
+export async function deleteMinioPrefix(bucket: string, prefix: string): Promise<void> {
+  try {
+    const client = getClient();
+    const keys: string[] = [];
+    await new Promise<void>((resolve, reject) => {
+      const stream = client.listObjectsV2(bucket, prefix, true);
+      stream.on("data", (obj) => { if (obj.name) keys.push(obj.name); });
+      stream.on("end", () => resolve());
+      stream.on("error", (err) => reject(err));
+    });
+    for (const key of keys) {
+      try {
+        await client.removeObject(bucket, key);
+      } catch (err) {
+        process.stderr.write(
+          JSON.stringify({
+            level: 40,
+            time: Date.now(),
+            msg: `[minio-cleanup] failed to remove ${bucket}/${key}: ${err instanceof Error ? err.message : String(err)}`,
+          }) + "\n"
+        );
+      }
+    }
+  } catch (err) {
+    process.stderr.write(
+      JSON.stringify({
+        level: 50,
+        time: Date.now(),
+        msg: `[minio-cleanup] prefix delete failed for ${bucket}/${prefix}: ${err instanceof Error ? err.message : String(err)}`,
+      }) + "\n"
+    );
+  }
+}
+
 /** Best-effort deletion of MinIO objects. Logs failures but never throws. */
 export async function deleteMinioObjects(
   objects: { storageKey: string; storageBucket: string }[]

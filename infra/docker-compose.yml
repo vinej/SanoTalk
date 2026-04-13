@@ -141,6 +141,52 @@ services:
     networks:
       - monitoring
 
+  # ─── Loki auth proxy (nginx) ────────────────────────────────────────────
+  # Exposes only /loki/api/v1/push (+ /ready) on 127.0.0.1:3100, gated by
+  # HTTP Basic auth. The host-side SanoTalk server writes logs through this
+  # proxy. Loki itself stays on the monitoring network with no host port,
+  # so reads are unreachable from outside Docker (Grafana reaches Loki via
+  # the monitoring network, not via this proxy).
+  loki-proxy:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+      - NET_BIND_SERVICE
+    tmpfs:
+      - /tmp
+      - /var/cache/nginx
+      - /var/run
+    deploy:
+      resources:
+        limits:
+          memory: 64M
+          cpus: "0.25"
+    depends_on:
+      - loki
+    environment:
+      LOKI_USER: ${LOKI_USER:?LOKI_USER is required}
+      LOKI_PASSWORD: ${LOKI_PASSWORD:?LOKI_PASSWORD is required}
+    ports:
+      - "127.0.0.1:3100:3100"
+    volumes:
+      - ./loki-proxy/loki.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./loki-proxy/10-htpasswd.sh:/docker-entrypoint.d/10-htpasswd.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3100/ready >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - monitoring
+
   # ─── Grafana ─────────────────────────────────────────────────────────────
   grafana:
     image: grafana/grafana:11.3.0

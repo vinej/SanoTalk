@@ -130,10 +130,10 @@ export const privacyRouter = createTRPCRouter({
   getAiDataSharingConsent: protectedProcedure
     .query(async ({ ctx }) => {
       const [result] = await ctx.db
-        .select({ aiDataSharingConsent: (user as any).aiDataSharingConsent })
+        .select({ aiDataSharingConsent: user.aiDataSharingConsent })
         .from(user)
         .where(eq(user.id, ctx.user.id));
-      return { consented: (result as any)?.aiDataSharingConsent === true };
+      return { consented: result?.aiDataSharingConsent === true };
     }),
 
   /** Toggle AI data sharing consent */
@@ -142,7 +142,7 @@ export const privacyRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       await ctx.db
         .update(user)
-        .set({ aiDataSharingConsent: input.consented } as any)
+        .set({ aiDataSharingConsent: input.consented })
         .where(eq(user.id, ctx.user.id));
 
       // Record in consent history with correct type

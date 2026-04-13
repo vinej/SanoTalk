@@ -1,18 +1,28 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { LiveKitRoom, useChat, useRoomContext } from "@livekit/components-react";
+import { LiveKitRoom, useRoomContext } from "@livekit/components-react";
+import { RoomEvent } from "livekit-client";
 import { trpc } from "../../lib/trpc";
 import { ChatMessageInput } from "./chat-message-input";
-import { ScrollArea } from "../ui/scroll-area";
 import { Button } from "../ui/button";
-import { LogOut, UserPlus, Info } from "lucide-react";
-import { useAvatarUrl, getInitials } from "../../lib/avatar-url";
-import type { ReceivedChatMessage } from "@livekit/components-core";
+import { LogOut, Info } from "lucide-react";
 
 interface FriendChatPanelProps {
   roomId: string;
   currentUserId: string;
   onLeft: () => void;
+}
+
+/** Server-relayed chat payload. Shape must match
+ *  `packages/trpc/src/routers/friendChat.ts#sendMessage`. */
+interface ChatPayload {
+  type: "chat";
+  id: string;
+  senderId: string;
+  senderName: string;
+  senderAvatar: string | null;
+  message: string;
+  timestamp: number;
 }
 
 export function FriendChatPanel({ roomId, currentUserId, onLeft }: FriendChatPanelProps) {
@@ -22,12 +32,6 @@ export function FriendChatPanel({ roomId, currentUserId, onLeft }: FriendChatPan
   const leaveMutation = trpc.friendChat.leave.useMutation();
   const utils = trpc.useUtils();
 
-  // Get LiveKit token
-  const { data: tokenData } = trpc.friendChat.getToken.useMutation().isPending
-    ? { data: undefined }
-    : { data: undefined };
-
-  // Use a ref to store token data and only fetch once
   const tokenRef = useRef<{ token: string; serverUrl: string } | null>(null);
   const fetchedRef = useRef(false);
 
@@ -49,7 +53,8 @@ export function FriendChatPanel({ roomId, currentUserId, onLeft }: FriendChatPan
   const roomName = room?.name
     || room?.participants
         .filter((p) => p.userId !== currentUserId)
-        .map((p) => p.user.name)
+        .map((p) => p.user?.name)
+        .filter(Boolean)
         .join(", ")
     || t("title");
 
@@ -63,7 +68,6 @@ export function FriendChatPanel({ roomId, currentUserId, onLeft }: FriendChatPan
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
       <div className="flex items-center justify-between border-b px-4 py-2.5 bg-card shrink-0">
         <div className="min-w-0">
           <h2 className="text-sm font-semibold truncate">{roomName}</h2>
@@ -79,13 +83,11 @@ export function FriendChatPanel({ roomId, currentUserId, onLeft }: FriendChatPan
         </div>
       </div>
 
-      {/* Ephemeral notice */}
       <div className="flex items-center gap-2 px-4 py-1.5 bg-amber-50 dark:bg-amber-950/30 border-b text-xs text-amber-700 dark:text-amber-400">
         <Info className="h-3 w-3 shrink-0" />
         {t("ephemeralNotice")}
       </div>
 
-      {/* LiveKit room */}
       <LiveKitRoom
         token={getToken.data.token}
         serverUrl={getToken.data.serverUrl}
@@ -100,41 +102,69 @@ export function FriendChatPanel({ roomId, currentUserId, onLeft }: FriendChatPan
   );
 }
 
-/** Inner component rendered inside LiveKitRoom context. */
+/** Inner component rendered inside LiveKitRoom context. Messages travel
+ *  server → LiveKit data channel → every participant. Clients never publish
+ *  chat data directly (the token grants canPublishData=false). */
 function ChatMessages({ currentUserId, roomId }: { currentUserId: string; roomId: string }) {
   const { t } = useTranslation("chat");
-  const { chatMessages, send, isSending } = useChat();
+  const room = useRoomContext();
+  const sendMutation = trpc.friendChat.sendMessage.useMutation();
   const heartbeat = trpc.friendChat.heartbeat.useMutation();
   const scrollRef = useRef<HTMLDivElement>(null);
   const heartbeatTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  // Auto-scroll on new messages
+  const [messages, setMessages] = useState<ChatPayload[]>([]);
+
+  // Subscribe to server-relayed chat payloads. De-dupe by payload id so the
+  // sender's own message (echoed back from the server) doesn't appear twice.
+  useEffect(() => {
+    if (!room) return;
+    const decoder = new TextDecoder();
+    const onData = (bytes: Uint8Array, _p: unknown, _kind: unknown, topic?: string) => {
+      if (topic !== undefined && topic !== "chat") return;
+      try {
+        const parsed = JSON.parse(decoder.decode(bytes)) as Partial<ChatPayload>;
+        if (parsed.type !== "chat" || !parsed.id || typeof parsed.message !== "string") return;
+        setMessages((prev) => prev.some((m) => m.id === parsed.id)
+          ? prev
+          : [...prev, parsed as ChatPayload]);
+      } catch {
+        // malformed payload — ignore
+      }
+    };
+    room.on(RoomEvent.DataReceived, onData);
+    return () => { room.off(RoomEvent.DataReceived, onData); };
+  }, [room]);
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [chatMessages.length]);
+  }, [messages.length]);
 
   const handleSend = useCallback(async (message: string) => {
-    await send(message);
-    // Debounced heartbeat
+    try {
+      await sendMutation.mutateAsync({ roomId, message });
+    } catch {
+      // Toast would go here; for now swallow — the input stays filled on error.
+      return;
+    }
     if (heartbeatTimer.current) clearTimeout(heartbeatTimer.current);
     heartbeatTimer.current = setTimeout(() => {
       heartbeat.mutate({ roomId });
     }, 5000);
-  }, [send, roomId, heartbeat]);
+  }, [sendMutation, roomId, heartbeat]);
 
   return (
     <>
-      {/* Messages */}
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
-        {chatMessages.length === 0 && (
+        {messages.length === 0 && (
           <p className="text-center text-sm text-muted-foreground mt-8">{t("noMessages")}</p>
         )}
-        {chatMessages.map((msg: ReceivedChatMessage, i: number) => {
-          const isOwn = msg.from?.identity === currentUserId;
+        {messages.map((msg) => {
+          const isOwn = msg.senderId === currentUserId;
           return (
-            <div key={msg.id ?? i} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
+            <div key={msg.id} className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
               <div className={`max-w-[75%] rounded-lg px-3 py-1.5 text-sm ${
                 isOwn
                   ? "bg-primary text-primary-foreground"
@@ -142,12 +172,12 @@ function ChatMessages({ currentUserId, roomId }: { currentUserId: string; roomId
               }`}>
                 {!isOwn && (
                   <p className="text-xs font-medium text-muted-foreground mb-0.5">
-                    {msg.from?.name ?? "Unknown"}
+                    {msg.senderName || "Unknown"}
                   </p>
                 )}
                 <p className="whitespace-pre-wrap break-words">{msg.message}</p>
                 <p className={`text-[10px] mt-0.5 ${isOwn ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                  {msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : ""}
+                  {new Date(msg.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                 </p>
               </div>
             </div>
@@ -155,8 +185,7 @@ function ChatMessages({ currentUserId, roomId }: { currentUserId: string; roomId
         })}
       </div>
 
-      {/* Input */}
-      <ChatMessageInput onSend={handleSend} disabled={isSending} />
+      <ChatMessageInput onSend={handleSend} disabled={sendMutation.isPending} />
     </>
   );
 }

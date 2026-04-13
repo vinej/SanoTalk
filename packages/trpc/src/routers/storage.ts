@@ -66,7 +66,9 @@ export const storageRouter = createTRPCRouter({
       // Note: presignedPutObject doesn't enforce Content-Type server-side.
       // Download endpoint mitigates XSS by forcing Content-Disposition: attachment.
       // MinIO should not be directly accessible from the internet.
-      const presignedUrl = await client.presignedPutObject(bucket, key, 3600);
+      // 10-minute TTL: long enough for a legitimate client+network round-trip,
+      // short enough to limit the blast radius of a leaked URL.
+      const presignedUrl = await client.presignedPutObject(bucket, key, 600);
       return { presignedUrl, key, bucket, contentType: input.contentType };
     }),
 
@@ -101,14 +103,28 @@ export const storageRouter = createTRPCRouter({
 
       const buffer = Buffer.from(input.base64, "base64");
 
-      // Validate magic bytes match declared content type
-      const magicBytes: Record<string, number[]> = {
-        "image/jpeg": [0xFF, 0xD8, 0xFF],
-        "image/png": [0x89, 0x50, 0x4E, 0x47],
-        "image/webp": [0x52, 0x49, 0x46, 0x46], // RIFF header
-      };
-      const expected = magicBytes[input.contentType];
-      if (!expected || buffer.length < expected.length || !expected.every((b, i) => buffer[i] === b)) {
+      // Validate magic bytes match declared content type.
+      // For JPEG we also require the EOI marker (FF D9) at the tail so a
+      // truncated/appended payload is rejected. For WebP we verify "WEBP"
+      // appears at bytes 8-11 (the RIFF header alone matches AVI/WAV/etc).
+      // For PNG we verify the IEND chunk near the tail.
+      const matches = (bytes: number[], at: number): boolean =>
+        buffer.length >= at + bytes.length && bytes.every((b, i) => buffer[at + i] === b);
+      let ok = false;
+      if (input.contentType === "image/jpeg") {
+        ok = matches([0xFF, 0xD8, 0xFF], 0)
+          && buffer.length >= 4
+          && buffer[buffer.length - 2] === 0xFF
+          && buffer[buffer.length - 1] === 0xD9;
+      } else if (input.contentType === "image/png") {
+        ok = matches([0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A], 0)
+          // IEND chunk: "IEND" + CRC (4 bytes) at tail
+          && matches([0x49, 0x45, 0x4E, 0x44], buffer.length - 8);
+      } else if (input.contentType === "image/webp") {
+        ok = matches([0x52, 0x49, 0x46, 0x46], 0)
+          && matches([0x57, 0x45, 0x42, 0x50], 8); // "WEBP"
+      }
+      if (!ok) {
         throw new TRPCError({ code: "BAD_REQUEST", message: "File content does not match declared type" });
       }
 

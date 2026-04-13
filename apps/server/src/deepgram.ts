@@ -99,33 +99,52 @@ export function startDeepgramWebSocket(server: Server, allowedOrigins?: string[]
     }
     wsCountByUser.set(userId, currentCount + 1);
 
-    // When a sessionId is provided, verify the user belongs to that session
-    if (sessionId) {
-      const talk = await db.query.talkSession.findFirst({
-        where: eq(talkSession.id, sessionId),
-      });
-      if (!talk) {
-        logger.warn({ sessionId, userId }, "WebSocket rejected: session not found");
-        wsCountByUser.set(userId, (wsCountByUser.get(userId) ?? 1) - 1);
-        ws.close(1008, "Session not found");
-        return;
-      }
+    // Register the decrement hook IMMEDIATELY after increment so any error path
+    // (thrown exception, early return, abrupt disconnect) releases the slot
+    // exactly once. Previously, manual decrements on error branches could race
+    // with the close-event decrement or be skipped entirely on thrown errors.
+    let released = false;
+    const releaseSlot = () => {
+      if (released) return;
+      released = true;
+      const n = (wsCountByUser.get(userId!) ?? 1) - 1;
+      if (n <= 0) wsCountByUser.delete(userId!);
+      else wsCountByUser.set(userId!, n);
+    };
+    ws.on("close", releaseSlot);
+    ws.on("error", releaseSlot);
 
-      const isHost = talk.hostId === userId;
-      if (!isHost) {
-        const participant = await db.query.sessionParticipant.findFirst({
-          where: and(
-            eq(sessionParticipant.sessionId, sessionId),
-            eq(sessionParticipant.userId, userId)
-          ),
+    try {
+      // When a sessionId is provided, verify the user belongs to that session
+      if (sessionId) {
+        const talk = await db.query.talkSession.findFirst({
+          where: eq(talkSession.id, sessionId),
         });
-        if (!participant) {
-          logger.warn({ sessionId, userId }, "WebSocket rejected: user not in session");
-          wsCountByUser.set(userId, (wsCountByUser.get(userId) ?? 1) - 1);
-          ws.close(1008, "Access denied");
+        if (!talk) {
+          logger.warn({ sessionId, userId }, "WebSocket rejected: session not found");
+          ws.close(1008, "Session not found");
           return;
         }
+
+        const isHost = talk.hostId === userId;
+        if (!isHost) {
+          const participant = await db.query.sessionParticipant.findFirst({
+            where: and(
+              eq(sessionParticipant.sessionId, sessionId),
+              eq(sessionParticipant.userId, userId)
+            ),
+          });
+          if (!participant) {
+            logger.warn({ sessionId, userId }, "WebSocket rejected: user not in session");
+            ws.close(1008, "Access denied");
+            return;
+          }
+        }
       }
+    } catch (err) {
+      logger.error({ err, userId, sessionId }, "WebSocket setup failed");
+      ws.close(1011, "Internal error");
+      return;
     }
 
     logger.info({ sessionId: sessionId ?? "general", userId }, "WebSocket authorized");
@@ -260,9 +279,6 @@ export function startDeepgramWebSocket(server: Server, allowedOrigins?: string[]
 
     ws.on("close", () => {
       dgConnection.requestClose();
-      const n = (wsCountByUser.get(userId!) ?? 1) - 1;
-      if (n <= 0) wsCountByUser.delete(userId!);
-      else wsCountByUser.set(userId!, n);
       logger.info("Transcription WS client disconnected");
     });
   });

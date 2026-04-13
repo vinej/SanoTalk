@@ -39,6 +39,9 @@ if (process.env.NODE_ENV === "production" && process.env.MINIO_ACCESS_KEY === "m
 if (process.env.NODE_ENV === "production" && process.env.BETTER_AUTH_SECRET?.includes("your-super-secret")) {
   throw new Error("Default BETTER_AUTH_SECRET detected in production — set a strong random secret");
 }
+if (process.env.NODE_ENV === "production" && !process.env.EMAIL_FROM) {
+  throw new Error("EMAIL_FROM must be set in production (DMARC/SPF will fail with the Resend default sender)");
+}
 // Terra is optional, but partial config is almost always a mistake.
 const TERRA_VARS = ["TERRA_API_KEY", "TERRA_DEV_ID", "TERRA_WEBHOOK_SECRET"] as const;
 const terraSet = TERRA_VARS.filter((k) => !!process.env[k]);
@@ -148,13 +151,19 @@ app.use(
 );
 
 // ─── Rate Limiting ─────────────────────────────────────────────────────────
+// Only disable rate limits when explicitly opted in (local dev convenience).
+// Staging and production MUST NOT set this flag.
+const disableRateLimits = process.env.DISABLE_RATE_LIMITS === "true";
+if (disableRateLimits && isProduction) {
+  throw new Error("DISABLE_RATE_LIMITS must never be set in production");
+}
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === "production" ? 100 : 500,
+  max: isProduction ? 100 : 500,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: "Too many requests, please try again later." },
-  skip: () => process.env.NODE_ENV !== "production",
+  skip: () => disableRateLimits,
 });
 
 const apiLimiter = rateLimit({
@@ -305,7 +314,7 @@ app.use(
 import { snapshotErData } from "@sanotalk/trpc/lib/er-snapshot";
 import { db, user as userTable, chatMessage, transcript, agentRun, dataRetentionPolicy, recording, talkSession } from "@sanotalk/db";
 import { eq, lte, and, sql, inArray } from "drizzle-orm";
-import { deleteMinioObjects } from "@sanotalk/trpc/lib/minio-cleanup";
+import { deleteMinioObjects, deleteMinioPrefix } from "@sanotalk/trpc/lib/minio-cleanup";
 import * as Minio from "minio";
 
 let _avatarMinio: Minio.Client | null = null;
@@ -510,6 +519,11 @@ async function purgeDeletedAccounts() {
           .where(inArray(recording.sessionId, sessions.map((s) => s.id)));
         if (recs.length > 0) void deleteMinioObjects(recs);
       }
+
+      // Remove every avatar the user has uploaded (keys are "avatars/{userId}-*").
+      // Fire-and-forget: DB deletion must proceed even if object storage is down.
+      const avatarBucket = process.env.MINIO_BUCKET ?? "sanotalk";
+      void deleteMinioPrefix(avatarBucket, `avatars/${u.id}-`);
 
       await db.delete(userTable).where(eq(userTable.id, u.id));
       logger.info({ userId: u.id }, "Account permanently deleted (Law 25)");

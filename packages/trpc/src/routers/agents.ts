@@ -48,12 +48,12 @@ async function getUserContext(db: DB, userId: string) {
   const [userRow] = await db
     .select({
       propertiesLanguage: user.propertiesLanguage,
-      aiDataSharingConsent: (user as any).aiDataSharingConsent,
+      aiDataSharingConsent: user.aiDataSharingConsent,
     })
     .from(user)
     .where(eq(user.id, userId));
 
-  const hasConsent = (userRow as any)?.aiDataSharingConsent === true;
+  const hasConsent = userRow?.aiDataSharingConsent === true;
 
   // If user hasn't consented to AI data sharing, return only language preference
   if (!hasConsent) {
