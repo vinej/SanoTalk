@@ -55,6 +55,13 @@ interface ContextExtras {
     userProperties?: UserProperty[],
     propertiesLanguage?: string
   ) => Promise<string>;
+  callGeneralChat?: (
+    history: Array<{ role: "user" | "assistant"; content: string }>,
+    userMessage: string,
+    language?: string,
+    userProperties?: UserProperty[],
+    propertiesLanguage?: string
+  ) => Promise<string>;
   callTestChat?: (
     history: Array<{ role: "user" | "assistant"; content: string }>,
     userMessage: string,
@@ -85,6 +92,7 @@ export async function createTRPCContext(opts: CreateHTTPContextOptions, extras: 
     callDrugInfoChat: extras.callDrugInfoChat ?? (async () => ""),
     callExerciseChat: extras.callExerciseChat ?? (async () => ""),
     callEatwellChat: extras.callEatwellChat ?? (async () => ""),
+    callGeneralChat: extras.callGeneralChat ?? (async () => ""),
     callTestChat: extras.callTestChat ?? (async () => ""),
     joinAiParticipant: extras.joinAiParticipant ?? (async () => {}),
     removeAiParticipant: extras.removeAiParticipant ?? (async () => {}),

@@ -167,6 +167,9 @@
     "titleEatwell": "饮食助手",
     "emptyEatwell": "询问营养、饮食或适合您健康状况的食物。",
     "placeholderEatwell": "哪些食物适合我的健康…",
+    "titleGeneral2": "通用助手",
+    "emptyGeneral2": "提出任何问题 — 专业话题请使用专门的助手。",
+    "placeholderGeneral2": "提出一般性问题…",
     "urgency": {
       "emergency": "拨打 911 — 紧急情况",
       "emergencyDesc": "您的症状可能危及生命。请立即拨打 911 或前往最近的急诊室。",

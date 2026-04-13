@@ -29,6 +29,7 @@ import { Route as AuthMedicationsRouteImport } from './routes/_auth/medications'
 import { Route as AuthKanbanRouteImport } from './routes/_auth/kanban'
 import { Route as AuthHealthHelpRouteImport } from './routes/_auth/health-help'
 import { Route as AuthGoOutsideRouteImport } from './routes/_auth/go-outside'
+import { Route as AuthGeneralAiRouteImport } from './routes/_auth/general-ai'
 import { Route as AuthFriendChatRouteImport } from './routes/_auth/friend-chat'
 import { Route as AuthExerciseAiRouteImport } from './routes/_auth/exercise-ai'
 import { Route as AuthErAlertsRouteImport } from './routes/_auth/er-alerts'
@@ -145,6 +146,11 @@ const AuthGoOutsideRoute = AuthGoOutsideRouteImport.update({
   path: '/go-outside',
   getParentRoute: () => AuthRoute,
 } as any)
+const AuthGeneralAiRoute = AuthGeneralAiRouteImport.update({
+  id: '/general-ai',
+  path: '/general-ai',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthFriendChatRoute = AuthFriendChatRouteImport.update({
   id: '/friend-chat',
   path: '/friend-chat',
@@ -248,6 +254,7 @@ export interface FileRoutesByFullPath {
   '/er-alerts': typeof AuthErAlertsRoute
   '/exercise-ai': typeof AuthExerciseAiRoute
   '/friend-chat': typeof AuthFriendChatRoute
+  '/general-ai': typeof AuthGeneralAiRoute
   '/go-outside': typeof AuthGoOutsideRoute
   '/health-help': typeof AuthHealthHelpRoute
   '/kanban': typeof AuthKanbanRoute
@@ -284,6 +291,7 @@ export interface FileRoutesByTo {
   '/er-alerts': typeof AuthErAlertsRoute
   '/exercise-ai': typeof AuthExerciseAiRoute
   '/friend-chat': typeof AuthFriendChatRoute
+  '/general-ai': typeof AuthGeneralAiRoute
   '/go-outside': typeof AuthGoOutsideRoute
   '/health-help': typeof AuthHealthHelpRoute
   '/kanban': typeof AuthKanbanRoute
@@ -323,6 +331,7 @@ export interface FileRoutesById {
   '/_auth/er-alerts': typeof AuthErAlertsRoute
   '/_auth/exercise-ai': typeof AuthExerciseAiRoute
   '/_auth/friend-chat': typeof AuthFriendChatRoute
+  '/_auth/general-ai': typeof AuthGeneralAiRoute
   '/_auth/go-outside': typeof AuthGoOutsideRoute
   '/_auth/health-help': typeof AuthHealthHelpRoute
   '/_auth/kanban': typeof AuthKanbanRoute
@@ -363,6 +372,7 @@ export interface FileRouteTypes {
     | '/er-alerts'
     | '/exercise-ai'
     | '/friend-chat'
+    | '/general-ai'
     | '/go-outside'
     | '/health-help'
     | '/kanban'
@@ -399,6 +409,7 @@ export interface FileRouteTypes {
     | '/er-alerts'
     | '/exercise-ai'
     | '/friend-chat'
+    | '/general-ai'
     | '/go-outside'
     | '/health-help'
     | '/kanban'
@@ -437,6 +448,7 @@ export interface FileRouteTypes {
     | '/_auth/er-alerts'
     | '/_auth/exercise-ai'
     | '/_auth/friend-chat'
+    | '/_auth/general-ai'
     | '/_auth/go-outside'
     | '/_auth/health-help'
     | '/_auth/kanban'
@@ -607,6 +619,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthGoOutsideRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/_auth/general-ai': {
+      id: '/_auth/general-ai'
+      path: '/general-ai'
+      fullPath: '/general-ai'
+      preLoaderRoute: typeof AuthGeneralAiRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/friend-chat': {
       id: '/_auth/friend-chat'
       path: '/friend-chat'
@@ -736,6 +755,7 @@ interface AuthRouteChildren {
   AuthErAlertsRoute: typeof AuthErAlertsRoute
   AuthExerciseAiRoute: typeof AuthExerciseAiRoute
   AuthFriendChatRoute: typeof AuthFriendChatRoute
+  AuthGeneralAiRoute: typeof AuthGeneralAiRoute
   AuthGoOutsideRoute: typeof AuthGoOutsideRoute
   AuthHealthHelpRoute: typeof AuthHealthHelpRoute
   AuthKanbanRoute: typeof AuthKanbanRoute
@@ -767,6 +787,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthErAlertsRoute: AuthErAlertsRoute,
   AuthExerciseAiRoute: AuthExerciseAiRoute,
   AuthFriendChatRoute: AuthFriendChatRoute,
+  AuthGeneralAiRoute: AuthGeneralAiRoute,
   AuthGoOutsideRoute: AuthGoOutsideRoute,
   AuthHealthHelpRoute: AuthHealthHelpRoute,
   AuthKanbanRoute: AuthKanbanRoute,

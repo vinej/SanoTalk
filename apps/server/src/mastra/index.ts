@@ -9,6 +9,7 @@ import { testChatAgent } from "./agents/test-chat.js";
 import { drugInfoChatAgent } from "./agents/drug-info-chat.js";
 import { exerciseChatAgent } from "./agents/exercise-chat.js";
 import { eatwellChatAgent } from "./agents/eatwell-chat.js";
+import { generalChatAgent } from "./agents/general-chat.js";
 import { runTestChatDocsMode, testDocsModeEnabled } from "./test-docs.js";
 import { db, agentRun, transcriptSummary, transcript, chatMessage, talkSession, userLink, user, task } from "@sanotalk/db";
 import { escapeHtml, sanitizeSubject } from "@sanotalk/trpc/lib/escape-html";
@@ -142,7 +143,7 @@ async function autoSendSummaryToLinkedProfessional(params: {
 }
 
 export const mastra = new Mastra({
-  agents: { summaryAgent, healthSummaryAgent, companionSummaryAgent, pharmacistSummaryAgent, soapNoteAgent, healthChatAgent, companionChatAgent, newsChatAgent, pharmacistChatAgent, testChatAgent, drugInfoChatAgent, exerciseChatAgent, eatwellChatAgent },
+  agents: { summaryAgent, healthSummaryAgent, companionSummaryAgent, pharmacistSummaryAgent, soapNoteAgent, healthChatAgent, companionChatAgent, newsChatAgent, pharmacistChatAgent, testChatAgent, drugInfoChatAgent, exerciseChatAgent, eatwellChatAgent, generalChatAgent },
   logger: new PinoLogger({ name: 'Mastra', level: 'info' }),
 });
 
@@ -480,6 +481,26 @@ export async function callEatwellChat(
     { role: "user" as const, content: userMessage },
   ];
   const result = await eatwellChatAgent.generate(messages as any);
+  return result.text.slice(0, MAX_CHAT_RESPONSE_LENGTH);
+}
+
+export async function callGeneralChat(
+  history: Array<{ role: "user" | "assistant"; content: string }>,
+  userMessage: string,
+  language = "en",
+  userProperties?: UserProperty[],
+  propertiesLanguage = "en"
+): Promise<string> {
+  const languageInstruction = { role: "user" as const, content: `Respond in language code "${language}". All your replies must be in that language.` };
+  const languageAck = { role: "assistant" as const, content: "Understood. I will respond in the requested language." };
+  const messages = [
+    languageInstruction,
+    languageAck,
+    ...buildPropertyContext(userProperties, propertiesLanguage),
+    ...trimHistory(history),
+    { role: "user" as const, content: userMessage },
+  ];
+  const result = await generalChatAgent.generate(messages as any);
   return result.text.slice(0, MAX_CHAT_RESPONSE_LENGTH);
 }
 

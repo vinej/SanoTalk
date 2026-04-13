@@ -831,6 +831,52 @@ export const agentsRouter = createTRPCRouter({
       return { cleared: true };
     }),
 
+  // ── General AI Assistant (minimal prompt, non-specialized) ─────────────────
+
+  generalChatHistory: protectedProcedure
+    .query(async ({ ctx }) => {
+      return decryptMessages(await ctx.db.query.chatMessage.findMany({
+        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "general_ai")),
+        orderBy: [asc(chatMessage.createdAt)],
+        limit: 500,
+      }));
+    }),
+
+  sendGeneralChatMessage: protectedProcedure
+    .input(z.object({
+      message: z.string().min(1).max(2000),
+      language: z.enum(["en", "fr", "es", "zh", "ar", "hi"]).optional(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      const pastMessages = decryptMessages(await ctx.db.query.chatMessage.findMany({
+        where: and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "general_ai")),
+        orderBy: [asc(chatMessage.createdAt)],
+        limit: 20,
+      }));
+
+      const _allowedRoles = new Set(["user", "assistant"]);
+      const history: Array<{ role: "user" | "assistant"; content: string }> = pastMessages
+        .filter((msg) => _allowedRoles.has(msg.role))
+        .map((msg) => ({ role: msg.role as "user" | "assistant", content: msg.content }));
+
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "general_ai", role: "user", content: encryptContent(input.message) ?? input.message });
+
+      const { properties: userProperties, propertiesLanguage } = await getUserContext(ctx.db, ctx.user.id);
+      const assistantText = await ctx.callGeneralChat(history, input.message, input.language ?? "en", userProperties, propertiesLanguage);
+
+      await ctx.db.insert(chatMessage).values({ userId: ctx.user.id, chatType: "general_ai", role: "assistant", content: encryptContent(assistantText) ?? assistantText });
+
+      return { message: assistantText };
+    }),
+
+  clearGeneralChat: protectedProcedure
+    .mutation(async ({ ctx }) => {
+      await ctx.db.delete(chatMessage).where(
+        and(isNull(chatMessage.sessionId), eq(chatMessage.userId, ctx.user.id), eq(chatMessage.chatType, "general_ai"))
+      );
+      return { cleared: true };
+    }),
+
   // ── Test AI Agent (admin only, no patient context) ──────────────────────────
 
   testChatHistory: protectedProcedure
@@ -986,7 +1032,7 @@ export const agentsRouter = createTRPCRouter({
     }),
 
   listSavedConversations: protectedProcedure
-    .input(z.object({ chatType: z.enum(["health", "companion", "news", "pharmacist", "drugInfo", "test", "exercise", "eatwell"]) }))
+    .input(z.object({ chatType: z.enum(["health", "companion", "news", "pharmacist", "drugInfo", "test", "exercise", "eatwell", "general_ai"]) }))
     .query(async ({ ctx, input }) => {
       if (input.chatType === "test") {
         const isAdmin = await verifyAdminFromDb(ctx.db, ctx.user.id);
@@ -1013,7 +1059,7 @@ export const agentsRouter = createTRPCRouter({
 
   saveConversation: protectedProcedure
     .input(z.object({
-      chatType: z.enum(["health", "companion", "news", "pharmacist", "drugInfo", "test", "exercise", "eatwell"]),
+      chatType: z.enum(["health", "companion", "news", "pharmacist", "drugInfo", "test", "exercise", "eatwell", "general_ai"]),
       title: z.string().min(1).max(120),
     }))
     .mutation(async ({ ctx, input }) => {
@@ -1085,7 +1131,7 @@ export const agentsRouter = createTRPCRouter({
         ),
       });
       if (!saved) throw new TRPCError({ code: "NOT_FOUND", message: "Saved conversation not found" });
-      const chatType = z.enum(["health", "companion", "news", "pharmacist", "drugInfo", "test", "exercise", "eatwell"]).parse(saved.chatType);
+      const chatType = z.enum(["health", "companion", "news", "pharmacist", "drugInfo", "test", "exercise", "eatwell", "general_ai"]).parse(saved.chatType);
       const savedMsgSchema = z.array(z.object({
         role: z.enum(["user", "assistant"]),
         content: z.string().max(30000), // Higher limit to accommodate encrypted content (hex-encoded ciphertext ~2.5x plaintext)

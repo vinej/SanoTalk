@@ -167,6 +167,9 @@
     "titleEatwell": "Eat Well Assistant",
     "emptyEatwell": "Ask about nutrition, diet, or what to eat with your conditions.",
     "placeholderEatwell": "What foods are good for my health…",
+    "titleGeneral2": "General Assistant",
+    "emptyGeneral2": "Ask anything — for specialized topics, use the dedicated assistants.",
+    "placeholderGeneral2": "Ask a general question…",
     "urgency": {
       "emergency": "Call 911 — Emergency",
       "emergencyDesc": "Your symptoms may be life-threatening. Call 911 immediately or go to the nearest emergency room.",

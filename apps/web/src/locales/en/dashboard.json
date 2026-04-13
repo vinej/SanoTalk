@@ -35,6 +35,8 @@
   "exerciseAiDesc": "Get personalized exercise advice for seniors",
   "eatWell": "Eat Well Assistant",
   "eatWellDesc": "Nutrition advice tailored to your health conditions",
+  "generalAi": "General Assistant",
+  "generalAiDesc": "Ask non-specialized questions",
   "medications": "Medications",
   "medicationsDesc": "Track prescriptions and manage your medications",
   "allergies": "Allergies & Conditions",

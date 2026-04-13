@@ -35,6 +35,8 @@
   "exerciseAiDesc": "为老年人提供个性化的运动建议",
   "eatWell": "饮食助手",
   "eatWellDesc": "根据您的健康状况提供营养建议",
+  "generalAi": "通用助手",
+  "generalAiDesc": "提出非专业问题",
   "medications": "药物管理",
   "medicationsDesc": "跟踪处方并管理您的药物",
   "allergies": "过敏与疾病",

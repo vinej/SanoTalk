@@ -98,7 +98,7 @@ function renderMessageContent(content: string, t: (key: string) => string) {
 
 // ── Variant configuration ───────────────────────────────────────────────────
 
-type ChatType = "health" | "companion" | "news" | "pharmacist" | "drugInfo" | "test" | "exercise" | "eatwell";
+type ChatType = "health" | "companion" | "news" | "pharmacist" | "drugInfo" | "test" | "exercise" | "eatwell" | "general_ai";
 
 const VARIANT_STYLE: Record<ChatType, {
   titleKey: string;
@@ -115,6 +115,7 @@ const VARIANT_STYLE: Record<ChatType, {
   test:       { titleKey: "chat.titleTest",       emptyKey: "chat.emptyTest",        placeholderKey: "chat.placeholderTest",        headerClass: "bg-gray-50 dark:bg-gray-950/30 text-gray-700 dark:text-gray-300",                      bubbleClass: "bg-gray-100 dark:bg-gray-950/30 text-foreground" },
   exercise:   { titleKey: "chat.titleExercise",   emptyKey: "chat.emptyExercise",    placeholderKey: "chat.placeholderExercise",    headerClass: "bg-muted/50 text-foreground",                                                         bubbleClass: "bg-muted text-foreground" },
   eatwell:    { titleKey: "chat.titleEatwell",    emptyKey: "chat.emptyEatwell",     placeholderKey: "chat.placeholderEatwell",     headerClass: "bg-green-50 dark:bg-green-950/30 text-green-700 dark:text-green-300",                  bubbleClass: "bg-green-50 dark:bg-green-950/30 text-foreground" },
+  general_ai: { titleKey: "chat.titleGeneral2",   emptyKey: "chat.emptyGeneral2",    placeholderKey: "chat.placeholderGeneral2",    headerClass: "bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300",                     bubbleClass: "bg-blue-50 dark:bg-blue-950/30 text-foreground" },
 };
 
 // ── Props ────────────────────────────────────────────────────────────────────
@@ -196,6 +197,9 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
   const { data: eatwellMessages = [], refetch: refetchEatwell } = trpc.agents.eatwellChatHistory.useQuery(
     undefined, { enabled: chatTypeArg === "eatwell" }
   );
+  const { data: generalMessages = [], refetch: refetchGeneral } = trpc.agents.generalChatHistory.useQuery(
+    undefined, { enabled: chatTypeArg === "general_ai" }
+  );
 
   // ── Variant hook map (queries) ────────────────────────────────────────────
   const variantQueries: Record<ChatType, { messages: typeof healthMessages; refetch: typeof refetchHealth }> = {
@@ -207,6 +211,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
     test:       { messages: testMessages,       refetch: refetchTest },
     exercise:   { messages: exerciseMessages,   refetch: refetchExercise },
     eatwell:    { messages: eatwellMessages,    refetch: refetchEatwell },
+    general_ai: { messages: generalMessages,    refetch: refetchGeneral },
   };
 
   const messages = isSessionMode ? sessionMessages : variantQueries[chatTypeArg].messages;
@@ -253,6 +258,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
   const sendTestMessage = trpc.agents.sendTestChatMessage.useMutation(onMutationSuccess);
   const sendExerciseMessage = trpc.agents.sendExerciseChatMessage.useMutation(onMutationSuccess);
   const sendEatwellMessage = trpc.agents.sendEatwellChatMessage.useMutation(onMutationSuccess);
+  const sendGeneralMessage = trpc.agents.sendGeneralChatMessage.useMutation(onMutationSuccess);
   const clearHealth = trpc.agents.clearHealthChat.useMutation(onMutationSuccess);
   const clearCompanion = trpc.agents.clearCompanionChat.useMutation(onMutationSuccess);
   const clearNews = trpc.agents.clearNewsChat.useMutation(onMutationSuccess);
@@ -261,6 +267,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
   const clearTest = trpc.agents.clearTestChat.useMutation(onMutationSuccess);
   const clearExercise = trpc.agents.clearExerciseChat.useMutation(onMutationSuccess);
   const clearEatwell = trpc.agents.clearEatwellChat.useMutation(onMutationSuccess);
+  const clearGeneral = trpc.agents.clearGeneralChat.useMutation(onMutationSuccess);
 
   // ── Variant hook map (mutations) ──────────────────────────────────────────
   const variantMutations: Record<ChatType, { send: typeof sendHealthMessage; clear: typeof clearHealth }> = {
@@ -272,6 +279,7 @@ export function AiChatPanel({ sessionId, variant = "health", pendingVoiceText, o
     test:       { send: sendTestMessage,       clear: clearTest },
     exercise:   { send: sendExerciseMessage,   clear: clearExercise },
     eatwell:    { send: sendEatwellMessage,    clear: clearEatwell },
+    general_ai: { send: sendGeneralMessage,    clear: clearGeneral },
   };
 
   const activeSend = variantMutations[chatTypeArg].send;

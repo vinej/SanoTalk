@@ -16,7 +16,7 @@ import { logger } from "./logger";
 import { startDeepgramWebSocket } from "./deepgram";
 import { terraWebhookHandler } from "./terra/webhook";
 import { runReconcilePoll, loadPollConfig } from "./terra/poll";
-import { runPendingAgents, triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat, callPharmacistChat, callDrugInfoChat, callExerciseChat, callEatwellChat, callTestChat } from "./mastra/index";
+import { runPendingAgents, triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat, callPharmacistChat, callDrugInfoChat, callExerciseChat, callEatwellChat, callGeneralChat, callTestChat } from "./mastra/index";
 import { joinAiParticipant, removeAiParticipant, removeAllAiParticipants, isAiAssistant } from "./ai-voice/index";
 import http from "http";
 import crypto from "crypto";
@@ -282,9 +282,20 @@ app.use(
   "/api/trpc",
   createExpressMiddleware({
     router: appRouter,
-    createContext: (opts) => createTRPCContext(opts, { triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat, callPharmacistChat, callDrugInfoChat, callExerciseChat, callEatwellChat, callTestChat, joinAiParticipant, removeAiParticipant, removeAllAiParticipants, isAiAssistant }),
+    createContext: (opts) => createTRPCContext(opts, { triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat, callPharmacistChat, callDrugInfoChat, callExerciseChat, callEatwellChat, callGeneralChat, callTestChat, joinAiParticipant, removeAiParticipant, removeAllAiParticipants, isAiAssistant }),
     onError({ path, error }) {
-      logger.error({ path, code: error.code }, "tRPC error");
+      logger.error(
+        {
+          path,
+          code: error.code,
+          message: error.message,
+          stack: error.stack,
+          cause: error.cause instanceof Error
+            ? { message: error.cause.message, stack: error.cause.stack, name: error.cause.name }
+            : error.cause,
+        },
+        "tRPC error"
+      );
     },
   })
 );
