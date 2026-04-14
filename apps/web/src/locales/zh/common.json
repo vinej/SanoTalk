@@ -62,6 +62,8 @@
     "submit": "登录",
     "submitting": "登录中…",
     "pendingApproval": "您的账户正在等待管理员审核。激活后将通过邮件通知您。",
+    "idleSignedOut": "由于 15 分钟无操作，您已被退出登录。请重新登录。",
+    "sessionExpired": "您的会话已过期。请重新登录。",
     "noAccount": "没有账户？",
     "signUp": "注册",
     "forgotPassword": "忘记密码？"

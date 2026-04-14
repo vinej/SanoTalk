@@ -62,6 +62,8 @@
     "submit": "Iniciar sesión",
     "submitting": "Iniciando sesión…",
     "pendingApproval": "Tu cuenta está pendiente de aprobación por un administrador. Recibirás un correo cuando esté activada.",
+    "idleSignedOut": "Sesión cerrada tras 15 minutos de inactividad. Inicia sesión nuevamente.",
+    "sessionExpired": "Tu sesión ha expirado. Inicia sesión nuevamente.",
     "noAccount": "¿No tienes una cuenta?",
     "signUp": "Registrarse",
     "forgotPassword": "¿Olvidaste tu contraseña?"

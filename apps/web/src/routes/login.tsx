@@ -17,6 +17,18 @@ function LoginPage() {
   const navigate = useNavigate();
   const { t } = useTranslation("common");
   const { t: tp } = useTranslation("privacy");
+  // Read ?reason= so an upstream sign-out (idle timeout, server-side session
+  // expiry) can explain why the user was bounced. URLSearchParams avoids
+  // needing a TanStack Router search schema for this ephemeral param.
+  const reason = typeof window !== "undefined"
+    ? new URLSearchParams(window.location.search).get("reason")
+    : null;
+  const idleNotice =
+    reason === "idle"
+      ? t("login.idleSignedOut", "Signed out after 15 minutes of inactivity. Please sign in again.")
+      : reason === "expired"
+        ? t("login.sessionExpired", "Your session has expired. Please sign in again.")
+        : null;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -72,6 +84,12 @@ function LoginPage() {
 
           <div className="bg-card border rounded-xl p-6 shadow-sm space-y-5">
             <h2 className="text-xl font-semibold">{t("login.title")}</h2>
+
+            {idleNotice && (
+              <div className="text-sm rounded-md border border-amber-300 bg-amber-50 dark:bg-amber-950/30 dark:border-amber-700 text-amber-800 dark:text-amber-200 px-3 py-2">
+                {idleNotice}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1.5">

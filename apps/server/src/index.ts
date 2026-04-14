@@ -293,6 +293,27 @@ app.use(
     router: appRouter,
     createContext: (opts) => createTRPCContext(opts, { triggerAgentRun, callHealthChat, callCompanionChat, callNewsChat, callPharmacistChat, callDrugInfoChat, callExerciseChat, callEatwellChat, callGeneralChat, callTestChat, joinAiParticipant, removeAiParticipant, removeAllAiParticipants, isAiAssistant }),
     onError({ path, error }) {
+      // Downgrade expected client-flow errors (expired session, permission
+      // denied, validation, not-found, rate-limit) to info — they're the
+      // app working correctly and would otherwise drown the error channel.
+      // Server-side faults (INTERNAL_SERVER_ERROR, TIMEOUT, anything else)
+      // stay at error level with full stack + cause.
+      const expectedCodes = new Set([
+        "UNAUTHORIZED",
+        "FORBIDDEN",
+        "BAD_REQUEST",
+        "NOT_FOUND",
+        "TOO_MANY_REQUESTS",
+        "CONFLICT",
+        "PRECONDITION_FAILED",
+      ]);
+      if (expectedCodes.has(error.code)) {
+        logger.info(
+          { path, code: error.code, message: error.message },
+          "tRPC client error"
+        );
+        return;
+      }
       logger.error(
         {
           path,

@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { trpc } from "../lib/trpc";
+import { getLastActivity, IDLE_TIMEOUT_MS } from "../lib/idle-tracker";
 
 const INTERVAL_MS = 30_000;
 
@@ -10,9 +11,13 @@ export function useHeartbeat() {
     let timer: ReturnType<typeof setInterval> | null = null;
 
     const fire = () => {
-      if (document.visibilityState === "visible") {
-        heartbeat.mutate();
-      }
+      // Skip when the tab is hidden OR the user has been idle past the
+      // session-timeout threshold. The latter prevents heartbeat from
+      // refreshing the better-auth session for an inactive user — the
+      // idle-timeout hook owns the real sign-out path.
+      if (document.visibilityState !== "visible") return;
+      if (Date.now() - getLastActivity() >= IDLE_TIMEOUT_MS) return;
+      heartbeat.mutate();
     };
 
     const start = () => {

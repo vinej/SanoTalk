@@ -62,6 +62,8 @@
     "submit": "Sign in",
     "submitting": "Signing in…",
     "pendingApproval": "Your account is pending administrator approval. You will receive an email when activated.",
+    "idleSignedOut": "Signed out after 15 minutes of inactivity. Please sign in again.",
+    "sessionExpired": "Your session has expired. Please sign in again.",
     "noAccount": "Don't have an account?",
     "signUp": "Sign up",
     "forgotPassword": "Forgot password?"

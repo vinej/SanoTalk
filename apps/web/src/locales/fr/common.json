@@ -62,6 +62,8 @@
     "submit": "Se connecter",
     "submitting": "Connexion en cours…",
     "pendingApproval": "Votre compte est en attente d'approbation par un administrateur. Vous recevrez un courriel lorsqu'il sera activé.",
+    "idleSignedOut": "Déconnecté après 15 minutes d'inactivité. Veuillez vous reconnecter.",
+    "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter.",
     "noAccount": "Vous n'avez pas de compte ?",
     "signUp": "S'inscrire",
     "forgotPassword": "Mot de passe oublié ?"

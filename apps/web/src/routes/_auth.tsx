@@ -5,6 +5,7 @@ import { hasAnalyticsConsent } from "../components/cookie-consent-banner";
 import { AppHeader } from "../components/app-header";
 import { PrivacyFooter } from "../components/privacy-footer";
 import { useHeartbeat } from "../hooks/use-heartbeat";
+import { useIdleTimeout } from "../hooks/use-idle-timeout";
 
 export const Route: any = createFileRoute("/_auth")({
   beforeLoad: async ({ location }) => {
@@ -39,6 +40,7 @@ export const Route: any = createFileRoute("/_auth")({
 
 function AuthLayout() {
   useHeartbeat();
+  useIdleTimeout();
   return (
     <div className="h-screen flex flex-col">
       <AppHeader />

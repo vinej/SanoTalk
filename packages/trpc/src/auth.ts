@@ -185,9 +185,15 @@ export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
   database: withCustomAdapter(_baseAdapter),
   session: {
-    expiresIn: 60 * 60 * 8,      // 8-hour absolute session lifetime
-    updateAge: 60 * 15,           // refresh session every 15 min of activity
-    cookieCache: { enabled: true, maxAge: 60 },  // 1 min — short window for PHI app
+    // 15-minute idle timeout: each authenticated request that's older than
+    // updateAge re-sets the cookie expiry to now+15min. After 15 minutes with
+    // no requests, the cookie expires and the next request fails auth.
+    // The client-side idle-timeout hook is the primary enforcement (it pauses
+    // the heartbeat and signs out on real input idleness). This is the
+    // server-side backstop in case the client is bypassed.
+    expiresIn: 60 * 15,           // 15-minute rolling lifetime
+    updateAge: 60 * 5,            // refresh cookie if last update >5 min ago
+    cookieCache: { enabled: true, maxAge: 30 },  // 30 s — keep server in sync with cookie state
   },
   advanced: {
     cookiePrefix: "sanotalk",
