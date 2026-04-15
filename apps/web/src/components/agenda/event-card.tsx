@@ -14,7 +14,7 @@ export interface TimelineItem {
   recurrenceRule?: string | null;
 }
 
-const TYPE_CONFIG: Record<EventType, { icon: typeof CalendarDays; color: string; bg: string; border: string }> = {
+export const TYPE_CONFIG: Record<EventType, { icon: typeof CalendarDays; color: string; bg: string; border: string }> = {
   appointment:  { icon: CalendarDays,    color: "text-blue-600",   bg: "bg-blue-50 dark:bg-blue-950/30",   border: "border-blue-200 dark:border-blue-800" },
   exercise:     { icon: Dumbbell,        color: "text-green-600",  bg: "bg-green-50 dark:bg-green-950/30",  border: "border-green-200 dark:border-green-800" },
   medication:   { icon: Pill,            color: "text-rose-600",   bg: "bg-rose-50 dark:bg-rose-950/30",   border: "border-rose-200 dark:border-rose-800" },

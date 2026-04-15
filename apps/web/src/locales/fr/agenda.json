@@ -2,6 +2,7 @@
   "title": "Agenda",
   "subtitle": "Vos rendez-vous, rappels et emploi du temps",
   "tabs": {
+    "planner": "Planificateur",
     "today": "Aujourd'hui",
     "week": "Semaine",
     "month": "Mois",
@@ -79,6 +80,10 @@
     "saved": "Disponibilité enregistrée",
     "startTime": "De",
     "endTime": "À"
+  },
+  "planner": {
+    "upcoming": "À venir",
+    "moreEvents": "+{{count}} de plus"
   },
   "calendar": {
     "monthView": "Mois",

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { ArrowLeft } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../components/ui/tabs";
 import { trpc } from "../../lib/trpc";
+import { AgendaPlannerView } from "../../components/agenda/agenda-planner-view";
 import { AgendaTodayView } from "../../components/agenda/agenda-today-view";
 import { AgendaRangeView } from "../../components/agenda/agenda-range-view";
 import { AgendaCalendarView } from "../../components/agenda/agenda-calendar-view";
@@ -35,8 +36,9 @@ function AgendaPage() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 py-6">
-        <Tabs defaultValue="today">
+        <Tabs defaultValue="planner">
           <TabsList className="mb-6 flex-wrap">
+            <TabsTrigger value="planner">{t("tabs.planner")}</TabsTrigger>
             <TabsTrigger value="today">{t("tabs.today")}</TabsTrigger>
             <TabsTrigger value="week">{t("tabs.week")}</TabsTrigger>
             <TabsTrigger value="month">{t("tabs.month")}</TabsTrigger>
@@ -46,6 +48,10 @@ function AgendaPage() {
               <TabsTrigger value="availability">{t("tabs.availability")}</TabsTrigger>
             )}
           </TabsList>
+
+          <TabsContent value="planner">
+            <AgendaPlannerView />
+          </TabsContent>
 
           <TabsContent value="today">
             <AgendaTodayView />

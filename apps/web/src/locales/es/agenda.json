@@ -2,6 +2,7 @@
   "title": "Agenda",
   "subtitle": "Tus citas, recordatorios y horario",
   "tabs": {
+    "planner": "Planificador",
     "today": "Hoy",
     "week": "Semana",
     "month": "Mes",
@@ -79,6 +80,10 @@
     "saved": "Disponibilidad guardada",
     "startTime": "Desde",
     "endTime": "Hasta"
+  },
+  "planner": {
+    "upcoming": "Próximos",
+    "moreEvents": "+{{count}} más"
   },
   "calendar": {
     "monthView": "Mes",

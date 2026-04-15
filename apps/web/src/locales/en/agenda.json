@@ -2,6 +2,7 @@
   "title": "Agenda",
   "subtitle": "Your appointments, reminders, and schedule",
   "tabs": {
+    "planner": "Planner",
     "today": "Today",
     "week": "Week",
     "month": "Month",
@@ -79,6 +80,10 @@
     "saved": "Availability saved",
     "startTime": "From",
     "endTime": "To"
+  },
+  "planner": {
+    "upcoming": "Upcoming",
+    "moreEvents": "+{{count}} more"
   },
   "calendar": {
     "monthView": "Month",

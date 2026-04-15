@@ -2,6 +2,7 @@
   "title": "एजेंडा",
   "subtitle": "आपकी अपॉइंटमेंट, दवा अनुस्मारक और शेड्यूल",
   "tabs": {
+    "planner": "योजनाकार",
     "today": "आज",
     "week": "सप्ताह",
     "month": "महीना",
@@ -79,6 +80,10 @@
     "saved": "उपलब्धता सहेजी गई",
     "startTime": "से",
     "endTime": "तक"
+  },
+  "planner": {
+    "upcoming": "आगामी",
+    "moreEvents": "+{{count}} और"
   },
   "calendar": {
     "monthView": "महीना",

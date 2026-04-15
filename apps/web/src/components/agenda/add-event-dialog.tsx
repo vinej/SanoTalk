@@ -30,9 +30,11 @@ interface AddEventDialogProps {
     eventType: CreatableEventType;
     recurrenceRule: string | null;
   };
+  /** When creating, pre-fill this date (otherwise today) */
+  defaultDate?: Date;
 }
 
-export function AddEventDialog({ open, onOpenChange, editEvent }: AddEventDialogProps) {
+export function AddEventDialog({ open, onOpenChange, editEvent, defaultDate }: AddEventDialogProps) {
   const { t } = useTranslation("agenda");
   const utils = trpc.useUtils();
 
@@ -70,15 +72,15 @@ export function AddEventDialog({ open, onOpenChange, editEvent }: AddEventDialog
       setTitle("");
       setDescription("");
       setLocation("");
-      const today = new Date();
-      setDate(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`);
+      const d = defaultDate ?? new Date();
+      setDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
       setStartTime("09:00");
       setEndTime("");
       setAllDay(false);
       setEventType("appointment");
       setRecurrence("none");
     }
-  }, [editEvent, open]);
+  }, [editEvent, defaultDate, open]);
 
   const createMutation = trpc.agenda.createEvent.useMutation({
     onSuccess: () => {

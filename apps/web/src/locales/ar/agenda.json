@@ -2,6 +2,7 @@
   "title": "الأجندة",
   "subtitle": "مواعيدك وتذكيرات الأدوية وجدولك الزمني",
   "tabs": {
+    "planner": "المخطط",
     "today": "اليوم",
     "week": "الأسبوع",
     "month": "الشهر",
@@ -79,6 +80,10 @@
     "saved": "تم حفظ التوفر",
     "startTime": "من",
     "endTime": "إلى"
+  },
+  "planner": {
+    "upcoming": "القادمة",
+    "moreEvents": "+{{count}} المزيد"
   },
   "calendar": {
     "monthView": "شهر",

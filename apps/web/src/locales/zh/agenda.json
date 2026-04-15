@@ -2,6 +2,7 @@
   "title": "日程",
   "subtitle": "您的预约、用药提醒和日程安排",
   "tabs": {
+    "planner": "计划表",
     "today": "今天",
     "week": "本周",
     "month": "本月",
@@ -79,6 +80,10 @@
     "saved": "可用时间已保存",
     "startTime": "从",
     "endTime": "到"
+  },
+  "planner": {
+    "upcoming": "即将到来",
+    "moreEvents": "+{{count}} 更多"
   },
   "calendar": {
     "monthView": "月",
