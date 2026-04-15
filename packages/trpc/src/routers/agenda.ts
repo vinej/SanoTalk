@@ -222,6 +222,7 @@ export const agendaRouter = createTRPCRouter({
           title: decryptContent(e.title) ?? e.title,
           subtitle: decryptContent(e.description) ?? null,
           id: e.id,
+          recurrenceRule: e.recurrenceRule as string | null,
         }));
 
       // 2. Medication reminders
@@ -262,6 +263,7 @@ export const agendaRouter = createTRPCRouter({
           title: decryptContent(m.medName) ?? m.medName,
           subtitle: [decryptContent(m.medDosage), decryptContent(m.label)].filter(Boolean).join(" — ") || null,
           id: m.scheduleId,
+          recurrenceRule: null as string | null,
         }));
 
       // Merge and sort by time (derive HH:MM for sorting)

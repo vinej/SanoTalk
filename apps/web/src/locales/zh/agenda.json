@@ -25,7 +25,9 @@
     "other": "其他",
     "editEvent": "编辑事件",
     "deleteEvent": "删除事件",
+    "deleteAll": "删除所有重复",
     "deleteConfirm": "确定要删除此事件吗？",
+    "deleteRecurringConfirm": "这将删除此重复事件的所有实例。是否继续？",
     "deleted": "事件已删除",
     "created": "事件已创建",
     "updated": "事件已更新"

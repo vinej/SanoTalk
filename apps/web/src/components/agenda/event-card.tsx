@@ -11,6 +11,7 @@ export interface TimelineItem {
   title: string;
   subtitle: string | null;
   id: string;
+  recurrenceRule?: string | null;
 }
 
 const TYPE_CONFIG: Record<EventType, { icon: typeof CalendarDays; color: string; bg: string; border: string }> = {

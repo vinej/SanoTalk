@@ -85,13 +85,14 @@ export function AgendaRangeView({ mode }: AgendaRangeViewProps) {
       endAt: null,
       allDay: false,
       eventType: item.type as CreatableEventType,
-      recurrenceRule: null,
+      recurrenceRule: item.recurrenceRule ?? null,
     });
   }
 
   function handleDelete(item: TimelineItem) {
     if (item.type === "medication") return;
-    if (confirm(t("event.deleteConfirm"))) {
+    const msg = item.recurrenceRule ? t("event.deleteRecurringConfirm") : t("event.deleteConfirm");
+    if (confirm(msg)) {
       deleteMutation.mutate({ id: item.id });
     }
   }
@@ -137,6 +138,7 @@ export function AgendaRangeView({ mode }: AgendaRangeViewProps) {
           title: e.title,
           subtitle: e.description ?? null,
           id: e.id,
+          recurrenceRule: e.recurrenceRule,
         }));
 
         return (

@@ -53,7 +53,7 @@ export function AgendaCalendarView() {
       endAt: null,
       allDay: false,
       eventType: item.type as CreatableEventType,
-      recurrenceRule: null,
+      recurrenceRule: item.recurrenceRule ?? null,
     });
   }
 

@@ -32,6 +32,7 @@ export function DayDetailPanel({ date, onEditEvent }: DayDetailPanelProps) {
     title: e.title,
     subtitle: e.description ?? null,
     id: e.id,
+    recurrenceRule: e.recurrenceRule,
   }));
 
   const medItems: TimelineItem[] = (medReminders ?? []).map((m) => ({

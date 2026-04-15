@@ -25,7 +25,9 @@
     "other": "Other",
     "editEvent": "Edit Event",
     "deleteEvent": "Delete Event",
+    "deleteAll": "Delete all occurrences",
     "deleteConfirm": "Are you sure you want to delete this event?",
+    "deleteRecurringConfirm": "This will delete ALL occurrences of this recurring event. Continue?",
     "deleted": "Event deleted",
     "created": "Event created",
     "updated": "Event updated"

@@ -43,7 +43,7 @@ export function AgendaTodayView() {
       };
     }
     return { ...item, time: item.time ?? "00:00" };
-  });
+  }) as TimelineItem[];
 
   const upcomingItems = items.filter((item) => item.time >= currentTime);
   const pastItems = items.filter((item) => item.time < currentTime);
@@ -62,13 +62,14 @@ export function AgendaTodayView() {
       endAt: null,
       allDay: false,
       eventType: item.type as CreatableEventType,
-      recurrenceRule: null,
+      recurrenceRule: item.recurrenceRule ?? null,
     });
   }
 
   function handleDelete(item: TimelineItem) {
     if (item.type === "medication") return;
-    if (confirm(t("event.deleteConfirm"))) {
+    const msg = item.recurrenceRule ? t("event.deleteRecurringConfirm") : t("event.deleteConfirm");
+    if (confirm(msg)) {
       deleteMutation.mutate({ id: item.id });
     }
   }

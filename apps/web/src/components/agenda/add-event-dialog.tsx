@@ -96,6 +96,23 @@ export function AddEventDialog({ open, onOpenChange, editEvent }: AddEventDialog
     },
   });
 
+  const deleteMutation = trpc.agenda.deleteEvent.useMutation({
+    onSuccess: () => {
+      utils.agenda.invalidate();
+      onOpenChange(false);
+      toast.success(t("event.deleted"));
+    },
+  });
+
+  function handleDelete() {
+    if (!editEvent) return;
+    const isRecurring = !!editEvent.recurrenceRule;
+    const msg = isRecurring ? t("event.deleteRecurringConfirm") : t("event.deleteConfirm");
+    if (confirm(msg)) {
+      deleteMutation.mutate({ id: editEvent.id });
+    }
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!title.trim() || !date) return;
@@ -135,7 +152,7 @@ export function AddEventDialog({ open, onOpenChange, editEvent }: AddEventDialog
     }
   }
 
-  const isLoading = createMutation.isPending || updateMutation.isPending;
+  const isLoading = createMutation.isPending || updateMutation.isPending || deleteMutation.isPending;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -237,13 +254,27 @@ export function AddEventDialog({ open, onOpenChange, editEvent }: AddEventDialog
             />
           </div>
 
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              {t("form.cancel")}
-            </Button>
-            <Button type="submit" disabled={isLoading || !title.trim()}>
-              {t("form.save")}
-            </Button>
+          <DialogFooter className="sm:justify-between gap-2">
+            {editEvent ? (
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={handleDelete}
+                disabled={isLoading}
+              >
+                {editEvent.recurrenceRule ? t("event.deleteAll") : t("event.deleteEvent")}
+              </Button>
+            ) : (
+              <span />
+            )}
+            <div className="flex gap-2">
+              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                {t("form.cancel")}
+              </Button>
+              <Button type="submit" disabled={isLoading || !title.trim()}>
+                {t("form.save")}
+              </Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>
