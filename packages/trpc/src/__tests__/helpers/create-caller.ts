@@ -14,6 +14,7 @@ export const mockUser = {
   email: "test@example.com",
   role: "doctor",
   emailVerified: true,
+  approved: true,
   image: null,
   twoFactorEnabled: null,
   specialty: null,
@@ -47,6 +48,18 @@ function baseCtx(db: MockDb): TRPCContext {
     user: null,
     triggerAgentRun: vi.fn(),
     callHealthChat: vi.fn().mockResolvedValue(""),
+    callCompanionChat: vi.fn().mockResolvedValue(""),
+    callNewsChat: vi.fn().mockResolvedValue(""),
+    callPharmacistChat: vi.fn().mockResolvedValue(""),
+    callDrugInfoChat: vi.fn().mockResolvedValue(""),
+    callExerciseChat: vi.fn().mockResolvedValue(""),
+    callEatwellChat: vi.fn().mockResolvedValue(""),
+    callGeneralChat: vi.fn().mockResolvedValue(""),
+    callTestChat: vi.fn().mockResolvedValue(""),
+    joinAiParticipant: vi.fn().mockResolvedValue(undefined),
+    removeAiParticipant: vi.fn().mockResolvedValue(undefined),
+    removeAllAiParticipants: vi.fn().mockResolvedValue(undefined),
+    isAiAssistant: vi.fn().mockResolvedValue(false),
   };
 }
 

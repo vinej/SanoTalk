@@ -38,8 +38,10 @@ describe("user.profile", () => {
 // ── user.listByRole ───────────────────────────────────────────────────────────
 
 describe("user.listByRole", () => {
-  it("returns doctors when role is doctor", async () => {
+  it("returns doctors when role is doctor (admin path)", async () => {
     const db = createMockDb();
+    // verifyAdminFromDb re-reads the user's role from DB — admins bypass the related-users filter.
+    db.query.user.findFirst.mockResolvedValue({ role: "admin" });
     const doctors = [
       { id: OTHER_ID, name: "Dr. Smith", email: "smith@example.com", specialty: "Cardiology", licenseNumber: "123" },
     ];
@@ -52,8 +54,9 @@ describe("user.listByRole", () => {
     expect(result[0]).toMatchObject({ name: "Dr. Smith" });
   });
 
-  it("returns pharmacists when role is pharmacist", async () => {
+  it("returns pharmacists when role is pharmacist (admin path)", async () => {
     const db = createMockDb();
+    db.query.user.findFirst.mockResolvedValue({ role: "admin" });
     db.query.user.findMany.mockResolvedValue([]);
 
     const caller = createAuthedCaller(db);
@@ -61,6 +64,16 @@ describe("user.listByRole", () => {
 
     expect(result).toEqual([]);
     expect(db.query.user.findMany).toHaveBeenCalledOnce();
+  });
+
+  it("returns empty array for non-admin with no related users", async () => {
+    const db = createMockDb();
+    // Non-admin path: getRelatedUserIds queries userLink/userFriend/connectionRequest —
+    // mock chain resolves to [] by default, so relatedIds is empty and router short-circuits.
+    const caller = createAuthedCaller(db);
+    const result = await caller.user.listByRole({ role: "doctor" });
+
+    expect(result).toEqual([]);
   });
 
   it("throws UNAUTHORIZED when not authenticated", async () => {

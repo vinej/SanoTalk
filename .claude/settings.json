@@ -15,7 +15,19 @@
       "Bash(powershell -Command \"winget list age 2>&1\")",
       "Bash(pnpm -F @sanotalk/server typecheck)",
       "Bash(pnpm --filter @sanotalk/web build)",
-      "Bash(ls c:/SanoTalk/SanoTalk/.env*)"
+      "Bash(ls c:/SanoTalk/SanoTalk/.env*)",
+      "Read(//c/SanoTalk/**)",
+      "Bash(mkdir -p c:/SanoTalk/create-stack-app)",
+      "Bash(node scripts/smoke.mjs)",
+      "Bash(pnpm --filter @sanotalk/trpc exec tsc -b --force)"
+    ],
+    "additionalDirectories": [
+      "c:\\SanoTalk\\create-stack-app",
+      "c:\\SanoTalk\\finatalk\\apps\\web\\src\\routes",
+      "c:\\SanoTalk\\finatalk\\apps\\web\\src\\locales\\en",
+      "c:\\SanoTalk\\finatalk\\apps\\web\\src\\locales\\fr",
+      "c:\\SanoTalk\\finatalk\\apps\\web\\src\\styles",
+      "c:\\SanoTalk\\finatalk\\apps\\web\\src\\components"
     ]
   }
 }

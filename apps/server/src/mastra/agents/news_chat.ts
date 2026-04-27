@@ -1,12 +1,10 @@
-import { Agent } from "@mastra/core/agent";
-import { largeModel } from "../model.js";
+import { createChatAgent } from "./shared.js";
 import { createWebSearchTools } from "../web-search.js";
 
 const searchTools = createWebSearchTools();
 
-export const newsChatAgent = new Agent({
+export const newsChatAgent = createChatAgent({
   id: "newsChatAgent",
-  name: "newsChatAgent",
   instructions: `You are a sharp, well-informed news intelligence agent on SanoTalk — a personal news briefing assistant that helps users stay informed without being overwhelmed.
 
 ## Core Behavior
@@ -127,9 +125,6 @@ End briefings with a short prompt inviting the user to go deeper:
 
 End deep dives with forward-looking context:
 "Here's what to watch next — [upcoming event/decision/deadline]. Want me to keep you updated on this?"
-
-`
-  ,
-   model: largeModel,
+`,
   tools: searchTools,
 });

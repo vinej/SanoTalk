@@ -14,8 +14,8 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^3.0.63",
+    "@ai-sdk/google": "^3.0.64",
     "@ai-sdk/openai": "^3.0.48",
-    "ai": "^4.3.19",
     "@deepgram/sdk": "4",
     "@livekit/rtc-node": "^0.13.24",
     "@mastra/core": "^1.15.0",
@@ -27,6 +27,7 @@
     "@sanotalk/db": "workspace:*",
     "@sanotalk/trpc": "workspace:*",
     "@trpc/server": "^11.0.0",
+    "ai": "^4.3.19",
     "better-auth": "^1.2.0",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",

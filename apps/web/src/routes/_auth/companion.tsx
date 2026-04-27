@@ -1,26 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useTranslation } from "react-i18next";
-import { ArrowLeft } from "lucide-react";
-import { AiChatPanel } from "../../components/chat/ai-chat-panel";
-import { AiTransparencyNotice } from "../../components/ai-transparency-notice";
+import { createFileRoute } from "@tanstack/react-router";
+import { AiChatScreen } from "../../components/chat/ai-chat-screen";
 
 export const Route = createFileRoute("/_auth/companion")({
-  component: CompanionPage,
+  component: () => <AiChatScreen variant="companion" />,
 });
-
-function CompanionPage() {
-  const { t } = useTranslation("common");
-  return (
-    <div className="flex-1 min-h-0 p-4 flex flex-col gap-2">
-      <Link
-        to="/dashboard"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        {t("backToDashboard")}
-      </Link>
-      <AiTransparencyNotice />
-      <AiChatPanel variant="companion" />
-    </div>
-  );
-}

@@ -191,14 +191,16 @@ describe("sessions.rename", () => {
     ).rejects.toMatchObject({ code: "NOT_FOUND" });
   });
 
-  it("throws FORBIDDEN when user is not the host", async () => {
+  it("throws NOT_FOUND when user is not the host (atomic host check)", async () => {
+    // The router's UPDATE WHERE clause filters on hostId — non-host mutations
+    // return 0 rows and surface as NOT_FOUND to avoid session-ID enumeration.
     const db = createMockDb();
-    db.query.talkSession.findFirst.mockResolvedValue(makeSession({ hostId: OTHER_USER_ID }));
+    db._chain.returning.mockResolvedValue([]);
 
     const caller = createAuthedCaller(db);
     await expect(
       caller.sessions.rename({ id: SESSION_ID, title: "New Title" })
-    ).rejects.toMatchObject({ code: "FORBIDDEN" });
+    ).rejects.toMatchObject({ code: "NOT_FOUND" });
   });
 });
 
@@ -228,13 +230,13 @@ describe("sessions.start", () => {
     });
   });
 
-  it("throws FORBIDDEN when user is not the host", async () => {
+  it("throws NOT_FOUND when user is not the host (atomic host check)", async () => {
     const db = createMockDb();
-    db.query.talkSession.findFirst.mockResolvedValue(makeSession({ hostId: OTHER_USER_ID }));
+    db._chain.returning.mockResolvedValue([]);
 
     const caller = createAuthedCaller(db);
     await expect(caller.sessions.start({ id: SESSION_ID })).rejects.toMatchObject({
-      code: "FORBIDDEN",
+      code: "NOT_FOUND",
     });
   });
 });
@@ -265,13 +267,13 @@ describe("sessions.end", () => {
     });
   });
 
-  it("throws FORBIDDEN when user is not the host", async () => {
+  it("throws NOT_FOUND when user is not the host (atomic host check)", async () => {
     const db = createMockDb();
-    db.query.talkSession.findFirst.mockResolvedValue(makeSession({ hostId: OTHER_USER_ID }));
+    db._chain.returning.mockResolvedValue([]);
 
     const caller = createAuthedCaller(db);
     await expect(caller.sessions.end({ id: SESSION_ID })).rejects.toMatchObject({
-      code: "FORBIDDEN",
+      code: "NOT_FOUND",
     });
   });
 });
@@ -281,7 +283,9 @@ describe("sessions.end", () => {
 describe("sessions.delete", () => {
   it("deletes session when user is the host", async () => {
     const db = createMockDb();
-    db.query.talkSession.findFirst.mockResolvedValue(makeSession());
+    // Router: select(recording)...where() → [] (chain thenable default);
+    // then delete(talkSession)...returning() → must return a non-empty row to confirm deletion.
+    db._chain.returning.mockResolvedValue([{ id: SESSION_ID }]);
 
     const caller = createAuthedCaller(db);
     await caller.sessions.delete({ id: SESSION_ID });
@@ -299,13 +303,12 @@ describe("sessions.delete", () => {
     });
   });
 
-  it("throws FORBIDDEN when user is not the host", async () => {
+  it("throws NOT_FOUND when user is not the host (atomic host check)", async () => {
     const db = createMockDb();
-    db.query.talkSession.findFirst.mockResolvedValue(makeSession({ hostId: OTHER_USER_ID }));
-
+    // Default: chain resolves to [] → no rows deleted → NOT_FOUND.
     const caller = createAuthedCaller(db);
     await expect(caller.sessions.delete({ id: SESSION_ID })).rejects.toMatchObject({
-      code: "FORBIDDEN",
+      code: "NOT_FOUND",
     });
   });
 

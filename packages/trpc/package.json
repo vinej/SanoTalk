@@ -10,7 +10,8 @@
     "./lib/er-snapshot": "./src/lib/er-snapshot.ts",
     "./lib/minio-cleanup": "./src/lib/minio-cleanup.ts",
     "./lib/escape-html": "./src/lib/escape-html.ts",
-    "./lib/crypto": "./src/lib/crypto.ts"
+    "./lib/crypto": "./src/lib/crypto.ts",
+    "./lib/summary-email": "./src/lib/summary-email.ts"
   },
   "scripts": {
     "build": "tsc",

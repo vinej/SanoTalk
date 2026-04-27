@@ -1,9 +1,8 @@
 import { useMemo } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { ArrowLeft, ShieldCheck } from "lucide-react";
-import { AiChatPanel } from "../../components/chat/ai-chat-panel";
-import { AiTransparencyNotice } from "../../components/ai-transparency-notice";
+import { ShieldCheck } from "lucide-react";
+import { AiChatScreen } from "../../components/chat/ai-chat-screen";
 
 export const Route = createFileRoute("/_auth/drug-info")({
   component: DrugInfoPage,
@@ -23,15 +22,7 @@ function DrugInfoPage() {
   }, [t]);
 
   return (
-    <div className="flex-1 min-h-0 p-4 flex flex-col gap-2">
-      <Link
-        to="/dashboard"
-        className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        {t("common:backToDashboard")}
-      </Link>
-
+    <AiChatScreen variant="drugInfo">
       <details className="rounded-lg border bg-blue-50 dark:bg-blue-950/20 px-4 py-3 shrink-0">
         <summary className="flex items-center gap-2 text-sm font-medium cursor-pointer select-none">
           <ShieldCheck className="h-4 w-4 text-blue-600 shrink-0" />
@@ -54,9 +45,6 @@ function DrugInfoPage() {
           </a>
         </p>
       </details>
-
-      <AiTransparencyNotice />
-      <AiChatPanel variant="drugInfo" />
-    </div>
+    </AiChatScreen>
   );
 }

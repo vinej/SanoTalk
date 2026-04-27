@@ -4,15 +4,17 @@ import { logger } from "../logger.js";
 import { testChatAgent } from "./agents/test-chat.js";
 
 // --- caps ------------------------------------------------------------------
-// Step 2 (title filter): prompt holds only filenames (cheap).
-// Step 3 (summary router): prompt holds up to TOP_CANDIDATES_LIMIT summaries.
-// Step 4 (reader): prompt holds ONE original file.
+// 3-step pipeline: title filter → summary router → reader
+//   • title filter: prompt holds only filenames (cheap)
+//   • summary router: prompt holds up to TOP_CANDIDATES_LIMIT summaries
+//   • reader: prompt holds ONE original file
+// 2-step pipeline: summary router (ALL summaries) → reader
 const MAX_FILES = 200;               // upper bound on original .md files
 const MAX_CHARS_PER_FILE = 200_000;  // ~50K tokens — largest file in user's set is ~86K chars
 const MAX_CHARS_PER_SUMMARY = 2_000; // ~500 tokens per summary
 const READER_HISTORY_CHARS = 30_000; // ~7.5K tokens of chat history in reader call
 const MAX_RESPONSE_CHARS = 4_000;    // response length cap for summary/router/reader
-const TOP_CANDIDATES_LIMIT = 3;      // titles → top N short-list before the summary router
+const TOP_CANDIDATES_LIMIT = 4;      // 3-step: titles → top N short-list before the summary router
 
 const SUMMARY_PREFIX = "summary_";
 
@@ -25,8 +27,14 @@ export const testDocsModeEnabled: boolean =
 
 const resolvedPath = testDocsModeEnabled ? resolve(rawPath!) : null;
 
+// TEST_STEPS controls the router pipeline:
+//   2 → read summaries of ALL documents, pick the best, then answer.
+//   3 → pre-filter by filename to the top 4, read those summaries, pick the
+//       best, then answer. (default — cheaper on folders with many docs)
+const testSteps: 2 | 3 = process.env.TEST_STEPS?.trim() === "2" ? 2 : 3;
+
 if (testDocsModeEnabled) {
-  logger.info({ path: resolvedPath }, "[TestAgent] Docs mode ENABLED");
+  logger.info({ path: resolvedPath, steps: testSteps }, "[TestAgent] Docs mode ENABLED");
 } else if (rawMode === "true") {
   logger.warn(
     "[TestAgent] TEST_AGENT_DOCS_MODE=true but TEST_AGENT_DOCS_PATH is empty — docs mode disabled"
@@ -380,10 +388,14 @@ export async function runTestChatDocsMode(
   if (explicit) {
     logger.info({ picked: explicit }, "[TestAgent] Using explicitly referenced document");
     picked = explicit;
+  } else if (testSteps === 2) {
+    // 2-step: skip title filter, route directly over ALL document summaries
+    const files = await listMdFiles(resolvedPath);
+    const all = files.filter((f) => !isSummaryName(f.name)).map((f) => f.name);
+    picked = await selectBestFromCandidates(all, userMessage, language);
   } else {
-    // Step 2: title pre-filter → top N candidates
+    // 3-step: title pre-filter → top N → summary router
     const candidates = await selectTopCandidatesByTitle(userMessage, language);
-    // Step 3: summary router → pick 1 from candidates (generates summaries lazily)
     picked = await selectBestFromCandidates(candidates, userMessage, language);
   }
   if (!picked) {
