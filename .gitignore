@@ -42,3 +42,6 @@ coverage
 
 # Seed files (contain predictable IDs — never use in production)
 seed-*.sql
+
+# Claude Code machine-local settings (never commit)
+.claude/settings.local.json
